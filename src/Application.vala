@@ -20,27 +20,27 @@
 */
 public class IridiumApp : Gtk.Application {
 
-    public IridiumApp() {
-        Object(
+    public IridiumApp () {
+        Object (
             application_id: "com.github.avojak.iridium",
             flags: ApplicationFlags.FLAGS_NONE
         );
     }
 
-    protected override void activate() {
-        var main_window = new Gtk.ApplicationWindow(this);
+    protected override void activate () {
+        var main_window = new Gtk.ApplicationWindow (this);
         main_window.default_height = 300;
         main_window.default_width = 300;
         main_window.title = _("Iridium");
 
-        var label = new Gtk.Label(_("Hello, world!"));
+        var label = new Gtk.Label (_("Hello, world!"));
 
-        main_window.add(label);
-        main_window.show_all();
+        main_window.add (label);
+        main_window.show_all ();
     }
 
-    public static int main(string[] args) {
-        return new IridiumApp().run(args);
+    public static int main (string[] args) {
+        return new IridiumApp ().run (args);
     }
 
 }
