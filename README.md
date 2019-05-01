@@ -1,5 +1,7 @@
 # Iridium
 
+![Travis (.com)](https://img.shields.io/travis/com/avojak/iridium.svg)
+
 Iridium is a native Linux IRC client build in Vala and Gtk.
 
 ## Install from Source

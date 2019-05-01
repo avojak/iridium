@@ -9,6 +9,11 @@
   <description>
     <p>TODO</p>
   </description>
+  <screenshots>
+    <screenshot type="default">
+      <image>TODO</image>
+    </screenshot>
+  </screenshots>
   <developer_name>Andrew Vojak</developer_name>
   <url type="homepage">https://github.com/avojak/iridium</url>
 	<url type="bugtracker">https://github.com/avojak/iridium/issues</url>
