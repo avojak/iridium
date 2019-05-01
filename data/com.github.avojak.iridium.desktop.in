@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Iridium
+GenericName=IRC Client
+Comment=Friendly IRC client
+Categories=Utility;Chat;IRCClient;
+Exec=com.github.avojak.iridium
+Icon=application-default-icon
+Terminal=false
+Type=Application
+Keywords=IRC;Chat;
