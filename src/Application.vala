@@ -18,9 +18,10 @@
 *
 * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
 */
-public class IridiumApp : Gtk.Application {
 
-    public IridiumApp () {
+public class Iridium : Gtk.Application {
+
+    public Iridium () {
         Object (
             application_id: "com.github.avojak.iridium",
             flags: ApplicationFlags.FLAGS_NONE
@@ -28,19 +29,20 @@ public class IridiumApp : Gtk.Application {
     }
 
     protected override void activate () {
-        var main_window = new Gtk.ApplicationWindow (this);
-        main_window.default_height = 300;
-        main_window.default_width = 300;
-        main_window.title = _("Iridium");
-
-        var label = new Gtk.Label (_("Hello, world!"));
-
-        main_window.add (label);
+        var main_window = new MainWindow (this);
         main_window.show_all ();
+
+        var server_handler = new ServerHandler (main_window);
+        var server = "irc.freenode.net";
+        var nick = "iridium_bot";
+        var login = "iridium_bot";
+        var channel = "#irchacks";
+        server_handler.handle (server, nick, login, channel);
     }
 
     public static int main (string[] args) {
-        return new IridiumApp ().run (args);
+        var app = new Iridium ();
+        return app.run (args);
     }
 
 }

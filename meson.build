@@ -10,7 +10,9 @@ add_global_arguments('-DGETTEXT_PACKAGE="@0@"'.format(meson.project_name()), lan
 # Create a new executable, list the files we want to compile, list the dependencies we need, and install
 executable(
     meson.project_name(),
-    'src/Application.vala',
+    join_paths('src', 'Application.vala'),
+    join_paths('src', 'MainWindow.vala'),
+    join_paths('src', 'ServerHandler.vala'),
     dependencies: [
         dependency('gtk+-3.0')
     ],

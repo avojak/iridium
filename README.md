@@ -22,7 +22,13 @@ dependencies required:
 $ meson build --prefix=/usr
 $ cd build
 $ ninja
+```
+
+## Running
+
+```
 $ sudo ninja install
+$ com.github.avojak.iridium
 ```
 
 ### Updating Translations
