@@ -12,6 +12,7 @@ executable(
     meson.project_name(),
     join_paths('src', 'Application.vala'),
     join_paths('src', 'MainWindow.vala'),
+    join_paths('src', 'ServerConnection.vala'),
     join_paths('src', 'ServerHandler.vala'),
     dependencies: [
         dependency('gtk+-3.0')
