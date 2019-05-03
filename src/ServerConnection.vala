@@ -38,11 +38,11 @@ public class ServerConnection : GLib.Object {
         this.realname = realname;
     }
 
-    public void open_connection () {
-        new Thread<int> (@"Server connection [$server]", do_connect);
+    public void do_connect () {
+        new Thread<int> (@"Server connection [$server]", open_connection);
     }
 
-    private int do_connect () {
+    private int open_connection () {
         try {
             // Resolve the IP address for the server hostname
             Resolver resolver = Resolver.get_default ();

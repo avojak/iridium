@@ -37,13 +37,9 @@ public class Iridium : Gtk.Application {
         var username = "iridium_bot";
         var realname = "Iridium IRC Bot";
         var c = new ServerConnection (server, nickname, username, realname);
-        c.open_connection ();
-        /* var server_handler = new ServerHandler (main_window);
-        var server = "irc.freenode.net";
-        var nick = "iridium_bot";
-        var login = "iridium_bot";
-        var channel = "#irchacks";
-        server_handler.handle (server, nick, login, channel); */
+        c.do_connect ();
+
+        // var channel = "#irchacks";
     }
 
     public static int main (string[] args) {
