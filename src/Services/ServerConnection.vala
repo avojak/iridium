@@ -71,7 +71,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             } while (line != null && !should_exit);
         } catch (GLib.Error e) {
             stderr.printf ("Error while connecting: %s\n", e.message);
-            open_failed ();
+            open_failed (e.message);
             return 0;
         }
         return 1;
@@ -92,8 +92,8 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     }
 
     public signal void open_successful ();
-    public signal void open_failed ();
+    public signal void open_failed (string message);
     public signal void close_successful ();
-    public signal void close_failed ();
+    public signal void close_failed (string message);
 
 }

@@ -18,6 +18,7 @@ executable(
     join_paths('src', 'Services', 'ServerConnectionHandler.vala'),
     join_paths('src', 'Views', 'Welcome.vala'),
     join_paths('src', 'Widgets', 'ServerConnectionDialog.vala'),
+    join_paths('src', 'Widgets', 'ServerPanel.vala'),
     dependencies: [
         dependency('gtk+-3.0'),
         dependency('glib-2.0'),

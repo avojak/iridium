@@ -23,7 +23,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     public Iridium.Widgets.ServerConnectionDialog? connection_dialog = null;
 
-    private Gtk.TextView text_view;
+    /* private Gtk.TextView text_view; */
 
     public MainWindow (Gtk.Application application) {
         Object (
@@ -83,17 +83,19 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
         set_titlebar (header_bar);
 
-        var main_layout = new Iridium.Layouts.MainLayout (this);
+        var welcome_view = new Iridium.Views.Welcome (this);
+        var server_panel = new Iridium.Widgets.ServerPanel ();
+        var main_layout = new Iridium.Layouts.MainLayout (welcome_view, server_panel);
 
         resize (900, 600);
 
         add (main_layout);
     }
 
-    public void add_message (string message) {
+    /* public void add_message (string message) {
         Gtk.TextIter iter;
         text_view.buffer.get_end_iter (out iter);
         text_view.buffer.insert (ref iter, message, message.length);
-    }
+    } */
 
 }

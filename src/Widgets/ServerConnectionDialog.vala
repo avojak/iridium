@@ -24,6 +24,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
     public unowned Iridium.MainWindow main_window { get; construct; }
 
     private Gtk.Spinner spinner;
+    private Gtk.Label status_label;
 
     public ServerConnectionDialog (Iridium.MainWindow main_window) {
         Object (
@@ -106,7 +107,14 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         spinner = new Gtk.Spinner ();
         body.add (spinner);
 
-        // TODO: Add some feedback message in case connection fails
+        status_label = new Gtk.Label ("");
+        status_label.get_style_context ().add_class ("h4");
+        status_label.halign = Gtk.Align.CENTER;
+        status_label.valign = Gtk.Align.CENTER;
+        status_label.justify = Gtk.Justification.CENTER;
+        status_label.set_line_wrap (true);
+        status_label.margin_bottom = 10;
+        body.add (status_label);
 
         // Add action buttons
         var cancel_button = new Gtk.Button.with_label ("Cancel");
@@ -118,6 +126,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         connect_button.get_style_context ().add_class ("suggested-action");
         connect_button.clicked.connect (() => {
             spinner.start ();
+            status_label.label = "";
 
             var connection_details = new Iridium.Services.ServerConnectionDetails ();
             // TODO: Get these from the entries
@@ -131,8 +140,9 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
                 spinner.stop ();
                 close ();
             });
-            server_connection.open_failed.connect (() => {
+            server_connection.open_failed.connect ((message) => {
                 spinner.stop ();
+                status_label.label = message;
             });
         });
 

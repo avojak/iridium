@@ -21,25 +21,27 @@
 
 public class Iridium.Layouts.MainLayout : Gtk.Paned {
 
-    public unowned Iridium.MainWindow main_window { get; construct; }
+    public unowned Iridium.Views.Welcome welcome_view { get; construct; }
+    public unowned Iridium.Widgets.ServerPanel server_panel { get; construct; }
 
     private Gtk.Stack server_stack;
     private Gtk.Stack main_stack;
 
-    public MainLayout (Iridium.MainWindow main_window) {
+    public MainLayout (Iridium.Views.Welcome welcome_view, Iridium.Widgets.ServerPanel server_panel) {
         Object (
             orientation: Gtk.Orientation.HORIZONTAL,
-            main_window: main_window
+            welcome_view: welcome_view,
+            server_panel: server_panel
         );
     }
 
     construct {
         position = 240;
-        
+
         server_stack = new Gtk.Stack ();
+        server_stack.add_named (server_panel, "server_panel");
 
         main_stack = new Gtk.Stack ();
-        Iridium.Views.Welcome welcome_view = new Iridium.Views.Welcome (main_window);
         main_stack.add_named (welcome_view, "welcome");
 
         pack1 (server_stack, false, false);
