@@ -12,10 +12,15 @@ executable(
     meson.project_name(),
     join_paths('src', 'Application.vala'),
     join_paths('src', 'MainWindow.vala'),
-    join_paths('src', 'ServerConnection.vala'),
-    join_paths('src', 'ServerHandler.vala'),
+    join_paths('src', 'Layouts', 'MainLayout.vala'),
+    join_paths('src', 'Services', 'ServerConnection.vala'),
+    join_paths('src', 'Services', 'ServerHandler.vala'),
+    join_paths('src', 'Views', 'Welcome.vala'),
+    join_paths('src', 'Widgets', 'ServerConnectionDialog.vala'),
     dependencies: [
-        dependency('gtk+-3.0')
+        dependency('gtk+-3.0'),
+        dependency('glib-2.0'),
+        dependency('granite', version: '>= 0.5.1')
     ],
     install: true
 )

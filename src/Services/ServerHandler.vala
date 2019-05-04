@@ -19,12 +19,14 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class ServerHandler : GLib.Object {
+public class Iridium.Services.ServerHandler : GLib.Object {
 
-    private MainWindow main_window;
+    public unowned Iridium.MainWindow main_window { get; construct; }
 
-    public ServerHandler (MainWindow main_window) {
-        this.main_window = main_window;
+    public ServerHandler (Iridium.MainWindow main_window) {
+        Object (
+            main_window: main_window
+        );
     }
 
 }

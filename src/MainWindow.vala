@@ -19,7 +19,9 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class MainWindow : Gtk.Window {
+public class Iridium.MainWindow : Gtk.ApplicationWindow {
+
+    public Iridium.Widgets.ServerConnectionDialog? connection_dialog = null;
 
     private Gtk.TextView text_view;
 
@@ -34,7 +36,7 @@ public class MainWindow : Gtk.Window {
     }
 
     construct {
-        default_height = 600;
+        /* default_height = 600;
         default_width = 800;
 
         var header = new Gtk.HeaderBar ();
@@ -62,7 +64,13 @@ public class MainWindow : Gtk.Window {
         scrolled_window.add (text_view);
         scrolled_window.set_border_width (0);
 
-        add (scrolled_window);
+        add (scrolled_window); */
+
+        Iridium.Layouts.MainLayout main_layout = new Iridium.Layouts.MainLayout (this);
+
+        resize (900, 600);
+
+        add (main_layout);
     }
 
     public void add_message (string message) {

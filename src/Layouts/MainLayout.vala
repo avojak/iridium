@@ -19,32 +19,31 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Application : Gtk.Application {
+public class Iridium.Layouts.MainLayout : Gtk.Paned {
 
-    public Application () {
+    public unowned Iridium.MainWindow main_window { get; construct; }
+
+    private Gtk.Stack server_stack;
+    private Gtk.Stack main_stack;
+
+    public MainLayout (Iridium.MainWindow main_window) {
         Object (
-            application_id: "com.github.avojak.iridium",
-            flags: ApplicationFlags.FLAGS_NONE
+            orientation: Gtk.Orientation.HORIZONTAL,
+            main_window: main_window
         );
     }
 
-    protected override void activate () {
-        var main_window = new Iridium.MainWindow (this);
-        main_window.show_all ();
+    construct {
+        position = 240;
+        
+        server_stack = new Gtk.Stack ();
 
-        /* var server = "irc.freenode.net";
-        var nickname = "iridium_bot";
-        var username = "iridium_bot";
-        var realname = "Iridium IRC Bot";
-        var c = new Iridium.Services.ServerConnection (server, nickname, username, realname);
-        c.do_connect (); */
+        main_stack = new Gtk.Stack ();
+        Iridium.Views.Welcome welcome_view = new Iridium.Views.Welcome (main_window);
+        main_stack.add_named (welcome_view, "welcome");
 
-        // var channel = "#irchacks";
-    }
-
-    public static int main (string[] args) {
-        var app = new Iridium.Application ();
-        return app.run (args);
+        pack1 (server_stack, false, false);
+        pack2 (main_stack, true, false);
     }
 
 }

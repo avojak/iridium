@@ -19,7 +19,7 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class ServerConnection : GLib.Object {
+public class Iridium.Services.ServerConnection : GLib.Object {
 
     private const uint16 DEFAULT_PORT = 6667;
 
