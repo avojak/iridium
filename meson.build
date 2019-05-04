@@ -14,7 +14,8 @@ executable(
     join_paths('src', 'MainWindow.vala'),
     join_paths('src', 'Layouts', 'MainLayout.vala'),
     join_paths('src', 'Services', 'ServerConnection.vala'),
-    join_paths('src', 'Services', 'ServerHandler.vala'),
+    join_paths('src', 'Services', 'ServerConnectionDetails.vala'),
+    join_paths('src', 'Services', 'ServerConnectionHandler.vala'),
     join_paths('src', 'Views', 'Welcome.vala'),
     join_paths('src', 'Widgets', 'ServerConnectionDialog.vala'),
     dependencies: [

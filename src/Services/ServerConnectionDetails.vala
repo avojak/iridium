@@ -19,14 +19,13 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Services.ServerHandler : GLib.Object {
+public class Iridium.Services.ServerConnectionDetails : GLib.Object {
 
-    public unowned Iridium.MainWindow main_window { get; construct; }
+    public const uint16 DEFAULT_PORT = 6667;
 
-    public ServerHandler (Iridium.MainWindow main_window) {
-        Object (
-            main_window: main_window
-        );
-    }
+    public string server;
+    public string nickname;
+    public string username;
+    public string realname;
 
 }

@@ -22,6 +22,7 @@
 public class Iridium.Application : Gtk.Application {
 
     public static GLib.Settings settings;
+    public static Iridium.Services.ServerConnectionHandler connection_handler;
 
     public Application () {
         Object (
@@ -32,6 +33,7 @@ public class Iridium.Application : Gtk.Application {
 
     static construct {
         settings = new GLib.Settings ("com.github.avojak.iridium");
+        connection_handler = new Iridium.Services.ServerConnectionHandler ();
     }
 
     protected override void activate () {

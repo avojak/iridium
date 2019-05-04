@@ -23,6 +23,8 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
 
     public unowned Iridium.MainWindow main_window { get; construct; }
 
+    private Gtk.Spinner spinner;
+
     public ServerConnectionDialog (Iridium.MainWindow main_window) {
         Object (
             deletable: false,
@@ -101,6 +103,11 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
 
         body.add (form_grid);
 
+        spinner = new Gtk.Spinner ();
+        body.add (spinner);
+
+        // TODO: Add some feedback message in case connection fails
+
         // Add action buttons
         var cancel_button = new Gtk.Button.with_label ("Cancel");
         cancel_button.clicked.connect (() => {
@@ -110,12 +117,23 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         var connect_button = new Gtk.Button.with_label ("Connect");
         connect_button.get_style_context ().add_class ("suggested-action");
         connect_button.clicked.connect (() => {
-            var server = "irc.freenode.net";
-            var nickname = "iridium";
-            var username = "iridium";
-            var realname = "Iridium IRC Client";
-            var connection = new Iridium.Services.ServerConnection (server, nickname, username, realname);
-            connection.do_connect ();
+            spinner.start ();
+
+            var connection_details = new Iridium.Services.ServerConnectionDetails ();
+            // TODO: Get these from the entries
+            connection_details.server = "irc.freenode.net";
+            connection_details.nickname = "iridium";
+            connection_details.username = "iridium";
+            connection_details.realname = "Iridium IRC Client";
+
+            var server_connection = Iridium.Application.connection_handler.connect_to_server (connection_details);
+            server_connection.open_successful.connect (() => {
+                spinner.stop ();
+                close ();
+            });
+            server_connection.open_failed.connect (() => {
+                spinner.stop ();
+            });
         });
 
         add_action_widget (cancel_button, 0);

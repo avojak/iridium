@@ -21,29 +21,28 @@
 
 public class Iridium.Services.ServerConnection : GLib.Object {
 
-    private const uint16 DEFAULT_PORT = 6667;
-
+    public Iridium.Services.ServerConnectionDetails connection_details { get; construct; }
     private bool should_exit = false;
 
-    private string server;
-    private string nickname;
-    private string username;
-    private string realname;
-
-    public ServerConnection (string server, string nickname, string username,
-                             string realname) {
-        this.server = server;
-        this.nickname = nickname;
-        this.username = username;
-        this.realname = realname;
+    public ServerConnection (Iridium.Services.ServerConnectionDetails connection_details) {
+        Object (
+            connection_details: connection_details
+        );
     }
 
-    public void do_connect () {
-        new Thread<int> (@"Server connection [$server]", open_connection);
+    public void open () {
+        var server = connection_details.server;
+        new Thread<int> (@"Server connection [$server]", do_connect);
     }
 
-    private int open_connection () {
+    private int do_connect () {
         try {
+            var server = connection_details.server;
+            var nickname = connection_details.nickname;
+            var username = connection_details.username;
+            var realname = connection_details.realname;
+            var port = Iridium.Services.ServerConnectionDetails.DEFAULT_PORT;
+
             // Resolve the IP address for the server hostname
             Resolver resolver = Resolver.get_default ();
             List<InetAddress> addresses = resolver.lookup_by_name (server, null);
@@ -52,7 +51,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
             // Connect to the server
             SocketClient client = new SocketClient ();
-            SocketConnection connection = client.connect (new InetSocketAddress (address, DEFAULT_PORT));
+            SocketConnection connection = client.connect (new InetSocketAddress (address, port));
             print (@"Connected to $server\n");
 
             // Login to the server
@@ -72,16 +71,29 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             } while (line != null && !should_exit);
         } catch (GLib.Error e) {
             stderr.printf ("Error while connecting: %s\n", e.message);
+            open_failed ();
             return 0;
         }
         return 1;
     }
 
+    private void close () {
+        // TODO: Gracefully disconnect
+        should_exit = true;
+        close_successful ();
+    }
+
     private void handle_message (string message) {
         if (message.index_of ("004") >= 0) {
+            open_successful ();
             print ("Successfully connected. Exiting...\n");
             should_exit = true;
         }
     }
+
+    public signal void open_successful ();
+    public signal void open_failed ();
+    public signal void close_successful ();
+    public signal void close_failed ();
 
 }
