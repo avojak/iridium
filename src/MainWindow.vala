@@ -70,7 +70,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
         var mode_switch = new Granite.ModeSwitch.from_icon_name ("display-brightness-symbolic", "weather-clear-night-symbolic");
         mode_switch.primary_icon_tooltip_text = "Light background";
-        mode_switch.secondary_icon_tooltip_text = "Bark background";
+        mode_switch.secondary_icon_tooltip_text = "Dark background";
         mode_switch.valign = Gtk.Align.CENTER;
         mode_switch.bind_property ("active", gtk_settings, "gtk_application_prefer_dark_theme");
 
