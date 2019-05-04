@@ -66,7 +66,24 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
         add (scrolled_window); */
 
-        Iridium.Layouts.MainLayout main_layout = new Iridium.Layouts.MainLayout (this);
+        var gtk_settings = Gtk.Settings.get_default ();
+
+        var mode_switch = new Granite.ModeSwitch.from_icon_name ("display-brightness-symbolic", "weather-clear-night-symbolic");
+        mode_switch.primary_icon_tooltip_text = "Light background";
+        mode_switch.secondary_icon_tooltip_text = "Bark background";
+        mode_switch.valign = Gtk.Align.CENTER;
+        mode_switch.bind_property ("active", gtk_settings, "gtk_application_prefer_dark_theme");
+
+        Iridium.Application.settings.bind ("prefer-dark-style", mode_switch, "active", GLib.SettingsBindFlags.DEFAULT);
+
+        var header_bar = new Gtk.HeaderBar ();
+        header_bar.show_close_button = true;
+        header_bar.pack_end (mode_switch);
+        header_bar.pack_end (new Gtk.Separator (Gtk.Orientation.VERTICAL));
+
+        set_titlebar (header_bar);
+
+        var main_layout = new Iridium.Layouts.MainLayout (this);
 
         resize (900, 600);
 

@@ -21,11 +21,17 @@
 
 public class Iridium.Application : Gtk.Application {
 
+    public static GLib.Settings settings;
+
     public Application () {
         Object (
             application_id: "com.github.avojak.iridium",
             flags: ApplicationFlags.FLAGS_NONE
         );
+    }
+
+    static construct {
+        settings = new GLib.Settings ("com.github.avojak.iridium");
     }
 
     protected override void activate () {
