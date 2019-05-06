@@ -23,7 +23,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     public Iridium.Widgets.ServerConnectionDialog? connection_dialog = null;
 
-    /* private Gtk.TextView text_view; */
+    private Iridium.Views.Welcome welcome_view;
+    private Iridium.Widgets.ServerPanel server_panel;
+    private Iridium.Layouts.MainLayout main_layout;
 
     public MainWindow (Gtk.Application application) {
         Object (
@@ -36,36 +38,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     construct {
-        /* default_height = 600;
-        default_width = 800;
-
-        var header = new Gtk.HeaderBar ();
-        header.show_close_button = true;
-        header.has_subtitle = false;
-
-        var settings_button = new Gtk.MenuButton ();
-        settings_button.image = new Gtk.Image.from_icon_name ("open-menu", Gtk.IconSize.LARGE_TOOLBAR);
-        settings_button.tooltip_text = "Menu";
-
-        header.pack_end (settings_button);
-
-        set_titlebar (header);
-
-        var buffer = new Gtk.TextBuffer (null);
-        text_view = new Gtk.TextView.with_buffer (buffer);
-        text_view.set_wrap_mode (Gtk.WrapMode.WORD);
-        text_view.set_monospace (true);
-        text_view.set_editable (false);
-        text_view.set_cursor_visible (false);
-
-        var scrolled_window = new Gtk.ScrolledWindow (null, null);
-        scrolled_window.set_policy (Gtk.PolicyType.AUTOMATIC,
-                                    Gtk.PolicyType.AUTOMATIC);
-        scrolled_window.add (text_view);
-        scrolled_window.set_border_width (0);
-
-        add (scrolled_window); */
-
         var gtk_settings = Gtk.Settings.get_default ();
 
         var mode_switch = new Granite.ModeSwitch.from_icon_name ("display-brightness-symbolic", "weather-clear-night-symbolic");
@@ -83,19 +55,17 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
         set_titlebar (header_bar);
 
-        var welcome_view = new Iridium.Views.Welcome (this);
-        var server_panel = new Iridium.Widgets.ServerPanel ();
-        var main_layout = new Iridium.Layouts.MainLayout (welcome_view, server_panel);
+        welcome_view = new Iridium.Views.Welcome (this);
+        server_panel = new Iridium.Widgets.ServerPanel ();
+
+        main_layout = new Iridium.Layouts.MainLayout (welcome_view, server_panel);
+        add (main_layout);
 
         resize (900, 600);
-
-        add (main_layout);
     }
 
-    /* public void add_message (string message) {
-        Gtk.TextIter iter;
-        text_view.buffer.get_end_iter (out iter);
-        text_view.buffer.insert (ref iter, message, message.length);
-    } */
+    public void add_server_to_panel (string name) {
+        server_panel.add_server (name);
+    }
 
 }

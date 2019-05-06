@@ -52,10 +52,14 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         header_title.get_style_context ().add_class (Granite.STYLE_CLASS_H2_LABEL);
         header_title.halign = Gtk.Align.START;
         header_title.hexpand = true;
+        header_title.margin_end = 10;
         header_title.set_line_wrap (true);
+
+        var favorite_image = new Gtk.Image.from_icon_name ("non-starred", Gtk.IconSize.DIALOG);
 
         header_grid.attach (header_image, 0, 0, 1, 1);
         header_grid.attach (header_title, 1, 0, 1, 1);
+        header_grid.attach (favorite_image, 2, 0, 1, 1);
 
         body.add (header_grid);
 
@@ -134,10 +138,12 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
             connection_details.nickname = "iridium";
             connection_details.username = "iridium";
             connection_details.realname = "Iridium IRC Client";
+            connection_details.is_favorite = false;
 
             var server_connection = Iridium.Application.connection_handler.connect_to_server (connection_details);
             server_connection.open_successful.connect (() => {
                 spinner.stop ();
+                main_window.add_server_to_panel (connection_details.server);
                 close ();
             });
             server_connection.open_failed.connect ((message) => {

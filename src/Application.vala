@@ -40,14 +40,7 @@ public class Iridium.Application : Gtk.Application {
         var main_window = new Iridium.MainWindow (this);
         main_window.show_all ();
 
-        /* var server = "irc.freenode.net";
-        var nickname = "iridium_bot";
-        var username = "iridium_bot";
-        var realname = "Iridium IRC Bot";
-        var c = new Iridium.Services.ServerConnection (server, nickname, username, realname);
-        c.do_connect (); */
-
-        // var channel = "#irchacks";
+        // TODO: Use NetworkMonitor to handle lost internet connection
     }
 
     public static int main (string[] args) {

@@ -19,14 +19,25 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Services.ServerConnectionDetails : GLib.Object {
+public class Iridium.Widgets.ServerPanelRow : Gtk.ListBoxRow {
 
-    public const uint16 DEFAULT_PORT = 6667;
+    public string text { get; construct; }
 
-    public string server;
-    public string nickname;
-    public string username;
-    public string realname;
-    public bool is_favorite;
+    public ServerPanelRow (string text) {
+        Object (
+            text: text
+        );
+    }
+
+    construct {
+        var label = new Gtk.Label (text);
+        label.xalign = 0;
+        label.get_style_context ().add_class ("h4");
+
+        var status_image = new Gtk.Image.from_icon_name ("user-offline", Gtk.IconSize.MENU);
+
+        add (status_image);
+        add (label);
+    }
 
 }

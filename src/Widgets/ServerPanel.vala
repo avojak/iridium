@@ -21,4 +21,43 @@
 
 public class Iridium.Widgets.ServerPanel : Granite.Widgets.SourceList {
 
+    private Granite.Widgets.SourceList.ExpandableItem favorites_category;
+    private Granite.Widgets.SourceList.ExpandableItem others_category;
+
+    private Granite.Widgets.SourceList.Item favorites_dummy;
+    private Granite.Widgets.SourceList.Item others_dummy;
+
+    public ServerPanel () {
+        favorites_category = new Granite.Widgets.SourceList.ExpandableItem ("Favorites");
+        favorites_dummy = new Granite.Widgets.SourceList.Item ("");
+        favorites_category.add (favorites_dummy);
+        favorites_category.child_added.connect ((item) => {
+            favorites_category.expanded = true;
+        });
+
+        others_category = new Granite.Widgets.SourceList.ExpandableItem ("Other Servers");
+        others_dummy = new Granite.Widgets.SourceList.Item ("");
+        others_category.add (others_dummy);
+        others_category.child_added.connect ((item) => {
+            others_category.expanded = true;
+        });
+
+        root.add (favorites_category);
+        root.add (others_category);
+    }
+
+    public void add_server (string name) {
+        others_dummy.visible = false;
+        var server = new Granite.Widgets.SourceList.ExpandableItem (name);
+        var icon = new GLib.ThemedIcon ("user-available");
+        server.icon = icon;
+        others_category.add (server);
+    }
+
+    public void add_channel (string server, string name) {
+
+    }
+
+    public signal void server_added ();
+
 }

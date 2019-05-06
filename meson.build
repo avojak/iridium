@@ -19,9 +19,11 @@ executable(
     join_paths('src', 'Views', 'Welcome.vala'),
     join_paths('src', 'Widgets', 'ServerConnectionDialog.vala'),
     join_paths('src', 'Widgets', 'ServerPanel.vala'),
+    join_paths('src', 'Widgets', 'ServerPanelRow.vala'),
     dependencies: [
-        dependency('gtk+-3.0'),
-        dependency('glib-2.0'),
+        dependency('gtk+-3.0', version: '>= 3.6.0'),
+        dependency('gee-0.8', version: '>= 0.8.5'),
+        dependency('glib-2.0', version: '>= 2.30.0'),
         dependency('granite', version: '>= 0.5.1')
     ],
     install: true

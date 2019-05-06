@@ -23,7 +23,11 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
 
     /* public unowned Iridium.MainWindow main_window { get; construct; } */
 
-    private List<Iridium.Services.ServerConnection> connections = new List<Iridium.Services.ServerConnection> ();
+    private Gee.Map<string, Iridium.Services.ServerConnection> connections;
+
+    public ServerConnectionHandler () {
+        connections = new Gee.HashMap<string, Iridium.Services.ServerConnection> ();
+    }
 
     /* public ServerConnectionHandler (Iridium.MainWindow main_window) {
         Object (
@@ -33,7 +37,7 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
 
     public Iridium.Services.ServerConnection connect_to_server (Iridium.Services.ServerConnectionDetails connection_details) {
         var server_connection = new Iridium.Services.ServerConnection (connection_details);
-        connections.append (server_connection);
+        connections.set (connection_details.server, server_connection);
         server_connection.open ();
         return server_connection;
     }

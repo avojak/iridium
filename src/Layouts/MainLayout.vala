@@ -21,10 +21,9 @@
 
 public class Iridium.Layouts.MainLayout : Gtk.Paned {
 
-    public unowned Iridium.Views.Welcome welcome_view { get; construct; }
+    public weak Iridium.Views.Welcome welcome_view { get; construct; }
     public unowned Iridium.Widgets.ServerPanel server_panel { get; construct; }
 
-    private Gtk.Stack server_stack;
     private Gtk.Stack main_stack;
 
     public MainLayout (Iridium.Views.Welcome welcome_view, Iridium.Widgets.ServerPanel server_panel) {
@@ -38,13 +37,10 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
     construct {
         position = 240;
 
-        server_stack = new Gtk.Stack ();
-        server_stack.add_named (server_panel, "server_panel");
-
         main_stack = new Gtk.Stack ();
         main_stack.add_named (welcome_view, "welcome");
 
-        pack1 (server_stack, false, false);
+        pack1 (server_panel, false, false);
         pack2 (main_stack, true, false);
     }
 
