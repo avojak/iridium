@@ -1,3 +1,25 @@
+icon_sizes = ['16', '24', '32', '48', '64', '128']
+
+# Install the icons
+foreach i : icon_sizes
+    install_data(
+        join_paths('assets', 'icons', i + 'x' + i, meson.project_name() + '.internet-chat-new.svg'),
+        install_dir: join_paths(get_option('datadir'), 'icons', 'hicolor', i + 'x' + i, 'actions')
+    )
+    install_data(
+        join_paths('assets', 'icons', i + 'x' + i, meson.project_name() + '.internet-chat-new.svg'),
+        install_dir: join_paths(get_option('datadir'), 'icons', 'hicolor', i + 'x' + i + '@2', 'actions')
+    )
+    install_data(
+        join_paths('assets', 'icons', i + 'x' + i, meson.project_name() + '.network-server-new.svg'),
+        install_dir: join_paths(get_option('datadir'), 'icons', 'hicolor', i + 'x' + i, 'actions')
+    )
+    install_data(
+        join_paths('assets', 'icons', i + 'x' + i, meson.project_name() + '.network-server-new.svg'),
+        install_dir: join_paths(get_option('datadir'), 'icons', 'hicolor', i + 'x' + i + '@2', 'actions')
+    )
+endforeach
+
 # Install the settings schema
 install_data(
     meson.project_name() + '.gschema.xml',

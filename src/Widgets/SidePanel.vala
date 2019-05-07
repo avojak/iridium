@@ -19,7 +19,7 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Widgets.ServerPanel : Granite.Widgets.SourceList {
+public class Iridium.Widgets.SidePanel : Granite.Widgets.SourceList {
 
     private Granite.Widgets.SourceList.ExpandableItem favorites_category;
     private Granite.Widgets.SourceList.ExpandableItem others_category;
@@ -27,15 +27,15 @@ public class Iridium.Widgets.ServerPanel : Granite.Widgets.SourceList {
     private Granite.Widgets.SourceList.Item favorites_dummy;
     private Granite.Widgets.SourceList.Item others_dummy;
 
-    public ServerPanel () {
-        favorites_category = new Granite.Widgets.SourceList.ExpandableItem ("Favorites");
+    public SidePanel () {
+        favorites_category = new Granite.Widgets.SourceList.ExpandableItem ("Favorite Channels");
         favorites_dummy = new Granite.Widgets.SourceList.Item ("");
         favorites_category.add (favorites_dummy);
         favorites_category.child_added.connect ((item) => {
             favorites_category.expanded = true;
         });
 
-        others_category = new Granite.Widgets.SourceList.ExpandableItem ("Other Servers");
+        others_category = new Granite.Widgets.SourceList.ExpandableItem ("Servers");
         others_dummy = new Granite.Widgets.SourceList.Item ("");
         others_category.add (others_dummy);
         others_category.child_added.connect ((item) => {
@@ -48,9 +48,18 @@ public class Iridium.Widgets.ServerPanel : Granite.Widgets.SourceList {
 
     public void add_server (string name) {
         others_dummy.visible = false;
+
         var server = new Granite.Widgets.SourceList.ExpandableItem (name);
         var icon = new GLib.ThemedIcon ("user-available");
         server.icon = icon;
+
+        // TEMPORARY
+        var channel = new Granite.Widgets.SourceList.Item ();
+        channel.markup = "#irchacks <small>" + name + "</small>";
+        /* channel.activatable = new GLib.ThemedIcon ("view-more-horizontal-symbolic"); */
+        server.add (channel);
+        server.expanded = true;
+
         others_category.add (server);
     }
 

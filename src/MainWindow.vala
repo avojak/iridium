@@ -24,7 +24,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     public Iridium.Widgets.ServerConnectionDialog? connection_dialog = null;
 
     private Iridium.Views.Welcome welcome_view;
-    private Iridium.Widgets.ServerPanel server_panel;
+    private Iridium.Widgets.SidePanel side_panel;
     private Iridium.Layouts.MainLayout main_layout;
 
     public MainWindow (Gtk.Application application) {
@@ -40,6 +40,13 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     construct {
         var gtk_settings = Gtk.Settings.get_default ();
 
+        var server_connect_button = new Gtk.Button.from_icon_name ("com.github.avojak.iridium.network-server-new", Gtk.IconSize.LARGE_TOOLBAR);
+        server_connect_button.tooltip_text = "Connect to a server";
+
+        var channel_join_button = new Gtk.Button.from_icon_name ("com.github.avojak.iridium.internet-chat-new", Gtk.IconSize.LARGE_TOOLBAR);
+        channel_join_button.tooltip_text = "Join a channel";
+        channel_join_button.sensitive = false;
+
         var mode_switch = new Granite.ModeSwitch.from_icon_name ("display-brightness-symbolic", "weather-clear-night-symbolic");
         mode_switch.primary_icon_tooltip_text = "Light background";
         mode_switch.secondary_icon_tooltip_text = "Dark background";
@@ -49,23 +56,26 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         Iridium.Application.settings.bind ("prefer-dark-style", mode_switch, "active", GLib.SettingsBindFlags.DEFAULT);
 
         var header_bar = new Gtk.HeaderBar ();
+        header_bar.get_style_context ().add_class ("default-decoration");
         header_bar.show_close_button = true;
+        header_bar.pack_start (server_connect_button);
+        header_bar.pack_start (channel_join_button);
         header_bar.pack_end (mode_switch);
         header_bar.pack_end (new Gtk.Separator (Gtk.Orientation.VERTICAL));
 
         set_titlebar (header_bar);
 
         welcome_view = new Iridium.Views.Welcome (this);
-        server_panel = new Iridium.Widgets.ServerPanel ();
+        side_panel = new Iridium.Widgets.SidePanel ();
 
-        main_layout = new Iridium.Layouts.MainLayout (welcome_view, server_panel);
+        main_layout = new Iridium.Layouts.MainLayout (welcome_view, side_panel);
         add (main_layout);
 
         resize (900, 600);
     }
 
     public void add_server_to_panel (string name) {
-        server_panel.add_server (name);
+        side_panel.add_server (name);
     }
 
 }
