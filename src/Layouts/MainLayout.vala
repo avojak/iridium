@@ -44,4 +44,15 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
         pack2 (main_stack, true, false);
     }
 
+    public void add_chat_view (string name) {
+        var chat_view = new Iridium.Views.ChatView (name);
+        main_stack.add_named (chat_view, name);
+        chat_view.show ();
+        main_stack.set_visible_child_full (name, Gtk.StackTransitionType.SLIDE_RIGHT);
+    }
+
+    public void show_chat_view (string name) {
+
+    }
+
 }

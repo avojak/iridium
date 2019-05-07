@@ -42,9 +42,11 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
         var server_connect_button = new Gtk.Button.from_icon_name ("com.github.avojak.iridium.network-server-new", Gtk.IconSize.LARGE_TOOLBAR);
         server_connect_button.tooltip_text = "Connect to a server";
+        // TODO: Support keyboard accelerator
 
         var channel_join_button = new Gtk.Button.from_icon_name ("com.github.avojak.iridium.internet-chat-new", Gtk.IconSize.LARGE_TOOLBAR);
         channel_join_button.tooltip_text = "Join a channel";
+        // TODO: Support keyboard accelerator
         channel_join_button.sensitive = false;
 
         var mode_switch = new Granite.ModeSwitch.from_icon_name ("display-brightness-symbolic", "weather-clear-night-symbolic");
@@ -76,6 +78,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     public void add_server_to_panel (string name) {
         side_panel.add_server (name);
+        main_layout.add_chat_view (name);
     }
 
 }
