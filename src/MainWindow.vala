@@ -41,10 +41,12 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         var gtk_settings = Gtk.Settings.get_default ();
 
         var server_connect_button = new Gtk.Button.from_icon_name ("com.github.avojak.iridium.network-server-new", Gtk.IconSize.LARGE_TOOLBAR);
+        /* var server_connect_button = new Gtk.Button.from_icon_name ("network-server", Gtk.IconSize.LARGE_TOOLBAR); */
         server_connect_button.tooltip_text = "Connect to a server";
         // TODO: Support keyboard accelerator
 
         var channel_join_button = new Gtk.Button.from_icon_name ("com.github.avojak.iridium.internet-chat-new", Gtk.IconSize.LARGE_TOOLBAR);
+        /* var channel_join_button = new Gtk.Button.from_icon_name ("internet-chat", Gtk.IconSize.LARGE_TOOLBAR); */
         channel_join_button.tooltip_text = "Join a channel";
         // TODO: Support keyboard accelerator
         channel_join_button.sensitive = false;
@@ -58,14 +60,17 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         Iridium.Application.settings.bind ("prefer-dark-style", mode_switch, "active", GLib.SettingsBindFlags.DEFAULT);
 
         var header_bar = new Gtk.HeaderBar ();
-        header_bar.get_style_context ().add_class ("default-decoration");
+        /* header_bar.get_style_context ().add_class ("default-decoration"); */
         header_bar.show_close_button = true;
         header_bar.pack_start (server_connect_button);
         header_bar.pack_start (channel_join_button);
         header_bar.pack_end (mode_switch);
         header_bar.pack_end (new Gtk.Separator (Gtk.Orientation.VERTICAL));
+        // TODO: Update the header bar for the current channel and server being viewed
 
         set_titlebar (header_bar);
+
+        // TODO: Show an info bar across the top of the window area when internet connection is lost
 
         welcome_view = new Iridium.Views.Welcome (this);
         side_panel = new Iridium.Widgets.SidePanel ();
