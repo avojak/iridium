@@ -30,7 +30,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         Object (
             deletable: false,
             resizable: false,
-            title: "Server Connection",
+            title: "Connect to a Server",
             transient_for: main_window,
             main_window: main_window
         );
@@ -52,14 +52,14 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         header_title.get_style_context ().add_class (Granite.STYLE_CLASS_H2_LABEL);
         header_title.halign = Gtk.Align.START;
         header_title.hexpand = true;
-        header_title.margin_end = 10;
+        /* header_title.margin_end = 10; */
         header_title.set_line_wrap (true);
 
-        var favorite_image = new Gtk.Image.from_icon_name ("non-starred", Gtk.IconSize.DIALOG);
+        /* var favorite_image = new Gtk.Image.from_icon_name ("non-starred", Gtk.IconSize.DIALOG); */
 
         header_grid.attach (header_image, 0, 0, 1, 1);
         header_grid.attach (header_title, 1, 0, 1, 1);
-        header_grid.attach (favorite_image, 2, 0, 1, 1);
+        /* header_grid.attach (favorite_image, 2, 0, 1, 1); */
 
         body.add (header_grid);
 

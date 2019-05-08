@@ -22,6 +22,7 @@
 public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     public Iridium.Widgets.ServerConnectionDialog? connection_dialog = null;
+    public Iridium.Widgets.ChannelJoinDialog? channel_join_dialog = null;
 
     private Iridium.Views.Welcome welcome_view;
     private Iridium.Widgets.SidePanel side_panel;
@@ -49,7 +50,17 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         /* var channel_join_button = new Gtk.Button.from_icon_name ("internet-chat", Gtk.IconSize.LARGE_TOOLBAR); */
         channel_join_button.tooltip_text = "Join a channel";
         // TODO: Support keyboard accelerator
-        channel_join_button.sensitive = false;
+        /* channel_join_button.sensitive = false; */
+        channel_join_button.clicked.connect (() => {
+            if (channel_join_dialog == null) {
+                channel_join_dialog = new Iridium.Widgets.ChannelJoinDialog (this);
+                channel_join_dialog.show_all ();
+                channel_join_dialog.destroy.connect (() => {
+                    channel_join_dialog = null;
+                });
+            }
+            channel_join_dialog.present ();
+        });
 
         var mode_switch = new Granite.ModeSwitch.from_icon_name ("display-brightness-symbolic", "weather-clear-night-symbolic");
         mode_switch.primary_icon_tooltip_text = "Light background";
