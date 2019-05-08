@@ -27,9 +27,8 @@ public class Iridium.Views.ChatView : Gtk.Grid {
         Object (
             orientation: Gtk.Orientation.VERTICAL
         );
-    }
 
-    construct {
+        // Should all this go here or in the construct block???
         text_view = new Gtk.TextView ();
         text_view.pixels_below_lines = 3;
         text_view.border_width = 12;
@@ -40,11 +39,20 @@ public class Iridium.Views.ChatView : Gtk.Grid {
         text_view.vexpand = true;
         text_view.hexpand = true;
 
+        // Initialize the buffer iterator
+        Gtk.TextIter iter;
+        text_view.get_buffer ().get_end_iter (out iter);
+
         var entry = new Gtk.Entry ();
         entry.hexpand = true;
 
         attach (text_view, 0, 0, 1, 1);
         attach (entry, 0, 1, 1, 1);
+    }
+
+    construct {
+
+
     }
 
     public Gtk.TextBuffer get_buffer () {

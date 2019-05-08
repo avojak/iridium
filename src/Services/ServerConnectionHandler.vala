@@ -42,4 +42,8 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         return server_connection;
     }
 
+    public bool has_connection (string server) {
+        return connections.has_key (server);
+    }
+
 }

@@ -51,7 +51,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         main_layout = new Iridium.Layouts.MainLayout (welcome_view, side_panel);
         add (main_layout);
 
-        resize (900, 600);
+        resize (1000, 600);
 
         // Connect to signals
         header_bar.server_connect_button_clicked.connect (() => {
@@ -70,16 +70,26 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             connection_dialog = new Iridium.Widgets.ServerConnectionDialog (this);
             connection_dialog.show_all ();
             connection_dialog.connect_button_clicked.connect ((server, nickname, username, realname) => {
+                // Prevent duplicate connections
+                if (Iridium.Application.connection_handler.has_connection (server)) {
+                    connection_dialog.display_error ("Already connected to this server!");
+                    return;
+                }
+
+                // Create the connection details
                 var connection_details = new Iridium.Services.ServerConnectionDetails ();
                 connection_details.server = server;
                 connection_details.nickname = nickname;
                 connection_details.username = username;
                 connection_details.realname = realname;
 
+                // Create the chat view, but don't show it yet! This way we can
+                // display the server messages once connection is successful
                 var chat_view = new Iridium.Views.ChatView ();
                 main_layout.add_chat_view (chat_view, server);
                 var buffer = chat_view.get_buffer ();
 
+                // Attempt the server connection
                 var server_connection = Iridium.Application.connection_handler.connect_to_server (connection_details, buffer);
                 server_connection.open_successful.connect (() => {
                     connection_dialog.dismiss ();
