@@ -30,4 +30,22 @@ public class Iridium.Views.ChatView : Gtk.Grid {
         );
     }
 
+    construct {
+        var text_view = new Gtk.TextView ();
+        text_view.pixels_below_lines = 3;
+        text_view.border_width = 12;
+        text_view.wrap_mode = Gtk.WrapMode.WORD;
+        text_view.monospace = true;
+        text_view.editable = false;
+        text_view.cursor_visible = false;
+        text_view.vexpand = true;
+        text_view.hexpand = true;
+
+        var entry = new Gtk.Entry ();
+        entry.hexpand = true;
+
+        attach (text_view, 0, 0, 1, 1);
+        attach (entry, 0, 1, 1, 1);
+    }
+
 }
