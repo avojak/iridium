@@ -27,6 +27,5 @@ public class Iridium.Services.ServerConnectionDetails : GLib.Object {
     public string nickname;
     public string username;
     public string realname;
-    public bool is_favorite;
 
 }

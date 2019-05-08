@@ -21,13 +21,10 @@
 
 public class Iridium.Views.Welcome : Granite.Widgets.Welcome {
 
-    public unowned Iridium.MainWindow main_window { get; construct; }
-
-    public Welcome (Iridium.MainWindow main_window) {
+    public Welcome () {
         Object (
             title: "Welcome to Iridium",
-            subtitle: "Connect to Any IRC Server",
-            main_window: main_window
+            subtitle: "Connect to Any IRC Server"
         );
     }
 
@@ -44,22 +41,12 @@ public class Iridium.Views.Welcome : Granite.Widgets.Welcome {
         activated.connect (index => {
             switch (index) {
                 case 0:
-                    create_new_connection ();
+                    new_connection_button_clicked ();
                 break;
             }
         });
     }
 
-    // TODO: Move this somewhere else
-    private void create_new_connection () {
-        if (main_window.connection_dialog == null) {
-            main_window.connection_dialog = new Iridium.Widgets.ServerConnectionDialog (main_window);
-            main_window.connection_dialog.show_all ();
-            main_window.connection_dialog.destroy.connect (() => {
-                main_window.connection_dialog = null;
-            });
-        }
-        main_window.connection_dialog.present ();
-    }
+    public signal void new_connection_button_clicked ();
 
 }

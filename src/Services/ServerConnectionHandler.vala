@@ -35,8 +35,8 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         );
     } */
 
-    public Iridium.Services.ServerConnection connect_to_server (Iridium.Services.ServerConnectionDetails connection_details) {
-        var server_connection = new Iridium.Services.ServerConnection (connection_details);
+    public Iridium.Services.ServerConnection connect_to_server (Iridium.Services.ServerConnectionDetails connection_details, Gtk.TextBuffer buffer) {
+        var server_connection = new Iridium.Services.ServerConnection (connection_details, buffer);
         connections.set (connection_details.server, server_connection);
         server_connection.open ();
         return server_connection;

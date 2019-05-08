@@ -23,10 +23,12 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
     public Iridium.Services.ServerConnectionDetails connection_details { get; construct; }
     private bool should_exit = false;
+    public unowned Gtk.TextBuffer buffer { get; construct; }
 
-    public ServerConnection (Iridium.Services.ServerConnectionDetails connection_details) {
+    public ServerConnection (Iridium.Services.ServerConnectionDetails connection_details, Gtk.TextBuffer buffer) {
         Object (
-            connection_details: connection_details
+            connection_details: connection_details,
+            buffer: buffer
         );
     }
 
@@ -84,6 +86,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     }
 
     private void handle_message (string message) {
+        append_message_to_buffer (message);
         if (message.index_of ("004") >= 0) {
             open_successful ();
             print ("Successfully connected. Exiting...\n");
@@ -92,9 +95,10 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     }
 
     private void append_message_to_buffer (string message) {
-        /* Gtk.TextIter iter;
-        buffer.get_end_iter (out i);
-        buffer.insert (iter, message, message.len ()); */
+        Gtk.TextIter iter;
+        buffer.get_end_iter (out iter);
+        buffer.insert (ref iter, message, -1);
+        buffer.insert (ref iter, "\n", 1);
     }
 
     public signal void open_successful ();

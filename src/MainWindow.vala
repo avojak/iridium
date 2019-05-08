@@ -25,6 +25,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     public Iridium.Widgets.ChannelJoinDialog? channel_join_dialog = null;
 
     private Iridium.Views.Welcome welcome_view;
+    private Iridium.Widgets.HeaderBar header_bar;
     private Iridium.Widgets.SidePanel side_panel;
     private Iridium.Layouts.MainLayout main_layout;
 
@@ -39,62 +40,73 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     construct {
-        var gtk_settings = Gtk.Settings.get_default ();
-
-        var server_connect_button = new Gtk.Button.from_icon_name ("com.github.avojak.iridium.network-server-new", Gtk.IconSize.LARGE_TOOLBAR);
-        /* var server_connect_button = new Gtk.Button.from_icon_name ("network-server", Gtk.IconSize.LARGE_TOOLBAR); */
-        server_connect_button.tooltip_text = "Connect to a server";
-        // TODO: Support keyboard accelerator
-
-        var channel_join_button = new Gtk.Button.from_icon_name ("com.github.avojak.iridium.internet-chat-new", Gtk.IconSize.LARGE_TOOLBAR);
-        /* var channel_join_button = new Gtk.Button.from_icon_name ("internet-chat", Gtk.IconSize.LARGE_TOOLBAR); */
-        channel_join_button.tooltip_text = "Join a channel";
-        // TODO: Support keyboard accelerator
-        /* channel_join_button.sensitive = false; */
-        channel_join_button.clicked.connect (() => {
-            if (channel_join_dialog == null) {
-                channel_join_dialog = new Iridium.Widgets.ChannelJoinDialog (this);
-                channel_join_dialog.show_all ();
-                channel_join_dialog.destroy.connect (() => {
-                    channel_join_dialog = null;
-                });
-            }
-            channel_join_dialog.present ();
-        });
-
-        var mode_switch = new Granite.ModeSwitch.from_icon_name ("display-brightness-symbolic", "weather-clear-night-symbolic");
-        mode_switch.primary_icon_tooltip_text = "Light background";
-        mode_switch.secondary_icon_tooltip_text = "Dark background";
-        mode_switch.valign = Gtk.Align.CENTER;
-        mode_switch.bind_property ("active", gtk_settings, "gtk_application_prefer_dark_theme");
-
-        Iridium.Application.settings.bind ("prefer-dark-style", mode_switch, "active", GLib.SettingsBindFlags.DEFAULT);
-
-        var header_bar = new Gtk.HeaderBar ();
-        /* header_bar.get_style_context ().add_class ("default-decoration"); */
-        header_bar.show_close_button = true;
-        header_bar.pack_start (server_connect_button);
-        header_bar.pack_start (channel_join_button);
-        header_bar.pack_end (mode_switch);
-        header_bar.pack_end (new Gtk.Separator (Gtk.Orientation.VERTICAL));
-        // TODO: Update the header bar for the current channel and server being viewed
-
+        header_bar = new Iridium.Widgets.HeaderBar ();
         set_titlebar (header_bar);
 
         // TODO: Show an info bar across the top of the window area when internet connection is lost
 
-        welcome_view = new Iridium.Views.Welcome (this);
+        welcome_view = new Iridium.Views.Welcome ();
         side_panel = new Iridium.Widgets.SidePanel ();
 
         main_layout = new Iridium.Layouts.MainLayout (welcome_view, side_panel);
         add (main_layout);
 
         resize (900, 600);
+
+        // Connect to signals
+        header_bar.server_connect_button_clicked.connect (() => {
+            show_server_connection_dialog ();
+        });
+        header_bar.channel_join_button_clicked.connect (() => {
+            show_channel_join_dialog ();
+        });
+        welcome_view.new_connection_button_clicked.connect (() => {
+            show_server_connection_dialog ();
+        });
     }
 
-    public void add_server_to_panel (string name) {
-        side_panel.add_server (name);
-        main_layout.add_chat_view (name);
+    private void show_server_connection_dialog () {
+        if (connection_dialog == null) {
+            connection_dialog = new Iridium.Widgets.ServerConnectionDialog (this);
+            connection_dialog.show_all ();
+            connection_dialog.connect_button_clicked.connect ((server, nickname, username, realname) => {
+                var connection_details = new Iridium.Services.ServerConnectionDetails ();
+                connection_details.server = server;
+                connection_details.nickname = nickname;
+                connection_details.username = username;
+                connection_details.realname = realname;
+
+                var chat_view = new Iridium.Views.ChatView ();
+                main_layout.add_chat_view (chat_view, server);
+                var buffer = chat_view.get_buffer ();
+
+                var server_connection = Iridium.Application.connection_handler.connect_to_server (connection_details, buffer);
+                server_connection.open_successful.connect (() => {
+                    connection_dialog.dismiss ();
+                    side_panel.add_server (server);
+                    main_layout.show_chat_view (server);
+                });
+                server_connection.open_failed.connect ((message) => {
+                    connection_dialog.display_error (message);
+                    main_layout.remove_chat_view (server);
+                });
+            });
+            connection_dialog.destroy.connect (() => {
+                connection_dialog = null;
+            });
+        }
+        connection_dialog.present ();
+    }
+
+    private void show_channel_join_dialog () {
+        if (channel_join_dialog == null) {
+            channel_join_dialog = new Iridium.Widgets.ChannelJoinDialog (this);
+            channel_join_dialog.show_all ();
+            channel_join_dialog.destroy.connect (() => {
+                channel_join_dialog = null;
+            });
+        }
+        channel_join_dialog.present ();
     }
 
 }

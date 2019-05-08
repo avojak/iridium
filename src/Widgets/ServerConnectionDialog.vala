@@ -131,29 +131,24 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         connect_button.clicked.connect (() => {
             spinner.start ();
             status_label.label = "";
-
-            var connection_details = new Iridium.Services.ServerConnectionDetails ();
-            // TODO: Get these from the entries
-            connection_details.server = "irc.freenode.net";
-            connection_details.nickname = "iridium";
-            connection_details.username = "iridium";
-            connection_details.realname = "Iridium IRC Client";
-            connection_details.is_favorite = false;
-
-            var server_connection = Iridium.Application.connection_handler.connect_to_server (connection_details);
-            server_connection.open_successful.connect (() => {
-                spinner.stop ();
-                main_window.add_server_to_panel (connection_details.server);
-                close ();
-            });
-            server_connection.open_failed.connect ((message) => {
-                spinner.stop ();
-                status_label.label = message;
-            });
+            connect_button_clicked ("irc.freenode.net", "iridium", "iridium", "Iridium IRC Client");
         });
 
         add_action_widget (cancel_button, 0);
         add_action_widget (connect_button, 1);
     }
+
+    public void dismiss () {
+        spinner.stop ();
+        close ();
+    }
+
+    public void display_error (string message) {
+        // TODO: We can make the error messaging better
+        spinner.stop ();
+        status_label.label = message;
+    }
+
+    public signal void connect_button_clicked (string server, string nickname, string username, string realname);
 
 }

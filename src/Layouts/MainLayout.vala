@@ -44,15 +44,19 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
         pack2 (main_stack, true, false);
     }
 
-    public void add_chat_view (string name) {
-        var chat_view = new Iridium.Views.ChatView (name);
-        main_stack.add_named (chat_view, name);
-        chat_view.show_all ();
-        main_stack.set_visible_child_full (name, Gtk.StackTransitionType.SLIDE_RIGHT);
+    public void add_chat_view (Iridium.Views.ChatView view, string name) {
+        main_stack.add_named (view, name);
+    }
+
+    public void remove_chat_view (string name) {
+        var child = main_stack.get_child_by_name (name);
+        main_stack.remove (child);
     }
 
     public void show_chat_view (string name) {
-
+        main_stack.get_child_by_name (name).show_all ();
+        /* chat_view.show_all (); */
+        main_stack.set_visible_child_full (name, Gtk.StackTransitionType.SLIDE_RIGHT);
     }
 
 }

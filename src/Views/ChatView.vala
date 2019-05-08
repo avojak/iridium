@@ -21,17 +21,16 @@
 
 public class Iridium.Views.ChatView : Gtk.Grid {
 
-    public string name { get; construct; }
+    private Gtk.TextView text_view;
 
-    public ChatView (string name) {
+    public ChatView () {
         Object (
-            orientation: Gtk.Orientation.VERTICAL,
-            name: name
+            orientation: Gtk.Orientation.VERTICAL
         );
     }
 
     construct {
-        var text_view = new Gtk.TextView ();
+        text_view = new Gtk.TextView ();
         text_view.pixels_below_lines = 3;
         text_view.border_width = 12;
         text_view.wrap_mode = Gtk.WrapMode.WORD;
@@ -46,6 +45,10 @@ public class Iridium.Views.ChatView : Gtk.Grid {
 
         attach (text_view, 0, 0, 1, 1);
         attach (entry, 0, 1, 1, 1);
+    }
+
+    public Gtk.TextBuffer get_buffer () {
+        return text_view.get_buffer ();
     }
 
 }
