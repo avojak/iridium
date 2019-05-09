@@ -28,6 +28,10 @@ public class Iridium.Views.ChatView : Gtk.Grid {
             orientation: Gtk.Orientation.VERTICAL
         );
 
+
+    }
+
+    construct {
         // Should all this go here or in the construct block???
         text_view = new Gtk.TextView ();
         text_view.pixels_below_lines = 3;
@@ -48,10 +52,6 @@ public class Iridium.Views.ChatView : Gtk.Grid {
 
         attach (text_view, 0, 0, 1, 1);
         attach (entry, 0, 1, 1, 1);
-    }
-
-    construct {
-
 
     }
 

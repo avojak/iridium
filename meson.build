@@ -13,6 +13,8 @@ executable(
     join_paths('src', 'Application.vala'),
     join_paths('src', 'MainWindow.vala'),
     join_paths('src', 'Layouts', 'MainLayout.vala'),
+    join_paths('src', 'Services', 'Message.vala'),
+    join_paths('src', 'Services', 'NumericCodes.vala'),
     join_paths('src', 'Services', 'ServerConnection.vala'),
     join_paths('src', 'Services', 'ServerConnectionDetails.vala'),
     join_paths('src', 'Services', 'ServerConnectionHandler.vala'),
@@ -24,7 +26,7 @@ executable(
     join_paths('src', 'Widgets', 'SidePanel.vala'),
     join_paths('src', 'Widgets', 'ServerPanelRow.vala'),
     dependencies: [
-        dependency('gtk+-3.0', version: '>= 3.6.0'),
+        dependency('gtk+-3.0', version: '>= 3.6.4'),
         dependency('gee-0.8', version: '>= 0.8.5'),
         dependency('glib-2.0', version: '>= 2.30.0'),
         dependency('granite', version: '>= 0.5.1')

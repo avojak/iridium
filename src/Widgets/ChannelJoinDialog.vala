@@ -75,6 +75,7 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
         var channel_entry = new Gtk.Entry ();
         channel_entry.hexpand = true;
         channel_entry.placeholder_text = "#";
+        /* channel_entry.text = "#"; */
 
         form_grid.attach (channel_label, 0, 0, 1, 1);
         form_grid.attach (channel_entry, 1, 0, 1, 1);

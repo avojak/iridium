@@ -27,6 +27,8 @@ public class Iridium.Widgets.SidePanel : Granite.Widgets.SourceList {
     private Granite.Widgets.SourceList.Item favorites_dummy;
     private Granite.Widgets.SourceList.Item others_dummy;
 
+    private Gee.Map<string, Granite.Widgets.SourceList.ExpandableItem> servers;
+
     public SidePanel () {
         favorites_category = new Granite.Widgets.SourceList.ExpandableItem ("Favorite Channels");
         favorites_dummy = new Granite.Widgets.SourceList.Item ("");
@@ -44,6 +46,8 @@ public class Iridium.Widgets.SidePanel : Granite.Widgets.SourceList {
 
         root.add (favorites_category);
         root.add (others_category);
+
+        servers = new Gee.HashMap<string, Granite.Widgets.SourceList.ExpandableItem> ();
     }
 
     public void add_server (string name) {
@@ -53,18 +57,18 @@ public class Iridium.Widgets.SidePanel : Granite.Widgets.SourceList {
         var icon = new GLib.ThemedIcon ("user-available");
         server.icon = icon;
 
-        // TEMPORARY
-        var channel = new Granite.Widgets.SourceList.Item ();
-        channel.markup = "#irchacks <small>" + name + "</small>";
-        /* channel.activatable = new GLib.ThemedIcon ("view-more-horizontal-symbolic"); */
-        server.add (channel);
-        server.expanded = true;
+        servers.set (name, server);
 
         others_category.add (server);
     }
 
     public void add_channel (string server, string name) {
-
+        var channel = new Granite.Widgets.SourceList.Item ();
+        channel.markup = "#irchacks <small>" + name + "</small>";
+        /* channel.activatable = new GLib.ThemedIcon ("view-more-horizontal-symbolic"); */
+        var server_item = servers.get (server);
+        server_item.add (channel);
+        server_item.expanded = true;
     }
 
     public signal void server_added ();

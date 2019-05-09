@@ -95,10 +95,13 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     }
 
     private void append_message_to_buffer (string message) {
-        Gtk.TextIter iter;
-        buffer.get_end_iter (out iter);
-        buffer.insert (ref iter, message, -1);
-        buffer.insert (ref iter, "\n", 1);
+        Idle.add (() => {
+            Gtk.TextIter iter;
+            buffer.get_end_iter (out iter);
+            buffer.insert (ref iter, message, -1);
+            buffer.insert (ref iter, "\n", 1);
+            return false;
+        });
     }
 
     public signal void open_successful ();

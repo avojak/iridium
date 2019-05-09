@@ -92,13 +92,20 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 // Attempt the server connection
                 var server_connection = Iridium.Application.connection_handler.connect_to_server (connection_details, buffer);
                 server_connection.open_successful.connect (() => {
-                    connection_dialog.dismiss ();
-                    side_panel.add_server (server);
-                    main_layout.show_chat_view (server);
+                    Idle.add (() => {
+                        connection_dialog.dismiss ();
+                        side_panel.add_server (server);
+                        main_layout.show_chat_view (server);
+                        show_channel_join_dialog ();
+                        return false;
+                    });
                 });
                 server_connection.open_failed.connect ((message) => {
-                    connection_dialog.display_error (message);
-                    main_layout.remove_chat_view (server);
+                    Idle.add (() => {
+                        connection_dialog.display_error (message);
+                        main_layout.remove_chat_view (server);
+                        return false;
+                    });
                 });
             });
             connection_dialog.destroy.connect (() => {
