@@ -129,6 +129,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         var connect_button = new Gtk.Button.with_label ("Connect");
         connect_button.get_style_context ().add_class ("suggested-action");
         connect_button.clicked.connect (() => {
+            // TODO: Validate entries first!
             spinner.start ();
             status_label.label = "";
             connect_button_clicked ("irc.freenode.net", "iridium", "iridium", "Iridium IRC Client");

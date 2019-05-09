@@ -23,8 +23,10 @@ executable(
     join_paths('src', 'Widgets', 'ChannelJoinDialog.vala'),
     join_paths('src', 'Widgets', 'HeaderBar.vala'),
     join_paths('src', 'Widgets', 'ServerConnectionDialog.vala'),
-    join_paths('src', 'Widgets', 'SidePanel.vala'),
-    join_paths('src', 'Widgets', 'ServerPanelRow.vala'),
+    join_paths('src', 'Widgets', 'SidePanel', 'Panel.vala'),
+    join_paths('src', 'Widgets', 'SidePanel', 'Row.vala'),
+    join_paths('src', 'Widgets', 'SidePanel', 'ServerRow.vala'),
+    join_paths('src', 'Widgets', 'SidePanel', 'ChannelRow.vala'),
     dependencies: [
         dependency('gtk+-3.0', version: '>= 3.6.4'),
         dependency('gee-0.8', version: '>= 0.8.5'),

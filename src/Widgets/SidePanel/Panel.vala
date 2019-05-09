@@ -19,7 +19,7 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Widgets.SidePanel : Granite.Widgets.SourceList {
+public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
 
     private Granite.Widgets.SourceList.ExpandableItem favorites_category;
     private Granite.Widgets.SourceList.ExpandableItem others_category;
@@ -29,7 +29,7 @@ public class Iridium.Widgets.SidePanel : Granite.Widgets.SourceList {
 
     private Gee.Map<string, Granite.Widgets.SourceList.ExpandableItem> servers;
 
-    public SidePanel () {
+    public Panel () {
         favorites_category = new Granite.Widgets.SourceList.ExpandableItem ("Favorite Channels");
         favorites_dummy = new Granite.Widgets.SourceList.Item ("");
         favorites_category.add (favorites_dummy);
@@ -52,23 +52,30 @@ public class Iridium.Widgets.SidePanel : Granite.Widgets.SourceList {
 
     public void add_server (string name) {
         others_dummy.visible = false;
+        var server_item = new Iridium.Widgets.SidePanel.ServerRow (name);
+        servers.set (name, server_item);
+        others_category.add (server_item);
 
-        var server = new Granite.Widgets.SourceList.ExpandableItem (name);
-        var icon = new GLib.ThemedIcon ("user-available");
-        server.icon = icon;
-
-        servers.set (name, server);
-
-        others_category.add (server);
+        selected = server_item;
     }
 
     public void add_channel (string server, string name) {
-        var channel = new Granite.Widgets.SourceList.Item ();
-        channel.markup = "#irchacks <small>" + name + "</small>";
+        var channel_item = new Iridium.Widgets.SidePanel.ChannelRow (name, server);
+        /* channel_item.markup = "#irchacks <small>" + name + "</small>"; */
         /* channel.activatable = new GLib.ThemedIcon ("view-more-horizontal-symbolic"); */
+
         var server_item = servers.get (server);
-        server_item.add (channel);
+        server_item.add (channel_item);
         server_item.expanded = true;
+
+        selected = channel_item;
+    }
+
+    public string get_current_server () {
+        if (selected == null) {
+            return "";
+        }
+        return selected.name;
     }
 
     public signal void server_added ();

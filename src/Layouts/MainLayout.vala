@@ -22,11 +22,11 @@
 public class Iridium.Layouts.MainLayout : Gtk.Paned {
 
     public weak Iridium.Views.Welcome welcome_view { get; construct; }
-    public unowned Iridium.Widgets.SidePanel side_panel { get; construct; }
+    public unowned Iridium.Widgets.SidePanel.Panel side_panel { get; construct; }
 
     private Gtk.Stack main_stack;
 
-    public MainLayout (Iridium.Views.Welcome welcome_view, Iridium.Widgets.SidePanel side_panel) {
+    public MainLayout (Iridium.Views.Welcome welcome_view, Iridium.Widgets.SidePanel.Panel side_panel) {
         Object (
             orientation: Gtk.Orientation.HORIZONTAL,
             welcome_view: welcome_view,

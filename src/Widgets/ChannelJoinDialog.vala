@@ -22,17 +22,21 @@
 public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
 
     public unowned Iridium.MainWindow main_window { get; construct; }
+    public string[] servers { get; construct; }
+    public string current_server { get; construct; }
 
     private Gtk.Spinner spinner;
     private Gtk.Label status_label;
 
-    public ChannelJoinDialog (Iridium.MainWindow main_window) {
+    public ChannelJoinDialog (Iridium.MainWindow main_window, string[] servers, string current_server) {
         Object (
             deletable: false,
             resizable: false,
             title: "Join a Channel",
             transient_for: main_window,
-            main_window: main_window
+            main_window: main_window,
+            servers: servers,
+            current_server: current_server
         );
     }
 
@@ -48,7 +52,7 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
 
         var header_image = new Gtk.Image.from_icon_name ("internet-chat", Gtk.IconSize.DIALOG);
 
-        var header_title = new Gtk.Label ("Join a Server");
+        var header_title = new Gtk.Label ("Join a Channel");
         header_title.get_style_context ().add_class (Granite.STYLE_CLASS_H2_LABEL);
         header_title.halign = Gtk.Align.START;
         header_title.hexpand = true;
@@ -69,16 +73,33 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
         form_grid.row_spacing = 12;
         form_grid.column_spacing = 20;
 
+        var list_store = new Gtk.ListStore (1, typeof (string));
+        var active_index = 0;
+        for (int i = 0; i < servers.length; i++) {
+            Gtk.TreeIter iter;
+            list_store.append (out iter);
+            list_store.set (iter, 0, servers[i]);
+            if (servers[i] == current_server) {
+                active_index = i;
+            }
+        }
+        var server_combo = new Gtk.ComboBox.with_model (list_store);
+        var cell = new Gtk.CellRendererText ();
+        server_combo.pack_start (cell, false);
+        server_combo.set_attributes (cell, "text", 0);
+        server_combo.set_active (active_index);
+
         var channel_label = new Gtk.Label ("Channel");
         channel_label.halign = Gtk.Align.END;
 
         var channel_entry = new Gtk.Entry ();
         channel_entry.hexpand = true;
-        channel_entry.placeholder_text = "#";
-        /* channel_entry.text = "#"; */
+        /* channel_entry.placeholder_text = "#"; */
+        channel_entry.text = "#";
 
-        form_grid.attach (channel_label, 0, 0, 1, 1);
-        form_grid.attach (channel_entry, 1, 0, 1, 1);
+        form_grid.attach (server_combo, 0, 0, 2, 1);
+        form_grid.attach (channel_label, 0, 1, 1, 1);
+        form_grid.attach (channel_entry, 1, 1, 1, 1);
 
         body.add (form_grid);
 
@@ -103,12 +124,17 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
         var join_button = new Gtk.Button.with_label ("Join");
         join_button.get_style_context ().add_class ("suggested-action");
         join_button.clicked.connect (() => {
+            // TODO: Validate entries first!
             spinner.start ();
             status_label.label = "";
+            // TODO: Get value from entry
+            join_button_clicked ("#irchacks");
         });
 
         add_action_widget (not_now_button, 0);
         add_action_widget (join_button, 1);
     }
+
+    public signal void join_button_clicked (string channel);
 
 }

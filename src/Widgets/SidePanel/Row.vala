@@ -19,25 +19,8 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Widgets.ServerPanelRow : Gtk.ListBoxRow {
+public interface Iridium.Widgets.SidePanel.Row : GLib.Object {
 
-    public string text { get; construct; }
-
-    public ServerPanelRow (string text) {
-        Object (
-            text: text
-        );
-    }
-
-    construct {
-        var label = new Gtk.Label (text);
-        label.xalign = 0;
-        label.get_style_context ().add_class ("h4");
-
-        var status_image = new Gtk.Image.from_icon_name ("user-offline", Gtk.IconSize.MENU);
-
-        add (status_image);
-        add (label);
-    }
+    public abstract string get_server ();
 
 }

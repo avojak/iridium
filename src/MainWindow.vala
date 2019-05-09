@@ -26,7 +26,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     private Iridium.Views.Welcome welcome_view;
     private Iridium.Widgets.HeaderBar header_bar;
-    private Iridium.Widgets.SidePanel side_panel;
+    private Iridium.Widgets.SidePanel.Panel side_panel;
     private Iridium.Layouts.MainLayout main_layout;
 
     public MainWindow (Gtk.Application application) {
@@ -46,7 +46,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         // TODO: Show an info bar across the top of the window area when internet connection is lost
 
         welcome_view = new Iridium.Views.Welcome ();
-        side_panel = new Iridium.Widgets.SidePanel ();
+        side_panel = new Iridium.Widgets.SidePanel.Panel ();
 
         main_layout = new Iridium.Layouts.MainLayout (welcome_view, side_panel);
         add (main_layout);
@@ -117,8 +117,13 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     private void show_channel_join_dialog () {
         if (channel_join_dialog == null) {
-            channel_join_dialog = new Iridium.Widgets.ChannelJoinDialog (this);
+            var connected_servers = Iridium.Application.connection_handler.get_connected_servers ();
+            var current_server = side_panel.get_current_server ();
+            channel_join_dialog = new Iridium.Widgets.ChannelJoinDialog (this, connected_servers, current_server);
             channel_join_dialog.show_all ();
+            channel_join_dialog.join_button_clicked.connect ((channel) => {
+
+            });
             channel_join_dialog.destroy.connect (() => {
                 channel_join_dialog = null;
             });
