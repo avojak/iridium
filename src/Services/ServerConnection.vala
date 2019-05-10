@@ -22,13 +22,14 @@
 public class Iridium.Services.ServerConnection : GLib.Object {
 
     public Iridium.Services.ServerConnectionDetails connection_details { get; construct; }
-    private bool should_exit = false;
-    public unowned Gtk.TextBuffer buffer { get; construct; }
 
-    public ServerConnection (Iridium.Services.ServerConnectionDetails connection_details, Gtk.TextBuffer buffer) {
+    private DataInputStream input_stream;
+    private DataOutputStream output_stream;
+    private bool should_exit = false;
+
+    public ServerConnection (Iridium.Services.ServerConnectionDetails connection_details) {
         Object (
-            connection_details: connection_details,
-            buffer: buffer
+            connection_details: connection_details
         );
     }
 
@@ -56,11 +57,13 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             SocketConnection connection = client.connect (new InetSocketAddress (address, port));
             print (@"Connected to $server\n");
 
+            input_stream = new DataInputStream (connection.input_stream);
+            output_stream = new DataOutputStream (connection.output_stream);
+
             // Login to the server
-            connection.output_stream.write (@"NICK $nickname\r\n".data);
-            connection.output_stream.write (@"USER $username 0 * :$realname\r\n".data);
-            //connection.output_stream.write (@"MODE $username +i");
-            DataInputStream input_stream = new DataInputStream (connection.input_stream);
+            output_stream.put_string (@"NICK $nickname\r\n");
+            output_stream.put_string (@"USER $username 0 * :$realname\r\n");
+            //output_stream.write (@"MODE $username +i");
 
             string line = "";
             do {
@@ -86,7 +89,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     }
 
     private void handle_message (string message) {
-        append_message_to_buffer (message);
+        message_received (message);
         if (message.index_of ("004") >= 0) {
             open_successful ();
             print ("Successfully connected. Exiting...\n");
@@ -94,19 +97,18 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         }
     }
 
-    private void append_message_to_buffer (string message) {
-        Idle.add (() => {
-            Gtk.TextIter iter;
-            buffer.get_end_iter (out iter);
-            buffer.insert (ref iter, message, -1);
-            buffer.insert (ref iter, "\n", 1);
-            return false;
-        });
+    public void send_message (string message) {
+        try {
+            output_stream.put_string (@"$message\r\n");
+        } catch (GLib.IOError e) {
+            // TODO: Handle erros!!
+        }
     }
 
     public signal void open_successful ();
     public signal void open_failed (string message);
     public signal void close_successful ();
     public signal void close_failed (string message);
+    public signal void message_received (string message);
 
 }

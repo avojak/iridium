@@ -67,7 +67,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 return;
             }
             // Dummy selected
-            if (item.name.strip ().size () == 0) {
+            if (item.name.strip ().length == 0) {
                 header_bar.set_channel_join_button_enabled (false);
                 return;
             }
@@ -100,10 +100,11 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 // display the server messages once connection is successful
                 var chat_view = new Iridium.Views.ChatView ();
                 main_layout.add_chat_view (chat_view, server);
-                var buffer = chat_view.get_buffer ();
+                // Initialize the buffer I think? Get an error without this...
+                chat_view.get_buffer ();
 
                 // Attempt the server connection
-                var server_connection = Iridium.Application.connection_handler.connect_to_server (connection_details, buffer);
+                var server_connection = Iridium.Application.connection_handler.connect_to_server (connection_details);
                 server_connection.open_successful.connect (() => {
                     Idle.add (() => {
                         connection_dialog.dismiss ();
@@ -120,6 +121,10 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                         return false;
                     });
                 });
+                server_connection.message_received.connect ((message) => {
+                    // TODO: This may need to go in an Idle.add ()...
+                    chat_view.append_message_to_buffer (message);
+                });
             });
             connection_dialog.destroy.connect (() => {
                 connection_dialog = null;
@@ -135,6 +140,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             channel_join_dialog = new Iridium.Widgets.ChannelJoinDialog (this, connected_servers, current_server);
             channel_join_dialog.show_all ();
             channel_join_dialog.join_button_clicked.connect ((channel) => {
+                // TODO: Validate the channel name (must start with '#', '&', '+', '!'
+                //       and not contain certain characters)
 
                 // TODO: Create the chat view
 

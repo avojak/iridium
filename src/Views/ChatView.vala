@@ -59,4 +59,11 @@ public class Iridium.Views.ChatView : Gtk.Grid {
         return text_view.get_buffer ();
     }
 
+    public void append_message_to_buffer (string message) {
+        Gtk.TextIter iter;
+        text_view.get_buffer ().get_end_iter (out iter);
+        text_view.get_buffer ().insert (ref iter, message, -1);
+        text_view.get_buffer ().insert (ref iter, "\n", 1);
+    }
+
 }
