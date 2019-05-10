@@ -141,7 +141,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             channel_join_dialog.show_all ();
             channel_join_dialog.join_button_clicked.connect ((channel) => {
                 // TODO: Validate the channel name (must start with '#', '&', '+', '!'
-                //       and not contain certain characters)
+                //       and not contain certain characters). Double check this,
+                //       it might just be '#' and '&' (regular and local)...
 
                 // TODO: Create the chat view
 

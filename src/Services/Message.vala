@@ -19,6 +19,63 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
+/*
+ * This implementation is VERY heavily inspired by
+ * https://github.com/agronick/Relay/blob/master/src/message.vala
+ */
 public class Iridium.Services.Message : GLib.Object {
+
+    private static string REGEX_STR = """^(:(?<prefix>\S+) )?(?<command>\S+)( (?!:)(?<params>.+?))?( :(?<trail>.+))?$""";
+    private static string ESCAPE_EXCEPT_CHARS = "\b\f\n\r\t\'";
+    private static string[] USER_COMMANDS = {
+        Iridium.Services.MessageCommands.PRIVMSG,
+        Iridium.Services.MessageCommands.JOIN,
+        Iridium.Services.MessageCommands.NICK,
+        Iridium.Services.MessageCommands.QUIT,
+        Iridium.Services.MessageCommands.PART
+    };
+    private static GLib.Regex regex;
+
+    private string message;
+    private string prefix;
+    private string command;
+    private string[] params;
+    private string username;
+
+    static construct {
+        try {
+            regex = new GLib.Regex (REGEX_STR, GLib.RegexCompileFlags.OPTIMIZE);
+        } catch (GLib.RegexError e) {
+            // TODO: Handle errors!
+            // This should never ever happen
+        }
+    }
+
+    public Message (string _message) {
+        message = _message.validate() ? _message : _message.escape (ESCAPE_EXCEPT_CHARS);
+        parse_message ();
+    }
+
+    private void parse_message () {
+        try {
+            regex.replace_eval (message, -1, 0, 0, (match_info, result) => {
+                prefix = match_info.fetch_named ("prefix");
+                command = match_info.fetch_named ("command");
+                if (match_info.fetch_named ("params") != null) {
+                    params = match_info.fetch_named ("params").split (" ");
+                }
+                message = match_info.fetch_named ("trail");
+                if (message != null) {
+                    message.replace ("\t", "");
+                }
+                if ((prefix != null) && (command in USER_COMMANDS)) {
+                    username = prefix.split ("!")[0];
+                }
+                return false;
+            });
+        } catch (GLib.RegexError e) {
+            // TODO: Handle errors!
+        }
+    }
 
 }
