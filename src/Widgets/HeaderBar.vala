@@ -21,6 +21,8 @@
 
 public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
 
+    private Gtk.Button channel_join_button;
+
     public HeaderBar () {
         Object (
             show_close_button: true
@@ -36,11 +38,11 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
             server_connect_button_clicked ();
         });
 
-        var channel_join_button = new Gtk.Button.from_icon_name ("com.github.avojak.iridium.internet-chat-new", Gtk.IconSize.LARGE_TOOLBAR);
+        channel_join_button = new Gtk.Button.from_icon_name ("com.github.avojak.iridium.internet-chat-new", Gtk.IconSize.LARGE_TOOLBAR);
         /* var channel_join_button = new Gtk.Button.from_icon_name ("internet-chat", Gtk.IconSize.LARGE_TOOLBAR); */
         channel_join_button.tooltip_text = "Join a channel";
         // TODO: Support keyboard accelerator
-        /* channel_join_button.sensitive = false; */
+        channel_join_button.sensitive = false;
         channel_join_button.clicked.connect (() => {
             channel_join_button_clicked ();
         });
@@ -63,6 +65,10 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         pack_end (new Gtk.Separator (Gtk.Orientation.VERTICAL));
 
         // TODO: Update the header bar for the current channel and server being viewed
+    }
+
+    public void set_channel_join_button_enabled (bool enabled) {
+        channel_join_button.sensitive = enabled;
     }
 
     public signal void server_connect_button_clicked ();

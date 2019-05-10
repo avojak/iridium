@@ -27,7 +27,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
     private Granite.Widgets.SourceList.Item favorites_dummy;
     private Granite.Widgets.SourceList.Item others_dummy;
 
-    private Gee.Map<string, Granite.Widgets.SourceList.ExpandableItem> servers;
+    private Gee.Map<string, Granite.Widgets.SourceList.ExpandableItem> server_items;
 
     public Panel () {
         favorites_category = new Granite.Widgets.SourceList.ExpandableItem ("Favorite Channels");
@@ -47,13 +47,13 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         root.add (favorites_category);
         root.add (others_category);
 
-        servers = new Gee.HashMap<string, Granite.Widgets.SourceList.ExpandableItem> ();
+        server_items = new Gee.HashMap<string, Granite.Widgets.SourceList.ExpandableItem> ();
     }
 
     public void add_server (string name) {
         others_dummy.visible = false;
         var server_item = new Iridium.Widgets.SidePanel.ServerRow (name);
-        servers.set (name, server_item);
+        server_items.set (name, server_item);
         others_category.add (server_item);
 
         selected = server_item;
@@ -64,18 +64,24 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         /* channel_item.markup = "#irchacks <small>" + name + "</small>"; */
         /* channel.activatable = new GLib.ThemedIcon ("view-more-horizontal-symbolic"); */
 
-        var server_item = servers.get (server);
+        var server_item = server_items.get (server);
         server_item.add (channel_item);
         server_item.expanded = true;
 
         selected = channel_item;
     }
 
-    public string get_current_server () {
+    public string? get_current_server () {
         if (selected == null) {
-            return "";
+            return null;
         }
-        return selected.name;
+        // Don't consider the dummy rows
+        if (selected.name == "") {
+            return null;
+        }
+        // TODO: This feels wrong...
+        unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) selected;
+        return row.get_server_name ();
     }
 
     public signal void server_added ();

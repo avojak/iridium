@@ -135,6 +135,17 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
         add_action_widget (join_button, 1);
     }
 
+    public void dismiss () {
+        spinner.stop ();
+        close ();
+    }
+
+    public void display_error (string message) {
+        // TODO: We can make the error messaging better
+        spinner.stop ();
+        status_label.label = message;
+    }
+
     public signal void join_button_clicked (string channel);
 
 }

@@ -31,8 +31,12 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
         icon = new GLib.ThemedIcon ("user-available");
     }
 
-    public new string get_server () {
+    public new string get_server_name () {
         return name;
+    }
+
+    public new string? get_channel_name () {
+        return null;
     }
 
 }

@@ -33,8 +33,12 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
     construct {
     }
 
-    public new string get_server () {
+    public new string get_server_name () {
         return server_name;
+    }
+
+    public new string? get_channel_name () {
+        return name;
     }
 
 }
