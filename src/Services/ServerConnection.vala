@@ -121,6 +121,16 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             case Iridium.Services.NumericCodes.RPL_WELCOME:
                 open_successful (message.message);
                 break;
+            case Iridium.Services.MessageCommands.QUIT:
+                server_quit (message.message);
+                break;
+            case Iridium.Services.MessageCommands.JOIN:
+                if (message.message == null || message.message.strip () == "") {
+                    channel_joined (connection_details.server, message.params[0]);
+                } else {
+                    // TODO: Handle message for another user joining a channel    
+                }
+                break;
             // Errors
             case Iridium.Services.NumericCodes.ERR_NICKNAMEINUSE:
                 nickname_in_use (message.message);
@@ -135,13 +145,17 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         } */
     }
 
+    public void join_channel (string name) {
+        send_output ("JOIN " + name);
+    }
+
     public void close () {
         should_exit = true;
         send_output ("QUIT :Iridium IRC Client");
         do_close ();
     }
 
-    private void do_close () {
+    public void do_close () {
         should_exit = true;
 
         try {
@@ -175,6 +189,8 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     public signal void close_successful ();
     /* public signal void close_failed (string message); */
     public signal void server_message_received (string message);
+    public signal void channel_joined (string server, string channel);
     public signal void nickname_in_use (string message);
+    public signal void server_quit (string message);
 
 }

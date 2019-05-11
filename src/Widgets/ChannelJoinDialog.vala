@@ -127,8 +127,8 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
             // TODO: Validate entries first!
             spinner.start ();
             status_label.label = "";
-            // TODO: Get value from entry
-            join_button_clicked ("#irchacks");
+            // TODO: Get values from entries
+            join_button_clicked ("irc.freenode.net", "#irchacks");
         });
 
         add_action_widget (not_now_button, 0);
@@ -146,6 +146,6 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
         status_label.label = message;
     }
 
-    public signal void join_button_clicked (string channel);
+    public signal void join_button_clicked (string server, string channel);
 
 }

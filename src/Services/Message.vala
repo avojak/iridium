@@ -39,7 +39,7 @@ public class Iridium.Services.Message : GLib.Object {
     public string command { get; set; }
     public string message { get; set; }
     private string prefix;
-    private string[] params;
+    public string[] params { get; set; }
     private string username;
 
     static construct {

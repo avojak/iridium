@@ -125,7 +125,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 server_connection.open_failed.connect ((message) => {
                     Idle.add (() => {
                         connection_dialog.display_error (message);
-                        main_layout.remove_chat_view (server);
+                        /* main_layout.remove_chat_view (server); */
                         return false;
                     });
                 });
@@ -144,6 +144,23 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                         // TODO: Prompt for new nickname
                     }
                 });
+                server_connection.channel_joined.connect ((server_name, channel_name) => {
+                    Idle.add (() => {
+                        create_chat_view (channel_name);
+                        /* chat_view.append_message_to_buffer (message); */
+                        if (channel_join_dialog != null) {
+                            channel_join_dialog.dismiss ();
+                        }
+                        side_panel.add_channel (server_name, channel_name);
+                        main_layout.show_chat_view (channel_name);
+                        return false;
+                    });
+                });
+                server_connection.server_quit.connect ((message) => {
+                    server_connection.do_close ();
+                    // TODO: Remove chat views
+                    // TODO: Remove server from side panel
+                });
             });
             connection_dialog.destroy.connect (() => {
                 connection_dialog = null;
@@ -158,20 +175,16 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             var current_server = side_panel.get_current_server ();
             channel_join_dialog = new Iridium.Widgets.ChannelJoinDialog (this, connected_servers, current_server);
             channel_join_dialog.show_all ();
-            channel_join_dialog.join_button_clicked.connect ((channel) => {
-                // TODO: Validate the channel name (must start with '#', '&', '+', '!'
-                //       and not contain certain characters). Double check this,
-                //       it might just be '#' and '&' (regular and local)...
+            channel_join_dialog.join_button_clicked.connect ((server, channel) => {
+                // Validate channel name
+                // TODO: Look into what other restrictions exist
+                if (!channel.has_prefix ("#") && !channel.has_prefix ("&")) {
+                    channel_join_dialog.display_error ("Channel must begin with '#' or '&'");
+                    return;
+                }
 
-                // TODO: Create the chat view
-
-                // TODO: Move this into a success callback
-                Idle.add (() => {
-                    channel_join_dialog.dismiss ();
-                    side_panel.add_channel (current_server, channel);
-                    // TODO: Show chat view
-                    return false;
-                });
+                var server_connection = Iridium.Application.connection_handler.get_connection (server);
+                server_connection.join_channel (channel);
             });
             channel_join_dialog.destroy.connect (() => {
                 channel_join_dialog = null;

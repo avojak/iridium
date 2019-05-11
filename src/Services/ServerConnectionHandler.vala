@@ -58,4 +58,8 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         }
     }
 
+    public Iridium.Services.ServerConnection get_connection (string server) {
+        return connections.get (server);
+    }
+
 }
