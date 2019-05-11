@@ -40,36 +40,22 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
     private int do_connect () {
         try {
-            var server = connection_details.server;
-            var nickname = connection_details.nickname;
-            var username = connection_details.username;
-            var realname = connection_details.realname;
+            InetAddress address = resolve_server_hostname (connection_details.server);
             var port = Iridium.Services.ServerConnectionDetails.DEFAULT_PORT;
+            SocketConnection connection = connect_to_server (address, port);
 
-            // Resolve the IP address for the server hostname
-            Resolver resolver = Resolver.get_default ();
-            List<InetAddress> addresses = resolver.lookup_by_name (server, null);
-            InetAddress address = addresses.nth_data (0);
-            print (@"Resolved $server to $address\n");
-
-            // Connect to the server
-            SocketClient client = new SocketClient ();
-            SocketConnection connection = client.connect (new InetSocketAddress (address, port));
-            print (@"Connected to $server\n");
+            print ("Connected to server\n");
 
             input_stream = new DataInputStream (connection.input_stream);
             output_stream = new DataOutputStream (connection.output_stream);
 
-            // Login to the server
-            output_stream.put_string (@"NICK $nickname\r\n");
-            output_stream.put_string (@"USER $username 0 * :$realname\r\n");
-            //output_stream.write (@"MODE $username +i");
+            register (connection_details);
 
             string line = "";
             do {
                 try {
-                    line = input_stream.read_line (null).strip ();
-                    handle_message (line);
+                    line = input_stream.read_line (null);
+                    handle_line (line);
                 } catch (GLib.IOError e) {
                     stderr.printf ("IOError while reading: %s\n", e.message);
                 }
@@ -82,33 +68,113 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         return 1;
     }
 
-    private void close () {
-        // TODO: Gracefully disconnect
-        should_exit = true;
-        close_successful ();
+    private InetAddress resolve_server_hostname (string hostname) throws GLib.Error {
+        Resolver resolver = Resolver.get_default ();
+        List<InetAddress> addresses = resolver.lookup_by_name (hostname, null);
+        InetAddress address = addresses.nth_data (0);
+        return address;
     }
 
-    private void handle_message (string message) {
-        message_received (message);
-        if (message.index_of ("004") >= 0) {
+    private SocketConnection connect_to_server (InetAddress address, uint16 port) throws GLib.Error {
+        SocketClient client = new SocketClient ();
+        SocketConnection connection = client.connect (new InetSocketAddress (address, port));
+        return connection;
+    }
+
+    private void register (Iridium.Services.ServerConnectionDetails connection_details) {
+        var nickname = connection_details.nickname;
+        var username = connection_details.username;
+        var realname = connection_details.realname;
+        var mode = "+i";
+
+        // TODO: Password?
+        send_output (@"NICK $nickname");
+        send_output (@"USER $username 0 * :$realname");
+        send_output (@"MODE $username $mode");
+    }
+
+    private void handle_line (string line) {
+        if (line == null) {
+            close ();
+            return;
+        }
+        var message = new Iridium.Services.Message (line);
+        print (@"$line\n");
+        switch (message.command) {
+            case "PING":
+                send_output ("PONG " + message.message);
+                break;
+            case "NOTICE":
+            case Iridium.Services.NumericCodes.RPL_MOTD:
+            case Iridium.Services.NumericCodes.RPL_MOTDSTART:
+            case Iridium.Services.NumericCodes.RPL_YOURHOST:
+            case Iridium.Services.NumericCodes.RPL_LUSERCLIENT:
+            case Iridium.Services.NumericCodes.RPL_LUSEROP:
+            case Iridium.Services.NumericCodes.RPL_LUSERUNKNOWN:
+            case Iridium.Services.NumericCodes.RPL_LUSERCHANNELS:
+            case Iridium.Services.NumericCodes.RPL_UMODEIS:
+            case Iridium.Services.NumericCodes.RPL_SERVLIST:
+            case Iridium.Services.NumericCodes.RPL_ENDOFSTATS:
+            case Iridium.Services.NumericCodes.RPL_STATSLINKINFO:
+                server_message_received (message.message);
+                break;
+            case Iridium.Services.NumericCodes.RPL_WELCOME:
+                open_successful (message.message);
+                break;
+            // Errors
+            case Iridium.Services.NumericCodes.ERR_NICKNAMEINUSE:
+                nickname_in_use (message.message);
+                break;
+            default:
+                break;
+        }
+        /* if (message.index_of ("004") >= 0) {
             open_successful ();
             print ("Successfully connected. Exiting...\n");
             should_exit = true;
-        }
+        } */
     }
 
-    public void send_message (string message) {
+    public void close () {
+        should_exit = true;
+        send_output ("QUIT :Iridium IRC Client");
+        do_close ();
+    }
+
+    private void do_close () {
+        should_exit = true;
+
         try {
-            output_stream.put_string (@"$message\r\n");
+            input_stream.clear_pending ();
+            input_stream.close ();
+        } catch (GLib.IOError e) {
+            // TODO: Handle errors!
+        }
+
+        try {
+            output_stream.clear_pending ();
+            output_stream.flush ();
+            output_stream.close ();
+        } catch (GLib.Error e) {
+            // TODO: Handle errors!
+        }
+
+        close_successful ();
+    }
+
+    private void send_output (string response) {
+        try {
+            output_stream.put_string (@"$response\r\n");
         } catch (GLib.IOError e) {
             // TODO: Handle erros!!
         }
     }
 
-    public signal void open_successful ();
+    public signal void open_successful (string message);
     public signal void open_failed (string message);
     public signal void close_successful ();
-    public signal void close_failed (string message);
-    public signal void message_received (string message);
+    /* public signal void close_failed (string message); */
+    public signal void server_message_received (string message);
+    public signal void nickname_in_use (string message);
 
 }

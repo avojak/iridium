@@ -47,10 +47,14 @@ public class Iridium.Views.ChatView : Gtk.Grid {
         Gtk.TextIter iter;
         text_view.get_buffer ().get_end_iter (out iter);
 
+        var scroll = new Gtk.ScrolledWindow (null, null);
+        scroll.set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
+        scroll.add (text_view);
+
         var entry = new Gtk.Entry ();
         entry.hexpand = true;
 
-        attach (text_view, 0, 0, 1, 1);
+        attach (scroll, 0, 0, 1, 1);
         attach (entry, 0, 1, 1, 1);
 
     }

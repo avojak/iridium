@@ -21,25 +21,23 @@
 
 public class Iridium.Services.ServerConnectionHandler : GLib.Object {
 
-    /* public unowned Iridium.MainWindow main_window { get; construct; } */
-
     private Gee.Map<string, Iridium.Services.ServerConnection> connections;
 
     public ServerConnectionHandler () {
         connections = new Gee.HashMap<string, Iridium.Services.ServerConnection> ();
     }
 
-    /* public ServerConnectionHandler (Iridium.MainWindow main_window) {
-        Object (
-            main_window: main_window
-        );
-    } */
-
     public Iridium.Services.ServerConnection connect_to_server (Iridium.Services.ServerConnectionDetails connection_details) {
         var server_connection = new Iridium.Services.ServerConnection (connection_details);
         connections.set (connection_details.server, server_connection);
         server_connection.open ();
         return server_connection;
+    }
+
+    public void disconnect_from_server (string server) {
+        var connection = connections.get (server);
+        connection.close ();
+        connections.unset (server);
     }
 
     public string[] get_connected_servers () {
@@ -52,6 +50,12 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
 
     public bool has_connection (string server) {
         return connections.has_key (server);
+    }
+
+    public void close_all_connections () {
+        foreach (var connection in connections.entries) {
+            connection.value.close ();
+        }
     }
 
 }

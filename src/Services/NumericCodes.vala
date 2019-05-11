@@ -28,7 +28,11 @@ public class Iridium.Services.NumericCodes {
     public const string RPL_MYINFO = "004";
     public const string RPL_ISUPPORT = "005";
     public const string RPL_BOUNCE = "010";
+    public const string RPL_ENDOFSTATS = "219";
+    public const string RPL_STATSLINKINFO = "211";
     public const string RPL_UMODEIS = "221";
+    public const string RPL_SERVLIST = "234";
+    public const string RPL_SERVLISTEND = "235";
     public const string RPL_LUSERCLIENT = "251";
     public const string RPL_LUSEROP = "252";
     public const string RPL_LUSERUNKNOWN = "253";

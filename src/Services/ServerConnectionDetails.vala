@@ -21,6 +21,7 @@
 
 public class Iridium.Services.ServerConnectionDetails : GLib.Object {
 
+    // TODO: Support non-default port numbers
     public const uint16 DEFAULT_PORT = 6667;
 
     public string server;

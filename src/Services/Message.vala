@@ -36,9 +36,9 @@ public class Iridium.Services.Message : GLib.Object {
     };
     private static GLib.Regex regex;
 
-    private string message;
+    public string command { get; set; }
+    public string message { get; set; }
     private string prefix;
-    private string command;
     private string[] params;
     private string username;
 

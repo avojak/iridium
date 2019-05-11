@@ -76,6 +76,12 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         welcome_view.new_connection_button_clicked.connect (() => {
             show_server_connection_dialog ();
         });
+
+        // Close connections when the window is closed
+        this.destroy.connect (() => {
+            Iridium.Application.connection_handler.close_all_connections ();
+            GLib.Process.exit (0);
+        });
     }
 
     private void show_server_connection_dialog () {
@@ -98,15 +104,17 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
                 // Create the chat view, but don't show it yet! This way we can
                 // display the server messages once connection is successful
-                var chat_view = new Iridium.Views.ChatView ();
-                main_layout.add_chat_view (chat_view, server);
-                // Initialize the buffer I think? Get an error without this...
-                chat_view.get_buffer ();
+                // TODO: Instead of doing this, we should wait for a signal from
+                //       the connection handler, which can pass any relevant info
+                /* var chat_view = create_chat_view (server); */
 
                 // Attempt the server connection
+                // TODO: Should this be unowned?
                 var server_connection = Iridium.Application.connection_handler.connect_to_server (connection_details);
-                server_connection.open_successful.connect (() => {
+                server_connection.open_successful.connect ((message) => {
                     Idle.add (() => {
+                        var chat_view = create_chat_view (server);
+                        chat_view.append_message_to_buffer (message);
                         connection_dialog.dismiss ();
                         side_panel.add_server (server);
                         main_layout.show_chat_view (server);
@@ -121,9 +129,20 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                         return false;
                     });
                 });
-                server_connection.message_received.connect ((message) => {
-                    // TODO: This may need to go in an Idle.add ()...
-                    chat_view.append_message_to_buffer (message);
+                server_connection.server_message_received.connect ((message) => {
+                    Idle.add (() => {
+                        main_layout.get_chat_view (server).append_message_to_buffer (message);
+                        return false;
+                    });
+                });
+                server_connection.nickname_in_use.connect ((message) => {
+                    if (connection_dialog != null) {
+                        Iridium.Application.connection_handler.disconnect_from_server (server);
+                        connection_dialog.display_error ("Nickname already in use.");
+                    } else {
+                        main_layout.get_chat_view (server).append_message_to_buffer (message);
+                        // TODO: Prompt for new nickname
+                    }
                 });
             });
             connection_dialog.destroy.connect (() => {
@@ -159,6 +178,14 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             });
         }
         channel_join_dialog.present ();
+    }
+
+    private Iridium.Views.ChatView create_chat_view (string name) {
+        var chat_view = new Iridium.Views.ChatView ();
+        main_layout.add_chat_view (chat_view, name);
+        // Initialize the buffer I think? Get an error without this...
+        chat_view.get_buffer ();
+        return chat_view;
     }
 
 }

@@ -48,6 +48,11 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
         main_stack.add_named (view, name);
     }
 
+    public Iridium.Views.ChatView get_chat_view (string name) {
+        var view = main_stack.get_child_by_name (name);
+        return (Iridium.Views.ChatView) view;
+    }
+
     public void remove_chat_view (string name) {
         var child = main_stack.get_child_by_name (name);
         main_stack.remove (child);
