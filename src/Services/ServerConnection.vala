@@ -131,6 +131,9 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                     // TODO: Handle message for another user joining a channel
                 }
                 break;
+            case Iridium.Services.MessageCommands.PRIVMSG:
+                channel_message_received (message.params[0], message.message);
+                break;
             // Errors
             case Iridium.Services.NumericCodes.ERR_NICKNAMEINUSE:
                 nickname_in_use (message.message);
@@ -184,6 +187,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     public signal void close_successful ();
     /* public signal void close_failed (string message); */
     public signal void server_message_received (string message);
+    public signal void channel_message_received (string channel_name, string message);
     public signal void channel_joined (string server, string channel);
     public signal void nickname_in_use (string message);
     public signal void server_quit (string message);

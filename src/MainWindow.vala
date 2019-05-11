@@ -114,6 +114,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 server_connection.open_successful.connect ((message) => {
                     Idle.add (() => {
                         var chat_view = create_chat_view (server);
+                        main_layout.add_chat_view (chat_view, server);
                         chat_view.append_message_to_buffer (message);
                         connection_dialog.dismiss ();
                         side_panel.add_server (server);
@@ -146,12 +147,13 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                         connection_dialog.display_error ("Nickname already in use.");
                     } else {
                         main_layout.get_chat_view (server).append_message_to_buffer (message);
-                        // TODO: Prompt for new nickname
+                        // TODO: Prompt for new nickname?
                     }
                 });
                 server_connection.channel_joined.connect ((server_name, channel_name) => {
                     Idle.add (() => {
-                        create_chat_view (channel_name);
+                        var chat_view = create_chat_view (channel_name);
+                        main_layout.add_chat_view (chat_view, channel_name);
                         /* chat_view.append_message_to_buffer (message); */
                         if (channel_join_dialog != null) {
                             channel_join_dialog.dismiss ();
@@ -160,6 +162,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                         main_layout.show_chat_view (channel_name);
                         return false;
                     });
+                });
+                server_connection.channel_message_received.connect ((channel_name, message) => {
+                    main_layout.get_chat_view (channel_name).append_message_to_buffer (message);
                 });
                 server_connection.server_quit.connect ((message) => {
                     server_connection.do_close ();
@@ -201,7 +206,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     private Iridium.Views.ChatView create_chat_view (string name) {
         var chat_view = new Iridium.Views.ChatView ();
-        main_layout.add_chat_view (chat_view, name);
+        /* main_layout.add_chat_view (chat_view, name); */
         // Initialize the buffer I think? Get an error without this...
         chat_view.get_buffer ();
         return chat_view;
