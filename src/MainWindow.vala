@@ -131,7 +131,12 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 });
                 server_connection.server_message_received.connect ((message) => {
                     Idle.add (() => {
-                        main_layout.get_chat_view (server).append_message_to_buffer (message);
+                        var chat_view = main_layout.get_chat_view (server);
+                        // For some NOTICEs, the server ChatView has not yet been created,
+                        // because we haven't yet received the 001 WELCOME
+                        if (chat_view != null) {
+                            chat_view.append_message_to_buffer (message);
+                        }
                         return false;
                     });
                 });
