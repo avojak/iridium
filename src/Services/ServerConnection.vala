@@ -131,6 +131,9 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                     // TODO: Handle message for another user joining a channel
                 }
                 break;
+            case Iridium.Services.MessageCommands.PART:
+                // TODO: Implement
+                break;
             case Iridium.Services.MessageCommands.PRIVMSG:
                 channel_message_received (message.params[0], message.message);
                 break;

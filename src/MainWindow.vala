@@ -71,6 +71,12 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 header_bar.set_channel_join_button_enabled (false);
                 return;
             }
+            // Item selected
+            main_layout.show_chat_view (item.name);
+
+            // We have enough context to join a channel
+            // TODO: This should probably still be enabled as long as there's
+            //       at least one open connection.
             header_bar.set_channel_join_button_enabled (true);
         });
         welcome_view.new_connection_button_clicked.connect (() => {
@@ -164,7 +170,17 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                     });
                 });
                 server_connection.channel_message_received.connect ((channel_name, message) => {
-                    main_layout.get_chat_view (channel_name).append_message_to_buffer (message);
+                    Idle.add (() => {
+                        var chat_view = main_layout.get_chat_view (channel_name);
+                        if (chat_view == null) {
+                            chat_view = create_chat_view (channel_name);
+                            main_layout.add_chat_view (chat_view, channel_name);
+                            side_panel.add_channel (server, channel_name);
+                            main_layout.show_chat_view (channel_name);
+                        }
+                        chat_view.append_message_to_buffer (message);
+                        return false;
+                    });
                 });
                 server_connection.server_quit.connect ((message) => {
                     server_connection.do_close ();
