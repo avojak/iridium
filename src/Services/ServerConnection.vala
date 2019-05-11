@@ -128,7 +128,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 if (message.message == null || message.message.strip () == "") {
                     channel_joined (connection_details.server, message.params[0]);
                 } else {
-                    // TODO: Handle message for another user joining a channel    
+                    // TODO: Handle message for another user joining a channel
                 }
                 break;
             // Errors
@@ -138,11 +138,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             default:
                 break;
         }
-        /* if (message.index_of ("004") >= 0) {
-            open_successful ();
-            print ("Successfully connected. Exiting...\n");
-            should_exit = true;
-        } */
     }
 
     public void join_channel (string name) {

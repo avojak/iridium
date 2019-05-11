@@ -158,6 +158,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 });
                 server_connection.server_quit.connect ((message) => {
                     server_connection.do_close ();
+                    // TODO: Do we want to close the view or just show as disconnected??
                     // TODO: Remove chat views
                     // TODO: Remove server from side panel
                 });
