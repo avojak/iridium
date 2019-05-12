@@ -27,6 +27,7 @@ public class Iridium.Services.Message : GLib.Object {
 
     private static string REGEX_STR = """^(:(?<prefix>\S+) )?(?<command>\S+)( (?!:)(?<params>.+?))?( :(?<trail>.+))?$""";
     private static string ESCAPE_EXCEPT_CHARS = "\b\f\n\r\t\'";
+    private static string NON_PRINT_REGEX_STR = """[\x01]""";
     private static string[] USER_COMMANDS = {
         Iridium.Services.MessageCommands.PRIVMSG,
         Iridium.Services.MessageCommands.JOIN,
@@ -35,16 +36,18 @@ public class Iridium.Services.Message : GLib.Object {
         Iridium.Services.MessageCommands.PART
     };
     private static GLib.Regex regex;
+    private static GLib.Regex non_print_regex;
 
     public string command { get; set; }
     public string message { get; set; }
-    private string prefix;
+    public string prefix { get; set; }
     public string[] params { get; set; }
-    private string username;
+    public string username { get; set; }
 
     static construct {
         try {
             regex = new GLib.Regex (REGEX_STR, GLib.RegexCompileFlags.OPTIMIZE);
+            non_print_regex = new GLib.Regex (NON_PRINT_REGEX_STR, GLib.RegexCompileFlags.OPTIMIZE);
         } catch (GLib.RegexError e) {
             // TODO: Handle errors!
             // This should never ever happen
@@ -67,6 +70,7 @@ public class Iridium.Services.Message : GLib.Object {
                 message = match_info.fetch_named ("trail");
                 if (message != null) {
                     message.replace ("\t", "");
+                    strip_non_printable_chars ();
                 }
                 if ((prefix != null) && (command in USER_COMMANDS)) {
                     username = prefix.split ("!")[0];
@@ -75,6 +79,15 @@ public class Iridium.Services.Message : GLib.Object {
             });
         } catch (GLib.RegexError e) {
             // TODO: Handle errors!
+        }
+    }
+
+    private void strip_non_printable_chars () {
+        if (non_print_regex.match (message[0].to_string ())) {
+            message = message.substring (1);
+        }
+        if (non_print_regex.match (message[message.length - 1].to_string ())) {
+            message = message.substring (0, message.length - 1);
         }
     }
 

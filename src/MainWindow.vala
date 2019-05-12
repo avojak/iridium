@@ -176,6 +176,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                             chat_view = create_chat_view (channel_name);
                             main_layout.add_chat_view (chat_view, channel_name);
                             side_panel.add_channel (server, channel_name);
+                            // TODO: Remove this line, it's annoying!
                             main_layout.show_chat_view (channel_name);
                         }
                         chat_view.append_message_to_buffer (message);

@@ -135,6 +135,13 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 // TODO: Implement
                 break;
             case Iridium.Services.MessageCommands.PRIVMSG:
+                // CTCP VERSION
+                if (Iridium.Services.MessageCommands.VERSION == message.message) {
+                    // TODO: Respond to CTCP VERSION
+                    /* send_output ("VERSION Iridium IRC Client 1.0 [x86]"); */
+                    server_message_received ("Received a CTCP VERSION from " + message.username);
+                    break;
+                }
                 channel_message_received (message.params[0], message.message);
                 break;
             // Errors
