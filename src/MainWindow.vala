@@ -85,6 +85,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
         // Close connections when the window is closed
         this.destroy.connect (() => {
+            // TODO: Not sure if this is right...
             Iridium.Application.connection_handler.close_all_connections ();
             GLib.Process.exit (0);
         });
@@ -120,6 +121,10 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 server_connection.open_successful.connect ((message) => {
                     Idle.add (() => {
                         var chat_view = create_chat_view (server);
+                        chat_view.message_to_send.connect ((message) => {
+                            server_connection.send_user_message (message);
+                            chat_view.append_message_to_buffer (message);
+                        });
                         main_layout.add_chat_view (chat_view, server);
                         chat_view.append_message_to_buffer (message);
                         connection_dialog.dismiss ();
@@ -160,6 +165,10 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                     Idle.add (() => {
                         var chat_view = create_chat_view (channel_name);
                         main_layout.add_chat_view (chat_view, channel_name);
+                        chat_view.message_to_send.connect ((message) => {
+                            server_connection.send_user_message ("PRIVMSG " + channel_name + " :" + message);
+                            chat_view.append_message_to_buffer (message);
+                        });
                         /* chat_view.append_message_to_buffer (message); */
                         if (channel_join_dialog != null) {
                             channel_join_dialog.dismiss ();
@@ -175,6 +184,10 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                         if (chat_view == null) {
                             chat_view = create_chat_view (channel_name);
                             main_layout.add_chat_view (chat_view, channel_name);
+                            chat_view.message_to_send.connect ((message) => {
+                                server_connection.send_user_message ("PRIVMSG " + channel_name + " :" + message);
+                                chat_view.append_message_to_buffer (message);
+                            });
                             side_panel.add_channel (server, channel_name);
                             // TODO: Remove this line, it's annoying!
                             main_layout.show_chat_view (channel_name);

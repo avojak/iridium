@@ -57,6 +57,10 @@ public class Iridium.Views.ChatView : Gtk.Grid {
         attach (scroll, 0, 0, 1, 1);
         attach (entry, 0, 1, 1, 1);
 
+        entry.activate.connect (() => {
+            message_to_send (entry.get_text ());
+            entry.set_text ("");
+        });
     }
 
     public Gtk.TextBuffer get_buffer () {
@@ -69,5 +73,7 @@ public class Iridium.Views.ChatView : Gtk.Grid {
         text_view.get_buffer ().insert (ref iter, message, -1);
         text_view.get_buffer ().insert (ref iter, "\n", 1);
     }
+
+    public signal void message_to_send (string message);
 
 }

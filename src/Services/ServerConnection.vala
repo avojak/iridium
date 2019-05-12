@@ -104,7 +104,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             case "PING":
                 send_output ("PONG " + message.message);
                 break;
-            case "NOTICE":
+            case Iridium.Services.MessageCommands.NOTICE:
             case Iridium.Services.NumericCodes.RPL_MOTD:
             case Iridium.Services.NumericCodes.RPL_MOTDSTART:
             case Iridium.Services.NumericCodes.RPL_YOURHOST:
@@ -138,11 +138,11 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 // CTCP VERSION
                 if (Iridium.Services.MessageCommands.VERSION == message.message) {
                     // TODO: Respond to CTCP VERSION
-                    /* send_output ("VERSION Iridium IRC Client 1.0 [x86]"); */
+                    /* send_output ("VERSION Iridium IRC Client 1.0"); */
                     server_message_received ("Received a CTCP VERSION from " + message.username);
                     break;
                 }
-                channel_message_received (message.params[0], message.message);
+                channel_message_received (message.username, message.message);
                 break;
             // Errors
             case Iridium.Services.NumericCodes.ERR_NICKNAMEINUSE:
@@ -154,12 +154,13 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     }
 
     public void join_channel (string name) {
-        send_output ("JOIN " + name);
+        send_output (Iridium.Services.MessageCommands.JOIN + " " + name);
     }
 
     public void close () {
+        debug ("Closing connection for server: " + connection_details.server);
         should_exit = true;
-        send_output ("QUIT :Iridium IRC Client");
+        send_output (Iridium.Services.MessageCommands.QUIT + " :Iridium IRC Client");
         do_close ();
     }
 
@@ -182,6 +183,14 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         }
 
         close_successful ();
+    }
+
+    public void send_user_message (string text) {
+        /* var message = new Message ();
+        message.username = connection_details.username;
+        message.message = text;
+        message.command = Iridium.Services.MessageCommands.PRIVMSG; */
+        send_output (text);
     }
 
     private void send_output (string response) {
