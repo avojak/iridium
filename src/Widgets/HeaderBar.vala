@@ -25,6 +25,7 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
 
     public HeaderBar () {
         Object (
+            title: "Iridium",
             show_close_button: true
         );
     }
@@ -69,6 +70,11 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
 
     public void set_channel_join_button_enabled (bool enabled) {
         channel_join_button.sensitive = enabled;
+    }
+
+    public void update_title (string title, string? subtitle) {
+        this.title = title;
+        this.subtitle = subtitle;
     }
 
     public signal void server_connect_button_clicked ();

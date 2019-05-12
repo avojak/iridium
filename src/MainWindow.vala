@@ -34,7 +34,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             application: application,
             border_width: 0,
             resizable: true,
-            title: "Iridium",
             window_position: Gtk.WindowPosition.CENTER
         );
     }
@@ -73,6 +72,14 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             }
             // Item selected
             main_layout.show_chat_view (item.name);
+
+            // Update the header bar title
+            unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) item;
+            if (row.get_channel_name () != null) {
+                header_bar.update_title (row.get_channel_name (), row.get_server_name ());
+            } else {
+                header_bar.update_title (row.get_server_name (), null);
+            }
 
             // We have enough context to join a channel
             // TODO: This should probably still be enabled as long as there's

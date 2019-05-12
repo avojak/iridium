@@ -129,6 +129,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                     channel_joined (connection_details.server, message.params[0]);
                 } else {
                     // TODO: Handle message for another user joining a channel
+                    /* user_joined_channel (); */
                 }
                 break;
             case Iridium.Services.MessageCommands.PART:
@@ -139,6 +140,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 if (Iridium.Services.MessageCommands.VERSION == message.message) {
                     // TODO: Respond to CTCP VERSION
                     /* send_output ("VERSION Iridium IRC Client 1.0"); */
+                    /* ctcp_version_received (); */
                     server_message_received ("Received a CTCP VERSION from " + message.username);
                     break;
                 }
@@ -214,6 +216,8 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     public signal void server_message_received (string message);
     public signal void channel_message_received (string channel_name, string message);
     public signal void channel_joined (string server, string channel);
+    /* public signal void user_joined_channel (); */
+    /* public signal ctcp_version_received (); */
     public signal void nickname_in_use (string message);
     public signal void server_quit (string message);
 
