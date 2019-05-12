@@ -60,7 +60,6 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
 
     public void show_chat_view (string name) {
         main_stack.get_child_by_name (name).show_all ();
-        /* chat_view.show_all (); */
         main_stack.set_visible_child_full (name, Gtk.StackTransitionType.SLIDE_RIGHT);
     }
 

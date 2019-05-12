@@ -125,7 +125,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 server_quit (message.message);
                 break;
             case Iridium.Services.MessageCommands.JOIN:
-                if (message.message == null || message.message.strip () == "") {
+                if ((message.message == null || message.message.strip () == "") && message.username == connection_details.nickname) {
                     channel_joined (connection_details.server, message.params[0]);
                 } else {
                     // TODO: Handle message for another user joining a channel
@@ -142,7 +142,13 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                     server_message_received ("Received a CTCP VERSION from " + message.username);
                     break;
                 }
-                channel_message_received (message.username, message.message);
+                // If the first param is our nickname, it's a PM. Otherwise, it's
+                // a general message on a channel
+                if (message.params[0] == connection_details.nickname) {
+                    channel_message_received (message.username, message.message);
+                } else {
+                    channel_message_received (message.params[0], message.message);
+                }
                 break;
             // Errors
             case Iridium.Services.NumericCodes.ERR_NICKNAMEINUSE:
