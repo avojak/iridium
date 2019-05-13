@@ -74,6 +74,10 @@ public class Iridium.Views.ChatView : Gtk.Grid {
         text_view.get_buffer ().insert (ref iter, "\n", 1);
     }
 
+    public void add_message (Iridium.Services.Message message) {
+        
+    }
+
     public signal void message_to_send (string message);
 
 }

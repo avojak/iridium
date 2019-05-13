@@ -163,15 +163,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             var current_server = side_panel.get_current_server ();
             channel_join_dialog = new Iridium.Widgets.ChannelJoinDialog (this, connected_servers, current_server);
             channel_join_dialog.show_all ();
-            channel_join_dialog.join_button_clicked.connect ((server, channel) => {
-                // Validate channel name
-                // TODO: Look into what other restrictions exist
-                if (!channel.has_prefix ("#") && !channel.has_prefix ("&")) {
-                    channel_join_dialog.display_error ("Channel must begin with '#' or '&'");
-                    return;
-                }
-
-                Iridium.Application.connection_handler.get_connection (server).join_channel (channel);
+            channel_join_dialog.join_button_clicked.connect ((server_name, channel_name) => {
+                join_channel (server_name, channel_name);
             });
             channel_join_dialog.destroy.connect (() => {
                 channel_join_dialog = null;
@@ -214,14 +207,25 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         });
     }
 
+    private void join_channel (string server_name, string channel_name) {
+        // Validate channel name
+        // TODO: Look into what other restrictions exist
+        if (!channel_name.has_prefix ("#") && !channel_name.has_prefix ("&")) {
+            // TODO: Eventually validate that the dialog is non-null, and handle accordingly
+            channel_join_dialog.display_error ("Channel must begin with '#' or '&'");
+            return;
+        }
+
+        Iridium.Application.connection_handler.get_connection (server_name).join_channel (channel_name);
+    }
+
     private void channel_joined (Iridium.Services.ServerConnection server_connection, string channel_name) {
         Idle.add (() => {
             var server_name = server_connection.connection_details.server;
             var chat_view = create_chat_view (channel_name);
             main_layout.add_chat_view (chat_view, channel_name);
-            chat_view.message_to_send.connect ((message) => {
-                server_connection.send_user_message ("PRIVMSG " + channel_name + " :" + message);
-                chat_view.append_message_to_buffer (message);
+            chat_view.message_to_send.connect ((user_message) => {
+                send_user_message (server_connection, chat_view, channel_name, user_message);
             });
             /* chat_view.append_message_to_buffer (message); */
             if (channel_join_dialog != null) {
@@ -252,9 +256,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             if (chat_view == null) {
                 chat_view = create_chat_view (channel_name);
                 main_layout.add_chat_view (chat_view, channel_name);
-                chat_view.message_to_send.connect ((message) => {
-                    server_connection.send_user_message ("PRIVMSG " + channel_name + " :" + message);
-                    chat_view.append_message_to_buffer (message);
+                chat_view.message_to_send.connect ((user_message) => {
+                    send_user_message (server_connection, chat_view, channel_name, user_message);
                 });
                 side_panel.add_channel (server_name, channel_name);
                 // TODO: Remove this line, it's annoying!
@@ -273,6 +276,12 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             main_layout.get_chat_view (server_name).append_message_to_buffer (message);
             // TODO: Prompt for new nickname?
         }
+    }
+
+    private void send_user_message (Iridium.Services.ServerConnection server_connection,
+            Iridium.Views.ChatView chat_view, string channel_name, string message) {
+        server_connection.send_user_message ("PRIVMSG " + channel_name + " :" + message);
+        chat_view.append_message_to_buffer (message);
     }
 
 }
