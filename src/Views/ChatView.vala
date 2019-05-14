@@ -21,6 +21,8 @@
 
 public class Iridium.Views.ChatView : Gtk.Grid {
 
+    public static uint16 USERNAME_SPACING = 20;
+
     private Gtk.TextView text_view;
 
     public ChatView () {
@@ -57,10 +59,22 @@ public class Iridium.Views.ChatView : Gtk.Grid {
         attach (scroll, 0, 0, 1, 1);
         attach (entry, 0, 1, 1, 1);
 
+        create_text_tags ();
+
         entry.activate.connect (() => {
             message_to_send (entry.get_text ());
             entry.set_text ("");
         });
+    }
+
+    private void create_text_tags () {
+        var buffer = text_view.get_buffer ();
+        var color = Gdk.RGBA ();
+
+        // Username
+        color.parse ("#3689e6");
+        unowned Gtk.TextTag username_tag = buffer.create_tag ("username");
+        username_tag.foreground_rgba = color;
     }
 
     public Gtk.TextBuffer get_buffer () {
@@ -75,7 +89,8 @@ public class Iridium.Views.ChatView : Gtk.Grid {
     }
 
     public void add_message (Iridium.Services.Message message) {
-        
+        var rich_text = new Iridium.Services.RichText (message);
+        rich_text.display (text_view.get_buffer ());
     }
 
     public signal void message_to_send (string message);

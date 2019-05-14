@@ -237,19 +237,21 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         });
     }
 
-    private void server_message_received (string server_name, string message) {
+    private void server_message_received (string server_name, Iridium.Services.Message message) {
         Idle.add (() => {
             var chat_view = main_layout.get_chat_view (server_name);
             // For some NOTICEs, the server ChatView has not yet been created,
             // because we haven't yet received the 001 WELCOME
             if (chat_view != null) {
-                chat_view.append_message_to_buffer (message);
+                /* chat_view.append_message_to_buffer (message); */
+                chat_view.add_message (message);
             }
             return false;
         });
     }
 
-    private void channel_message_received (Iridium.Services.ServerConnection server_connection, string channel_name, string message) {
+    private void channel_message_received (Iridium.Services.ServerConnection server_connection,
+            string channel_name, Iridium.Services.Message message) {
         Idle.add (() => {
             var server_name = server_connection.connection_details.server;
             var chat_view = main_layout.get_chat_view (channel_name);
@@ -263,7 +265,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 // TODO: Remove this line, it's annoying!
                 main_layout.show_chat_view (channel_name);
             }
-            chat_view.append_message_to_buffer (message);
+            /* chat_view.append_message_to_buffer (message); */
+            chat_view.add_message (message);
             return false;
         });
     }
@@ -282,6 +285,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             Iridium.Views.ChatView chat_view, string channel_name, string message) {
         server_connection.send_user_message ("PRIVMSG " + channel_name + " :" + message);
         chat_view.append_message_to_buffer (message);
+        // TODO: Create a Message object and send that to the chat view
     }
 
 }

@@ -16,6 +16,7 @@ executable(
     join_paths('src', 'Services', 'Message.vala'),
     join_paths('src', 'Services', 'MessageCommands.vala'),
     join_paths('src', 'Services', 'NumericCodes.vala'),
+    join_paths('src', 'Services', 'RichText.vala'),
     join_paths('src', 'Services', 'ServerConnection.vala'),
     join_paths('src', 'Services', 'ServerConnectionDetails.vala'),
     join_paths('src', 'Services', 'ServerConnectionHandler.vala'),
