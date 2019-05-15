@@ -40,7 +40,7 @@ public class Iridium.Views.ChatView : Gtk.Grid {
         text_view.border_width = 12;
         text_view.wrap_mode = Gtk.WrapMode.WORD_CHAR;
         /* text_view.left_margin = 140; */
-        text_view.indent = -147; // TODO: Figure out how to compute this
+        text_view.indent = -140; // TODO: Figure out how to compute this
         text_view.monospace = true;
         text_view.editable = false;
         text_view.cursor_visible = false;

@@ -276,16 +276,21 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             Iridium.Application.connection_handler.disconnect_from_server (server_name);
             connection_dialog.display_error ("Nickname already in use.");
         } else {
+            // TODO: Use a Message object instead
             main_layout.get_chat_view (server_name).append_message_to_buffer (message);
             // TODO: Prompt for new nickname?
         }
     }
 
     private void send_user_message (Iridium.Services.ServerConnection server_connection,
-            Iridium.Views.ChatView chat_view, string channel_name, string message) {
-        server_connection.send_user_message ("PRIVMSG " + channel_name + " :" + message);
-        chat_view.append_message_to_buffer (message);
+            Iridium.Views.ChatView chat_view, string channel_name, string text) {
+        var message_text = "PRIVMSG " + channel_name + " :" + text;
+        server_connection.send_user_message (message_text);
+        /* chat_view.append_message_to_buffer (text); */
         // TODO: Create a Message object and send that to the chat view
+        var message = new Iridium.Services.Message (message_text);
+        message.username = server_connection.connection_details.nickname;
+        chat_view.add_message (message);
     }
 
 }
