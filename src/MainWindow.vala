@@ -187,7 +187,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             var chat_view = create_chat_view (server_name);
             chat_view.message_to_send.connect ((message_to_send) => {
                 server_connection.send_user_message (message_to_send);
-                chat_view.append_message_to_buffer (message_to_send);
+                send_user_message (server_connection, chat_view, server_name, message_to_send);
             });
             main_layout.add_chat_view (chat_view, server_name);
             chat_view.append_message_to_buffer (message);

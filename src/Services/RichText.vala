@@ -71,6 +71,16 @@ public class Iridium.Services.RichText : GLib.Object {
     private void display_server_msg (Gtk.TextBuffer buffer) {
         Gtk.TextIter iter;
         buffer.get_end_iter (out iter);
+
+        // Add a placeholder for the username since it's a server message
+        var username = "*";
+        username += string.nfill (Iridium.Views.ChatView.USERNAME_SPACING - username.length, ' ');
+        buffer.insert_text (ref iter, username, username.length);
+        // Add spacing after username and before the start of the message
+        Gtk.TextIter username_start = iter;
+        username_start.backward_chars (username.length);
+        buffer.apply_tag_by_name ("username", username_start, iter);
+
         buffer.insert_text (ref iter, message.message, message.message.length);
         buffer.insert (ref iter, "\n", 1);
     }
