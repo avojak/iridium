@@ -23,6 +23,11 @@ public class Iridium.Views.ChatView : Gtk.Grid {
 
     public static uint16 USERNAME_SPACING = 20;
 
+    // Colors defined by the elementary OS Human Interface Guidelines
+    private static string COLOR_STRAWBERRY = "#c6262e";
+    private static string COLOR_LIME = "#68b723";
+    private static string COLOR_BLUEBERRY = "#3689e6";
+
     private Gtk.TextView text_view;
 
     public ChatView () {
@@ -74,9 +79,10 @@ public class Iridium.Views.ChatView : Gtk.Grid {
         var color = Gdk.RGBA ();
 
         // Username
-        color.parse ("#3689e6");
+        color.parse (COLOR_BLUEBERRY);
         unowned Gtk.TextTag username_tag = buffer.create_tag ("username");
         username_tag.foreground_rgba = color;
+        username_tag.weight = Pango.Weight.SEMIBOLD;
     }
 
     public Gtk.TextBuffer get_buffer () {
