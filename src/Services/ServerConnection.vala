@@ -120,7 +120,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 server_message_received (message);
                 break;
             case Iridium.Services.NumericCodes.RPL_WELCOME:
-                open_successful (message.message);
+                open_successful (message);
                 break;
             case Iridium.Services.MessageCommands.QUIT:
                 server_quit (message.message);
@@ -160,7 +160,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 break;
             // Errors
             case Iridium.Services.NumericCodes.ERR_NICKNAMEINUSE:
-                nickname_in_use (message.message);
+                nickname_in_use (message);
                 break;
             default:
                 break;
@@ -215,7 +215,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         }
     }
 
-    public signal void open_successful (string message);
+    public signal void open_successful (Iridium.Services.Message message);
     public signal void open_failed (string message);
     public signal void close_successful ();
     /* public signal void close_failed (string message); */
@@ -224,7 +224,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     public signal void channel_joined (string server, string channel);
     /* public signal void user_joined_channel (); */
     /* public signal ctcp_version_received (); */
-    public signal void nickname_in_use (string message);
+    public signal void nickname_in_use (Iridium.Services.Message message);
     public signal void server_quit (string message);
 
 }

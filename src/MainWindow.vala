@@ -180,7 +180,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         return chat_view;
     }
 
-    private void server_connection_succcessful (Iridium.Services.ServerConnection server_connection, string message) {
+    private void server_connection_succcessful (Iridium.Services.ServerConnection server_connection,
+            Iridium.Services.Message message) {
         // TODO: Will need to eventually check if connection_dialog is null, etc.
         Idle.add (() => {
             var server_name = server_connection.connection_details.server;
@@ -190,8 +191,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 send_user_message (server_connection, chat_view, server_name, message_to_send);
             });
             main_layout.add_chat_view (chat_view, server_name);
-            // TODO: Update this to use the new method:
-            chat_view.append_message_to_buffer (message);
+            chat_view.add_message (message, false);
             connection_dialog.dismiss ();
             side_panel.add_server (server_name);
             main_layout.show_chat_view (server_name);
@@ -269,13 +269,12 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         });
     }
 
-    private void nickname_in_use (string server_name, string message) {
+    private void nickname_in_use (string server_name, Iridium.Services.Message message) {
         if (connection_dialog != null) {
             Iridium.Application.connection_handler.disconnect_from_server (server_name);
             connection_dialog.display_error ("Nickname already in use.");
         } else {
-            // TODO: Use a Message object instead
-            main_layout.get_chat_view (server_name).append_message_to_buffer (message);
+            main_layout.get_chat_view (server_name).add_message (message, false);
             // TODO: Prompt for new nickname?
         }
     }

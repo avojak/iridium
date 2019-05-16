@@ -74,6 +74,10 @@ public class Iridium.Services.RichText : GLib.Object {
         buffer.insert (ref iter, "\n", 1);
     }
 
+    // TODO: Look into some different options for formatting.
+    //       Maybe italics instead of the * placeholder? Might look a little
+    //       cleaner. Just need to keep in mind that the indent will still
+    //       be there unless I can figure out a way to ignore it in some cases.
     private void display_server_msg (Gtk.TextBuffer buffer) {
         Gtk.TextIter iter;
         buffer.get_end_iter (out iter);
