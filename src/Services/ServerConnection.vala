@@ -116,7 +116,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             case Iridium.Services.NumericCodes.RPL_SERVLIST:
             case Iridium.Services.NumericCodes.RPL_ENDOFSTATS:
             case Iridium.Services.NumericCodes.RPL_STATSLINKINFO:
-                /* server_message_received (message.message); */
                 server_message_received (message);
                 break;
             case Iridium.Services.NumericCodes.RPL_WELCOME:
@@ -151,16 +150,17 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 // If the first param is our nickname, it's a PM. Otherwise, it's
                 // a general message on a channel
                 if (message.params[0] == connection_details.nickname) {
-                    /* channel_message_received (message.username, message.message); */
                     channel_message_received (message.username, message);
                 } else {
-                    /* channel_message_received (message.params[0], message.message); */
                     channel_message_received (message.params[0], message);
                 }
                 break;
             // Errors
             case Iridium.Services.NumericCodes.ERR_NICKNAMEINUSE:
                 nickname_in_use (message);
+                break;
+            case Iridium.Services.NumericCodes.ERR_UNKNOWNCOMMAND:
+                server_error_received (message);
                 break;
             default:
                 break;
@@ -220,6 +220,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     public signal void close_successful ();
     /* public signal void close_failed (string message); */
     public signal void server_message_received (Iridium.Services.Message message);
+    public signal void server_error_received (Iridium.Services.Message message);
     public signal void channel_message_received (string channel_name, Iridium.Services.Message message);
     public signal void channel_joined (string server, string channel);
     /* public signal void user_joined_channel (); */

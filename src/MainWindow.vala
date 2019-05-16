@@ -130,6 +130,10 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 server_connection.server_message_received.connect ((message) => {
                     server_message_received (server, message);
                 });
+                // Error received from the server
+                server_connection.server_error_received.connect ((message) => {
+                    /* server_error_received (server, message); */
+                });
                 // Nickname already in use
                 server_connection.nickname_in_use.connect ((message) => {
                     nickname_in_use (server, message);
