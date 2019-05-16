@@ -175,8 +175,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     private Iridium.Views.ChatView create_chat_view (string name) {
         var chat_view = new Iridium.Views.ChatView ();
-        // Initialize the buffer I think? Get an error without this...
-        chat_view.get_buffer ();
         return chat_view;
     }
 

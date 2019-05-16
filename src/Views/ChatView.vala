@@ -34,12 +34,9 @@ public class Iridium.Views.ChatView : Gtk.Grid {
         Object (
             orientation: Gtk.Orientation.VERTICAL
         );
-
-
     }
 
     construct {
-        // Should all this go here or in the construct block???
         text_view = new Gtk.TextView ();
         text_view.pixels_below_lines = 3;
         text_view.border_width = 12;
@@ -89,10 +86,6 @@ public class Iridium.Views.ChatView : Gtk.Grid {
         unowned Gtk.TextTag self_username_tag = buffer.create_tag ("self-username");
         self_username_tag.foreground_rgba = color;
         self_username_tag.weight = Pango.Weight.SEMIBOLD;
-    }
-
-    public Gtk.TextBuffer get_buffer () {
-        return text_view.get_buffer ();
     }
 
     public void add_message (Iridium.Services.Message message, bool is_user_message) {
