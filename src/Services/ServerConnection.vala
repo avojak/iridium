@@ -160,6 +160,15 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 nickname_in_use (message);
                 break;
             case Iridium.Services.NumericCodes.ERR_UNKNOWNCOMMAND:
+            case Iridium.Services.NumericCodes.ERR_NOSUCHNICK:
+            case Iridium.Services.NumericCodes.ERR_NOSUCHCHANNEL:
+            case Iridium.Services.NumericCodes.ERR_NOMOTD:
+            case Iridium.Services.NumericCodes.ERR_USERNOTINCHANNEL:
+            case Iridium.Services.NumericCodes.ERR_NOTONCHANNEL:
+            case Iridium.Services.NumericCodes.ERR_NOTREGISTERED:
+            case Iridium.Services.NumericCodes.ERR_NEEDMOREPARAMS:
+            case Iridium.Services.NumericCodes.ERR_UNKNOWNMODE:
+            case Iridium.Services.NumericCodes.ERR_CHANOPRIVSNEEDED:
                 server_error_received (message);
                 break;
             default:

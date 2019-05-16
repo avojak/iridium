@@ -132,7 +132,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 });
                 // Error received from the server
                 server_connection.server_error_received.connect ((message) => {
-                    /* server_error_received (server, message); */
+                    server_error_received (server, message);
                 });
                 // Nickname already in use
                 server_connection.nickname_in_use.connect ((message) => {
@@ -193,7 +193,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 send_user_message (server_connection, chat_view, server_name, message_to_send);
             });
             main_layout.add_chat_view (chat_view, server_name);
-            chat_view.add_message (message, false);
+            /* chat_view.add_message (message, false); */
+            chat_view.display_server_msg (message);
             connection_dialog.dismiss ();
             side_panel.add_server (server_name);
             main_layout.show_chat_view (server_name);
@@ -245,7 +246,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             // For some NOTICEs, the server ChatView has not yet been created,
             // because we haven't yet received the 001 WELCOME
             if (chat_view != null) {
-                chat_view.add_message (message, false);
+                /* chat_view.add_message (message, false); */
+                chat_view.display_server_msg (message);
             }
             return false;
         });
@@ -266,7 +268,21 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 // TODO: Remove this line, it's annoying!
                 main_layout.show_chat_view (channel_name);
             }
-            chat_view.add_message (message, false);
+            /* chat_view.add_message (message, false); */
+            chat_view.display_priv_msg (message);
+            return false;
+        });
+    }
+
+    private void server_error_received (string server_name, Iridium.Services.Message message) {
+        Idle.add (() => {
+            var chat_view = main_layout.get_chat_view (server_name);
+            // For some NOTICEs, the server ChatView has not yet been created,
+            // because we haven't yet received the 001 WELCOME
+            if (chat_view != null) {
+                /* chat_view.add_message (message, false); */
+                chat_view.display_server_error_msg (message);
+            }
             return false;
         });
     }
@@ -276,7 +292,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             Iridium.Application.connection_handler.disconnect_from_server (server_name);
             connection_dialog.display_error ("Nickname already in use.");
         } else {
-            main_layout.get_chat_view (server_name).add_message (message, false);
+            // TODO: This should be an error
+            /* main_layout.get_chat_view (server_name).add_message (message, false); */
+            main_layout.get_chat_view (server_name).display_server_error_msg (message);
             // TODO: Prompt for new nickname?
         }
     }
@@ -289,7 +307,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         // Display the message in the chat view
         var message = new Iridium.Services.Message (message_text);
         message.username = server_connection.connection_details.nickname;
-        chat_view.add_message (message, true);
+        /* chat_view.add_message (message, true); */
+        chat_view.display_self_priv_msg (message);
     }
 
 }
