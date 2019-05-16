@@ -22,10 +22,12 @@
 public class Iridium.Services.RichText : GLib.Object {
 
     public Iridium.Services.Message message { get; construct; }
+    public bool is_user_message { get; construct; }
 
-    public RichText (Iridium.Services.Message message) {
+    public RichText (Iridium.Services.Message message, bool is_user_message) {
         Object (
-            message: message
+            message: message,
+            is_user_message: is_user_message
         );
     }
 
@@ -60,10 +62,14 @@ public class Iridium.Services.RichText : GLib.Object {
         }
         buffer.insert_text (ref iter, username, username.length);
 
-        // Add spacing after username and before the start of the message
+        // Format the username
         Gtk.TextIter username_start = iter;
         username_start.backward_chars (username.length);
-        buffer.apply_tag_by_name ("username", username_start, iter);
+        if (is_user_message) {
+            buffer.apply_tag_by_name ("self-username", username_start, iter);
+        } else {
+            buffer.apply_tag_by_name ("username", username_start, iter);
+        }
         buffer.insert_text (ref iter, message.message, message.message.length);
         buffer.insert (ref iter, "\n", 1);
     }
@@ -76,8 +82,8 @@ public class Iridium.Services.RichText : GLib.Object {
         var username = "*";
         username += string.nfill (Iridium.Views.ChatView.USERNAME_SPACING - username.length, ' ');
         buffer.insert_text (ref iter, username, username.length);
-        
-        // Add spacing after username and before the start of the message
+
+        // Format the username
         Gtk.TextIter username_start = iter;
         username_start.backward_chars (username.length);
         buffer.apply_tag_by_name ("username", username_start, iter);

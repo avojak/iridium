@@ -83,6 +83,12 @@ public class Iridium.Views.ChatView : Gtk.Grid {
         unowned Gtk.TextTag username_tag = buffer.create_tag ("username");
         username_tag.foreground_rgba = color;
         username_tag.weight = Pango.Weight.SEMIBOLD;
+
+        // Self username
+        color.parse (COLOR_LIME);
+        unowned Gtk.TextTag self_username_tag = buffer.create_tag ("self-username");
+        self_username_tag.foreground_rgba = color;
+        self_username_tag.weight = Pango.Weight.SEMIBOLD;
     }
 
     public Gtk.TextBuffer get_buffer () {
@@ -96,8 +102,8 @@ public class Iridium.Views.ChatView : Gtk.Grid {
         text_view.get_buffer ().insert (ref iter, "\n", 1);
     }
 
-    public void add_message (Iridium.Services.Message message) {
-        var rich_text = new Iridium.Services.RichText (message);
+    public void add_message (Iridium.Services.Message message, bool is_user_message) {
+        var rich_text = new Iridium.Services.RichText (message, is_user_message);
         rich_text.display (text_view.get_buffer ());
     }
 

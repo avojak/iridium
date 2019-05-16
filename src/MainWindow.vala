@@ -190,6 +190,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 send_user_message (server_connection, chat_view, server_name, message_to_send);
             });
             main_layout.add_chat_view (chat_view, server_name);
+            // TODO: Update this to use the new method:
             chat_view.append_message_to_buffer (message);
             connection_dialog.dismiss ();
             side_panel.add_server (server_name);
@@ -227,7 +228,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             chat_view.message_to_send.connect ((user_message) => {
                 send_user_message (server_connection, chat_view, channel_name, user_message);
             });
-            /* chat_view.append_message_to_buffer (message); */
             if (channel_join_dialog != null) {
                 channel_join_dialog.dismiss ();
             }
@@ -243,8 +243,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             // For some NOTICEs, the server ChatView has not yet been created,
             // because we haven't yet received the 001 WELCOME
             if (chat_view != null) {
-                /* chat_view.append_message_to_buffer (message); */
-                chat_view.add_message (message);
+                chat_view.add_message (message, false);
             }
             return false;
         });
@@ -265,8 +264,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 // TODO: Remove this line, it's annoying!
                 main_layout.show_chat_view (channel_name);
             }
-            /* chat_view.append_message_to_buffer (message); */
-            chat_view.add_message (message);
+            chat_view.add_message (message, false);
             return false;
         });
     }
@@ -284,13 +282,13 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     private void send_user_message (Iridium.Services.ServerConnection server_connection,
             Iridium.Views.ChatView chat_view, string channel_name, string text) {
+        // Send the message
         var message_text = "PRIVMSG " + channel_name + " :" + text;
         server_connection.send_user_message (message_text);
-        /* chat_view.append_message_to_buffer (text); */
-        // TODO: Create a Message object and send that to the chat view
+        // Display the message in the chat view
         var message = new Iridium.Services.Message (message_text);
         message.username = server_connection.connection_details.nickname;
-        chat_view.add_message (message);
+        chat_view.add_message (message, true);
     }
 
 }

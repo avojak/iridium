@@ -83,6 +83,7 @@ public class Iridium.Services.Message : GLib.Object {
     }
 
     private void strip_non_printable_chars () {
+        // TODO: Probably a better way to do this
         if (non_print_regex.match (message[0].to_string ())) {
             message = message.substring (1);
         }
