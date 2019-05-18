@@ -40,6 +40,11 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         connections.unset (server);
     }
 
+    public void leave_channel (string server, string channel) {
+        var connection = connections.get (server);
+        connection.leave_channel (channel);
+    }
+
     public string[] get_connected_servers () {
         string[] servers = { };
         foreach (string key in connections.keys) {

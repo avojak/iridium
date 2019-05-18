@@ -133,7 +133,11 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 }
                 break;
             case Iridium.Services.MessageCommands.PART:
-                // TODO: Implement
+                if (message.username == connection_details.nickname) {
+                    channel_left (connection_details.server, message.params[0]);
+                } else {
+                    // TODO: Handle other users leaving channels
+                }
                 break;
             case Iridium.Services.MessageCommands.PRIVMSG:
                 // CTCP VERSION
@@ -216,6 +220,10 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         send_output (text);
     }
 
+    public void leave_channel (string channel) {
+        send_output (Iridium.Services.MessageCommands.PART + " " + channel);
+    }
+
     private void send_output (string response) {
         try {
             output_stream.put_string (@"$response\r\n");
@@ -232,6 +240,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     public signal void server_error_received (Iridium.Services.Message message);
     public signal void channel_message_received (string channel_name, Iridium.Services.Message message);
     public signal void channel_joined (string server, string channel);
+    public signal void channel_left (string server, string channel);
     /* public signal void user_joined_channel (); */
     /* public signal ctcp_version_received (); */
     public signal void nickname_in_use (Iridium.Services.Message message);

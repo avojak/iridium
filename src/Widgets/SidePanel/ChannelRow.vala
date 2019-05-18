@@ -23,6 +23,8 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
 
     public string server_name { get; construct; }
 
+    private Gtk.Menu context_menu;
+
     public ChannelRow (string name, string server_name) {
         Object (
             name: name,
@@ -31,6 +33,23 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
     }
 
     construct {
+        context_menu = new Gtk.Menu ();
+
+        var favorite_item = new Gtk.MenuItem.with_label ("Add to favorites");
+        favorite_item.activate.connect (() => {
+
+        });
+
+        var leave_item = new Gtk.MenuItem.with_label ("Leave channel");
+        leave_item.activate.connect (() => {
+            leave_channel ();
+        });
+
+        context_menu.append (favorite_item);
+        context_menu.append (new Gtk.SeparatorMenuItem ());
+        context_menu.append (leave_item);
+
+        context_menu.show_all ();
     }
 
     public new string get_server_name () {
@@ -40,5 +59,11 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
     public new string? get_channel_name () {
         return name;
     }
+
+    public override Gtk.Menu? get_context_menu () {
+        return context_menu;
+    }
+
+    public signal void leave_channel ();
 
 }

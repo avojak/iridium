@@ -62,13 +62,25 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
     public void add_channel (string server, string name) {
         var channel_item = new Iridium.Widgets.SidePanel.ChannelRow (name, server);
         /* channel_item.markup = "#irchacks <small>" + name + "</small>"; */
-        /* channel.activatable = new GLib.ThemedIcon ("view-more-horizontal-symbolic"); */
+        channel_item.leave_channel.connect (() => {
+            leave_channel (server, name);
+        });
 
         var server_item = server_items.get (server);
         server_item.add (channel_item);
         server_item.expanded = true;
 
         selected = channel_item;
+    }
+
+    public void remove_channel (string server_name, string channel_name) {
+        var server_item = server_items.get (server_name);
+        foreach (var channel_item in server_item.children) {
+            if (channel_item.name == channel_name) {
+                server_item.remove (channel_item);
+                return;
+            }
+        }
     }
 
     public string? get_current_server () {
@@ -85,5 +97,6 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
     }
 
     public signal void server_added ();
+    public signal void leave_channel (string server_name, string channel_name);
 
 }
