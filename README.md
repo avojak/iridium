@@ -56,6 +56,7 @@ This project is very much in-progress and has a lot of work left to do. Here is 
 - [x] Automatically open chat views for joined channels and incoming direct messages
 - [ ] Support leaving channels and disconnecting from servers
 - [ ] Autoscrolling
+- [ ] Unread message badges for channels
 - [ ] Support authentication for servers
 - [ ] Special formatting for usernames and URLs in messages
 - [ ] Favorite channels
