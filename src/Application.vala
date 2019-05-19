@@ -37,7 +37,7 @@ public class Iridium.Application : Gtk.Application {
     }
 
     protected override void activate () {
-        var main_window = new Iridium.MainWindow (this);
+        var main_window = new Iridium.MainWindow (this, connection_handler);
         main_window.show_all ();
 
         // TODO: Use NetworkMonitor to handle lost internet connection

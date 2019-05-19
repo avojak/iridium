@@ -42,6 +42,13 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         others_category.add (others_dummy);
         others_category.child_added.connect ((item) => {
             others_category.expanded = true;
+            others_dummy.visible = false;
+        });
+        others_category.child_removed.connect ((item) => {
+            if (others_category.n_children == 1) {
+                others_category.expanded = false;
+                others_dummy.visible = true;
+            }
         });
 
         root.add (favorites_category);
@@ -51,8 +58,25 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
     }
 
     public void add_server (string name) {
-        others_dummy.visible = false;
         var server_item = new Iridium.Widgets.SidePanel.ServerRow (name);
+        // Disconnect from the server and disable the item and associated channel items
+        server_item.disconnect_from_server.connect ((should_close) => {
+            disconnect_from_server (name);
+            server_item.disable ();
+            // Disable the channels
+            foreach (var channel_item in server_item.children) {
+                unowned Iridium.Widgets.SidePanel.Row channel_row = (Iridium.Widgets.SidePanel.Row) channel_item;
+                channel_row.disable ();
+            }
+        });
+        // Remove the server item and its associated channel items
+        server_item.remove_server.connect (() => {
+            foreach (var channel_item in server_item.children) {
+                server_item.remove (channel_item);
+            }
+            others_category.remove (server_items.get (name));
+            server_items.unset (name);
+        });
         server_items.set (name, server_item);
         others_category.add (server_item);
 
@@ -64,6 +88,10 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         /* channel_item.markup = "#irchacks <small>" + name + "</small>"; */
         channel_item.leave_channel.connect (() => {
             leave_channel (server, name);
+            channel_item.disable ();
+        });
+        channel_item.remove_channel.connect (() => {
+            remove_channel (server, name);
         });
 
         var server_item = server_items.get (server);
@@ -98,5 +126,6 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
 
     public signal void server_added ();
     public signal void leave_channel (string server_name, string channel_name);
+    public signal void disconnect_from_server(string server_name);
 
 }

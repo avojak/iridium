@@ -21,9 +21,14 @@
 
 public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.ExpandableItem, Iridium.Widgets.SidePanel.Row {
 
-    public ServerRow (string name) {
+    public string server_name { get; construct; }
+
+    private bool is_enabled = true;
+
+    public ServerRow (string server_name) {
         Object (
-            name: name
+            name: server_name,
+            server_name: server_name
         );
     }
 
@@ -32,11 +37,72 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
     }
 
     public new string get_server_name () {
-        return name;
+        return server_name;
     }
 
     public new string? get_channel_name () {
         return null;
     }
+
+    public new void enable () {
+        if (is_enabled) {
+            return;
+        }
+        icon = new GLib.ThemedIcon ("user-available");
+        markup = null;
+        is_enabled = true;
+    }
+
+    public new void disable () {
+        if (!is_enabled) {
+            return;
+        }
+        icon = new GLib.ThemedIcon ("user-offline");
+        markup = "<i>" + server_name + "</i>";
+        is_enabled = false;
+    }
+
+    public override Gtk.Menu? get_context_menu () {
+        var menu = new Gtk.Menu ();
+
+        var edit_item = new Gtk.MenuItem.with_label ("Edit settings...");
+        edit_item.activate.connect (() => {
+            // TODO: Implement
+        });
+
+        var connect_item = new Gtk.MenuItem.with_label ("Connect");
+        connect_item.activate.connect (() => {
+            // TODO: Implement
+        });
+
+        var disconnect_item = new Gtk.MenuItem.with_label ("Disconnect");
+        disconnect_item.activate.connect (() => {
+            disconnect_from_server ();
+        });
+
+        var close_item = new Gtk.MenuItem.with_label ("Close");
+        close_item.activate.connect (() => {
+            if (is_enabled) {
+                disconnect_from_server ();
+            }
+            remove_server ();
+        });
+
+        menu.append (edit_item);
+        menu.append (new Gtk.SeparatorMenuItem ());
+        if (is_enabled) {
+            menu.append (disconnect_item);
+        } else {
+            menu.append (connect_item);
+        }
+        menu.append (close_item);
+
+        menu.show_all ();
+
+        return menu;
+    }
+
+    public signal void disconnect_from_server ();
+    public signal void remove_server ();
 
 }

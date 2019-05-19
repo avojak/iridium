@@ -21,6 +21,8 @@
 
 public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
+    public Iridium.Services.ServerConnectionHandler connection_handler { get; construct; }
+
     public Iridium.Widgets.ServerConnectionDialog? connection_dialog = null;
     public Iridium.Widgets.ChannelJoinDialog? channel_join_dialog = null;
 
@@ -29,12 +31,13 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     private Iridium.Widgets.SidePanel.Panel side_panel;
     private Iridium.Layouts.MainLayout main_layout;
 
-    public MainWindow (Gtk.Application application) {
+    public MainWindow (Gtk.Application application, Iridium.Services.ServerConnectionHandler connection_handler) {
         Object (
             application: application,
             border_width: 0,
             resizable: true,
-            window_position: Gtk.WindowPosition.CENTER
+            window_position: Gtk.WindowPosition.CENTER,
+            connection_handler: connection_handler
         );
     }
 
@@ -86,17 +89,33 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             //       at least one open connection.
             header_bar.set_channel_join_button_enabled (true);
         });
+        side_panel.disconnect_from_server.connect ((server_name) => {
+            // TODO: Might need to disable the join channel header button!
+            connection_handler.disconnect_from_server (server_name);
+        });
         side_panel.leave_channel.connect ((server_name, channel_name) => {
-            Iridium.Application.connection_handler.leave_channel (server_name, channel_name);
+            connection_handler.leave_channel (server_name, channel_name);
         });
         welcome_view.new_connection_button_clicked.connect (() => {
             show_server_connection_dialog ();
         });
 
+        // Connect to all of the connection handler signals
+        connection_handler.server_connection_successful.connect (on_server_connection_successful);
+        connection_handler.server_connection_failed.connect (on_server_connection_failed);
+        connection_handler.server_connection_closed.connect (on_server_connection_closed);
+        connection_handler.server_message_received.connect (on_server_message_received);
+        connection_handler.server_error_received.connect (on_server_error_received);
+        connection_handler.server_quit.connect (on_server_quit);
+        connection_handler.nickname_in_use.connect (on_nickname_in_use);
+        connection_handler.channel_joined.connect (on_channel_joined);
+        connection_handler.channel_left.connect (on_channel_left);
+        connection_handler.channel_message_received.connect (on_channel_message_received);
+
         // Close connections when the window is closed
         this.destroy.connect (() => {
             // TODO: Not sure if this is right...
-            Iridium.Application.connection_handler.close_all_connections ();
+            connection_handler.close_all_connections ();
             GLib.Process.exit (0);
         });
     }
@@ -107,7 +126,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             connection_dialog.show_all ();
             connection_dialog.connect_button_clicked.connect ((server, nickname, username, realname) => {
                 // Prevent duplicate connections
-                if (Iridium.Application.connection_handler.has_connection (server)) {
+                if (connection_handler.has_connection (server)) {
                     connection_dialog.display_error ("Already connected to this server!");
                     return;
                 }
@@ -120,45 +139,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 connection_details.realname = realname;
 
                 // Attempt the server connection
-                // TODO: Should this be unowned?
-                var server_connection = Iridium.Application.connection_handler.connect_to_server (connection_details);
-                server_connection.open_successful.connect ((message) => {
-                    server_connection_succcessful (server_connection, message);
-                });
-                // Server connection failed
-                server_connection.open_failed.connect ((message) => {
-                    server_connection_failed (message);
-                });
-                // Message received from the server
-                server_connection.server_message_received.connect ((message) => {
-                    server_message_received (server, message);
-                });
-                // Error received from the server
-                server_connection.server_error_received.connect ((message) => {
-                    server_error_received (server, message);
-                });
-                // Nickname already in use
-                server_connection.nickname_in_use.connect ((message) => {
-                    nickname_in_use (server, message);
-                });
-                // Channel has been joined
-                server_connection.channel_joined.connect ((server_name, channel_name) => {
-                    channel_joined (server_connection, channel_name);
-                });
-                server_connection.channel_left.connect ((server_name, channel_name) => {
-                    channel_left (server_name, channel_name);
-                });
-                // Channel message received
-                server_connection.channel_message_received.connect ((channel_name, message) => {
-                    channel_message_received (server_connection, channel_name, message);
-                });
-                // User has quit the server
-                server_connection.server_quit.connect ((message) => {
-                    server_connection.do_close ();
-                    // TODO: Do we want to close the view or just show as disconnected??
-                    // TODO: Remove chat views?
-                    // TODO: Remove server from side panel?
-                });
+                connection_handler.connect_to_server (connection_details);
             });
             connection_dialog.destroy.connect (() => {
                 connection_dialog = null;
@@ -169,7 +150,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     private void show_channel_join_dialog () {
         if (channel_join_dialog == null) {
-            var connected_servers = Iridium.Application.connection_handler.get_connected_servers ();
+            var connected_servers = connection_handler.get_connected_servers ();
             var current_server = side_panel.get_current_server ();
             channel_join_dialog = new Iridium.Widgets.ChannelJoinDialog (this, connected_servers, current_server);
             channel_join_dialog.show_all ();
@@ -183,40 +164,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         channel_join_dialog.present ();
     }
 
-    private Iridium.Views.ChatView create_chat_view (string name) {
-        var chat_view = new Iridium.Views.ChatView ();
-        return chat_view;
-    }
-
-    private void server_connection_succcessful (Iridium.Services.ServerConnection server_connection,
-            Iridium.Services.Message message) {
-        // TODO: Will need to eventually check if connection_dialog is null, etc.
-        Idle.add (() => {
-            var server_name = server_connection.connection_details.server;
-            var chat_view = create_chat_view (server_name);
-            chat_view.message_to_send.connect ((message_to_send) => {
-                server_connection.send_user_message (message_to_send);
-                send_user_message (server_connection, chat_view, server_name, message_to_send);
-            });
-            main_layout.add_chat_view (chat_view, server_name);
-            /* chat_view.add_message (message, false); */
-            chat_view.display_server_msg (message);
-            connection_dialog.dismiss ();
-            side_panel.add_server (server_name);
-            main_layout.show_chat_view (server_name);
-            show_channel_join_dialog ();
-            return false;
-        });
-    }
-
-    private void server_connection_failed (string message) {
-        // TODO: Will need to eventually check if connection_dialog is null, etc.
-        Idle.add (() => {
-            connection_dialog.display_error (message);
-            return false;
-        });
-    }
-
     private void join_channel (string server_name, string channel_name) {
         // Validate channel name
         // TODO: Look into what other restrictions exist
@@ -225,90 +172,92 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             channel_join_dialog.display_error ("Channel must begin with '#' or '&'");
             return;
         }
-
-        Iridium.Application.connection_handler.get_connection (server_name).join_channel (channel_name);
+        connection_handler.join_channel (server_name, channel_name);
     }
 
-    private void channel_joined (Iridium.Services.ServerConnection server_connection, string channel_name) {
+    private void send_user_message (string server_name, string channel_name, string text, Iridium.Views.ChatView chat_view) {
+        // Send the message
+        var message_text = "PRIVMSG " + channel_name + " :" + text;
+        connection_handler.send_user_message (server_name, message_text);
+        // Display the message in the chat view
+        var message = new Iridium.Services.Message (message_text);
+        message.username = connection_handler.get_nickname (server_name);
+        chat_view.display_self_priv_msg (message);
+    }
+
+    //
+    // ServerConnectionHandler Callbacks
+    //
+
+    private void on_server_connection_successful (string server_name, Iridium.Services.Message message) {
         Idle.add (() => {
-            var server_name = server_connection.connection_details.server;
-            var chat_view = create_chat_view (channel_name);
-            main_layout.add_chat_view (chat_view, channel_name);
-            chat_view.message_to_send.connect ((user_message) => {
-                send_user_message (server_connection, chat_view, channel_name, user_message);
-            });
-            if (channel_join_dialog != null) {
-                channel_join_dialog.dismiss ();
+            // Check if the chat view already exists before creating a new one
+            var chat_view = main_layout.get_chat_view (server_name);
+            if (chat_view == null) {
+                chat_view = new Iridium.Views.ChatView ();
+                chat_view.message_to_send.connect ((message_to_send) => {
+                    send_user_message (server_name, server_name, message_to_send, chat_view);
+                });
+                main_layout.add_chat_view (chat_view, server_name);
             }
-            side_panel.add_channel (server_name, channel_name);
-            main_layout.show_chat_view (channel_name);
+
+            chat_view.display_server_msg (message);
+            if (connection_dialog != null) {
+                connection_dialog.dismiss ();
+            }
+            side_panel.add_server (server_name);
+            main_layout.show_chat_view (server_name);
+            show_channel_join_dialog ();
             return false;
         });
     }
 
-    private void channel_left (string server_name, string channel_name) {
-        // Remove side panel item
+    private void on_server_connection_failed (string server_name, string error_message) {
         Idle.add (() => {
-            side_panel.remove_channel (server_name, channel_name);
-            return false;
-        });
-        // Remove chat view
-        Idle.add (() => {
-            main_layout.remove_chat_view (channel_name, server_name);
+            if (connection_dialog != null) {
+                connection_dialog.display_error (error_message);
+            }
             return false;
         });
     }
 
-    private void server_message_received (string server_name, Iridium.Services.Message message) {
+    private void on_server_connection_closed (string server_name) {
+        // TODO: Implement - display disconnect message and disable the server
+        //       and all associated channel rows
+    }
+
+    private void on_server_message_received (string server_name, Iridium.Services.Message message) {
         Idle.add (() => {
             var chat_view = main_layout.get_chat_view (server_name);
             // For some NOTICEs, the server ChatView has not yet been created,
             // because we haven't yet received the 001 WELCOME
             if (chat_view != null) {
-                /* chat_view.add_message (message, false); */
                 chat_view.display_server_msg (message);
             }
             return false;
         });
     }
 
-    private void channel_message_received (Iridium.Services.ServerConnection server_connection,
-            string channel_name, Iridium.Services.Message message) {
-        Idle.add (() => {
-            var server_name = server_connection.connection_details.server;
-            var chat_view = main_layout.get_chat_view (channel_name);
-            if (chat_view == null) {
-                chat_view = create_chat_view (channel_name);
-                main_layout.add_chat_view (chat_view, channel_name);
-                chat_view.message_to_send.connect ((user_message) => {
-                    send_user_message (server_connection, chat_view, channel_name, user_message);
-                });
-                side_panel.add_channel (server_name, channel_name);
-                // TODO: Remove this line, it's annoying!
-                main_layout.show_chat_view (channel_name);
-            }
-            /* chat_view.add_message (message, false); */
-            chat_view.display_priv_msg (message);
-            return false;
-        });
-    }
-
-    private void server_error_received (string server_name, Iridium.Services.Message message) {
+    private void on_server_error_received (string server_name, Iridium.Services.Message message) {
         Idle.add (() => {
             var chat_view = main_layout.get_chat_view (server_name);
             // For some NOTICEs, the server ChatView has not yet been created,
             // because we haven't yet received the 001 WELCOME
             if (chat_view != null) {
-                /* chat_view.add_message (message, false); */
                 chat_view.display_server_error_msg (message);
             }
             return false;
         });
     }
 
-    private void nickname_in_use (string server_name, Iridium.Services.Message message) {
+    private void on_server_quit (string server_name, string message) {
+        connection_handler.disconnect_from_server (server_name);
+    }
+
+    private void on_nickname_in_use (string server_name, Iridium.Services.Message message) {
         if (connection_dialog != null) {
-            Iridium.Application.connection_handler.disconnect_from_server (server_name);
+            // TODO: Should this be outside the if-statement?
+            connection_handler.disconnect_from_server (server_name);
             connection_dialog.display_error ("Nickname already in use.");
         } else {
             // TODO: This should be an error
@@ -318,16 +267,51 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         }
     }
 
-    private void send_user_message (Iridium.Services.ServerConnection server_connection,
-            Iridium.Views.ChatView chat_view, string channel_name, string text) {
-        // Send the message
-        var message_text = "PRIVMSG " + channel_name + " :" + text;
-        server_connection.send_user_message (message_text);
-        // Display the message in the chat view
-        var message = new Iridium.Services.Message (message_text);
-        message.username = server_connection.connection_details.nickname;
-        /* chat_view.add_message (message, true); */
-        chat_view.display_self_priv_msg (message);
+    private void on_channel_joined (string server_name, string channel_name) {
+        Idle.add (() => {
+            // Check if the chat view already exists before creating a new one
+            var chat_view = main_layout.get_chat_view (channel_name);
+            if (chat_view == null) {
+                chat_view = new Iridium.Views.ChatView ();
+                main_layout.add_chat_view (chat_view, channel_name);
+                chat_view.message_to_send.connect ((user_message) => {
+                    /* send_user_message (server_connection, chat_view, channel_name, user_message); */
+                    send_user_message (server_name, channel_name, user_message, chat_view);
+                });
+            }
+
+            if (channel_join_dialog != null) {
+                channel_join_dialog.dismiss ();
+            }
+            side_panel.add_channel (server_name, channel_name);
+            main_layout.show_chat_view (channel_name);
+            return false;
+        });
+    }
+
+    private void on_channel_left (string server_name, string channel_name) {
+        // TODO: Display a message that we've left the channel
+        // TODO: Disable the channel row
+    }
+
+    private void on_channel_message_received (string server_name, string channel_name, Iridium.Services.Message message) {
+        Idle.add (() => {
+            // Check if the chat view already exists before creating a new one
+            var chat_view = main_layout.get_chat_view (channel_name);
+            if (chat_view == null) {
+                chat_view = new Iridium.Views.ChatView ();
+                main_layout.add_chat_view (chat_view, channel_name);
+                chat_view.message_to_send.connect ((user_message) => {
+                    /* send_user_message (server_connection, chat_view, channel_name, user_message); */
+                    send_user_message (server_name, channel_name, user_message, chat_view);
+                });
+                side_panel.add_channel (server_name, channel_name);
+                // TODO: Remove this line eventually - it's annoying!
+                main_layout.show_chat_view (channel_name);
+            }
+            chat_view.display_priv_msg (message);
+            return false;
+        });
     }
 
 }

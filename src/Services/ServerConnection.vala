@@ -34,6 +34,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     }
 
     public void open () {
+        should_exit = false;
         var server = connection_details.server;
         new Thread<int> (@"Server connection [$server]", do_connect);
     }
@@ -126,7 +127,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 break;
             case Iridium.Services.MessageCommands.JOIN:
                 if ((message.message == null || message.message.strip () == "") && message.username == connection_details.nickname) {
-                    channel_joined (connection_details.server, message.params[0]);
+                    channel_joined (message.params[0]);
                 } else {
                     // TODO: Handle message for another user joining a channel
                     /* user_joined_channel (); */
@@ -134,7 +135,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 break;
             case Iridium.Services.MessageCommands.PART:
                 if (message.username == connection_details.nickname) {
-                    channel_left (connection_details.server, message.params[0]);
+                    channel_left (message.params[0]);
                 } else {
                     // TODO: Handle other users leaving channels
                 }
@@ -197,6 +198,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         try {
             input_stream.clear_pending ();
             input_stream.close ();
+            input_stream = null;
         } catch (GLib.IOError e) {
             // TODO: Handle errors!
         }
@@ -205,11 +207,12 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             output_stream.clear_pending ();
             output_stream.flush ();
             output_stream.close ();
+            output_stream = null;
         } catch (GLib.Error e) {
             // TODO: Handle errors!
         }
 
-        close_successful ();
+        connection_closed ();
     }
 
     public void send_user_message (string text) {
@@ -228,22 +231,22 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         try {
             output_stream.put_string (@"$response\r\n");
         } catch (GLib.IOError e) {
-            // TODO: Handle erros!!
+            // TODO: Handle errors!!
         }
     }
 
     public signal void open_successful (Iridium.Services.Message message);
-    public signal void open_failed (string message);
-    public signal void close_successful ();
+    public signal void open_failed (string error_message);
+    public signal void connection_closed ();
     /* public signal void close_failed (string message); */
     public signal void server_message_received (Iridium.Services.Message message);
     public signal void server_error_received (Iridium.Services.Message message);
+    public signal void server_quit (string message);
+    public signal void nickname_in_use (Iridium.Services.Message message);
+    public signal void channel_joined (string channel);
+    public signal void channel_left (string channel);
     public signal void channel_message_received (string channel_name, Iridium.Services.Message message);
-    public signal void channel_joined (string server, string channel);
-    public signal void channel_left (string server, string channel);
     /* public signal void user_joined_channel (); */
     /* public signal ctcp_version_received (); */
-    public signal void nickname_in_use (Iridium.Services.Message message);
-    public signal void server_quit (string message);
 
 }

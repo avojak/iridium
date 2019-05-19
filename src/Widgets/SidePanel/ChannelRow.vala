@@ -19,37 +19,26 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
+// TODO: Might be able to set the visibility to hide/show when it's a
+//       favorite or when it's been un-favorited? ie. two items, one
+//       that's a favorite and one that isn't. This might be easier than
+//       trying to move or re-create the row.
 public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.Item, Iridium.Widgets.SidePanel.Row {
 
+    public string channel_name { get; construct; }
     public string server_name { get; construct; }
 
-    private Gtk.Menu context_menu;
+    private bool is_enabled = true;
 
-    public ChannelRow (string name, string server_name) {
+    public ChannelRow (string channel_name, string server_name) {
         Object (
-            name: name,
+            name: channel_name,
+            channel_name: channel_name,
             server_name: server_name
         );
     }
 
     construct {
-        context_menu = new Gtk.Menu ();
-
-        var favorite_item = new Gtk.MenuItem.with_label ("Add to favorites");
-        favorite_item.activate.connect (() => {
-
-        });
-
-        var leave_item = new Gtk.MenuItem.with_label ("Leave channel");
-        leave_item.activate.connect (() => {
-            leave_channel ();
-        });
-
-        context_menu.append (favorite_item);
-        context_menu.append (new Gtk.SeparatorMenuItem ());
-        context_menu.append (leave_item);
-
-        context_menu.show_all ();
     }
 
     public new string get_server_name () {
@@ -57,13 +46,66 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
     }
 
     public new string? get_channel_name () {
-        return name;
+        return channel_name;
+    }
+
+    public new void enable () {
+        if (is_enabled) {
+            return;
+        }
+        markup = null;
+        is_enabled = true;
+    }
+
+    public new void disable () {
+        if (!is_enabled) {
+            return;
+        }
+        markup = "<i>" + channel_name + "</i>";
+        is_enabled = false;
     }
 
     public override Gtk.Menu? get_context_menu () {
-        return context_menu;
+        var menu = new Gtk.Menu ();
+
+        var favorite_item = new Gtk.MenuItem.with_label ("Add to favorites");
+        favorite_item.activate.connect (() => {
+            // TODO: Implement
+        });
+
+        var join_item = new Gtk.MenuItem.with_label ("Join channel");
+        join_item.activate.connect (() => {
+            // TODO: Implement
+        });
+
+        var leave_item = new Gtk.MenuItem.with_label ("Leave channel");
+        leave_item.activate.connect (() => {
+            leave_channel ();
+        });
+
+        var close_item = new Gtk.MenuItem.with_label ("Close");
+        close_item.activate.connect (() => {
+            if (is_enabled) {
+                leave_channel ();
+            }
+            remove_channel ();
+        });
+
+        menu.append (favorite_item);
+        menu.append (new Gtk.SeparatorMenuItem ());
+        if (is_enabled) {
+            menu.append (leave_item);
+        } else {
+            menu.append (join_item);
+        }
+        menu.append (close_item);
+
+        menu.show_all ();
+
+        return menu;
     }
 
     public signal void leave_channel ();
+    public signal void remove_channel ();
 
 }
