@@ -95,11 +95,6 @@ public class Iridium.Views.ChatView : Gtk.Grid {
         error_tag.weight = Pango.Weight.SEMIBOLD;
     }
 
-    /* public void add_message (Iridium.Services.Message message, bool is_user_message) {
-        var rich_text = new Iridium.Models.OldRichText (message, is_user_message);
-        rich_text.display (text_view.get_buffer ());
-    } */
-
     // TODO: Consolidate these down into a single display_rich_text function?
 
     public void display_priv_msg (Iridium.Services.Message message) {

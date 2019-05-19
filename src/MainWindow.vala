@@ -307,6 +307,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                     /* send_user_message (server_connection, chat_view, channel_name, user_message); */
                     send_user_message (server_name, channel_name, user_message, chat_view);
                 });
+                // TODO: Should this be outside the if-statement? Might fix the
+                //       bug where a direct message doesn't show the row again.
                 side_panel.add_channel (server_name, channel_name);
                 // TODO: Remove this line eventually - it's annoying!
                 main_layout.show_chat_view (channel_name);

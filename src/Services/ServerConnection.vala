@@ -216,10 +216,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     }
 
     public void send_user_message (string text) {
-        /* var message = new Message ();
-        message.username = connection_details.username;
-        message.message = text;
-        message.command = Iridium.Services.MessageCommands.PRIVMSG; */
+        // TODO: Some issues sending messages to the server... FIX PLZ
         send_output (text);
     }
 

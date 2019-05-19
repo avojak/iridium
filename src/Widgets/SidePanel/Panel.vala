@@ -108,7 +108,6 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
             remove_channel (server, name);
         });
 
-        /* var server_item = server_items.get (server); */
         server_item.add (channel_item);
         server_item.expanded = true;
 

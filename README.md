@@ -54,7 +54,7 @@ $ ninja com.github.avojak.iridium-update-po
 This project is very much in-progress and has a lot of work left to do. Here is a list of features I plan on implementing that I will update upon completion:
 
 - [x] Automatically open chat views for joined channels and incoming direct messages
-- [ ] Support leaving channels and disconnecting from servers
+- [x] Support leaving channels and disconnecting from servers
 - [ ] Autoscrolling
 - [ ] Unread message badges for channels
 - [ ] Support authentication for servers
