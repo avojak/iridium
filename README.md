@@ -51,7 +51,7 @@ $ ninja com.github.avojak.iridium-update-po
 
 ## Feature TODO List
 
-This project is very much in-progress and has a lot of work left to do. Here is a list of features I plan on implementing that I will update upon completion:
+This project is very much in-progress and has a lot of remaining work. Here is a list of features I plan on implementing that I will update upon completion:
 
 - [x] Automatically open chat views for joined channels and incoming direct messages
 - [x] Support leaving channels and disconnecting from servers
