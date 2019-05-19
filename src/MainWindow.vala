@@ -206,6 +206,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 connection_dialog.dismiss ();
             }
             side_panel.add_server (server_name);
+            side_panel.enable_server_row (server_name);
             main_layout.show_chat_view (server_name);
             show_channel_join_dialog ();
             return false;
@@ -284,6 +285,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 channel_join_dialog.dismiss ();
             }
             side_panel.add_channel (server_name, channel_name);
+            side_panel.enable_channel_row (server_name, channel_name);
             main_layout.show_chat_view (channel_name);
             return false;
         });

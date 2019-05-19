@@ -58,6 +58,11 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
     }
 
     public void add_server (string name) {
+        // Check if this server row already exists
+        if (server_items.has_key (name)) {
+            return;
+        }
+
         var server_item = new Iridium.Widgets.SidePanel.ServerRow (name);
         // Disconnect from the server and disable the item and associated channel items
         server_item.disconnect_from_server.connect ((should_close) => {
@@ -84,6 +89,15 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
     }
 
     public void add_channel (string server, string name) {
+        // Check if this channel row already exists
+        var server_item = server_items.get (server);
+        foreach (var child in server_item.children) {
+            unowned Iridium.Widgets.SidePanel.ChannelRow channel_item = (Iridium.Widgets.SidePanel.ChannelRow) child;
+            if (channel_item.channel_name == name) {
+                return;
+            }
+        }
+
         var channel_item = new Iridium.Widgets.SidePanel.ChannelRow (name, server);
         /* channel_item.markup = "#irchacks <small>" + name + "</small>"; */
         channel_item.leave_channel.connect (() => {
@@ -94,7 +108,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
             remove_channel (server, name);
         });
 
-        var server_item = server_items.get (server);
+        /* var server_item = server_items.get (server); */
         server_item.add (channel_item);
         server_item.expanded = true;
 
@@ -104,7 +118,8 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
     public void remove_channel (string server_name, string channel_name) {
         var server_item = server_items.get (server_name);
         foreach (var channel_item in server_item.children) {
-            if (channel_item.name == channel_name) {
+            unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) channel_item;
+            if (row.get_channel_name () == channel_name) {
                 server_item.remove (channel_item);
                 return;
             }
@@ -122,6 +137,29 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         // TODO: This feels wrong...
         unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) selected;
         return row.get_server_name ();
+    }
+
+    public void enable_server_row (string server_name) {
+        var server_item = server_items.get (server_name);
+        if (server_item == null) {
+            return;
+        }
+        unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) server_item;
+        row.enable ();
+    }
+
+    public void enable_channel_row (string server_name, string channel_name) {
+        var server_item = server_items.get (server_name);
+        if (server_item == null) {
+            return;
+        }
+        foreach (var channel_item in server_item.children) {
+            unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) channel_item;
+            if (row.get_channel_name () == channel_name) {
+                row.enable ();
+                return;
+            }
+        }
     }
 
     public signal void server_added ();
