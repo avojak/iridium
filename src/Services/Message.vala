@@ -54,7 +54,11 @@ public class Iridium.Services.Message : GLib.Object {
         }
     }
 
-    public Message (string _message) {
+    public Message (string _message = "") {
+        if (_message.strip ().length == 0) {
+            message = _message;
+            return;
+        }
         message = _message.validate() ? _message : _message.escape (ESCAPE_EXCEPT_CHARS);
         parse_message ();
     }

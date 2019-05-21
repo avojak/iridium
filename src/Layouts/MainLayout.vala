@@ -66,6 +66,16 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
         return (Iridium.Views.ChatView) view;
     }
 
+    // TODO: Add methods here so we don't have to do type-casting at the consumer level
+
+    public Iridium.Views.ChannelChatView? get_channel_chat_view (string name) {
+        return main_stack.get_child_by_name (name) as Iridium.Views.ChannelChatView;
+    }
+
+    public Iridium.Views.ServerChatView? get_server_chat_view (string name) {
+        return main_stack.get_child_by_name (name) as Iridium.Views.ServerChatView;
+    }
+
     public void show_chat_view (string name) {
         main_stack.get_child_by_name (name).show_all ();
         main_stack.set_visible_child_full (name, Gtk.StackTransitionType.SLIDE_RIGHT);

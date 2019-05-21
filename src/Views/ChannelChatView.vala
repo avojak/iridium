@@ -19,19 +19,24 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Models.ServerMessageText : Iridium.Models.RichText {
+public class Iridium.Views.ChannelChatView : Iridium.Views.ChatView {
 
-    public ServerMessageText (Iridium.Services.Message message) {
-        Object (
-            message: message
-        );
+    protected override int get_indent () {
+        return -140; // TODO: Figure out how to compute this
     }
 
-    public override void display (Gtk.TextBuffer buffer) {
-        Gtk.TextIter iter;
-        buffer.get_end_iter (out iter);
-        buffer.insert_text (ref iter, message.message, message.message.length);
-        buffer.insert (ref iter, "\n", 1);
+    public void display_priv_msg (Iridium.Services.Message message) {
+        var rich_text = new Iridium.Models.OthersPrivMessageText (message);
+        rich_text.display (text_view.get_buffer ());
+    }
+
+    public void display_self_priv_msg (Iridium.Services.Message message) {
+        var rich_text = new Iridium.Models.SelfPrivMessageText (message);
+        rich_text.display (text_view.get_buffer ());
+    }
+
+    public void display_channel_error_msg (Iridium.Services.Message message) {
+
     }
 
 }

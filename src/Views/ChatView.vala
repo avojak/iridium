@@ -19,17 +19,14 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-// TODO: Maybe subclass this to remove the indent?
-public class Iridium.Views.ChatView : Gtk.Grid {
-
-    public static uint16 USERNAME_SPACING = 20;
+public abstract class Iridium.Views.ChatView : Gtk.Grid {
 
     // Colors defined by the elementary OS Human Interface Guidelines
     private static string COLOR_STRAWBERRY = "#c6262e";
     private static string COLOR_LIME = "#68b723";
     private static string COLOR_BLUEBERRY = "#3689e6";
 
-    private Gtk.TextView text_view;
+    protected Gtk.TextView text_view;
 
     public ChatView () {
         Object (
@@ -43,7 +40,7 @@ public class Iridium.Views.ChatView : Gtk.Grid {
         text_view.border_width = 12;
         text_view.wrap_mode = Gtk.WrapMode.WORD_CHAR;
         /* text_view.left_margin = 140; */
-        text_view.indent = -140; // TODO: Figure out how to compute this
+        text_view.indent = get_indent ();
         text_view.monospace = true;
         text_view.editable = false;
         text_view.cursor_visible = false;
@@ -95,31 +92,7 @@ public class Iridium.Views.ChatView : Gtk.Grid {
         error_tag.weight = Pango.Weight.SEMIBOLD;
     }
 
-    // TODO: Consolidate these down into a single display_rich_text function?
-
-    public void display_priv_msg (Iridium.Services.Message message) {
-        var rich_text = new Iridium.Models.OthersPrivMessageText (message);
-        rich_text.display (text_view.get_buffer ());
-    }
-
-    public void display_self_priv_msg (Iridium.Services.Message message) {
-        var rich_text = new Iridium.Models.SelfPrivMessageText (message);
-        rich_text.display (text_view.get_buffer ());
-    }
-
-    public void display_server_msg (Iridium.Services.Message message) {
-        var rich_text = new Iridium.Models.ServerMessageText (message);
-        rich_text.display (text_view.get_buffer ());
-    }
-
-    public void display_server_error_msg (Iridium.Services.Message message) {
-        var rich_text = new Iridium.Models.ServerErrorMessageText (message);
-        rich_text.display (text_view.get_buffer ());
-    }
-
-    public void display_channel_error_msg (Iridium.Services.Message message) {
-
-    }
+    protected abstract int get_indent ();
 
     public signal void message_to_send (string message);
 

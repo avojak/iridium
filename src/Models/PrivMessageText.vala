@@ -21,6 +21,8 @@
 
 public abstract class Iridium.Models.PrivMessageText : Iridium.Models.RichText {
 
+    private static uint16 USERNAME_SPACING = 20;
+
     public PrivMessageText (Iridium.Services.Message message) {
         Object (
             message: message
@@ -33,11 +35,11 @@ public abstract class Iridium.Models.PrivMessageText : Iridium.Models.RichText {
 
         // Display username
         var username = message.username;
-        if (username.length > Iridium.Views.ChatView.USERNAME_SPACING) {
-            username = username.substring (0, Iridium.Views.ChatView.USERNAME_SPACING - 3);
+        if (username.length > USERNAME_SPACING) {
+            username = username.substring (0, USERNAME_SPACING - 3);
             username += "...";
         } else {
-            username += string.nfill (Iridium.Views.ChatView.USERNAME_SPACING - username.length, ' ');
+            username += string.nfill (USERNAME_SPACING - username.length, ' ');
         }
         buffer.insert_text (ref iter, username, username.length);
 

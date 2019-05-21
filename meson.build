@@ -27,6 +27,8 @@ executable(
     join_paths('src', 'Services', 'ServerConnectionDetails.vala'),
     join_paths('src', 'Services', 'ServerConnectionHandler.vala'),
     join_paths('src', 'Views', 'ChatView.vala'),
+    join_paths('src', 'Views', 'ChannelChatView.vala'),
+    join_paths('src', 'Views', 'ServerChatView.vala'),
     join_paths('src', 'Views', 'Welcome.vala'),
     join_paths('src', 'Widgets', 'ChannelJoinDialog.vala'),
     join_paths('src', 'Widgets', 'HeaderBar.vala'),
