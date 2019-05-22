@@ -111,6 +111,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         connection_handler.channel_joined.connect (on_channel_joined);
         connection_handler.channel_left.connect (on_channel_left);
         connection_handler.channel_message_received.connect (on_channel_message_received);
+        connection_handler.user_joined_channel.connect (on_user_joined_channel);
+        connection_handler.user_left_channel.connect (on_user_left_channel);
 
         // Close connections when the window is closed
         this.destroy.connect (() => {
@@ -337,6 +339,32 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             // TODO: Remove this line eventually - it's annoying!
             main_layout.show_chat_view (channel_name);
             chat_view.display_priv_msg (message);
+            return false;
+        });
+    }
+
+    private void on_user_joined_channel (string server_name, string channel_name, string username) {
+        Idle.add (() => {
+            // Display a message in the channel chat view
+            var channel_chat_view = main_layout.get_channel_chat_view (channel_name);
+            if (channel_chat_view != null) {
+                var message = new Iridium.Services.Message ();
+                message.message = username + " has joined";
+                channel_chat_view.display_server_msg (message);
+            }
+            return false;
+        });
+    }
+
+    private void on_user_left_channel (string server_name, string channel_name, string username) {
+        Idle.add (() => {
+            // Display a message in the channel chat view
+            var channel_chat_view = main_layout.get_channel_chat_view (channel_name);
+            if (channel_chat_view != null) {
+                var message = new Iridium.Services.Message ();
+                message.message = username + " has left";
+                channel_chat_view.display_server_msg (message);
+            }
             return false;
         });
     }

@@ -52,6 +52,8 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
             server_connection.channel_joined.connect (on_channel_joined);
             server_connection.channel_left.connect (on_channel_left);
             server_connection.channel_message_received.connect (on_channel_message_received);
+            server_connection.user_joined_channel.connect (on_user_joined_channel);
+            server_connection.user_left_channel.connect (on_user_left_channel);
             /* known_connections.set (server, server_connection); */
         }
         open_connections.set (server, server_connection);
@@ -170,6 +172,14 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         channel_message_received (source.connection_details.server, channel_name, message);
     }
 
+    private void on_user_joined_channel (Iridium.Services.ServerConnection source, string channel_name, string username) {
+        user_joined_channel (source.connection_details.server, channel_name, username);
+    }
+
+    private void on_user_left_channel (Iridium.Services.ServerConnection source, string channel_name, string username) {
+        user_left_channel (source.connection_details.server, channel_name, username);
+    }
+
     //
     // Signals
     //
@@ -184,5 +194,7 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
     public signal void channel_joined (string server_name, string channel_name);
     public signal void channel_left (string server_name, string channel_name);
     public signal void channel_message_received (string server_name, string channel_name, Iridium.Services.Message message);
+    public signal void user_joined_channel (string server_name, string channel_name, string username);
+    public signal void user_left_channel (string server_name, string channel_name, string username);
 
 }

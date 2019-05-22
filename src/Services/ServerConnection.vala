@@ -123,21 +123,24 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 open_successful (message);
                 break;
             case Iridium.Services.MessageCommands.QUIT:
-                server_quit (message.message);
+                if (message.username == connection_details.nickname) {
+                    server_quit (message.message);
+                } else {
+                    // TODO: Handle message for another user quitting
+                }
                 break;
             case Iridium.Services.MessageCommands.JOIN:
                 if ((message.message == null || message.message.strip () == "") && message.username == connection_details.nickname) {
                     channel_joined (message.params[0]);
                 } else {
-                    // TODO: Handle message for another user joining a channel
-                    /* user_joined_channel (); */
+                    user_joined_channel (message.params[0], message.username);
                 }
                 break;
             case Iridium.Services.MessageCommands.PART:
                 if (message.username == connection_details.nickname) {
                     channel_left (message.params[0]);
                 } else {
-                    // TODO: Handle other users leaving channels
+                    user_left_channel (message.params[0], message.username);
                 }
                 break;
             case Iridium.Services.MessageCommands.PRIVMSG:
@@ -243,7 +246,8 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     public signal void channel_joined (string channel);
     public signal void channel_left (string channel);
     public signal void channel_message_received (string channel_name, Iridium.Services.Message message);
-    /* public signal void user_joined_channel (); */
+    public signal void user_joined_channel (string channel_name, string username);
+    public signal void user_left_channel (string channel_name, string username);
     /* public signal ctcp_version_received (); */
 
 }
