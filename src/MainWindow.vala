@@ -286,8 +286,22 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     private void on_user_quit_server (string server_name, string username, Iridium.Services.Message message) {
-        // Get the list of channels that the user is in
-        // TODO
+        // Display a message in any channel that the user was in
+        Gee.List<string> channels = connection_handler.get_channels_for_user (server_name, username);
+        Idle.add (() => {
+            foreach (string channel in channels) {
+                var channel_chat_view = main_layout.get_channel_chat_view (channel);
+                if (channel_chat_view != null) {
+                    var message_to_display = new Iridium.Services.Message ();
+                    message_to_display.message = username + " has quit";
+                    if (message.message != null && message.message.strip () != "") {
+                        message_to_display.message += " (" + message.message + ")";
+                    }
+                    channel_chat_view.display_server_msg (message_to_display);
+                }
+            }
+            return false;
+        });
 
         // If the user was in a private message chat view, display the message there
         Idle.add (() => {

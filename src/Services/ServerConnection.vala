@@ -27,6 +27,9 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     private DataOutputStream output_stream;
     private bool should_exit = false;
 
+    private Gee.Map<string, Gee.List<string>> channel_users = new Gee.HashMap<string, Gee.List<string>> ();
+    private Gee.Map<string, Gee.List<string>> username_buffer = new Gee.HashMap<string, Gee.List<string>> ();
+
     public ServerConnection (Iridium.Services.ServerConnectionDetails connection_details) {
         Object (
             connection_details: connection_details
@@ -163,6 +166,12 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                     channel_message_received (message.params[0], message);
                 }
                 break;
+            case Iridium.Services.NumericCodes.RPL_NAMREPLY:
+                usernames_received (message.params[2], message.message.split (" "));
+                break;
+            case Iridium.Services.NumericCodes.RPL_ENDOFNAMES:
+                end_of_usernames (message.params[1]);
+                break;
             // Errors
             case Iridium.Services.NumericCodes.ERR_NICKNAMEINUSE:
                 nickname_in_use (message);
@@ -223,8 +232,25 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         send_output (text);
     }
 
-    public void leave_channel (string channel) {
-        send_output (Iridium.Services.MessageCommands.PART + " " + channel);
+    public void leave_channel (string channel_name) {
+        send_output (Iridium.Services.MessageCommands.PART + " " + channel_name);
+    }
+
+    public Gee.List<string> get_users (string channel_name) {
+        if (!channel_users.has_key (channel_name)) {
+            return new Gee.LinkedList<string> ();
+        }
+        return channel_users.get (channel_name);
+    }
+
+    public Gee.List<string> get_channels_for_user (string username) {
+        var channels = new Gee.LinkedList<string> ();
+        foreach (Gee.Map.Entry<string, Gee.List<string>> entry in channel_users.entries) {
+            if (entry.value.index_of (username) >= 0) {
+                channels.add (entry.key);
+            }
+        }
+        return channels;
     }
 
     private void send_output (string response) {
@@ -233,6 +259,24 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         } catch (GLib.IOError e) {
             // TODO: Handle errors!!
         }
+    }
+
+    private void usernames_received (string channel_name, string[] usernames) {
+        // Initialize the buffer to an empty list
+        if (!username_buffer.has_key (channel_name) || username_buffer.get (channel_name) == null) {
+            username_buffer.set (channel_name, new Gee.LinkedList<string> ());
+        }
+        // Add each new username to the buffer
+        foreach (string username in usernames) {
+            username_buffer.get (channel_name).add (username);
+        }
+    }
+
+    private void end_of_usernames (string channel_name) {
+        // Copy the buffered usernames over to the master map of users by channel
+        channel_users.set (channel_name, username_buffer.get (channel_name));
+        // Clear the buffered usernames
+        username_buffer.unset (channel_name);
     }
 
     public signal void open_successful (Iridium.Services.Message message);

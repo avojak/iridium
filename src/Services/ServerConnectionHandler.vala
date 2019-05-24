@@ -97,10 +97,6 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         }
     }
 
-    public Iridium.Services.ServerConnection get_connection (string server) {
-        return open_connections.get (server);
-    }
-
     //
     // Newer stuff
     //
@@ -127,6 +123,22 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
             return;
         }
         connection.join_channel (channel_name);
+    }
+
+    public Gee.List<string> get_users (string server_name, string channel_name) {
+        var connection = open_connections.get (server_name);
+        if (connection == null) {
+            return new Gee.LinkedList<string> ();
+        }
+        return connection.get_users (channel_name);
+    }
+
+    public Gee.List<string> get_channels_for_user (string server_name, string username) {
+        var connection = open_connections.get (server_name);
+        if (connection == null) {
+            return new Gee.LinkedList<string> ();
+        }
+        return connection.get_channels_for_user (username);
     }
 
     //
