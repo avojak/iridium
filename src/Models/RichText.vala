@@ -29,6 +29,20 @@ public abstract class Iridium.Models.RichText : GLib.Object {
         );
     }
 
-    public abstract void display (Gtk.TextBuffer buffer);
+    public void display (Gtk.TextBuffer buffer) {
+        // Display the rich text in the buffer
+        do_display (buffer);
+
+        // Update the "buffer-end" mark to be at the end of the buffer
+        Gtk.TextIter iter;
+        buffer.get_end_iter (out iter);
+        if (buffer.get_mark ("buffer-end") == null) {
+            buffer.create_mark ("buffer-end", iter, false);
+        } else {
+            buffer.move_mark_by_name ("buffer-end", iter);
+        }
+    }
+
+    public abstract void do_display (Gtk.TextBuffer buffer);
 
 }

@@ -28,6 +28,8 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
 
     protected Gtk.TextView text_view;
 
+    private Gtk.ScrolledWindow scrolled_window;
+
     public ChatView () {
         Object (
             orientation: Gtk.Orientation.VERTICAL
@@ -51,14 +53,14 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         Gtk.TextIter iter;
         text_view.get_buffer ().get_end_iter (out iter);
 
-        var scroll = new Gtk.ScrolledWindow (null, null);
-        scroll.set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
-        scroll.add (text_view);
+        scrolled_window = new Gtk.ScrolledWindow (null, null);
+        scrolled_window.set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
+        scrolled_window.add (text_view);
 
         var entry = new Gtk.Entry ();
         entry.hexpand = true;
 
-        attach (scroll, 0, 0, 1, 1);
+        attach (scrolled_window, 0, 0, 1, 1);
         attach (entry, 0, 1, 1, 1);
 
         create_text_tags ();
@@ -66,6 +68,10 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         entry.activate.connect (() => {
             message_to_send (entry.get_text ());
             entry.set_text ("");
+        });
+
+        scrolled_window.get_vadjustment ().value_changed.connect (() => {
+            print (scrolled_window.get_vadjustment ().value.to_string () + "\n");
         });
     }
 
@@ -90,6 +96,16 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         unowned Gtk.TextTag error_tag = buffer.create_tag ("error");
         error_tag.foreground_rgba = color;
         error_tag.weight = Pango.Weight.SEMIBOLD;
+    }
+
+    // TODO: Need to figure out a good way to lock scrolling... Might be annoying
+    //       to experience the auto-scroll when you're looking back at old
+    //       messages...
+    protected void do_autoscroll () {
+        var buffer_end_mark = text_view.get_buffer ().get_mark ("buffer-end");
+        if (buffer_end_mark != null) {
+            text_view.scroll_mark_onscreen (buffer_end_mark);
+        }
     }
 
     protected abstract int get_indent ();

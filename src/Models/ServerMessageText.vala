@@ -27,7 +27,7 @@ public class Iridium.Models.ServerMessageText : Iridium.Models.RichText {
         );
     }
 
-    public override void display (Gtk.TextBuffer buffer) {
+    public override void do_display (Gtk.TextBuffer buffer) {
         Gtk.TextIter iter;
         buffer.get_end_iter (out iter);
         buffer.insert_text (ref iter, message.message, message.message.length);

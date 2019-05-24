@@ -29,7 +29,7 @@ public abstract class Iridium.Models.PrivMessageText : Iridium.Models.RichText {
         );
     }
 
-    public override void display (Gtk.TextBuffer buffer) {
+    public override void do_display (Gtk.TextBuffer buffer) {
         Gtk.TextIter iter;
         buffer.get_end_iter (out iter);
 
