@@ -59,6 +59,11 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
 
         var entry = new Gtk.Entry ();
         entry.hexpand = true;
+        entry.margin = 6;
+        entry.secondary_icon_name = "edit-clear-symbolic";
+        entry.secondary_icon_tooltip_text = "Clear";
+        entry.secondary_icon_sensitive = false;
+        entry.secondary_icon_activatable = false;
 
         attach (scrolled_window, 0, 0, 1, 1);
         attach (entry, 0, 1, 1, 1);
@@ -68,6 +73,15 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         entry.activate.connect (() => {
             message_to_send (entry.get_text ());
             entry.set_text ("");
+        });
+        entry.changed.connect (() => {
+            entry.secondary_icon_sensitive = (entry.text != "");
+            entry.secondary_icon_activatable = (entry.text != "");
+        });
+        entry.icon_release.connect ((icon_pos, event) => {
+            if (icon_pos == Gtk.EntryIconPosition.SECONDARY) {
+                entry.set_text ("");
+            }
         });
 
         scrolled_window.get_vadjustment ().value_changed.connect (() => {
