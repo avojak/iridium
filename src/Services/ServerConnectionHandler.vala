@@ -48,6 +48,7 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
             server_connection.server_message_received.connect (on_server_message_received);
             server_connection.server_error_received.connect (on_server_error_received);
             server_connection.server_quit.connect (on_server_quit);
+            server_connection.user_quit_server.connect (on_user_quit_server);
             server_connection.nickname_in_use.connect (on_nickname_in_use);
             server_connection.channel_joined.connect (on_channel_joined);
             server_connection.channel_left.connect (on_channel_left);
@@ -156,6 +157,10 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         server_quit (source.connection_details.server, message);
     }
 
+    private void on_user_quit_server (Iridium.Services.ServerConnection source, string username, Iridium.Services.Message message) {
+        user_quit_server (source.connection_details.server, username, message);
+    }
+
     private void on_nickname_in_use (Iridium.Services.ServerConnection source, Iridium.Services.Message message) {
         nickname_in_use (source.connection_details.server, message);
     }
@@ -190,6 +195,7 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
     public signal void server_message_received (string server_name, Iridium.Services.Message message);
     public signal void server_error_received (string server_name, Iridium.Services.Message message);
     public signal void server_quit (string server_name, string message);
+    public signal void user_quit_server (string server_name, string username, Iridium.Services.Message message);
     public signal void nickname_in_use (string server_name, Iridium.Services.Message message);
     public signal void channel_joined (string server_name, string channel_name);
     public signal void channel_left (string server_name, string channel_name);

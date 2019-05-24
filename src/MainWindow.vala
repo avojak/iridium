@@ -107,6 +107,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         connection_handler.server_message_received.connect (on_server_message_received);
         connection_handler.server_error_received.connect (on_server_error_received);
         connection_handler.server_quit.connect (on_server_quit);
+        connection_handler.user_quit_server.connect (on_user_quit_server);
         connection_handler.nickname_in_use.connect (on_nickname_in_use);
         connection_handler.channel_joined.connect (on_channel_joined);
         connection_handler.channel_left.connect (on_channel_left);
@@ -282,6 +283,26 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     private void on_server_quit (string server_name, string message) {
         connection_handler.disconnect_from_server (server_name);
+    }
+
+    private void on_user_quit_server (string server_name, string username, Iridium.Services.Message message) {
+        // Get the list of channels that the user is in
+        // TODO
+
+        // If the user was in a private message chat view, display the message there
+        Idle.add (() => {
+            // Display a message in the channel chat view
+            var channel_chat_view = main_layout.get_channel_chat_view (username);
+            if (channel_chat_view != null) {
+                var message_to_display = new Iridium.Services.Message ();
+                message_to_display.message = username + " has quit";
+                if (message.message != null && message.message.strip () != "") {
+                    message_to_display.message += " (" + message.message + ")";
+                }
+                channel_chat_view.display_server_msg (message_to_display);
+            }
+            return false;
+        });
     }
 
     private void on_nickname_in_use (string server_name, Iridium.Services.Message message) {

@@ -126,7 +126,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 if (message.username == connection_details.nickname) {
                     server_quit (message.message);
                 } else {
-                    // TODO: Handle message for another user quitting
+                    user_quit_server (message.username, message);
                 }
                 break;
             case Iridium.Services.MessageCommands.JOIN:
@@ -242,6 +242,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     public signal void server_message_received (Iridium.Services.Message message);
     public signal void server_error_received (Iridium.Services.Message message);
     public signal void server_quit (string message);
+    public signal void user_quit_server (string username, Iridium.Services.Message message);
     public signal void nickname_in_use (Iridium.Services.Message message);
     public signal void channel_joined (string channel);
     public signal void channel_left (string channel);
