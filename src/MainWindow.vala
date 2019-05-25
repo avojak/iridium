@@ -349,14 +349,15 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             }
             side_panel.add_channel (server_name, channel_name);
             side_panel.enable_channel_row (server_name, channel_name);
-            main_layout.show_chat_view (channel_name);
+            side_panel.select_channel_row (server_name, channel_name);
             return false;
         });
     }
 
     private void on_channel_left (string server_name, string channel_name) {
         // TODO: Display a message that we've left the channel
-        // TODO: Disable the channel row
+
+        side_panel.disable_channel_row (server_name, channel_name);
     }
 
     private void on_channel_message_received (string server_name, string channel_name, Iridium.Services.Message message) {
@@ -371,8 +372,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 });
             }
             side_panel.add_channel (server_name, channel_name);
-            // TODO: Remove this line eventually - it's annoying!
-            main_layout.show_chat_view (channel_name);
             chat_view.display_priv_msg (message);
             return false;
         });

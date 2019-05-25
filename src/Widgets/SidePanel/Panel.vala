@@ -161,6 +161,34 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         }
     }
 
+    public void disable_channel_row (string server_name, string channel_name) {
+        var server_item = server_items.get (server_name);
+        if (server_item == null) {
+            return;
+        }
+        foreach (var channel_item in server_item.children) {
+            unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) channel_item;
+            if (row.get_channel_name () == channel_name) {
+                row.disable ();
+                return;
+            }
+        }
+    }
+
+    public void select_channel_row (string server_name, string channel_name) {
+        var server_item = server_items.get (server_name);
+        if (server_item == null) {
+            return;
+        }
+        foreach (var channel_item in server_item.children) {
+            unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) channel_item;
+            if (row.get_channel_name () == channel_name) {
+                selected = channel_item;
+                return;
+            }
+        }
+    }
+
     public signal void server_added ();
     public signal void leave_channel (string server_name, string channel_name);
     public signal void disconnect_from_server(string server_name);
