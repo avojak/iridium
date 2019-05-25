@@ -21,8 +21,9 @@
 
 public class Iridium.Application : Gtk.Application {
 
-    public static GLib.Settings settings;
-    public static Iridium.Services.ServerConnectionHandler connection_handler;
+    public static Iridium.Services.Settings settings;
+
+    private static Iridium.Services.ServerConnectionHandler connection_handler;
 
     public Application () {
         Object (
@@ -32,7 +33,7 @@ public class Iridium.Application : Gtk.Application {
     }
 
     static construct {
-        settings = new GLib.Settings ("com.github.avojak.iridium");
+        settings = new Iridium.Services.Settings ();
         connection_handler = new Iridium.Services.ServerConnectionHandler ();
     }
 
@@ -41,6 +42,12 @@ public class Iridium.Application : Gtk.Application {
         main_window.show_all ();
 
         // TODO: Use NetworkMonitor to handle lost internet connection
+
+        restore_state ();
+    }
+
+    private void restore_state () {
+        // TODO: Implement
     }
 
     public static int main (string[] args) {

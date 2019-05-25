@@ -22,11 +22,9 @@
 public class Iridium.Services.ServerConnectionHandler : GLib.Object {
 
     private Gee.Map<string, Iridium.Services.ServerConnection> open_connections;
-    private Gee.Map<string, Iridium.Services.ServerConnection> known_connections;
 
     public ServerConnectionHandler () {
         open_connections = new Gee.HashMap<string, Iridium.Services.ServerConnection> ();
-        known_connections = new Gee.HashMap<string, Iridium.Services.ServerConnection> ();
     }
 
     public Iridium.Services.ServerConnection connect_to_server (Iridium.Services.ServerConnectionDetails connection_details) {
@@ -36,27 +34,21 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
             return open_connections.get (server);
         }
         // Check if we've been connected and can re-use everything
-        Iridium.Services.ServerConnection server_connection = null;
-        if (known_connections.has_key (server)) {
-            server_connection = known_connections.get (server);
-        } else {
-            // Connect to all of the server connection signals
-            server_connection = new Iridium.Services.ServerConnection (connection_details);
-            server_connection.open_successful.connect (on_server_connection_succcessful);
-            server_connection.open_failed.connect (on_server_connection_failed);
-            server_connection.connection_closed.connect (on_server_connection_closed);
-            server_connection.server_message_received.connect (on_server_message_received);
-            server_connection.server_error_received.connect (on_server_error_received);
-            server_connection.server_quit.connect (on_server_quit);
-            server_connection.user_quit_server.connect (on_user_quit_server);
-            server_connection.nickname_in_use.connect (on_nickname_in_use);
-            server_connection.channel_joined.connect (on_channel_joined);
-            server_connection.channel_left.connect (on_channel_left);
-            server_connection.channel_message_received.connect (on_channel_message_received);
-            server_connection.user_joined_channel.connect (on_user_joined_channel);
-            server_connection.user_left_channel.connect (on_user_left_channel);
-            /* known_connections.set (server, server_connection); */
-        }
+        Iridium.Services.ServerConnection server_connection = new Iridium.Services.ServerConnection (connection_details);
+        server_connection.open_successful.connect (on_server_connection_succcessful);
+        server_connection.open_failed.connect (on_server_connection_failed);
+        server_connection.connection_closed.connect (on_server_connection_closed);
+        server_connection.server_message_received.connect (on_server_message_received);
+        server_connection.server_error_received.connect (on_server_error_received);
+        server_connection.server_quit.connect (on_server_quit);
+        server_connection.user_quit_server.connect (on_user_quit_server);
+        server_connection.nickname_in_use.connect (on_nickname_in_use);
+        server_connection.channel_joined.connect (on_channel_joined);
+        server_connection.channel_left.connect (on_channel_left);
+        server_connection.channel_message_received.connect (on_channel_message_received);
+        server_connection.user_joined_channel.connect (on_user_joined_channel);
+        server_connection.user_left_channel.connect (on_user_left_channel);
+
         open_connections.set (server, server_connection);
         server_connection.open ();
         return server_connection;

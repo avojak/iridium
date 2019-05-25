@@ -6,5 +6,10 @@
       <summary>If the dark Gtk stylesheet should be used</summary>
       <description>If the dark Gtk stylesheet should be used</description>
     </key>
+    <key name="connections" type="as">
+      <default>[]</default>
+      <summary>The saved server connections</summary>
+      <description>All saved server connections and channels</description>
+    </key>
   </schema>
 </schemalist>
