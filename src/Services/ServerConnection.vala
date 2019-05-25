@@ -294,6 +294,5 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     public signal void channel_message_received (string channel_name, Iridium.Services.Message message);
     public signal void user_joined_channel (string channel_name, string username);
     public signal void user_left_channel (string channel_name, string username);
-    /* public signal ctcp_version_received (); */
 
 }
