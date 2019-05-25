@@ -84,9 +84,9 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
             }
         });
 
-        scrolled_window.get_vadjustment ().value_changed.connect (() => {
+        /* scrolled_window.get_vadjustment ().value_changed.connect (() => {
             print (scrolled_window.get_vadjustment ().value.to_string () + "\n");
-        });
+        }); */
     }
 
     private void create_text_tags () {

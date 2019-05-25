@@ -149,13 +149,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             case Iridium.Services.MessageCommands.PRIVMSG:
                 // CTCP VERSION
                 if (Iridium.Services.MessageCommands.VERSION == message.message) {
-                    // TODO: Respond to CTCP VERSION
-                    /* send_output ("VERSION Iridium IRC Client 1.0"); */
-                    /* ctcp_version_received (); */
-
-                    // TODO: Update the text of this message
-                    /* server_message_received ("Received a CTCP VERSION from " + message.username); */
-                    server_message_received (message);
+                    ctcp_version_query_received (message);
                     break;
                 }
                 // If the first param is our nickname, it's a PM. Otherwise, it's
@@ -277,6 +271,13 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         channel_users.set (channel_name, username_buffer.get (channel_name));
         // Clear the buffered usernames
         username_buffer.unset (channel_name);
+    }
+
+    private void ctcp_version_query_received (Iridium.Services.Message message) {
+        send_output (Iridium.Services.MessageCommands.VERSION + " " + Constants.PROJECT_NAME + " " + Constants.VERSION);
+        var display_message = new Iridium.Services.Message ();
+        display_message.message = "Received a CTCP VERSION from " + message.username;
+        server_message_received (display_message);
     }
 
     public signal void open_successful (Iridium.Services.Message message);
