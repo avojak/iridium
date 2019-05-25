@@ -64,28 +64,28 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         }
 
         var server_item = new Iridium.Widgets.SidePanel.ServerRow (name);
-        // Disconnect from the server and disable the item and associated channel items
+        // Disconnect from the server
         server_item.disconnect_from_server.connect ((should_close) => {
             disconnect_from_server (name);
-            server_item.disable ();
-            // Disable the channels
-            foreach (var channel_item in server_item.children) {
-                unowned Iridium.Widgets.SidePanel.Row channel_row = (Iridium.Widgets.SidePanel.Row) channel_item;
-                channel_row.disable ();
-            }
         });
         // Remove the server item and its associated channel items
         server_item.remove_server.connect (() => {
-            foreach (var channel_item in server_item.children) {
-                server_item.remove (channel_item);
-            }
-            others_category.remove (server_items.get (name));
-            server_items.unset (name);
+            remove_server (server_item, name);
         });
         server_items.set (name, server_item);
         others_category.add (server_item);
 
         selected = server_item;
+    }
+
+    private void remove_server (Iridium.Widgets.SidePanel.ServerRow server_item, string server_name) {
+        others_category.remove (server_item);
+        server_items.unset (server_name);
+
+        // If there aren't anymore servers to show, set selected to null
+        if (server_items.is_empty) {
+            selected = null;
+        }
     }
 
     public void add_channel (string server, string name) {
@@ -147,6 +147,20 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         row.enable ();
     }
 
+    public void disable_server_row (string server_name) {
+        var server_item = server_items.get (server_name);
+        if (server_item == null) {
+            return;
+        }
+        unowned Iridium.Widgets.SidePanel.Row server_row = (Iridium.Widgets.SidePanel.Row) server_item;
+        server_row.disable ();
+        // Disable all of the children
+        foreach (var channel_item in server_item.children) {
+            unowned Iridium.Widgets.SidePanel.Row channel_row = (Iridium.Widgets.SidePanel.Row) channel_item;
+            channel_row.disable ();
+        }
+    }
+
     public void enable_channel_row (string server_name, string channel_name) {
         var server_item = server_items.get (server_name);
         if (server_item == null) {
@@ -189,7 +203,6 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         }
     }
 
-    public signal void server_added ();
     public signal void leave_channel (string server_name, string channel_name);
     public signal void disconnect_from_server(string server_name);
 

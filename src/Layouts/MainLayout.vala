@@ -51,14 +51,9 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
         main_stack.add_named (view, name);
     }
 
-    public void remove_chat_view (string name, string alternative) {
-        var view = get_chat_view (name);
-        // If the chat view to remove is currently being displayed, show
-        // the alternative view
-        if (main_stack.get_visible_child () == view) {
-            show_chat_view (alternative);
-        }
-        main_stack.remove (view);
+    public void show_welcome_view () {
+        main_stack.get_child_by_name ("welcome").show_all ();
+        main_stack.set_visible_child_full ("welcome", Gtk.StackTransitionType.SLIDE_RIGHT);
     }
 
     public Iridium.Views.ChatView? get_chat_view (string name) {

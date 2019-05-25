@@ -66,6 +66,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             // No item selected
             if (item == null) {
                 header_bar.set_channel_join_button_enabled (false);
+                main_layout.show_welcome_view ();
                 return;
             }
             // Dummy selected
@@ -255,6 +256,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     private void on_server_connection_closed (string server_name) {
         // TODO: Implement - display disconnect message and disable the server
         //       and all associated channel rows
+        side_panel.disable_server_row (server_name);
     }
 
     private void on_server_message_received (string server_name, Iridium.Services.Message message) {
