@@ -21,6 +21,9 @@
 
 public abstract class Iridium.Views.ChatView : Gtk.Grid {
 
+    // TODO: Disable or somehow indicate that you are disconnected from a server
+    //       and cannot send messages.
+
     // Colors defined by the elementary OS Human Interface Guidelines
     private static string COLOR_STRAWBERRY = "#c6262e";
     private static string COLOR_LIME = "#68b723";
@@ -120,6 +123,18 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         if (buffer_end_mark != null) {
             text_view.scroll_mark_onscreen (buffer_end_mark);
         }
+    }
+
+    public void display_self_priv_msg (Iridium.Services.Message message) {
+        var rich_text = new Iridium.Models.SelfPrivMessageText (message);
+        rich_text.display (text_view.get_buffer ());
+        do_autoscroll ();
+    }
+
+    public void display_server_msg (Iridium.Services.Message message) {
+        var rich_text = new Iridium.Models.ServerMessageText (message);
+        rich_text.display (text_view.get_buffer ());
+        do_autoscroll ();
     }
 
     protected abstract int get_indent ();

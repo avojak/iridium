@@ -115,6 +115,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         connection_handler.channel_message_received.connect (on_channel_message_received);
         connection_handler.user_joined_channel.connect (on_user_joined_channel);
         connection_handler.user_left_channel.connect (on_user_left_channel);
+        connection_handler.direct_message_received.connect (on_direct_message_received);
 
         // Close connections when the window is closed
         this.destroy.connect (() => {
@@ -193,7 +194,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         send_server_command (server_name, text.substring (1));
     }
 
-    private void send_channel_message (string server_name, string channel_name, string text, Iridium.Views.ChannelChatView chat_view) {
+    private void send_channel_message (string server_name, string channel_name, string text, Iridium.Views.ChatView chat_view) {
         if (text == null || text.strip() .length == 0) {
             return;
         }
@@ -308,14 +309,14 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         // If the user was in a private message chat view, display the message there
         Idle.add (() => {
             // Display a message in the channel chat view
-            var channel_chat_view = main_layout.get_channel_chat_view (username);
-            if (channel_chat_view != null) {
+            var direct_message_chat_view = main_layout.get_direct_message_chat_view (username);
+            if (direct_message_chat_view != null) {
                 var message_to_display = new Iridium.Services.Message ();
                 message_to_display.message = username + " has quit";
                 if (message.message != null && message.message.strip () != "") {
                     message_to_display.message += " (" + message.message + ")";
                 }
-                channel_chat_view.display_server_msg (message_to_display);
+                direct_message_chat_view.display_server_msg (message_to_display);
             }
             return false;
         });
@@ -401,6 +402,23 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 message.message = username + " has left";
                 channel_chat_view.display_server_msg (message);
             }
+            return false;
+        });
+    }
+
+    private void on_direct_message_received (string server_name, string username, Iridium.Services.Message message) {
+        Idle.add (() => {
+            // Check if the chat view already exists before creating a new one
+            var chat_view = main_layout.get_direct_message_chat_view (username);
+            if (chat_view == null) {
+                chat_view = new Iridium.Views.DirectMessageChatView ();
+                main_layout.add_chat_view (chat_view, username);
+                chat_view.message_to_send.connect ((user_message) => {
+                    send_channel_message (server_name, username, user_message, chat_view);
+                });
+            }
+            side_panel.add_direct_message (server_name, username);
+            chat_view.display_priv_msg (message);
             return false;
         });
     }

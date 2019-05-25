@@ -30,6 +30,7 @@ executable(
     join_paths('Services', 'Settings.vala'),
     join_paths('Views', 'ChatView.vala'),
     join_paths('Views', 'ChannelChatView.vala'),
+    join_paths('Views', 'DirectMessageChatView.vala'),
     join_paths('Views', 'ServerChatView.vala'),
     join_paths('Views', 'Welcome.vala'),
     join_paths('Widgets', 'ChannelJoinDialog.vala'),
@@ -39,6 +40,7 @@ executable(
     join_paths('Widgets', 'SidePanel', 'Row.vala'),
     join_paths('Widgets', 'SidePanel', 'ServerRow.vala'),
     join_paths('Widgets', 'SidePanel', 'ChannelRow.vala'),
+    join_paths('Widgets', 'SidePanel', 'DirectMessageRow.vala'),
     config_header,
     dependencies: [
         dependency('gtk+-3.0', version: '>= 3.6.4'),

@@ -31,19 +31,6 @@ public class Iridium.Views.ChannelChatView : Iridium.Views.ChatView {
         do_autoscroll ();
     }
 
-    public void display_self_priv_msg (Iridium.Services.Message message) {
-        var rich_text = new Iridium.Models.SelfPrivMessageText (message);
-        rich_text.display (text_view.get_buffer ());
-        do_autoscroll ();
-    }
-
-    // TODO: Can probably refactor this out into the base class
-    public void display_server_msg (Iridium.Services.Message message) {
-        var rich_text = new Iridium.Models.ServerMessageText (message);
-        rich_text.display (text_view.get_buffer ());
-        do_autoscroll ();
-    }
-
     public void display_channel_error_msg (Iridium.Services.Message message) {
         // TODO: Implement
     }

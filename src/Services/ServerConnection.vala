@@ -140,6 +140,8 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 }
                 break;
             case Iridium.Services.MessageCommands.PART:
+                // If the the message username is our nickname, we're the one
+                // leaving. Otherwise, it's another user leaving.
                 if (message.username == connection_details.nickname) {
                     channel_left (message.params[0]);
                 } else {
@@ -155,7 +157,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 // If the first param is our nickname, it's a PM. Otherwise, it's
                 // a general message on a channel
                 if (message.params[0] == connection_details.nickname) {
-                    channel_message_received (message.username, message);
+                    direct_message_received (message.username, message);
                 } else {
                     channel_message_received (message.params[0], message);
                 }
@@ -294,5 +296,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     public signal void channel_message_received (string channel_name, Iridium.Services.Message message);
     public signal void user_joined_channel (string channel_name, string username);
     public signal void user_left_channel (string channel_name, string username);
+    public signal void direct_message_received (string username, Iridium.Services.Message message);
 
 }

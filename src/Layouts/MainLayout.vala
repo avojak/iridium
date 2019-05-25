@@ -71,6 +71,10 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
         return main_stack.get_child_by_name (name) as Iridium.Views.ServerChatView;
     }
 
+    public Iridium.Views.DirectMessageChatView? get_direct_message_chat_view (string name) {
+        return main_stack.get_child_by_name (name) as Iridium.Views.DirectMessageChatView;
+    }
+
     public void show_chat_view (string name) {
         main_stack.get_child_by_name (name).show_all ();
         main_stack.set_visible_child_full (name, Gtk.StackTransitionType.SLIDE_RIGHT);

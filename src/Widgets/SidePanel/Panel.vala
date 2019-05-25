@@ -88,24 +88,24 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         }
     }
 
-    public void add_channel (string server, string name) {
+    public void add_channel (string server_name, string channel_name) {
         // Check if this channel row already exists
-        var server_item = server_items.get (server);
+        var server_item = server_items.get (server_name);
         foreach (var child in server_item.children) {
             unowned Iridium.Widgets.SidePanel.ChannelRow channel_item = (Iridium.Widgets.SidePanel.ChannelRow) child;
-            if (channel_item.channel_name == name) {
+            if (channel_item.channel_name == channel_name) {
                 return;
             }
         }
 
-        var channel_item = new Iridium.Widgets.SidePanel.ChannelRow (name, server);
-        /* channel_item.markup = "#irchacks <small>" + name + "</small>"; */
+        var channel_item = new Iridium.Widgets.SidePanel.ChannelRow (channel_name, server_name);
+        /* channel_item.markup = "#irchacks <small>" + channel_name + "</small>"; */
         channel_item.leave_channel.connect (() => {
-            leave_channel (server, name);
+            leave_channel (server_name, channel_name);
             channel_item.disable ();
         });
         channel_item.remove_channel.connect (() => {
-            remove_channel (server, name);
+            remove_channel (server_name, channel_name);
         });
 
         server_item.add (channel_item);
@@ -120,6 +120,43 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
             unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) channel_item;
             if (row.get_channel_name () == channel_name) {
                 server_item.remove (channel_item);
+                return;
+            }
+        }
+    }
+
+    // TODO: Lots of refactoring can be done here. Lots of code is shared
+    //       with the channel functions!
+    public void add_direct_message (string server_name, string username) {
+        // Check if this direct message row already exists
+        var server_item = server_items.get (server_name);
+        foreach (var child in server_item.children) {
+            if (child is Iridium.Widgets.SidePanel.DirectMessageRow) {
+                unowned Iridium.Widgets.SidePanel.DirectMessageRow direct_message_item = (Iridium.Widgets.SidePanel.DirectMessageRow) child;
+                if (direct_message_item.username == username) {
+                    return;
+                }
+            }
+        }
+
+        var direct_message_item = new Iridium.Widgets.SidePanel.DirectMessageRow (username, server_name);
+        /* direct_message_item.markup = "#irchacks <small>" + username + "</small>"; */
+        direct_message_item.close_direct_message.connect (() => {
+            remove_direct_message (server_name, username);
+        });
+
+        server_item.add (direct_message_item);
+        server_item.expanded = true;
+
+        selected = direct_message_item;
+    }
+
+    private void remove_direct_message (string server_name, string username) {
+        var server_item = server_items.get (server_name);
+        foreach (var direct_message_item in server_item.children) {
+            unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) direct_message_item;
+            if (row.get_channel_name () == username) {
+                server_item.remove (direct_message_item);
                 return;
             }
         }
