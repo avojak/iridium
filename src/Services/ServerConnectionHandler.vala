@@ -126,14 +126,6 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         return connection.get_users (channel_name);
     }
 
-    public Gee.List<string> get_channels_for_user (string server_name, string username) {
-        var connection = open_connections.get (server_name);
-        if (connection == null) {
-            return new Gee.LinkedList<string> ();
-        }
-        return connection.get_channels_for_user (username);
-    }
-
     //
     // ServerConnection Callbacks
     //
@@ -162,8 +154,8 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         server_quit (source.connection_details.server, message);
     }
 
-    private void on_user_quit_server (Iridium.Services.ServerConnection source, string username, Iridium.Services.Message message) {
-        user_quit_server (source.connection_details.server, username, message);
+    private void on_user_quit_server (Iridium.Services.ServerConnection source, string username, Gee.List<string> channels, Iridium.Services.Message message) {
+        user_quit_server (source.connection_details.server, username, channels, message);
     }
 
     private void on_nickname_in_use (Iridium.Services.ServerConnection source, Iridium.Services.Message message) {
@@ -204,7 +196,7 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
     public signal void server_message_received (string server_name, Iridium.Services.Message message);
     public signal void server_error_received (string server_name, Iridium.Services.Message message);
     public signal void server_quit (string server_name, string message);
-    public signal void user_quit_server (string server_name, string username, Iridium.Services.Message message);
+    public signal void user_quit_server (string server_name, string username, Gee.List<string> channels, Iridium.Services.Message message);
     public signal void nickname_in_use (string server_name, Iridium.Services.Message message);
     public signal void channel_joined (string server_name, string channel_name);
     public signal void channel_left (string server_name, string channel_name);

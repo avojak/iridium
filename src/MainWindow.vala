@@ -288,9 +288,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         connection_handler.disconnect_from_server (server_name);
     }
 
-    private void on_user_quit_server (string server_name, string username, Iridium.Services.Message message) {
+    private void on_user_quit_server (string server_name, string username, Gee.List<string> channels, Iridium.Services.Message message) {
         // Display a message in any channel that the user was in
-        Gee.List<string> channels = connection_handler.get_channels_for_user (server_name, username);
         Idle.add (() => {
             foreach (string channel in channels) {
                 var channel_chat_view = main_layout.get_channel_chat_view (channel);

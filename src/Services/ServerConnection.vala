@@ -129,14 +129,14 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 if (message.username == connection_details.nickname) {
                     server_quit (message.message);
                 } else {
-                    user_quit_server (message.username, message);
+                    on_user_quit_server (message.username, message);
                 }
                 break;
             case Iridium.Services.MessageCommands.JOIN:
                 if ((message.message == null || message.message.strip () == "") && message.username == connection_details.nickname) {
                     channel_joined (message.params[0]);
                 } else {
-                    user_joined_channel (message.params[0], message.username);
+                    on_user_joined_channel (message.params[0], message.username);
                 }
                 break;
             case Iridium.Services.MessageCommands.PART:
@@ -145,7 +145,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 if (message.username == connection_details.nickname) {
                     channel_left (message.params[0]);
                 } else {
-                    user_left_channel (message.params[0], message.username);
+                    on_user_left_channel (message.params[0], message.username);
                 }
                 break;
             case Iridium.Services.MessageCommands.PRIVMSG:
@@ -239,16 +239,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         return channel_users.get (channel_name);
     }
 
-    public Gee.List<string> get_channels_for_user (string username) {
-        var channels = new Gee.LinkedList<string> ();
-        foreach (Gee.Map.Entry<string, Gee.List<string>> entry in channel_users.entries) {
-            if (entry.value.index_of (username) >= 0) {
-                channels.add (entry.key);
-            }
-        }
-        return channels;
-    }
-
     private void send_output (string response) {
         try {
             output_stream.put_string (@"$response\r\n");
@@ -278,8 +268,35 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     private void ctcp_version_query_received (Iridium.Services.Message message) {
         send_output (Iridium.Services.MessageCommands.VERSION + " " + Constants.PROJECT_NAME + " " + Constants.VERSION);
         var display_message = new Iridium.Services.Message ();
-        display_message.message = "Received a CTCP VERSION from " + message.username;
+        display_message.message = "Received a CTCP VERSION query from " + message.username;
         server_message_received (display_message);
+    }
+
+    private void on_user_joined_channel (string channel_name, string username) {
+        // Update our list of users in channels
+        channel_users.get (channel_name).add (username);
+        // Send the signal
+        user_joined_channel (channel_name, username);
+    }
+
+    private void on_user_left_channel (string channel_name, string username) {
+        // Update our list of users in channels
+        channel_users.get (channel_name).remove (username);
+        // Send the signal
+        user_left_channel (channel_name, username);
+    }
+
+    private void on_user_quit_server (string username, Iridium.Services.Message message) {
+        // Update our list of users in channels, and get the list of channels
+        // that the user was in (that we care about)
+        Gee.List<string> channels = new Gee.LinkedList<string> ();
+        foreach (Gee.Map.Entry<string, Gee.List<string>> entry in channel_users.entries) {
+            if (entry.value.remove (username)) {
+                channels.add (entry.key);
+            }
+        }
+        // Send the signal
+        user_quit_server (username, channels, message);
     }
 
     public signal void open_successful (Iridium.Services.Message message);
@@ -289,7 +306,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     public signal void server_message_received (Iridium.Services.Message message);
     public signal void server_error_received (Iridium.Services.Message message);
     public signal void server_quit (string message);
-    public signal void user_quit_server (string username, Iridium.Services.Message message);
+    public signal void user_quit_server (string username, Gee.List<string> channels, Iridium.Services.Message message);
     public signal void nickname_in_use (Iridium.Services.Message message);
     public signal void channel_joined (string channel);
     public signal void channel_left (string channel);
