@@ -48,15 +48,17 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
             channel_join_button_clicked ();
         });
 
-        var gtk_settings = Gtk.Settings.get_default ();
-
         var mode_switch = new Granite.ModeSwitch.from_icon_name ("display-brightness-symbolic", "weather-clear-night-symbolic");
         mode_switch.primary_icon_tooltip_text = "Light background";
         mode_switch.secondary_icon_tooltip_text = "Dark background";
         mode_switch.valign = Gtk.Align.CENTER;
-        mode_switch.bind_property ("active", gtk_settings, "gtk_application_prefer_dark_theme");
-
-        Iridium.Application.settings.bind ("prefer-dark-style", mode_switch, "active", GLib.SettingsBindFlags.DEFAULT);
+        mode_switch.bind_property ("active", Iridium.Application.settings, "prefer-dark-style");
+        mode_switch.notify.connect (() => {
+            Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = Iridium.Application.settings.prefer_dark_style;
+        });
+        if (Iridium.Application.settings.prefer_dark_style) {
+            mode_switch.active = true;
+        }
 
         /* get_style_context ().add_class ("default-decoration"); */
         pack_start (server_connect_button);

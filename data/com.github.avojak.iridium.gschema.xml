@@ -6,10 +6,20 @@
       <summary>If the dark Gtk stylesheet should be used</summary>
       <description>If the dark Gtk stylesheet should be used</description>
     </key>
-    <key name="connections" type="as">
+    <key name="connection-details" type="as">
       <default>[]</default>
-      <summary>The saved server connections</summary>
-      <description>All saved server connections and channels</description>
+      <summary>The saved server connections details</summary>
+      <description>All saved server connections details</description>
+    </key>
+    <key name="servers" type="as">
+      <default>[]</default>
+      <summary>The server rows in the side panel</summary>
+      <description>All servers displayed in the side panel and their enabled state</description>
+    </key>
+    <key name="channels" type="as">
+      <default>[]</default>
+      <summary>The channel rows in the side panel</summary>
+      <description>All channels displayed in the side panel and their enabled state</description>
     </key>
   </schema>
 </schemalist>

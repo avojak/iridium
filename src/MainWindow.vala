@@ -117,8 +117,29 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         connection_handler.user_left_channel.connect (on_user_left_channel);
         connection_handler.direct_message_received.connect (on_direct_message_received);
 
+        // Connect to all of the side panel signals to make settings changes
+        side_panel.server_row_added.connect (Iridium.Application.settings.on_server_row_added);
+        side_panel.server_row_removed.connect (Iridium.Application.settings.on_server_row_removed);
+        side_panel.server_row_enabled.connect (Iridium.Application.settings.on_server_row_enabled);
+        side_panel.server_row_disabled.connect (Iridium.Application.settings.on_server_row_disabled);
+        side_panel.channel_row_added.connect (Iridium.Application.settings.on_channel_row_added);
+        side_panel.channel_row_removed.connect (Iridium.Application.settings.on_channel_row_removed);
+        side_panel.channel_row_enabled.connect (Iridium.Application.settings.on_channel_row_enabled);
+        side_panel.channel_row_disabled.connect (Iridium.Application.settings.on_channel_row_disabled);
+
+        // Connect to the connection handler signal to make settings changes for new connections
+        connection_handler.server_connection_successful.connect ((server_name, message) => {
+            var connection_details = connection_handler.get_connection_details (server_name);
+            Iridium.Application.settings.on_server_connection_successful (connection_details);
+        });
+
         // Close connections when the window is closed
         this.destroy.connect (() => {
+            // Disconnect this signal so that we don't modify the setting to
+            // show servers as disabled, when in reality they were enabled prior
+            // to closing the application.
+            side_panel.server_row_disabled.disconnect (Iridium.Application.settings.on_server_row_disabled);
+
             // TODO: Not sure if this is right...
             connection_handler.close_all_connections ();
             GLib.Process.exit (0);
@@ -239,6 +260,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             }
             side_panel.add_server (server_name);
             side_panel.enable_server_row (server_name);
+            // TODO: Maybe only do these two things if the dialog was open?
             main_layout.show_chat_view (server_name);
             show_channel_join_dialog ();
             return false;
@@ -351,6 +373,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             }
             side_panel.add_channel (server_name, channel_name);
             side_panel.enable_channel_row (server_name, channel_name);
+            // TODO: Maybe only do this if the dialog was open?
+            //       Might also be able to surround this with an initializing
+            //       boolean check (ie. only select if we're not initializing).
             side_panel.select_channel_row (server_name, channel_name);
             return false;
         });

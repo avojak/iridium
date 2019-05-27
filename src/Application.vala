@@ -41,13 +41,18 @@ public class Iridium.Application : Gtk.Application {
         var main_window = new Iridium.MainWindow (this, connection_handler);
         main_window.show_all ();
 
+        // TODO: Connect to signals to save window size and position in settings
+
         // TODO: Use NetworkMonitor to handle lost internet connection
 
+        // TODO: Should this be done before showing the main window?
         restore_state ();
     }
 
     private void restore_state () {
-        // TODO: Implement
+        var servers = settings.get_servers_list ();
+        var channels = settings.get_channels_list ();
+        var connection_details = settings.get_connection_details_list ();
     }
 
     public static int main (string[] args) {

@@ -57,25 +57,27 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         server_items = new Gee.HashMap<string, Granite.Widgets.SourceList.ExpandableItem> ();
     }
 
-    public void add_server (string name) {
+    public void add_server (string server_name) {
         // Check if this server row already exists
-        if (server_items.has_key (name)) {
+        if (server_items.has_key (server_name)) {
             return;
         }
 
-        var server_item = new Iridium.Widgets.SidePanel.ServerRow (name);
+        var server_item = new Iridium.Widgets.SidePanel.ServerRow (server_name);
         // Disconnect from the server
         server_item.disconnect_from_server.connect ((should_close) => {
-            disconnect_from_server (name);
+            disconnect_from_server (server_name);
         });
         // Remove the server item and its associated channel items
         server_item.remove_server.connect (() => {
-            remove_server (server_item, name);
+            remove_server (server_item, server_name);
         });
-        server_items.set (name, server_item);
+        server_items.set (server_name, server_item);
         others_category.add (server_item);
 
         selected = server_item;
+
+        server_row_added (server_name);
     }
 
     private void remove_server (Iridium.Widgets.SidePanel.ServerRow server_item, string server_name) {
@@ -86,6 +88,8 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         if (server_items.is_empty) {
             selected = null;
         }
+
+        server_row_removed (server_name);
     }
 
     public void add_channel (string server_name, string channel_name) {
@@ -112,6 +116,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         server_item.expanded = true;
 
         selected = channel_item;
+        channel_row_added (server_name, channel_name);
     }
 
     public void remove_channel (string server_name, string channel_name) {
@@ -120,9 +125,10 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
             unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) channel_item;
             if (row.get_channel_name () == channel_name) {
                 server_item.remove (channel_item);
-                return;
+                break;
             }
         }
+        channel_row_removed (server_name, channel_name);
     }
 
     // TODO: Lots of refactoring can be done here. Lots of code is shared
@@ -182,6 +188,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         }
         unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) server_item;
         row.enable ();
+        server_row_enabled (server_name);
     }
 
     public void disable_server_row (string server_name) {
@@ -196,6 +203,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
             unowned Iridium.Widgets.SidePanel.Row channel_row = (Iridium.Widgets.SidePanel.Row) channel_item;
             channel_row.disable ();
         }
+        server_row_disabled (server_name);
     }
 
     public void enable_channel_row (string server_name, string channel_name) {
@@ -207,9 +215,10 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
             unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) channel_item;
             if (row.get_channel_name () == channel_name) {
                 row.enable ();
-                return;
+                break;
             }
         }
+        channel_row_enabled (server_name, channel_name);
     }
 
     public void disable_channel_row (string server_name, string channel_name) {
@@ -221,9 +230,10 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
             unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) channel_item;
             if (row.get_channel_name () == channel_name) {
                 row.disable ();
-                return;
+                break;
             }
         }
+        channel_row_disabled (server_name, channel_name);
     }
 
     public void select_channel_row (string server_name, string channel_name) {
@@ -242,5 +252,18 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
 
     public signal void leave_channel (string server_name, string channel_name);
     public signal void disconnect_from_server(string server_name);
+
+    public signal void server_row_added (string server_name);
+    public signal void server_row_removed (string server_name);
+    public signal void server_row_enabled (string server_name);
+    public signal void server_row_disabled (string server_name);
+    public signal void channel_row_added (string server_name, string channel_name);
+    public signal void channel_row_removed (string server_name, string channel_name);
+    public signal void channel_row_enabled (string server_name, string channel_name);
+    public signal void channel_row_disabled (string server_name, string channel_name);
+    public signal void dm_row_added (string server_name, string username);
+    public signal void dm_row_removed (string server_name, string username);
+    public signal void dm_row_enabled (string server_name, string username);
+    public signal void dm_row_disabled (string server_name, string username);
 
 }

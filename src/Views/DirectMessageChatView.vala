@@ -19,6 +19,7 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
+// TODO: Rename Direct -> Private
 public class Iridium.Views.DirectMessageChatView : Iridium.Views.ChatView {
 
     protected override int get_indent () {

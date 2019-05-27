@@ -35,7 +35,7 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         }
         // Check if we've been connected and can re-use everything
         Iridium.Services.ServerConnection server_connection = new Iridium.Services.ServerConnection (connection_details);
-        server_connection.open_successful.connect (on_server_connection_succcessful);
+        server_connection.open_successful.connect (on_server_connection_successful);
         server_connection.open_failed.connect (on_server_connection_failed);
         server_connection.connection_closed.connect (on_server_connection_closed);
         server_connection.server_message_received.connect (on_server_message_received);
@@ -50,7 +50,11 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         server_connection.user_left_channel.connect (on_user_left_channel);
         server_connection.direct_message_received.connect (on_direct_message_received);
 
+        // TODO: This may cause a bug since we're not yet sure whether the
+        //       connection attempt was successful. Maybe do this in the
+        //       callback instead?
         open_connections.set (server, server_connection);
+
         server_connection.open ();
         return server_connection;
     }
@@ -126,11 +130,19 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         return connection.get_users (channel_name);
     }
 
+    public Iridium.Services.ServerConnectionDetails? get_connection_details (string server_name) {
+        var connection = open_connections.get (server_name);
+        if (connection == null) {
+            return null;
+        }
+        return connection.connection_details;
+    }
+
     //
     // ServerConnection Callbacks
     //
 
-    private void on_server_connection_succcessful (Iridium.Services.ServerConnection source, Iridium.Services.Message message) {
+    private void on_server_connection_successful (Iridium.Services.ServerConnection source, Iridium.Services.Message message) {
         server_connection_successful (source.connection_details.server, message);
     }
 
