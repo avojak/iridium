@@ -146,6 +146,80 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         });
     }
 
+    public void initialize (Gee.List<string> servers_list, Gee.List<string> channels_list, Gee.List<string> connection_details_list) {
+        Gee.List<string> server_rows = new Gee.ArrayList<string> ();
+        Gee.List<string> enabled_servers = new Gee.ArrayList<string> ();
+        foreach (string entry in servers_list) {
+            string[] tokens = entry.split ("\n");
+            var server_name = tokens[0].split ("=")[1];
+            var enabled = bool.parse (tokens[1].split ("=")[1]);
+            server_rows.add (server_name);
+            if (enabled) {
+                enabled_servers.add (server_name);
+            }
+        }
+
+        Gee.Map<string, Gee.List<string>> channel_rows = new Gee.HashMap<string, Gee.ArrayList<string>> ();
+        Gee.Map<string, Gee.List<string>> enabled_channels = new Gee.HashMap<string, Gee.ArrayList<string>> ();
+        foreach (string entry in channels_list) {
+            string[] tokens = entry.split ("\n");
+            var server_name = tokens[0].split ("=")[1];
+            var channel_name = tokens[1].split ("=")[1];
+            var enabled = bool.parse (tokens[2].split ("=")[1]);
+
+            if (!channel_rows.has_key (server_name)) {
+                channel_rows.set (server_name, new Gee.ArrayList<string> ());
+                enabled_channels.set (server_name, new Gee.ArrayList<string> ());
+            }
+
+            channel_rows.get (server_name).add (channel_name);
+            if (enabled) {
+                enabled_channels.get (server_name).add (channel_name);
+            }
+
+            side_panel.add_channel (server_name, channel_name);
+            if (!enabled) {
+                side_panel.disable_channel_row (server_name, channel_name);
+            }
+        }
+
+        Idle.add (() => {
+            foreach (string server_name in server_rows) {
+                side_panel.add_server (server_name);
+                side_panel.disable_server_row (server_name);
+            }
+            foreach (Gee.Map.Entry<string, Gee.List<string>> entry in channel_rows.entries) {
+                var server_name = entry.key;
+                foreach (string channel_name in entry.value) {
+                    side_panel.add_channel (server_name, channel_name);
+                    side_panel.disable_channel_row (server_name, channel_name);
+                }
+            }
+            return false;
+        });
+
+        Gee.Map<string, Iridium.Services.ServerConnectionDetails> connection_details_map = new Gee.HashMap<string, Iridium.Services.ServerConnectionDetails> ();
+        foreach (string entry in connection_details_list) {
+            string[] tokens = entry.split ("\n");
+            var connection_details = new Iridium.Services.ServerConnectionDetails ();
+            connection_details.server = tokens[0].split ("=")[1];
+            connection_details.username = tokens[2].split ("=")[1];
+            connection_details.nickname = tokens[3].split ("=")[1];
+            connection_details.realname = tokens[4].split ("=")[1];
+            connection_details_map.set (connection_details.server, connection_details);
+        }
+
+        foreach (string server_name in enabled_servers) {
+            var connection_details = connection_details_map.get (server_name);
+            var server_connection = connection_handler.connect_to_server (connection_details);
+            server_connection.open_successful.connect (() => {
+                foreach (string channel_name in enabled_channels.get (server_name)) {
+                    connection_handler.join_channel (server_name, channel_name);
+                }
+            });
+        }
+    }
+
     private void show_server_connection_dialog () {
         if (connection_dialog == null) {
             connection_dialog = new Iridium.Widgets.ServerConnectionDialog (this);
@@ -255,14 +329,19 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             }
 
             chat_view.display_server_msg (message);
-            if (connection_dialog != null) {
-                connection_dialog.dismiss ();
-            }
+
             side_panel.add_server (server_name);
             side_panel.enable_server_row (server_name);
             // TODO: Maybe only do these two things if the dialog was open?
-            main_layout.show_chat_view (server_name);
-            show_channel_join_dialog ();
+            /* main_layout.show_chat_view (server_name);
+            show_channel_join_dialog (); */
+            if (connection_dialog != null) {
+                connection_dialog.dismiss ();
+
+                main_layout.show_chat_view (server_name);
+                show_channel_join_dialog ();
+            }
+
             return false;
         });
     }
@@ -368,15 +447,17 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 });
             }
 
-            if (channel_join_dialog != null) {
-                channel_join_dialog.dismiss ();
-            }
             side_panel.add_channel (server_name, channel_name);
             side_panel.enable_channel_row (server_name, channel_name);
             // TODO: Maybe only do this if the dialog was open?
             //       Might also be able to surround this with an initializing
             //       boolean check (ie. only select if we're not initializing).
-            side_panel.select_channel_row (server_name, channel_name);
+            /* side_panel.select_channel_row (server_name, channel_name); */
+            if (channel_join_dialog != null) {
+                channel_join_dialog.dismiss ();
+
+                side_panel.select_channel_row (server_name, channel_name);
+            }
             return false;
         });
     }

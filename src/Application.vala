@@ -46,13 +46,14 @@ public class Iridium.Application : Gtk.Application {
         // TODO: Use NetworkMonitor to handle lost internet connection
 
         // TODO: Should this be done before showing the main window?
-        restore_state ();
+        restore_state (main_window);
     }
 
-    private void restore_state () {
+    private void restore_state (Iridium.MainWindow main_window) {
         var servers = settings.get_servers_list ();
         var channels = settings.get_channels_list ();
         var connection_details = settings.get_connection_details_list ();
+        main_window.initialize (servers, channels, connection_details);
     }
 
     public static int main (string[] args) {
