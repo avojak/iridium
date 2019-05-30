@@ -176,11 +176,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             if (enabled) {
                 enabled_channels.get (server_name).add (channel_name);
             }
-
-            side_panel.add_channel (server_name, channel_name);
-            if (!enabled) {
-                side_panel.disable_channel_row (server_name, channel_name);
-            }
         }
 
         Idle.add (() => {

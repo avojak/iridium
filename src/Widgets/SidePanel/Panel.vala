@@ -75,7 +75,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         server_items.set (server_name, server_item);
         others_category.add (server_item);
 
-        selected = server_item;
+        /* selected = server_item; */
 
         server_row_added (server_name);
     }
@@ -115,7 +115,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         server_item.add (channel_item);
         server_item.expanded = true;
 
-        selected = channel_item;
+        /* selected = channel_item; */
         channel_row_added (server_name, channel_name);
     }
 
