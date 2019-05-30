@@ -16,6 +16,8 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - libstdc++-5-dev
+      - libgee-0.8-dev
+      - libgee-0.8-2
 
 install:
   - npm i -g @elementaryos/houston
