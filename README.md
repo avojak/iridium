@@ -16,6 +16,7 @@ dependencies required:
 - `debhelper (>= 10.5.1)`
 - `gettext`
 - `libgtk-3-dev (>= 3.10)`
+- `libgee-0.8-dev`
 - `meson`
 - `valac (>= 0.28.0)`
 
