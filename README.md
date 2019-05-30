@@ -62,7 +62,7 @@ This project is very much in-progress and has a lot of remaining work. Here is a
 - [ ] Support authentication for servers
 - [ ] Special formatting for usernames and URLs in messages
 - [ ] Favorite channels
-- [ ] Save and restore state when closing and re-opening
+- [x] Save and restore state when closing and re-opening
 - [ ] Display channel users list
 - [ ] Easy way to initiate a private message chat view
 - [ ] Display available channel list
