@@ -161,6 +161,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
         Gee.Map<string, Gee.List<string>> channel_rows = new Gee.HashMap<string, Gee.ArrayList<string>> ();
         Gee.Map<string, Gee.List<string>> enabled_channels = new Gee.HashMap<string, Gee.ArrayList<string>> ();
+        Gee.Map<string, Gee.List<string>> disabled_channels = new Gee.HashMap<string, Gee.ArrayList<string>> ();
         foreach (string entry in channels_list) {
             string[] tokens = entry.split ("\n");
             var server_name = tokens[0].split ("=")[1];
@@ -170,11 +171,14 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             if (!channel_rows.has_key (server_name)) {
                 channel_rows.set (server_name, new Gee.ArrayList<string> ());
                 enabled_channels.set (server_name, new Gee.ArrayList<string> ());
+                disabled_channels.set (server_name, new Gee.ArrayList<string> ());
             }
 
             channel_rows.get (server_name).add (channel_name);
             if (enabled) {
                 enabled_channels.get (server_name).add (channel_name);
+            } else {
+                disabled_channels.get (server_name).add (channel_name);
             }
         }
 
@@ -211,6 +215,16 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 foreach (string channel_name in enabled_channels.get (server_name)) {
                     connection_handler.join_channel (server_name, channel_name);
                 }
+                // Still add chat views for channels that aren't joined yet.
+                // This is needed in case a user clicks a channel item in the
+                // side panel when the channel hasn't been joined yet.
+                Idle.add (() => {
+                    foreach (string channel_name in disabled_channels.get (server_name)) {
+                        var chat_view = new Iridium.Views.ChannelChatView ();
+                        main_layout.add_chat_view (chat_view, channel_name);
+                    }
+                    return false;
+                });
             });
         }
     }
