@@ -32,6 +32,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     protected Gtk.TextView text_view;
 
     private Gtk.ScrolledWindow scrolled_window;
+    private Gtk.Entry entry;
 
     public ChatView () {
         Object (
@@ -60,13 +61,18 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         scrolled_window.set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
         scrolled_window.add (text_view);
 
-        var entry = new Gtk.Entry ();
+        entry = new Gtk.Entry ();
         entry.hexpand = true;
         entry.margin = 6;
         entry.secondary_icon_name = "edit-clear-symbolic";
         entry.secondary_icon_tooltip_text = "Clear";
         entry.secondary_icon_sensitive = false;
         entry.secondary_icon_activatable = false;
+
+        // TODO: Support emojis instead of having the clear button?
+        //       Maybe find a way to do both cleanly?
+        //       We already get the right-click emoji menu for free...
+        //  entry.show_emoji_icon = true;
 
         attach (scrolled_window, 0, 0, 1, 1);
         attach (entry, 0, 1, 1, 1);
@@ -135,6 +141,12 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         var rich_text = new Iridium.Models.ServerMessageText (message);
         rich_text.display (text_view.get_buffer ());
         do_autoscroll ();
+    }
+
+    public void set_entry_focus () {
+        // TODO: It's not working...
+        entry.grab_focus_without_selecting ();
+        //  print (entry.has_focus.to_string () + "\n");
     }
 
     protected abstract int get_indent ();

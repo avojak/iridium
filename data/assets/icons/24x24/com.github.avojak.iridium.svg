@@ -6,10 +6,34 @@
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    id="svg6955"
    height="24"
    width="24"
-   version="1.1">
+   version="1.1"
+   sodipodi:docname="com.github.avojak.iridium.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     id="namedview38"
+     showgrid="false"
+     inkscape:zoom="9.8333333"
+     inkscape:cx="12"
+     inkscape:cy="12"
+     inkscape:window-x="0"
+     inkscape:window-y="30"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg6955" />
   <defs
      id="defs6957">
     <linearGradient
@@ -97,7 +121,7 @@
        gradientTransform="matrix(7.8155022e-8,3.4259259,4.4444444,-1.013903e-7,-13.88889,-55.814815)"
        gradientUnits="userSpaceOnUse"
        id="radialGradient3950"
-       xlink:href="#linearGradient4221" />
+       xlink:href="#linearGradient4223" />
     <radialGradient
        r="13.5"
        fy="6.9499998"
@@ -134,6 +158,35 @@
        cx="13.5"
        id="radialGradient3859"
        xlink:href="#linearGradient3853" />
+    <radialGradient
+       r="26.5"
+       fy="19.018763"
+       fx="36"
+       cy="19.018763"
+       cx="36"
+       gradientTransform="matrix(-2.2629402e-7,10.263208,12.075472,2.662038e-7,-152.15205,-352.72999)"
+       gradientUnits="userSpaceOnUse"
+       id="radialGradient3895"
+       xlink:href="#linearGradient4223" />
+    <linearGradient
+       id="linearGradient4223">
+      <stop
+         id="stop4225"
+         style="stop-color:#b0b0b0;stop-opacity:1"
+         offset="0" />
+      <stop
+         id="stop4227"
+         style="stop-color:#646464;stop-opacity:1"
+         offset="0.26238" />
+      <stop
+         id="stop4229"
+         style="stop-color:#000000;stop-opacity:1"
+         offset="0.66093999" />
+      <stop
+         id="stop4231"
+         style="stop-color:#454545;stop-opacity:1"
+         offset="1" />
+    </linearGradient>
   </defs>
   <metadata
      id="metadata6960">
@@ -153,7 +206,7 @@
      id="path3083"
      style="opacity:0.2;fill:url(#radialGradient3859);fill-opacity:1;stroke:none" />
   <path
-     style="fill:url(#radialGradient3950);fill-opacity:1;stroke:#206b00;stroke-opacity:0.49803922"
+     style="fill:url(#radialGradient3950);fill-opacity:1;stroke:#292929;stroke-opacity:0.49803922"
      d="m 13.5,1.5 c 3.324,0 6,2.676 6,6 l 0,1 c 0,3.324 -2.676,6 -6,6 l -6,0 c -0.229086,0 -0.465233,-0.0065 -0.6875,-0.03125 -1.253055,1.124969 -3.150019,1.387664 -4.6875,0.5 C 2.09777,14.95303 2.08922,14.92251 2.0625,14.90625 2.782861,14.492545 3.424622,13.975506 4,13.34375 2.496476,12.255496 1.5,10.506048 1.5,8.5 l 0,-1 c 0,-3.324 2.676,-6 6,-6 z"
      id="path3946" />
   <path

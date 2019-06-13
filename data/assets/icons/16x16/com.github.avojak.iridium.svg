@@ -6,10 +6,34 @@
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    id="svg6955"
    height="16"
    width="16"
-   version="1.1">
+   version="1.1"
+   sodipodi:docname="com.github.avojak.iridium.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     id="namedview30"
+     showgrid="false"
+     inkscape:zoom="14.75"
+     inkscape:cx="8"
+     inkscape:cy="8"
+     inkscape:window-x="0"
+     inkscape:window-y="30"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg6955" />
   <defs
      id="defs6957">
     <linearGradient
@@ -88,7 +112,7 @@
        gradientTransform="matrix(3.8333334,3.1370928e-7,3.1548001e-7,-3.8333335,-27.500001,16.333347)"
        gradientUnits="userSpaceOnUse"
        id="radialGradient3886"
-       xlink:href="#linearGradient4216" />
+       xlink:href="#linearGradient4223" />
     <clipPath
        id="clipPath3899"
        clipPathUnits="userSpaceOnUse">
@@ -113,6 +137,35 @@
        gradientUnits="userSpaceOnUse"
        id="linearGradient3913"
        xlink:href="#linearGradient4546" />
+    <radialGradient
+       r="26.5"
+       fy="19.018763"
+       fx="36"
+       cy="19.018763"
+       cx="36"
+       gradientTransform="matrix(-2.2629402e-7,10.263208,12.075472,2.662038e-7,-168.21985,-360.05203)"
+       gradientUnits="userSpaceOnUse"
+       id="radialGradient3895"
+       xlink:href="#linearGradient4223" />
+    <linearGradient
+       id="linearGradient4223">
+      <stop
+         id="stop4225"
+         style="stop-color:#b0b0b0;stop-opacity:1"
+         offset="0" />
+      <stop
+         id="stop4227"
+         style="stop-color:#646464;stop-opacity:1"
+         offset="0.26238" />
+      <stop
+         id="stop4229"
+         style="stop-color:#000000;stop-opacity:1"
+         offset="0.66093999" />
+      <stop
+         id="stop4231"
+         style="stop-color:#454545;stop-opacity:1"
+         offset="1" />
+    </linearGradient>
   </defs>
   <metadata
      id="metadata6960">
@@ -127,7 +180,7 @@
     </rdf:RDF>
   </metadata>
   <path
-     style="fill:url(#radialGradient3886);fill-opacity:1;stroke:#206b00;stroke-linejoin:round;stroke-opacity:0.49803922"
+     style="fill:url(#radialGradient3886);fill-opacity:1;stroke:#292929;stroke-linejoin:round;stroke-opacity:0.49803922"
      d="m 9,0.50001743 c 2.484351,0 4.5,2.01564857 4.5,4.49999997 0,2.484351 -2.015649,4.5 -4.5,4.5 l -4,0 c -0.278759,0 -0.547729,-0.045181 -0.8125,-0.09375 C 3.31021,10.379664 1.868085,10.645951 0.65625,10.062517 1.294286,9.6885174 1.868605,9.2029714 2.34375,8.5937674 1.238589,7.7736384 0.5,6.4812274 0.5,5.0000174 0.5,2.515666 2.515649,0.50001743 5,0.50001743 l 4,0 z"
      id="path3884" />
   <path

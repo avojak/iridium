@@ -18,6 +18,16 @@ foreach i : icon_sizes
         join_paths('assets', 'icons', i + 'x' + i, meson.project_name() + '.network-server-new.svg'),
         install_dir: join_paths(get_option('datadir'), 'icons', 'hicolor', i + 'x' + i + '@2', 'actions')
     )
+    install_data(
+        join_paths('assets', 'icons', i + 'x' + i, meson.project_name() + '.svg'),
+        install_dir: join_paths(get_option('datadir'), 'icons', 'hicolor', i + 'x' + i, 'apps')
+        rename: meson.project_name() + '.svg'
+    )
+    install_data(
+        join_paths('assets', 'icons', i + 'x' + i, meson.project_name() + '.svg'),
+        install_dir: join_paths(get_option('datadir'), 'icons', 'hicolor', i + 'x' + i + '@2', 'apps')
+        rename: meson.project_name() + '.svg'
+    )
 endforeach
 
 # Install the settings schema
