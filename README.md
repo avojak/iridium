@@ -1,11 +1,16 @@
-# Iridium
-
 ![Travis (.com)](https://img.shields.io/travis/com/avojak/iridium.svg)
 ![GitHub](https://img.shields.io/github/license/avojak/iridium.svg?color=blue)
 
-Iridium is a native Linux IRC client built in Vala and Gtk for elementary OS.
+<p align="center">
+  <img src="data/assets/iridium.svg" alt="Icon" />
+</p>
+<h1 align="center">Iridium</h1>
 
-![](data/assets/screenshots/iridium-screenshot-01.png)
+![Screenshot](data/assets/screenshots/iridium-screenshot-01.png)
+
+## The friendly IRC client
+
+Iridium is a native Linux IRC client built in Vala and Gtk for elementary OS.
 
 ## Install from Source
 
