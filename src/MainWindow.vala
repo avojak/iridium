@@ -347,7 +347,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             if (connection_dialog != null) {
                 connection_dialog.dismiss ();
 
-                main_layout.show_chat_view (server_name);
+                side_panel.select_server_row (server_name);
                 show_channel_join_dialog ();
             }
 

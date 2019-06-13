@@ -236,6 +236,14 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         channel_row_disabled (server_name, channel_name);
     }
 
+    public void select_server_row (string server_name) {
+        var server_item = server_items.get (server_name);
+        if (server_item == null) {
+            return;
+        }
+        selected = server_item;
+    }
+
     public void select_channel_row (string server_name, string channel_name) {
         var server_item = server_items.get (server_name);
         if (server_item == null) {
