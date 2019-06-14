@@ -55,6 +55,11 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         root.add (others_category);
 
         server_items = new Gee.HashMap<string, Granite.Widgets.SourceList.ExpandableItem> ();
+
+        // Reset the badge when an item is selected
+        item_selected.connect ((item) => {
+            item.badge = "";
+        });
     }
 
     public void add_server (string server_name) {
@@ -154,7 +159,10 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         server_item.add (direct_message_item);
         server_item.expanded = true;
 
-        selected = direct_message_item;
+        // TODO: Automatically showing a PM when it's received was kinda annoying, 
+        //       but maybe not to everyone will feel that way. Maybe instead show
+        //       some indication/styling in the side panel to show that the PM is new?
+        //  selected = direct_message_item;
     }
 
     private void remove_direct_message (string server_name, string username) {
@@ -254,6 +262,39 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
             if (row.get_channel_name () == channel_name) {
                 selected = channel_item;
                 return;
+            }
+        }
+    }
+
+    public void increment_server_badge (string server_name) {
+        var server_item = server_items.get (server_name);
+        if (server_item == null) {
+            return;
+        }
+        // Don't increment if the item is currently selected
+        if (selected == server_item) {
+            return;
+        }
+        var current_count = int.parse (server_item.badge);
+        server_item.badge = (current_count + 1).to_string ();
+    }
+
+    public void increment_channel_badge (string server_name, string channel_name) {
+        var server_item = server_items.get (server_name);
+        if (server_item == null) {
+            return;
+        }
+        // TODO: Refactor out the 'channel row finding' logic
+        foreach (var channel_item in server_item.children) {
+            unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) channel_item;
+            if (row.get_channel_name () == channel_name) {
+                // Don't increment if the item is currently selected
+                if (selected == channel_item) {
+                    return;
+                }
+                var current_count = int.parse (channel_item.badge);
+                channel_item.badge = (current_count + 1).to_string ();
+                break;
             }
         }
     }

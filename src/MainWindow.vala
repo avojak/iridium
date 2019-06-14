@@ -146,6 +146,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         });
     }
 
+    // TODO: Restore private messages from the side panel
     public void initialize (Gee.List<string> servers_list, Gee.List<string> channels_list, Gee.List<string> connection_details_list) {
         Gee.List<string> server_rows = new Gee.ArrayList<string> ();
         Gee.List<string> enabled_servers = new Gee.ArrayList<string> ();
@@ -222,7 +223,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 // TODO: This causes a bug when initializing and a server is
                 //       present in the side bar, but not connected. Selecting
                 //       the item will not show a view because it hasn't been
-                //       created here.
+                //       created here. Maybe make the panel item not selectable?
 
                 Idle.add (() => {
                     foreach (string channel_name in disabled_channels.get (server_name)) {
@@ -384,6 +385,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             if (chat_view != null) {
                 chat_view.display_server_msg (message);
             }
+            side_panel.increment_server_badge (server_name);
             return false;
         });
     }
@@ -396,6 +398,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             if (chat_view != null) {
                 chat_view.display_server_error_msg (message);
             }
+            side_panel.increment_server_badge (server_name);
             return false;
         });
     }
@@ -496,6 +499,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             }
             side_panel.add_channel (server_name, channel_name);
             chat_view.display_priv_msg (message);
+            side_panel.increment_channel_badge (server_name, channel_name);
             return false;
         });
     }
@@ -539,6 +543,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             }
             side_panel.add_direct_message (server_name, username);
             chat_view.display_priv_msg (message);
+            side_panel.increment_channel_badge (server_name, username);
             return false;
         });
     }
