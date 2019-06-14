@@ -144,9 +144,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     }
 
     public void set_entry_focus () {
-        // TODO: It's not working...
         entry.grab_focus_without_selecting ();
-        //  print (entry.has_focus.to_string () + "\n");
     }
 
     protected abstract int get_indent ();

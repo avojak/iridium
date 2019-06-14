@@ -218,6 +218,12 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 // Still add chat views for channels that aren't joined yet.
                 // This is needed in case a user clicks a channel item in the
                 // side panel when the channel hasn't been joined yet.
+
+                // TODO: This causes a bug when initializing and a server is
+                //       present in the side bar, but not connected. Selecting
+                //       the item will not show a view because it hasn't been
+                //       created here.
+
                 Idle.add (() => {
                     foreach (string channel_name in disabled_channels.get (server_name)) {
                         var chat_view = new Iridium.Views.ChannelChatView ();

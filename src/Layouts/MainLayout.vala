@@ -82,8 +82,11 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
         }
         chat_view.show_all ();
         main_stack.set_visible_child_full (name, Gtk.StackTransitionType.SLIDE_RIGHT);
-        // TODO: Set focus on the text entry
-        chat_view.set_entry_focus ();
+        // Set focus on the text entry
+        Idle.add (() => {
+            chat_view.set_entry_focus ();
+            return false;
+        });
     }
 
 }
