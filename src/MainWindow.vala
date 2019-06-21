@@ -34,6 +34,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     private Gtk.Overlay overlay;
     private Granite.Widgets.OverlayBar overlay_bar;
 
+    private Iridium.Widgets.NetworkInfoBar network_info_bar;
+
     public MainWindow (Gtk.Application application, Iridium.Services.ServerConnectionHandler connection_handler) {
         Object (
             application: application,
@@ -49,17 +51,23 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         header_bar.hide_channel_users_button ();
         set_titlebar (header_bar);
 
-        // TODO: Show an info bar across the top of the window area when internet connection is lost
+        network_info_bar = new Iridium.Widgets.NetworkInfoBar ();
+        network_info_bar.show ();
 
         welcome_view = new Iridium.Views.Welcome ();
         side_panel = new Iridium.Widgets.SidePanel.Panel ();
         main_layout = new Iridium.Layouts.MainLayout (welcome_view, side_panel);
 
+        var grid = new Gtk.Grid ();
+
         overlay = new Gtk.Overlay ();
         overlay.add (main_layout);
-        add (overlay);
-
         overlay.show ();
+
+        grid.attach (network_info_bar, 0, 0, 1, 1);
+        grid.attach (overlay, 0, 1, 1, 1);
+
+        add (grid);
 
         resize (1000, 600);
 
@@ -386,6 +394,19 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     private void send_server_command (string server_name, string text) {
         // TODO: Check for commands (eg. /me, etc.)
         connection_handler.send_user_message (server_name, text);
+    }
+
+    //
+    // Network connection handlers
+    //
+
+    public void network_connection_lost () {
+        network_info_bar.revealed = true;
+        // TODO: Should also update the side panel to reflect a lost connection
+    }
+
+    public void network_connection_gained () {
+        network_info_bar.revealed = false;
     }
 
     //

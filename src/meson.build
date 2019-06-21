@@ -35,6 +35,7 @@ executable(
     join_paths('Views', 'Welcome.vala'),
     join_paths('Widgets', 'ChannelJoinDialog.vala'),
     join_paths('Widgets', 'HeaderBar.vala'),
+    join_paths('Widgets', 'NetworkInfoBar.vala'),
     join_paths('Widgets', 'ServerConnectionDialog.vala'),
     join_paths('Widgets', 'SidePanel', 'Panel.vala'),
     join_paths('Widgets', 'SidePanel', 'Row.vala'),
