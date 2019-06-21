@@ -43,6 +43,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     construct {
         header_bar = new Iridium.Widgets.HeaderBar ();
+        header_bar.hide_channel_users_button ();
         set_titlebar (header_bar);
 
         // TODO: Show an info bar across the top of the window area when internet connection is lost
@@ -79,10 +80,21 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
             // Update the header bar title
             unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) item;
-            if (row.get_channel_name () != null) {
-                header_bar.update_title (row.get_channel_name (), row.get_server_name ());
+            var server_name = row.get_server_name ();
+            var channel_name = row.get_channel_name ();
+            if (channel_name != null) {
+                header_bar.update_title (channel_name, server_name);
             } else {
-                header_bar.update_title (row.get_server_name (), null);
+                header_bar.update_title (server_name, null);
+            }
+
+            // Show or hide the channel users button in the header
+            if (item is Iridium.Widgets.SidePanel.ChannelRow) {
+                header_bar.show_channel_users_button ();
+                // Update the channel users list
+                update_channel_users_list (server_name, channel_name);                
+            } else {
+                header_bar.hide_channel_users_button ();
             }
 
             // We have enough context to join a channel
@@ -420,6 +432,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                     }
                     channel_chat_view.display_server_msg (message_to_display);
                 }
+                update_channel_users_list (server_name, channel);
             }
             return false;
         });
@@ -513,6 +526,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 message.message = username + " has joined";
                 channel_chat_view.display_server_msg (message);
             }
+            update_channel_users_list (server_name, channel_name);
             return false;
         });
     }
@@ -526,6 +540,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 message.message = username + " has left";
                 channel_chat_view.display_server_msg (message);
             }
+            update_channel_users_list (server_name, channel_name);
             return false;
         });
     }
@@ -546,6 +561,18 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             side_panel.increment_channel_badge (server_name, username);
             return false;
         });
+    }
+
+    private void update_channel_users_list (string server_name, string channel_name) {
+        // Check if the current view matches the server and channel
+        var selected_row = side_panel.get_selected_row ();
+        if (selected_row == null) {
+            return;
+        }
+        if (selected_row.get_server_name () == server_name && selected_row.get_channel_name () == channel_name) {
+            var usernames = connection_handler.get_users (server_name, channel_name);
+            header_bar.set_channel_users (usernames);
+        }
     }
 
 }

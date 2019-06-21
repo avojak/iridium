@@ -41,6 +41,8 @@ executable(
     join_paths('Widgets', 'SidePanel', 'ServerRow.vala'),
     join_paths('Widgets', 'SidePanel', 'ChannelRow.vala'),
     join_paths('Widgets', 'SidePanel', 'DirectMessageRow.vala'),
+    join_paths('Widgets', 'UsersPopover', 'ChannelUsersPopover.vala'),
+    join_paths('Widgets', 'UsersPopover', 'UserListBoxRow.vala'),
     config_header,
     dependencies: [
         dependency('gtk+-3.0', version: '>= 3.6.4'),

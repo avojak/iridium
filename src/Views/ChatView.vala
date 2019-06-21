@@ -68,6 +68,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         entry.secondary_icon_tooltip_text = "Clear";
         entry.secondary_icon_sensitive = false;
         entry.secondary_icon_activatable = false;
+        // TODO: Hide clear button when the entry is empty
 
         // TODO: Support emojis instead of having the clear button?
         //       Maybe find a way to do both cleanly?

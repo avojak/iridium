@@ -22,6 +22,9 @@
 public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
 
     private Gtk.Button channel_join_button;
+    private Gtk.MenuButton channel_users_button;
+
+    private Iridium.Widgets.UsersPopover.ChannelUsersPopover channel_users_popover;
 
     public HeaderBar () {
         Object (
@@ -31,23 +34,39 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
     }
 
     construct {
-        var server_connect_button = new Gtk.Button.from_icon_name ("com.github.avojak.iridium.network-server-new", Gtk.IconSize.LARGE_TOOLBAR);
-        /* var server_connect_button = new Gtk.Button.from_icon_name ("network-server", Gtk.IconSize.LARGE_TOOLBAR); */
-        server_connect_button.tooltip_text = "Connect to a server";
+        var server_connect_button = new Gtk.Button.from_icon_name ("com.github.avojak.iridium.network-server-new", Gtk.IconSize.BUTTON);
+        /* var server_connect_button = new Gtk.Button.from_icon_name ("network-server", Gtk.IconSize.BUTTON); */
+        server_connect_button.tooltip_text = "Connect to a Server";
         // TODO: Support keyboard accelerator
         server_connect_button.clicked.connect (() => {
             server_connect_button_clicked ();
         });
 
-        channel_join_button = new Gtk.Button.from_icon_name ("com.github.avojak.iridium.internet-chat-new", Gtk.IconSize.LARGE_TOOLBAR);
-        /* var channel_join_button = new Gtk.Button.from_icon_name ("internet-chat", Gtk.IconSize.LARGE_TOOLBAR); */
-        channel_join_button.tooltip_text = "Join a channel";
+        channel_join_button = new Gtk.Button.from_icon_name ("com.github.avojak.iridium.internet-chat-new", Gtk.IconSize.BUTTON);
+        /* var channel_join_button = new Gtk.Button.from_icon_name ("internet-chat", Gtk.IconSize.BUTTON); */
+        channel_join_button.tooltip_text = "Join a Channel";
         // TODO: Support keyboard accelerator
         channel_join_button.sensitive = false;
         channel_join_button.clicked.connect (() => {
             channel_join_button_clicked ();
         });
 
+        channel_users_button = new Gtk.MenuButton ();
+        channel_users_button.set_image (new Gtk.Image.from_icon_name ("system-users-symbolic", Gtk.IconSize.BUTTON));
+        channel_users_button.tooltip_text = "Channel Users";
+        channel_users_button.relief = Gtk.ReliefStyle.NONE;
+		channel_users_button.valign = Gtk.Align.CENTER;
+
+        channel_users_popover = new Iridium.Widgets.UsersPopover.ChannelUsersPopover (channel_users_button);
+        channel_users_button.popover = channel_users_popover;
+
+        var settings_button = new Gtk.MenuButton ();
+        settings_button.set_image (new Gtk.Image.from_icon_name ("preferences-system-symbolic", Gtk.IconSize.BUTTON));
+        settings_button.tooltip_text = "Settings";
+
+        // TODO: Create settings popup or popover
+
+        // TODO: Move this to a settings menu
         var mode_switch = new Granite.ModeSwitch.from_icon_name ("display-brightness-symbolic", "weather-clear-night-symbolic");
         mode_switch.primary_icon_tooltip_text = "Light background";
         mode_switch.secondary_icon_tooltip_text = "Dark background";
@@ -60,14 +79,13 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
             mode_switch.active = true;
         }
 
-        /* get_style_context ().add_class ("default-decoration"); */
         pack_start (server_connect_button);
         pack_start (channel_join_button);
 
         pack_end (mode_switch);
+        pack_end (settings_button);
+        pack_end (channel_users_button);
         pack_end (new Gtk.Separator (Gtk.Orientation.VERTICAL));
-
-        // TODO: Update the header bar for the current channel and server being viewed
     }
 
     public void set_channel_join_button_enabled (bool enabled) {
@@ -77,6 +95,20 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
     public void update_title (string title, string? subtitle) {
         this.title = title;
         this.subtitle = subtitle;
+    }
+
+    public void hide_channel_users_button () {
+        channel_users_button.visible = false;
+        channel_users_button.no_show_all = true;
+    }
+
+    public void show_channel_users_button () {
+        channel_users_button.visible = true;
+        channel_users_button.no_show_all = false;
+    }
+
+    public void set_channel_users (Gee.List<string> usernames) {
+        channel_users_popover.set_users (usernames);
     }
 
     public signal void server_connect_button_clicked ();

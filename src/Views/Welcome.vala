@@ -38,6 +38,9 @@ public class Iridium.Views.Welcome : Granite.Widgets.Welcome {
         // TODO: Revisit the wording based on human interface guidelines
         append ("com.github.avojak.iridium.network-server-new", "Add a New Server", "Connect to a Server and Save It in Servers List");
 
+        // TODO: Have an option for connecting to a server from a list of
+        //       popular/common servers?
+
         activated.connect (index => {
             switch (index) {
                 case 0:

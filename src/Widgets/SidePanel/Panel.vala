@@ -266,6 +266,18 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         }
     }
 
+    public Iridium.Widgets.SidePanel.Row? get_selected_row () {
+        if (selected == null) {
+            return null;
+        }
+        // Don't consider the dummy rows
+        if (selected.name == "") {
+            return null;
+        }
+        unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) selected;
+        return row;
+    }
+
     public void increment_server_badge (string server_name) {
         var server_item = server_items.get (server_name);
         if (server_item == null) {
