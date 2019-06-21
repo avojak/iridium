@@ -85,9 +85,8 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
             entry.set_text ("");
         });
         entry.changed.connect (() => {
-            //  entry.secondary_icon_sensitive = (entry.text != "");
-            //  entry.secondary_icon_activatable = (entry.text != "");
-            entry.set_child_visible (entry.text != "");
+            entry.secondary_icon_sensitive = (entry.text != "");
+            entry.secondary_icon_activatable = (entry.text != "");
         });
         entry.icon_release.connect ((icon_pos, event) => {
             if (icon_pos == Gtk.EntryIconPosition.SECONDARY) {
