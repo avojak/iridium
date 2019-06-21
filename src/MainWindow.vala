@@ -31,6 +31,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     private Iridium.Widgets.SidePanel.Panel side_panel;
     private Iridium.Layouts.MainLayout main_layout;
 
+    private Gtk.Overlay overlay;
+    private Granite.Widgets.OverlayBar overlay_bar;
+
     public MainWindow (Gtk.Application application, Iridium.Services.ServerConnectionHandler connection_handler) {
         Object (
             application: application,
@@ -50,9 +53,13 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
         welcome_view = new Iridium.Views.Welcome ();
         side_panel = new Iridium.Widgets.SidePanel.Panel ();
-
         main_layout = new Iridium.Layouts.MainLayout (welcome_view, side_panel);
-        add (main_layout);
+
+        overlay = new Gtk.Overlay ();
+        overlay.add (main_layout);
+        add (overlay);
+
+        overlay.show ();
 
         resize (1000, 600);
 
@@ -161,6 +168,11 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     // TODO: Restore private messages from the side panel
     public void initialize (Gee.List<string> servers_list, Gee.List<string> channels_list, Gee.List<string> connection_details_list) {
+        begin_initialization ();
+
+        // Map the server names to their initialization status (success or fail)
+        Gee.Map<string, bool> initialization_status = new Gee.HashMap<string, bool> ();
+
         Gee.List<string> server_rows = new Gee.ArrayList<string> ();
         Gee.List<string> enabled_servers = new Gee.ArrayList<string> ();
         foreach (string entry in servers_list) {
@@ -246,7 +258,38 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                     return false;
                 });
             });
+            server_connection.open_successful.connect (() => {
+                initialization_status.set (server_name, true);
+                if (initialization_status.size == enabled_servers.size) {
+                    on_initialization_complete ();
+                }
+            });
+            server_connection.open_failed.connect (() => {
+                // TODO: Give some user feedback, maybe a toast? Don't want the UI to get too busy though
+                initialization_status.set (server_name, false);
+                if (initialization_status.size == enabled_servers.size) {
+                    on_initialization_complete ();
+                }
+            });
         }
+    }
+
+    private void begin_initialization () {
+        if (overlay_bar == null) {
+            overlay_bar = new Granite.Widgets.OverlayBar (overlay);
+            overlay_bar.label = "Restoring server connections";
+            overlay_bar.active = true;
+            overlay.show_all ();
+        }
+    }
+
+    private void on_initialization_complete () {
+        Idle.add (() => {
+            if (overlay_bar != null) {
+                overlay_bar.destroy ();
+            }
+            return false;
+        });
     }
 
     private void show_server_connection_dialog () {
