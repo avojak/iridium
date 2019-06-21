@@ -197,25 +197,30 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         debug ("Closing connection for server: " + connection_details.server);
         should_exit = true;
         send_output (Iridium.Services.MessageCommands.QUIT + " :Iridium IRC Client");
+        channel_users.clear ();
         do_close ();
     }
 
-    public void do_close () {
+    private void do_close () {
         should_exit = true;
 
         try {
-            input_stream.clear_pending ();
-            input_stream.close ();
-            input_stream = null;
+            if (input_stream != null) {
+                input_stream.clear_pending ();
+                input_stream.close ();
+                input_stream = null;
+            }
         } catch (GLib.IOError e) {
             // TODO: Handle errors!
         }
 
         try {
-            output_stream.clear_pending ();
-            output_stream.flush ();
-            output_stream.close ();
-            output_stream = null;
+            if (output_stream != null) {
+                output_stream.clear_pending ();
+                output_stream.flush ();
+                output_stream.close ();
+                output_stream = null;
+            }
         } catch (GLib.Error e) {
             // TODO: Handle errors!
         }

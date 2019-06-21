@@ -397,15 +397,27 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     //
-    // Network connection handlers
+    // Respond to network connection changes
     //
 
     public void network_connection_lost () {
         network_info_bar.revealed = true;
-        // TODO: Should also update the side panel to reflect a lost connection
+        connection_handler.close_all_connections ();
     }
 
     public void network_connection_gained () {
+        // We don't attempt to restore connections currently because of how the signals
+        // are fired from the network monitor. When switching Wi-Fi access points, for
+        // example, there are multiple signals fired in quick succession which show
+        // the connection being quick gained, lost, and then gained again:
+        //
+        //      network available: G_NETWORK_CONNECTIVITY_LOCAL
+        //      network not available: G_NETWORK_CONNECTIVITY_LOCAL
+        //      network available: G_NETWORK_CONNECTIVITY_FULL
+        // 
+        // This makes it rather difficult to reliably restore server connections. 
+        // Furthermore, if you lose a network connection then quickly regain it, you 
+        // may not even need to reconnect to the IRC server.
         network_info_bar.revealed = false;
     }
 

@@ -72,5 +72,5 @@ This project is very much in-progress and has a lot of remaining work. Here is a
 - [x] Display channel users list
 - [x] Easy way to initiate a private message chat view
 - [ ] Display available channel list
-- [ ] Respond to network loss and re-connection
+- [x] Respond to network loss and re-connection
 - [ ] Lock scrolling when reading old messages

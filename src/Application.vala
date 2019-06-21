@@ -43,17 +43,26 @@ public class Iridium.Application : Gtk.Application {
 
         // TODO: Connect to signals to save window size and position in settings
 
-        // TODO: Use NetworkMonitor to handle lost internet connection
         var network_monitor = NetworkMonitor.get_default ();
+        // Note: These signals may be fired many times in a row, so be careful
+        //       about what sorts of actions are triggered as a result.
         network_monitor.network_changed.connect ((available) => {
+            // TODO: Might be able to get better behavior by checking connectivity as well?
             if (!available) {
+                print ("network not available: ");
+                print (network_monitor.get_connectivity ().to_string () + "\n");
                 main_window.network_connection_lost ();
             } else {
+                print ("network available: ");
+                print (network_monitor.get_connectivity ().to_string () + "\n");
                 main_window.network_connection_gained ();
             }
         });
+        // Check the initial state of the network connection
+        if (!network_monitor.get_network_available ()) {
+            main_window.network_connection_lost ();
+        }
 
-        // TODO: Should this be done before showing the main window?
         restore_state (main_window);
     }
 
