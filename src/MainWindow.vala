@@ -604,6 +604,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         // TODO: Display a message that we've left the channel
 
         side_panel.disable_channel_row (server_name, channel_name);
+        update_channel_users_list (server_name, channel_name);
     }
 
     private void on_channel_message_received (string server_name, string channel_name, Iridium.Services.Message message) {

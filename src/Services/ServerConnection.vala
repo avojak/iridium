@@ -235,6 +235,8 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
     public void leave_channel (string channel_name) {
         send_output (Iridium.Services.MessageCommands.PART + " " + channel_name);
+        // Clear out our list of channel users
+        channel_users.set (channel_name, new Gee.LinkedList<string> ());
     }
 
     public Gee.List<string> get_users (string channel_name) {
