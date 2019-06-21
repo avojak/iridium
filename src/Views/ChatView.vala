@@ -66,11 +66,6 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         entry.margin = 6;
         entry.secondary_icon_tooltip_text = "Clear";
 
-        // TODO: Support emojis instead of having the clear button?
-        //       Maybe find a way to do both cleanly?
-        //       We already get the right-click emoji menu for free...
-        //  entry.show_emoji_icon = true;
-
         attach (scrolled_window, 0, 0, 1, 1);
         attach (entry, 0, 1, 1, 1);
 

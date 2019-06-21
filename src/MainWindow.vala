@@ -63,6 +63,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         header_bar.channel_join_button_clicked.connect (() => {
             show_channel_join_dialog ();
         });
+        header_bar.username_selected.connect (on_username_selected);
         side_panel.item_selected.connect ((item) => {
             // No item selected
             if (item == null) {
@@ -318,7 +319,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     private void send_channel_message (string server_name, string channel_name, string text, Iridium.Views.ChatView chat_view) {
-        if (text == null || text.strip() .length == 0) {
+        if (text == null || text.strip ().length == 0) {
             return;
         }
         // Check if it's a server command
@@ -338,6 +339,32 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     private void send_server_command (string server_name, string text) {
         // TODO: Check for commands (eg. /me, etc.)
         connection_handler.send_user_message (server_name, text);
+    }
+
+    //
+    // HeaderBar Callbacks
+    //
+
+    private void on_username_selected (string username) {
+        var selected_row = side_panel.get_selected_row ();
+        if (selected_row == null) {
+            return;
+        }
+        var server_name = selected_row.get_server_name ();
+        Idle.add (() => {
+            // Check if the chat view already exists before creating a new one
+            var chat_view = main_layout.get_direct_message_chat_view (username);
+            if (chat_view == null) {
+                chat_view = new Iridium.Views.DirectMessageChatView ();
+                main_layout.add_chat_view (chat_view, username);
+                chat_view.message_to_send.connect ((user_message) => {
+                    send_channel_message (server_name, username, user_message, chat_view);
+                });
+            }
+            side_panel.add_direct_message (server_name, username);
+            side_panel.select_direct_message_row (server_name, username);
+            return false;
+        });
     }
 
     //

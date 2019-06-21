@@ -78,6 +78,18 @@ public class Iridium.Widgets.UsersPopover.ChannelUsersPopover : Gtk.Popover {
         search_entry.search_changed.connect (() => {
             list_box.invalidate_filter ();
         });
+        list_box.row_selected.connect ((row) => {
+            if (row == null) {
+                return;
+            }
+            Iridium.Widgets.UsersPopover.UserListBoxRow user_row = (Iridium.Widgets.UsersPopover.UserListBoxRow) row;
+            username_selected (user_row.username);
+            popdown ();
+        });
+        this.closed.connect (() => {
+            search_entry.set_text ("");
+            list_box.select_row (null);
+        });
     }
 
     public void set_users (Gee.List<string> usernames) {
@@ -93,5 +105,7 @@ public class Iridium.Widgets.UsersPopover.ChannelUsersPopover : Gtk.Popover {
         list_box.invalidate_filter ();
         scrolled_window.check_resize ();
     }
+
+    public signal void username_selected (string username);
 
 }

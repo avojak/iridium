@@ -266,6 +266,23 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         }
     }
 
+    public void select_direct_message_row (string server_name, string username) {
+        var server_item = server_items.get (server_name);
+        if (server_item == null) {
+            return;
+        }
+        foreach (var channel_item in server_item.children) {
+            // TODO: Apply this type check in other places
+            if (channel_item is Iridium.Widgets.SidePanel.DirectMessageRow) {
+                unowned Iridium.Widgets.SidePanel.DirectMessageRow row = (Iridium.Widgets.SidePanel.DirectMessageRow) channel_item;
+                if (row.get_channel_name () == username) {
+                    selected = channel_item;
+                    return;
+                }
+            }
+        }
+    }
+
     public Iridium.Widgets.SidePanel.Row? get_selected_row () {
         if (selected == null) {
             return null;

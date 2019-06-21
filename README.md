@@ -70,7 +70,7 @@ This project is very much in-progress and has a lot of remaining work. Here is a
 - [ ] Favorite channels
 - [x] Save and restore state when closing and re-opening
 - [x] Display channel users list
-- [ ] Easy way to initiate a private message chat view
+- [x] Easy way to initiate a private message chat view
 - [ ] Display available channel list
 - [ ] Respond to network loss and re-connection
 - [ ] Lock scrolling when reading old messages
