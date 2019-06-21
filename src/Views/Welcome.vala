@@ -23,8 +23,8 @@ public class Iridium.Views.Welcome : Granite.Widgets.Welcome {
 
     public Welcome () {
         Object (
-            title: "Welcome to Iridium",
-            subtitle: "Connect to Any IRC Server"
+            title: _("Welcome to Iridium"),
+            subtitle: _("Connect to Any IRC Server")
         );
     }
 
@@ -36,7 +36,7 @@ public class Iridium.Views.Welcome : Granite.Widgets.Welcome {
         // TODO: Instead, simply have an option to connect to a new server. We
         //       can maybe have a separate star icon for favoriting?
         // TODO: Revisit the wording based on human interface guidelines
-        append ("com.github.avojak.iridium.network-server-new", "Add a New Server", "Connect to a Server and Save It in Servers List");
+        append ("com.github.avojak.iridium.network-server-new", _("Add a New Server"), _("Connect to a Server and Save It in Servers List"));
 
         // TODO: Have an option for connecting to a server from a list of
         //       popular/common servers?

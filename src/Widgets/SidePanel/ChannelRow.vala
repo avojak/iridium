@@ -68,22 +68,22 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
     public override Gtk.Menu? get_context_menu () {
         var menu = new Gtk.Menu ();
 
-        var favorite_item = new Gtk.MenuItem.with_label ("Add to favorites");
+        var favorite_item = new Gtk.MenuItem.with_label (_("Add to favorites"));
         favorite_item.activate.connect (() => {
             // TODO: Implement
         });
 
-        var join_item = new Gtk.MenuItem.with_label ("Join channel");
+        var join_item = new Gtk.MenuItem.with_label (_("Join channel"));
         join_item.activate.connect (() => {
             // TODO: Implement
         });
 
-        var leave_item = new Gtk.MenuItem.with_label ("Leave channel");
+        var leave_item = new Gtk.MenuItem.with_label (_("Leave channel"));
         leave_item.activate.connect (() => {
             leave_channel ();
         });
 
-        var close_item = new Gtk.MenuItem.with_label ("Close");
+        var close_item = new Gtk.MenuItem.with_label (_("Close"));
         close_item.activate.connect (() => {
             if (is_enabled) {
                 leave_channel ();

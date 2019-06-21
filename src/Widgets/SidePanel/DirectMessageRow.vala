@@ -71,7 +71,7 @@ public class Iridium.Widgets.SidePanel.DirectMessageRow : Granite.Widgets.Source
     public override Gtk.Menu? get_context_menu () {
         var menu = new Gtk.Menu ();
 
-        var close_item = new Gtk.MenuItem.with_label ("Close");
+        var close_item = new Gtk.MenuItem.with_label (_("Close"));
         close_item.activate.connect (() => {
             close_direct_message ();
         });

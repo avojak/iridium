@@ -65,22 +65,22 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
     public override Gtk.Menu? get_context_menu () {
         var menu = new Gtk.Menu ();
 
-        var edit_item = new Gtk.MenuItem.with_label ("Edit settings...");
+        var edit_item = new Gtk.MenuItem.with_label (_("Edit settings..."));
         edit_item.activate.connect (() => {
             // TODO: Implement
         });
 
-        var connect_item = new Gtk.MenuItem.with_label ("Connect");
+        var connect_item = new Gtk.MenuItem.with_label (_("Connect"));
         connect_item.activate.connect (() => {
             // TODO: Implement
         });
 
-        var disconnect_item = new Gtk.MenuItem.with_label ("Disconnect");
+        var disconnect_item = new Gtk.MenuItem.with_label (_("Disconnect"));
         disconnect_item.activate.connect (() => {
             disconnect_from_server ();
         });
 
-        var close_item = new Gtk.MenuItem.with_label ("Close");
+        var close_item = new Gtk.MenuItem.with_label (_("Close"));
         close_item.activate.connect (() => {
             if (is_enabled) {
                 disconnect_from_server ();

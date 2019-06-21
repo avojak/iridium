@@ -30,7 +30,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         Object (
             deletable: false,
             resizable: false,
-            title: "Connect to a Server",
+            title: _("Connect to a Server"),
             transient_for: main_window,
             main_window: main_window
         );
@@ -48,7 +48,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
 
         var header_image = new Gtk.Image.from_icon_name ("network-server", Gtk.IconSize.DIALOG);
 
-        var header_title = new Gtk.Label ("New Connection");
+        var header_title = new Gtk.Label (_("New Connection"));
         header_title.get_style_context ().add_class (Granite.STYLE_CLASS_H2_LABEL);
         header_title.halign = Gtk.Align.START;
         header_title.hexpand = true;
@@ -69,33 +69,33 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         form_grid.row_spacing = 12;
         form_grid.column_spacing = 20;
 
-        var server_label = new Gtk.Label ("Server");
+        var server_label = new Gtk.Label (_("Server"));
         server_label.halign = Gtk.Align.END;
 
         var server_entry = new Gtk.Entry ();
         server_entry.hexpand = true;
         server_entry.placeholder_text = "irc.freenode.net";
 
-        var nickname_label = new Gtk.Label ("Nickname");
+        var nickname_label = new Gtk.Label (_("Nickname"));
         nickname_label.halign = Gtk.Align.END;
 
         var nickname_entry = new Gtk.Entry ();
         nickname_entry.hexpand = true;
         nickname_entry.placeholder_text = "iridium";
 
-        var username_label = new Gtk.Label ("Username");
+        var username_label = new Gtk.Label (_("Username"));
         username_label.halign = Gtk.Align.END;
 
         var username_entry = new Gtk.Entry ();
         username_entry.hexpand = true;
         username_entry.placeholder_text = "iridium";
 
-        var realname_label = new Gtk.Label ("Real Name");
+        var realname_label = new Gtk.Label (_("Real Name"));
         realname_label.halign = Gtk.Align.END;
 
         var realname_entry = new Gtk.Entry ();
         realname_entry.hexpand = true;
-        realname_entry.placeholder_text = "Iridium IRC Client";
+        realname_entry.placeholder_text = _("Iridium IRC Client");
 
         form_grid.attach (server_label, 0, 0, 1, 1);
         form_grid.attach (server_entry, 1, 0, 1, 1);
@@ -121,12 +121,12 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         body.add (status_label);
 
         // Add action buttons
-        var cancel_button = new Gtk.Button.with_label ("Cancel");
+        var cancel_button = new Gtk.Button.with_label (_("Cancel"));
         cancel_button.clicked.connect (() => {
             close ();
         });
 
-        var connect_button = new Gtk.Button.with_label ("Connect");
+        var connect_button = new Gtk.Button.with_label (_("Connect"));
         connect_button.get_style_context ().add_class ("suggested-action");
         connect_button.clicked.connect (() => {
             // TODO: Validate entries first!

@@ -30,14 +30,14 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
     private Gee.Map<string, Granite.Widgets.SourceList.ExpandableItem> server_items;
 
     public Panel () {
-        favorites_category = new Granite.Widgets.SourceList.ExpandableItem ("Favorite Channels");
+        favorites_category = new Granite.Widgets.SourceList.ExpandableItem (_("Favorite Channels"));
         favorites_dummy = new Granite.Widgets.SourceList.Item ("");
         favorites_category.add (favorites_dummy);
         favorites_category.child_added.connect ((item) => {
             favorites_category.expanded = true;
         });
 
-        others_category = new Granite.Widgets.SourceList.ExpandableItem ("Servers");
+        others_category = new Granite.Widgets.SourceList.ExpandableItem (_("Servers"));
         others_dummy = new Granite.Widgets.SourceList.Item ("");
         others_category.add (others_dummy);
         others_category.child_added.connect ((item) => {

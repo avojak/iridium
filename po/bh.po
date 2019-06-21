@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.avojak.iridium\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-30 21:25-0600\n"
-"PO-Revision-Date: 2019-04-30 21:25-0600\n"
+"POT-Creation-Date: 2019-06-21 12:18+0200\n"
+"PO-Revision-Date: 2019-06-21 12:18+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: bh\n"
@@ -16,39 +16,162 @@ msgstr ""
 "Content-Type: text/plain; charset=ASCII\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/Application.vala:34 data/com.github.avojak.iridium.desktop.in:3
-#: data/com.github.avojak.iridium.appdata.xml.in:7
+#: src/Views/ChatView.vala:67
+msgid "Clear"
+msgstr ""
+
+#: src/Views/Welcome.vala:26
+msgid "Welcome to Iridium"
+msgstr ""
+
+#: src/Views/Welcome.vala:27
+msgid "Connect to Any IRC Server"
+msgstr ""
+
+#: src/Views/Welcome.vala:39
+msgid "Add a New Server"
+msgstr ""
+
+#: src/Views/Welcome.vala:39
+msgid "Connect to a Server and Save It in Servers List"
+msgstr ""
+
+#: src/Widgets/SidePanel/ChannelRow.vala:71
+msgid "Add to favorites"
+msgstr ""
+
+#: src/Widgets/SidePanel/ChannelRow.vala:76
+msgid "Join channel"
+msgstr ""
+
+#: src/Widgets/SidePanel/ChannelRow.vala:81
+msgid "Leave channel"
+msgstr ""
+
+#: src/Widgets/SidePanel/ChannelRow.vala:86
+#: src/Widgets/SidePanel/DirectMessageRow.vala:74
+#: src/Widgets/SidePanel/ServerRow.vala:83
+msgid "Close"
+msgstr ""
+
+#: src/Widgets/SidePanel/Panel.vala:33
+msgid "Favorite Channels"
+msgstr ""
+
+#: src/Widgets/SidePanel/Panel.vala:40
+msgid "Servers"
+msgstr ""
+
+#: src/Widgets/SidePanel/ServerRow.vala:68
+msgid "Edit settings..."
+msgstr ""
+
+#: src/Widgets/SidePanel/ServerRow.vala:73
+#: src/Widgets/ServerConnectionDialog.vala:129
+msgid "Connect"
+msgstr ""
+
+#: src/Widgets/SidePanel/ServerRow.vala:78
+msgid "Disconnect"
+msgstr ""
+
+#: src/Widgets/UsersPopover/ChannelUsersPopover.vala:35
+msgid "No users"
+msgstr ""
+
+#: src/Widgets/ChannelJoinDialog.vala:35 src/Widgets/ChannelJoinDialog.vala:55
+#: src/Widgets/HeaderBar.vala:47
+msgid "Join a Channel"
+msgstr ""
+
+#: src/Widgets/ChannelJoinDialog.vala:92
+msgid "Channel"
+msgstr ""
+
+#: src/Widgets/ChannelJoinDialog.vala:119
+msgid "Not Now"
+msgstr ""
+
+#: src/Widgets/ChannelJoinDialog.vala:124
+msgid "Join"
+msgstr ""
+
+#: src/Widgets/HeaderBar.vala:31
 msgid "Iridium"
 msgstr ""
 
-#: src/Application.vala:36
-msgid "Hello, world!"
+#: src/Widgets/HeaderBar.vala:39 src/Widgets/ServerConnectionDialog.vala:33
+msgid "Connect to a Server"
 msgstr ""
 
-#: data/com.github.avojak.iridium.desktop.in:4
-msgid "IRC Client"
+#: src/Widgets/HeaderBar.vala:56
+msgid "Channel Users"
 msgstr ""
 
-#: data/com.github.avojak.iridium.desktop.in:5
-msgid "Friendly IRC client"
+#: src/Widgets/HeaderBar.vala:66
+msgid "Settings"
 msgstr ""
 
-#: data/com.github.avojak.iridium.desktop.in:8
-msgid "application-default-icon"
+#: src/Widgets/HeaderBar.vala:72
+msgid "Light background"
 msgstr ""
 
-#: data/com.github.avojak.iridium.desktop.in:11
-msgid "IRC;Chat;"
+#: src/Widgets/HeaderBar.vala:73
+msgid "Dark background"
 msgstr ""
 
-#: data/com.github.avojak.iridium.appdata.xml.in:8
-msgid "Friendly IRC Client"
+#: src/Widgets/ServerConnectionDialog.vala:51
+msgid "New Connection"
 msgstr ""
 
-#: data/com.github.avojak.iridium.appdata.xml.in:10
-msgid "TODO"
+#: src/Widgets/ServerConnectionDialog.vala:72
+msgid "Server"
 msgstr ""
 
-#: data/com.github.avojak.iridium.appdata.xml.in:12
-msgid "Andrew Vojak"
+#: src/Widgets/ServerConnectionDialog.vala:79
+msgid "Nickname"
+msgstr ""
+
+#: src/Widgets/ServerConnectionDialog.vala:86
+msgid "Username"
+msgstr ""
+
+#: src/Widgets/ServerConnectionDialog.vala:93
+msgid "Real Name"
+msgstr ""
+
+#: src/Widgets/ServerConnectionDialog.vala:98
+msgid "Iridium IRC Client"
+msgstr ""
+
+#: src/Widgets/ServerConnectionDialog.vala:124
+msgid "Cancel"
+msgstr ""
+
+#: src/MainWindow.vala:259
+msgid "Already connected to this server!"
+msgstr ""
+
+#: src/MainWindow.vala:301
+msgid "Channel must begin with '#' or '&'"
+msgstr ""
+
+#: src/MainWindow.vala:314
+msgid "Start your message with a /"
+msgstr ""
+
+#: src/MainWindow.vala:456 src/MainWindow.vala:473
+msgid " has quit"
+msgstr ""
+
+#: src/MainWindow.vala:487
+msgid "Nickname already in use."
+msgstr ""
+
+#: src/MainWindow.vala:553
+msgid " has joined"
+msgstr ""
+
+#: src/MainWindow.vala:567
+msgid " has left"
 msgstr ""

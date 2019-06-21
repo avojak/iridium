@@ -32,7 +32,7 @@ public class Iridium.Widgets.UsersPopover.ChannelUsersPopover : Gtk.Popover {
     }
 
     construct {
-        var placeholder = new Gtk.Label ("No users");
+        var placeholder = new Gtk.Label (_("No users"));
         placeholder.margin_top = 4;
         placeholder.margin_bottom = 4;
         placeholder.show_all ();
