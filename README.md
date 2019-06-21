@@ -69,7 +69,7 @@ This project is very much in-progress and has a lot of remaining work. Here is a
 - [ ] Special formatting for usernames and URLs in messages
 - [ ] Favorite channels
 - [x] Save and restore state when closing and re-opening
-- [ ] Display channel users list
+- [x] Display channel users list
 - [ ] Easy way to initiate a private message chat view
 - [ ] Display available channel list
 - [ ] Respond to network loss and re-connection
