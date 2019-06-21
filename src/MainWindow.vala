@@ -272,6 +272,10 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 }
             });
         }
+        // Handle case were there's nothing to initialize!
+        if (enabled_servers.size == 0) {
+            on_initialization_complete ();
+        }
     }
 
     private void begin_initialization () {
