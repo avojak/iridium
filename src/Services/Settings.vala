@@ -271,4 +271,19 @@ public class Iridium.Services.Settings : Granite.Services.Settings {
         return existing_connection_details;
     }
 
+    public Gee.Map<string, Iridium.Services.ServerConnectionDetails> get_connection_details_map () {
+        Gee.Map<string, Iridium.Services.ServerConnectionDetails> connection_details_map = new Gee.HashMap<string, Iridium.Services.ServerConnectionDetails> ();
+        var connection_details_list = get_connection_details_list ();
+        foreach (string entry in connection_details_list) {
+            string[] tokens = entry.split ("\n");
+            var connection_details = new Iridium.Services.ServerConnectionDetails ();
+            connection_details.server = tokens[0].split ("=")[1];
+            connection_details.username = tokens[2].split ("=")[1];
+            connection_details.nickname = tokens[3].split ("=")[1];
+            connection_details.realname = tokens[4].split ("=")[1];
+            connection_details_map.set (connection_details.server, connection_details);
+        }
+        return connection_details_map;
+    }
+
 }

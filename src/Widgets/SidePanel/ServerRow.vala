@@ -72,7 +72,7 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
 
         var connect_item = new Gtk.MenuItem.with_label ("Connect");
         connect_item.activate.connect (() => {
-            // TODO: Implement
+            connect_to_server ();
         });
 
         var disconnect_item = new Gtk.MenuItem.with_label ("Disconnect");
@@ -103,6 +103,7 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
     }
 
     public signal void disconnect_from_server ();
+    public signal void connect_to_server ();
     public signal void remove_server ();
 
 }

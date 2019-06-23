@@ -69,11 +69,12 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         }
 
         var server_item = new Iridium.Widgets.SidePanel.ServerRow (server_name);
-        // Disconnect from the server
         server_item.disconnect_from_server.connect ((should_close) => {
             disconnect_from_server (server_name);
         });
-        // Remove the server item and its associated channel items
+        server_item.connect_to_server.connect (() => {
+            connect_to_server (server_name);
+        });
         server_item.remove_server.connect (() => {
             remove_server (server_item, server_name);
         });
@@ -329,6 +330,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
     }
 
     public signal void leave_channel (string server_name, string channel_name);
+    public signal void connect_to_server (string server_name);
     public signal void disconnect_from_server(string server_name);
 
     public signal void server_row_added (string server_name);

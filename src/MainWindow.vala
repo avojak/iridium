@@ -118,6 +118,20 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             //       at least one open connection.
             header_bar.set_channel_join_button_enabled (true);
         });
+        side_panel.connect_to_server.connect ((server_name) => {
+            var connection_details_map = Iridium.Application.settings.get_connection_details_map ();
+            var connection_details = connection_details_map.get (server_name);
+            if (connection_details == null) {
+                return;
+            }
+            var server_connection = connection_handler.connect_to_server (connection_details);
+            server_connection.open_successful.connect (() => {
+                Idle.add (() => {
+                    side_panel.select_server_row (server_name);
+                    return false;
+                });
+            });
+        });
         side_panel.disconnect_from_server.connect ((server_name) => {
             // TODO: Might need to disable the join channel header button!
             connection_handler.disconnect_from_server (server_name);
@@ -231,6 +245,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             return false;
         });
 
+        // TODO: Re-use the parsing logic from the settings class!!!
         Gee.Map<string, Iridium.Services.ServerConnectionDetails> connection_details_map = new Gee.HashMap<string, Iridium.Services.ServerConnectionDetails> ();
         foreach (string entry in connection_details_list) {
             string[] tokens = entry.split ("\n");
