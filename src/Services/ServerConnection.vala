@@ -81,6 +81,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
     private SocketConnection connect_to_server (InetAddress address, uint16 port) throws GLib.Error {
         SocketClient client = new SocketClient ();
+        // TODO: Could use the NetworkMonitor to check the InetSocketAddress prior to attempting a connection
         SocketConnection connection = client.connect (new InetSocketAddress (address, port));
         return connection;
     }

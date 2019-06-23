@@ -25,6 +25,8 @@ public class Iridium.Application : Gtk.Application {
 
     private static Iridium.Services.ServerConnectionHandler connection_handler;
 
+    private bool is_network_available;
+
     public Application () {
         Object (
             application_id: "com.github.avojak.iridium",
@@ -44,24 +46,25 @@ public class Iridium.Application : Gtk.Application {
         // TODO: Connect to signals to save window size and position in settings
 
         var network_monitor = NetworkMonitor.get_default ();
+        // Check the initial state of the network connection
+        is_network_available = network_monitor.get_network_available ();
+        if (!is_network_available) {
+            main_window.network_connection_lost ();
+        }
         // Note: These signals may be fired many times in a row, so be careful
         //       about what sorts of actions are triggered as a result.
         network_monitor.network_changed.connect ((available) => {
             // TODO: Might be able to get better behavior by checking connectivity as well?
-            if (!available) {
-                print ("network not available: ");
-                print (network_monitor.get_connectivity ().to_string () + "\n");
-                main_window.network_connection_lost ();
-            } else {
-                print ("network available: ");
-                print (network_monitor.get_connectivity ().to_string () + "\n");
-                main_window.network_connection_gained ();
+            if (is_network_available != available) {
+                is_network_available = available;
+                if (!is_network_available) {
+                    main_window.network_connection_lost ();
+                } else {
+                    main_window.network_connection_gained ();
+                    restore_state (main_window);
+                }
             }
         });
-        // Check the initial state of the network connection
-        if (!network_monitor.get_network_available ()) {
-            main_window.network_connection_lost ();
-        }
 
         restore_state (main_window);
     }
