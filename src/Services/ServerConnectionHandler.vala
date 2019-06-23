@@ -95,7 +95,7 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
     }
 
     //
-    // Newer stuff
+    // Newer stuff - organize this better
     //
 
     public void send_user_message (string server_name, string message) {

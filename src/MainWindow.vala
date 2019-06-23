@@ -136,6 +136,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             // TODO: Might need to disable the join channel header button!
             connection_handler.disconnect_from_server (server_name);
         });
+        side_panel.join_channel.connect ((server_name, channel_name) => {
+            connection_handler.join_channel (server_name, channel_name);
+        });
         side_panel.leave_channel.connect ((server_name, channel_name) => {
             connection_handler.leave_channel (server_name, channel_name);
         });

@@ -75,7 +75,7 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
 
         var join_item = new Gtk.MenuItem.with_label ("Join channel");
         join_item.activate.connect (() => {
-            // TODO: Implement
+            join_channel ();
         });
 
         var leave_item = new Gtk.MenuItem.with_label ("Leave channel");
@@ -105,6 +105,7 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
         return menu;
     }
 
+    public signal void join_channel ();
     public signal void leave_channel ();
     public signal void remove_channel ();
 

@@ -110,9 +110,11 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
 
         var channel_item = new Iridium.Widgets.SidePanel.ChannelRow (channel_name, server_name);
         /* channel_item.markup = "#irchacks <small>" + channel_name + "</small>"; */
+        channel_item.join_channel.connect (() => {
+            join_channel (server_name, channel_name);
+        });
         channel_item.leave_channel.connect (() => {
             leave_channel (server_name, channel_name);
-            channel_item.disable ();
         });
         channel_item.remove_channel.connect (() => {
             remove_channel (server_name, channel_name);
@@ -329,6 +331,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         }
     }
 
+    public signal void join_channel (string server_name, string channel_name);
     public signal void leave_channel (string server_name, string channel_name);
     public signal void connect_to_server (string server_name);
     public signal void disconnect_from_server(string server_name);
