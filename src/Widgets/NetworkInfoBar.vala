@@ -21,6 +21,8 @@
 
 public class Iridium.Widgets.NetworkInfoBar : Gtk.InfoBar {
 
+    private const string SETTINGS_URI = "settings://network";
+
     public NetworkInfoBar () {
         Object (
             message_type: Gtk.MessageType.WARNING,
@@ -38,7 +40,7 @@ public class Iridium.Widgets.NetworkInfoBar : Gtk.InfoBar {
         this.response.connect ((response) => {
             if (response == 0) {
                 try {
-                    AppInfo.launch_default_for_uri ("settings://network", null);
+                    AppInfo.launch_default_for_uri (SETTINGS_URI, null);
                 } catch (Error e) {
                     warning ("%s\n", e.message);
                 }
