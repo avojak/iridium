@@ -33,6 +33,17 @@ public class Iridium.Widgets.NetworkInfoBar : Gtk.InfoBar {
         var network_info_label = new Gtk.Label ("Network connection is not available");
         get_content_area ().add (network_info_label);
         get_style_context ().add_class ("inline");
+        add_button ("Network Settings", 0);
+
+        this.response.connect ((response) => {
+            if (response == 0) {
+                try {
+                    AppInfo.launch_default_for_uri ("settings://network", null);
+                } catch (Error e) {
+                    warning ("%s\n", e.message);
+                }
+            }
+        });
     }
 
 }
