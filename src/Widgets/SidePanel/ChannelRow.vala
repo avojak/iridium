@@ -65,6 +65,10 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
         is_enabled = false;
     }
 
+    public new bool get_enabled () {
+        return is_enabled;
+    }
+
     public override Gtk.Menu? get_context_menu () {
         var menu = new Gtk.Menu ();
 

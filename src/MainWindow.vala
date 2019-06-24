@@ -48,7 +48,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     construct {
         header_bar = new Iridium.Widgets.HeaderBar ();
-        header_bar.hide_channel_users_button ();
+        header_bar.set_channel_users_button_visible (false);
         set_titlebar (header_bar);
 
         network_info_bar = new Iridium.Widgets.NetworkInfoBar ();
@@ -106,11 +106,12 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
             // Show or hide the channel users button in the header
             if (item is Iridium.Widgets.SidePanel.ChannelRow) {
-                header_bar.show_channel_users_button ();
+                header_bar.set_channel_users_button_visible (true);
+                header_bar.set_channel_users_button_enabled (row.get_enabled ());
                 // Update the channel users list
-                update_channel_users_list (server_name, channel_name);                
+                update_channel_users_list (server_name, channel_name);       
             } else {
-                header_bar.hide_channel_users_button ();
+                header_bar.set_channel_users_button_visible (false);
             }
 
             // We have enough context to join a channel
@@ -154,6 +155,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         connection_handler.server_error_received.connect (on_server_error_received);
         connection_handler.server_quit.connect (on_server_quit);
         connection_handler.user_quit_server.connect (on_user_quit_server);
+        connection_handler.channel_users_received.connect (on_channel_users_received);
         connection_handler.nickname_in_use.connect (on_nickname_in_use);
         connection_handler.channel_joined.connect (on_channel_joined);
         connection_handler.channel_left.connect (on_channel_left);
@@ -578,6 +580,10 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         });
     }
 
+    private void on_channel_users_received (string server_name, string channel_name) {
+        update_channel_users_list (server_name, channel_name);
+    }
+
     private void on_nickname_in_use (string server_name, Iridium.Services.Message message) {
         if (connection_dialog != null) {
             // TODO: Should this be outside the if-statement?
@@ -614,6 +620,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
                 side_panel.select_channel_row (server_name, channel_name);
             }
+            set_channel_users_button_enabled (server_name, channel_name, true);
             return false;
         });
     }
@@ -622,7 +629,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         // TODO: Display a message that we've left the channel
 
         side_panel.disable_channel_row (server_name, channel_name);
-        update_channel_users_list (server_name, channel_name);
+        //  update_channel_users_list (server_name, channel_name);
+        set_channel_users_button_enabled (server_name, channel_name, false);
     }
 
     private void on_channel_message_received (string server_name, string channel_name, Iridium.Services.Message message) {
@@ -698,6 +706,16 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         if (selected_row.get_server_name () == server_name && selected_row.get_channel_name () == channel_name) {
             var usernames = connection_handler.get_users (server_name, channel_name);
             header_bar.set_channel_users (usernames);
+        }
+    }
+
+    public void set_channel_users_button_enabled (string server_name, string channel_name, bool enabled) {
+        var selected_row = side_panel.get_selected_row ();
+        if (selected_row == null) {
+            return;
+        }
+        if (selected_row.get_server_name () == server_name && selected_row.get_channel_name () == channel_name) {
+            header_bar.set_channel_users_button_enabled (enabled);
         }
     }
 

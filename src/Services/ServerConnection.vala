@@ -271,6 +271,8 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         channel_users.set (channel_name, username_buffer.get (channel_name));
         // Clear the buffered usernames
         username_buffer.unset (channel_name);
+        // Send the signal
+        channel_users_received (channel_name);
     }
 
     private void ctcp_version_query_received (Iridium.Services.Message message) {
@@ -315,6 +317,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     public signal void server_error_received (Iridium.Services.Message message);
     public signal void server_quit (string message);
     public signal void user_quit_server (string username, Gee.List<string> channels, Iridium.Services.Message message);
+    public signal void channel_users_received (string channel);
     public signal void nickname_in_use (Iridium.Services.Message message);
     public signal void channel_joined (string channel);
     public signal void channel_left (string channel);

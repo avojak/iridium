@@ -89,23 +89,22 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         pack_end (new Gtk.Separator (Gtk.Orientation.VERTICAL));
     }
 
-    public void set_channel_join_button_enabled (bool enabled) {
-        channel_join_button.sensitive = enabled;
-    }
-
     public void update_title (string title, string? subtitle) {
         this.title = title;
         this.subtitle = subtitle;
     }
 
-    public void hide_channel_users_button () {
-        channel_users_button.visible = false;
-        channel_users_button.no_show_all = true;
+    public void set_channel_join_button_enabled (bool enabled) {
+        channel_join_button.sensitive = enabled;
     }
 
-    public void show_channel_users_button () {
-        channel_users_button.visible = true;
-        channel_users_button.no_show_all = false;
+    public void set_channel_users_button_visible (bool visible) {
+        channel_users_button.visible = visible;
+        channel_users_button.no_show_all = !visible;
+    }
+
+    public void set_channel_users_button_enabled (bool enabled) {
+        channel_users_button.sensitive = enabled;
     }
 
     public void set_channel_users (Gee.List<string> usernames) {
