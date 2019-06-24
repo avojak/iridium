@@ -33,7 +33,6 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         if (open_connections.has_key (server)) {
             return open_connections.get (server);
         }
-        // Check if we've been connected and can re-use everything
         Iridium.Services.ServerConnection server_connection = new Iridium.Services.ServerConnection (connection_details);
         server_connection.open_successful.connect (on_server_connection_successful);
         server_connection.open_failed.connect (on_server_connection_failed);
@@ -69,6 +68,22 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         open_connections.unset (server);
     }
 
+    public Iridium.Services.ServerConnectionDetails? get_connection_details (string server_name) {
+        var connection = open_connections.get (server_name);
+        if (connection == null) {
+            return null;
+        }
+        return connection.connection_details;
+    }
+
+    public void join_channel (string server_name, string channel_name) {
+        var connection = open_connections.get (server_name);
+        if (connection == null) {
+            return;
+        }
+        connection.join_channel (channel_name);
+    }
+
     public void leave_channel (string server, string channel) {
         var connection = open_connections.get (server);
         if (connection == null) {
@@ -95,10 +110,6 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         }
     }
 
-    //
-    // Newer stuff - organize this better
-    //
-
     public void send_user_message (string server_name, string message) {
         var connection = open_connections.get (server_name);
         if (connection == null) {
@@ -115,28 +126,12 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         return connection.connection_details.nickname;
     }
 
-    public void join_channel (string server_name, string channel_name) {
-        var connection = open_connections.get (server_name);
-        if (connection == null) {
-            return;
-        }
-        connection.join_channel (channel_name);
-    }
-
     public Gee.List<string> get_users (string server_name, string channel_name) {
         var connection = open_connections.get (server_name);
         if (connection == null) {
             return new Gee.LinkedList<string> ();
         }
         return connection.get_users (channel_name);
-    }
-
-    public Iridium.Services.ServerConnectionDetails? get_connection_details (string server_name) {
-        var connection = open_connections.get (server_name);
-        if (connection == null) {
-            return null;
-        }
-        return connection.connection_details;
     }
 
     //
