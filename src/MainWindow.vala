@@ -87,10 +87,10 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 return;
             }
             // Dummy selected
-            if (item.name.strip ().length == 0) {
-                header_bar.set_channel_join_button_enabled (false);
-                return;
-            }
+            //  if (item.name.strip ().length == 0) {
+            //      header_bar.set_channel_join_button_enabled (false);
+            //      return;
+            //  }
             // Item selected
             main_layout.show_chat_view (item.name);
 
@@ -138,7 +138,20 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             connection_handler.disconnect_from_server (server_name);
         });
         side_panel.join_channel.connect ((server_name, channel_name) => {
-            connection_handler.join_channel (server_name, channel_name);
+            // If we're not connected to the server yet, connect to it first before joining the channel
+            if (!connection_handler.has_connection (server_name)) {
+                var connection_details = Iridium.Application.settings.get_connection_details_map ().get (server_name);
+                if (connection_details == null) {
+                    // TODO: Handle this
+                    return;
+                }
+                var server_connection = connection_handler.connect_to_server (connection_details);
+                server_connection.open_successful.connect (() => {
+                    connection_handler.join_channel (server_name, channel_name);
+                });
+            } else {
+                connection_handler.join_channel (server_name, channel_name);
+            }
         });
         side_panel.leave_channel.connect ((server_name, channel_name) => {
             connection_handler.leave_channel (server_name, channel_name);
