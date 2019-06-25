@@ -60,7 +60,7 @@ public class Iridium.Widgets.SidePanel.PrivateMessageRow : Granite.Widgets.Sourc
             return;
         }
         icon = new GLib.ThemedIcon ("user-offline");
-        markup = "<i>" + server_name + "</i>";
+        markup = "<i>" + username + "</i>";
         is_enabled = false;
     }
 

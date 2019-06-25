@@ -174,7 +174,9 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 nickname_in_use (message);
                 break;
             case Iridium.Services.NumericCodes.ERR_UNKNOWNCOMMAND:
-            case Iridium.Services.NumericCodes.ERR_NOSUCHNICK:
+            case Iridium.Services.NumericCodes.ERR_NOSUCHNICK: 
+                // TODO: Handle no such nick for sending a PM. Should display the server 
+                //       error in the channel view, not the server view.
             case Iridium.Services.NumericCodes.ERR_NOSUCHCHANNEL:
             case Iridium.Services.NumericCodes.ERR_NOMOTD:
             case Iridium.Services.NumericCodes.ERR_USERNOTINCHANNEL:

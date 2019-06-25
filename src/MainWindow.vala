@@ -422,6 +422,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     public void network_connection_lost () {
         network_info_bar.revealed = true;
+        // TODO: Disable server and channel buttons in header bar
         connection_handler.close_all_connections ();
     }
 
@@ -439,6 +440,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         // Furthermore, if you lose a network connection then quickly regain it, you 
         // may not even need to reconnect to the IRC server.
         network_info_bar.revealed = false;
+        // TODO: Enable server and channel buttons in header bar
     }
 
     //
