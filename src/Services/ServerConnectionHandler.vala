@@ -48,7 +48,7 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         server_connection.channel_message_received.connect (on_channel_message_received);
         server_connection.user_joined_channel.connect (on_user_joined_channel);
         server_connection.user_left_channel.connect (on_user_left_channel);
-        server_connection.direct_message_received.connect (on_direct_message_received);
+        server_connection.private_message_received.connect (on_private_message_received);
 
         // TODO: This may cause a bug since we're not yet sure whether the
         //       connection attempt was successful. Maybe do this in the
@@ -194,8 +194,8 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         user_left_channel (source.connection_details.server, channel_name, username);
     }
 
-    private void on_direct_message_received (Iridium.Services.ServerConnection source, string username, Iridium.Services.Message message) {
-        direct_message_received (source.connection_details.server, username, message);
+    private void on_private_message_received (Iridium.Services.ServerConnection source, string username, Iridium.Services.Message message) {
+        private_message_received (source.connection_details.server, username, message);
     }
 
     //
@@ -216,6 +216,6 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
     public signal void channel_message_received (string server_name, string channel_name, Iridium.Services.Message message);
     public signal void user_joined_channel (string server_name, string channel_name, string username);
     public signal void user_left_channel (string server_name, string channel_name, string username);
-    public signal void direct_message_received (string server_name, string username, Iridium.Services.Message message);
+    public signal void private_message_received (string server_name, string username, Iridium.Services.Message message);
 
 }

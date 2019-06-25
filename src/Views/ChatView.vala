@@ -126,8 +126,8 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         }
     }
 
-    public void display_self_priv_msg (Iridium.Services.Message message) {
-        var rich_text = new Iridium.Models.SelfPrivMessageText (message);
+    public void display_self_private_msg (Iridium.Services.Message message) {
+        var rich_text = new Iridium.Models.SelfPrivateMessageText (message);
         rich_text.display (text_view.get_buffer ());
         do_autoscroll ();
     }

@@ -19,14 +19,14 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Widgets.SidePanel.DirectMessageRow : Granite.Widgets.SourceList.ExpandableItem, Iridium.Widgets.SidePanel.Row {
+public class Iridium.Widgets.SidePanel.PrivateMessageRow : Granite.Widgets.SourceList.ExpandableItem, Iridium.Widgets.SidePanel.Row {
 
     public string username { get; construct; }
     public string server_name { get; construct; }
 
     private bool is_enabled = true;
 
-    public DirectMessageRow (string username, string server_name) {
+    public PrivateMessageRow (string username, string server_name) {
         Object (
             name: username,
             username: username,
@@ -73,7 +73,7 @@ public class Iridium.Widgets.SidePanel.DirectMessageRow : Granite.Widgets.Source
 
         var close_item = new Gtk.MenuItem.with_label ("Close");
         close_item.activate.connect (() => {
-            close_direct_message ();
+            close_private_message ();
         });
 
         menu.append (close_item);
@@ -82,6 +82,6 @@ public class Iridium.Widgets.SidePanel.DirectMessageRow : Granite.Widgets.Source
         return menu;
     }
 
-    public signal void close_direct_message ();
+    public signal void close_private_message ();
 
 }

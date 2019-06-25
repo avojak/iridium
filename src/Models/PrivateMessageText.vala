@@ -19,11 +19,11 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public abstract class Iridium.Models.PrivMessageText : Iridium.Models.RichText {
+public abstract class Iridium.Models.PrivateMessageText : Iridium.Models.RichText {
 
     private static uint16 USERNAME_SPACING = 20;
 
-    public PrivMessageText (Iridium.Services.Message message) {
+    public PrivateMessageText (Iridium.Services.Message message) {
         Object (
             message: message
         );

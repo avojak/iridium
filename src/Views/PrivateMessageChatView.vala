@@ -19,15 +19,14 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-// TODO: Rename Direct -> Private
-public class Iridium.Views.DirectMessageChatView : Iridium.Views.ChatView {
+public class Iridium.Views.PrivateMessageChatView : Iridium.Views.ChatView {
 
     protected override int get_indent () {
         return -140; // TODO: Figure out how to compute this
     }
 
-    public void display_priv_msg (Iridium.Services.Message message) {
-        var rich_text = new Iridium.Models.OthersPrivMessageText (message);
+    public void display_private_msg (Iridium.Services.Message message) {
+        var rich_text = new Iridium.Models.OthersPrivateMessageText (message);
         rich_text.display (text_view.get_buffer ());
         do_autoscroll ();
     }

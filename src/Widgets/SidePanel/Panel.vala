@@ -143,39 +143,39 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
 
     // TODO: Lots of refactoring can be done here. Lots of code is shared
     //       with the channel functions!
-    public void add_direct_message (string server_name, string username) {
-        // Check if this direct message row already exists
+    public void add_private_message (string server_name, string username) {
+        // Check if this private message row already exists
         var server_item = server_items.get (server_name);
         foreach (var child in server_item.children) {
-            if (child is Iridium.Widgets.SidePanel.DirectMessageRow) {
-                unowned Iridium.Widgets.SidePanel.DirectMessageRow direct_message_item = (Iridium.Widgets.SidePanel.DirectMessageRow) child;
-                if (direct_message_item.username == username) {
+            if (child is Iridium.Widgets.SidePanel.PrivateMessageRow) {
+                unowned Iridium.Widgets.SidePanel.PrivateMessageRow private_message_item = (Iridium.Widgets.SidePanel.PrivateMessageRow) child;
+                if (private_message_item.username == username) {
                     return;
                 }
             }
         }
 
-        var direct_message_item = new Iridium.Widgets.SidePanel.DirectMessageRow (username, server_name);
-        /* direct_message_item.markup = "#irchacks <small>" + username + "</small>"; */
-        direct_message_item.close_direct_message.connect (() => {
-            remove_direct_message (server_name, username);
+        var private_message_item = new Iridium.Widgets.SidePanel.PrivateMessageRow (username, server_name);
+        /* private_message_item.markup = "#irchacks <small>" + username + "</small>"; */
+        private_message_item.close_private_message.connect (() => {
+            remove_private_message (server_name, username);
         });
 
-        server_item.add (direct_message_item);
+        server_item.add (private_message_item);
         server_item.expanded = true;
 
         // TODO: Automatically showing a PM when it's received was kinda annoying, 
         //       but maybe not to everyone will feel that way. Maybe instead show
         //       some indication/styling in the side panel to show that the PM is new?
-        //  selected = direct_message_item;
+        //  selected = private_message_item;
     }
 
-    private void remove_direct_message (string server_name, string username) {
+    private void remove_private_message (string server_name, string username) {
         var server_item = server_items.get (server_name);
-        foreach (var direct_message_item in server_item.children) {
-            unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) direct_message_item;
+        foreach (var private_message_item in server_item.children) {
+            unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) private_message_item;
             if (row.get_channel_name () == username) {
-                server_item.remove (direct_message_item);
+                server_item.remove (private_message_item);
                 return;
             }
         }
@@ -271,15 +271,15 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         }
     }
 
-    public void select_direct_message_row (string server_name, string username) {
+    public void select_private_message_row (string server_name, string username) {
         var server_item = server_items.get (server_name);
         if (server_item == null) {
             return;
         }
         foreach (var channel_item in server_item.children) {
             // TODO: Apply this type check in other places
-            if (channel_item is Iridium.Widgets.SidePanel.DirectMessageRow) {
-                unowned Iridium.Widgets.SidePanel.DirectMessageRow row = (Iridium.Widgets.SidePanel.DirectMessageRow) channel_item;
+            if (channel_item is Iridium.Widgets.SidePanel.PrivateMessageRow) {
+                unowned Iridium.Widgets.SidePanel.PrivateMessageRow row = (Iridium.Widgets.SidePanel.PrivateMessageRow) channel_item;
                 if (row.get_channel_name () == username) {
                     selected = channel_item;
                     return;

@@ -158,7 +158,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 // If the first param is our nickname, it's a PM. Otherwise, it's
                 // a general message on a channel
                 if (message.params[0] == connection_details.nickname) {
-                    direct_message_received (message.username, message);
+                    private_message_received (message.username, message);
                 } else {
                     channel_message_received (message.params[0], message);
                 }
@@ -324,6 +324,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     public signal void channel_message_received (string channel_name, Iridium.Services.Message message);
     public signal void user_joined_channel (string channel_name, string username);
     public signal void user_left_channel (string channel_name, string username);
-    public signal void direct_message_received (string username, Iridium.Services.Message message);
+    public signal void private_message_received (string username, Iridium.Services.Message message);
 
 }

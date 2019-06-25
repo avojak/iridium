@@ -25,7 +25,7 @@ public class Iridium.Services.Settings : Granite.Services.Settings {
     public string[] connection_details { get; set; }
     public string[] servers { get; set; }
     public string[] channels { get; set; }
-    /* public string[] direct_messages { get; set; } */
+    /* public string[] private_messages { get; set; } */
 
     public Settings () {
         base ("com.github.avojak.iridium");
@@ -45,7 +45,7 @@ public class Iridium.Services.Settings : Granite.Services.Settings {
     // channels:
     //   ["server=irc.freenode.net\nname=#irchacks\nenabled=true"]
 
-    // direct_messages:
+    // private_messages:
     //   ["server=irc.freenode.net\nname=avojak\nenabled=true"]
 
     public void on_server_connection_successful (Iridium.Services.ServerConnectionDetails new_connection_details) {

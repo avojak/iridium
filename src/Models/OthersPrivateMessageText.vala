@@ -19,16 +19,16 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Models.SelfPrivMessageText : Iridium.Models.PrivMessageText {
+public class Iridium.Models.OthersPrivateMessageText : Iridium.Models.PrivateMessageText {
 
-    public SelfPrivMessageText (Iridium.Services.Message message) {
+    public OthersPrivateMessageText (Iridium.Services.Message message) {
         Object (
             message: message
         );
     }
 
     public override string get_tag_name () {
-        return "self-username";
+        return "username";
     }
 
 }
