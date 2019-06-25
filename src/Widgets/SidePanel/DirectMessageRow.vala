@@ -19,10 +19,6 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-// TODO: Implement for direct messages from other users.
-//       The context menu will need to be slightly different, as the only
-//       option should be "close".
-
 public class Iridium.Widgets.SidePanel.DirectMessageRow : Granite.Widgets.SourceList.ExpandableItem, Iridium.Widgets.SidePanel.Row {
 
     public string username { get; construct; }

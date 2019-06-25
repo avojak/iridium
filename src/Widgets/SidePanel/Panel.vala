@@ -32,6 +32,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
     public Panel () {
         favorites_category = new Granite.Widgets.SourceList.ExpandableItem ("Favorite Channels");
         favorites_dummy = new Granite.Widgets.SourceList.Item ("");
+        favorites_dummy.selectable = false;
         favorites_category.add (favorites_dummy);
         favorites_category.child_added.connect ((item) => {
             favorites_category.expanded = true;
@@ -39,6 +40,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
 
         others_category = new Granite.Widgets.SourceList.ExpandableItem ("Servers");
         others_dummy = new Granite.Widgets.SourceList.Item ("");
+        others_dummy.selectable = false;
         others_category.add (others_dummy);
         others_category.child_added.connect ((item) => {
             others_category.expanded = true;

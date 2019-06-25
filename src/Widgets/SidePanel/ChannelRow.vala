@@ -39,6 +39,7 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
     }
 
     construct {
+        icon = new GLib.ThemedIcon ("user-available");
     }
 
     public new string get_server_name () {
@@ -53,6 +54,7 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
         if (is_enabled) {
             return;
         }
+        icon = new GLib.ThemedIcon ("user-available");
         markup = null;
         is_enabled = true;
     }
@@ -61,6 +63,7 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
         if (!is_enabled) {
             return;
         }
+        icon = new GLib.ThemedIcon ("user-offline");
         markup = "<i>" + channel_name + "</i>";
         is_enabled = false;
     }
