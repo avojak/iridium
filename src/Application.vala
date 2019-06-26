@@ -72,7 +72,7 @@ public class Iridium.Application : Gtk.Application {
     private void restore_state (Iridium.MainWindow main_window) {
         var servers = settings.get_servers_list ();
         var channels = settings.get_channels_list ();
-        var connection_details = settings.get_connection_details_list ();
+        var connection_details = settings.get_connection_details_map ();
         main_window.initialize (servers, channels, connection_details);
     }
 

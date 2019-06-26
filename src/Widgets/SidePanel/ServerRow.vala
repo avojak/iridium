@@ -62,6 +62,12 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
         is_enabled = false;
     }
 
+    public new void updating () {
+        icon = new GLib.ThemedIcon ("mail-unread");
+        markup = "<i>" + server_name + "</i>";
+        is_enabled = false;
+    }
+
     public new bool get_enabled () {
         return is_enabled;
     }

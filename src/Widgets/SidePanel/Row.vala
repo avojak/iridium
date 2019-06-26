@@ -25,6 +25,7 @@ public interface Iridium.Widgets.SidePanel.Row : GLib.Object {
     public abstract string? get_channel_name ();
     public abstract void enable ();
     public abstract void disable ();
+    public abstract void updating ();
     public abstract bool get_enabled ();
 
 }

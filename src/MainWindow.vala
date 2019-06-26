@@ -126,6 +126,10 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 return;
             }
             var server_connection = connection_handler.connect_to_server (connection_details);
+            Idle.add (() => {
+                side_panel.updating_server_row (server_name);
+                return false;
+            });
             server_connection.open_successful.connect (() => {
                 Idle.add (() => {
                     side_panel.select_server_row (server_name);
@@ -146,10 +150,18 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                     return;
                 }
                 var server_connection = connection_handler.connect_to_server (connection_details);
+                Idle.add (() => {
+                    side_panel.updating_server_row (server_name);
+                    return false;
+                });
                 server_connection.open_successful.connect (() => {
                     connection_handler.join_channel (server_name, channel_name);
                 });
             } else {
+                Idle.add (() => {
+                    side_panel.updating_channel_row (server_name, channel_name);
+                    return false;
+                });
                 connection_handler.join_channel (server_name, channel_name);
             }
         });
@@ -207,7 +219,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     // TODO: Restore private messages from the side panel
-    public void initialize (Gee.List<string> servers_list, Gee.List<string> channels_list, Gee.List<string> connection_details_list) {
+    public void initialize (Gee.List<string> servers_list, Gee.List<string> channels_list, Gee.Map<string, Iridium.Services.ServerConnectionDetails> connection_details_map) {
         begin_initialization ();
 
         // Map the server names to their initialization status (success or fail)
@@ -263,24 +275,20 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             return false;
         });
 
-        // TODO: Re-use the parsing logic from the settings class!!!
-        Gee.Map<string, Iridium.Services.ServerConnectionDetails> connection_details_map = new Gee.HashMap<string, Iridium.Services.ServerConnectionDetails> ();
-        foreach (string entry in connection_details_list) {
-            string[] tokens = entry.split ("\n");
-            var connection_details = new Iridium.Services.ServerConnectionDetails ();
-            connection_details.server = tokens[0].split ("=")[1];
-            connection_details.username = tokens[2].split ("=")[1];
-            connection_details.nickname = tokens[3].split ("=")[1];
-            connection_details.realname = tokens[4].split ("=")[1];
-            connection_details_map.set (connection_details.server, connection_details);
-        }
-
         foreach (string server_name in enabled_servers) {
             var connection_details = connection_details_map.get (server_name);
             var server_connection = connection_handler.connect_to_server (connection_details);
+            Idle.add (() => {
+                side_panel.updating_server_row (server_name);
+                return false;
+            });
             server_connection.open_successful.connect (() => {
                 foreach (string channel_name in enabled_channels.get (server_name)) {
                     connection_handler.join_channel (server_name, channel_name);
+                    Idle.add (() => {
+                        side_panel.updating_channel_row (server_name, channel_name);
+                        return false;
+                    });
                 }
                 // Still add chat views for channels that aren't joined yet.
                 // This is needed in case a user clicks a channel item in the

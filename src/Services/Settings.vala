@@ -235,19 +235,19 @@ public class Iridium.Services.Settings : Granite.Services.Settings {
     }
 
     public void on_dm_row_added (string server_name, string username) {
-
+        // TODO: Implement
     }
 
     public void on_dm_row_removed (string server_name, string username) {
-
+        // TODO: Implement
     }
 
     public void on_dm_row_enabled (string server_name, string username) {
-
+        // TODO: Implement
     }
 
     public void on_dm_row_disabled (string server_name, string username) {
-
+        // TODO: Implement
     }
 
     public Gee.List<string> get_servers_list () {

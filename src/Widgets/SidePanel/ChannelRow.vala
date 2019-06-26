@@ -68,6 +68,12 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
         is_enabled = false;
     }
 
+    public new void updating () {
+        icon = new GLib.ThemedIcon ("mail-unread");
+        markup = "<i>" + channel_name + "</i>";
+        is_enabled = false;
+    }
+
     public new bool get_enabled () {
         return is_enabled;
     }

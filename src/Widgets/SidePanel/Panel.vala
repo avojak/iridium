@@ -219,6 +219,15 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         server_row_disabled (server_name);
     }
 
+    public void updating_server_row (string server_name) {
+        var server_item = server_items.get (server_name);
+        if (server_item == null) {
+            return;
+        }
+        unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) server_item;
+        row.updating ();
+    }
+
     public void enable_channel_row (string server_name, string channel_name) {
         var server_item = server_items.get (server_name);
         if (server_item == null) {
@@ -247,6 +256,20 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
             }
         }
         channel_row_disabled (server_name, channel_name);
+    }
+
+    public void updating_channel_row (string server_name, string channel_name) {
+        var server_item = server_items.get (server_name);
+        if (server_item == null) {
+            return;
+        }
+        foreach (var channel_item in server_item.children) {
+            unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) channel_item;
+            if (row.get_channel_name () == channel_name) {
+                row.updating ();
+                break;
+            }
+        }
     }
 
     public void select_server_row (string server_name) {
