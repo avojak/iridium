@@ -63,6 +63,8 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
 
     // TODO: Add methods here so we don't have to do type-casting at the consumer level
 
+    // TODO: Need to do these lookups by server name and channel name to ensure uniqueness
+
     public Iridium.Views.ChannelChatView? get_channel_chat_view (string name) {
         return main_stack.get_child_by_name (name) as Iridium.Views.ChannelChatView;
     }

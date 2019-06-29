@@ -155,6 +155,10 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                     return false;
                 });
                 server_connection.open_successful.connect (() => {
+                    Idle.add (() => {
+                        side_panel.updating_channel_row (server_name, channel_name);
+                        return false;
+                    });
                     connection_handler.join_channel (server_name, channel_name);
                 });
             } else {
@@ -726,9 +730,15 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         if (selected_row == null) {
             return;
         }
+        var usernames = connection_handler.get_users (server_name, channel_name);
         if (selected_row.get_server_name () == server_name && selected_row.get_channel_name () == channel_name) {
-            var usernames = connection_handler.get_users (server_name, channel_name);
             header_bar.set_channel_users (usernames);
+        }
+        // Update the users for the channel chat view so it knows which usernames 
+        // to display in a different style.
+        var channel_chat_view = main_layout.get_channel_chat_view (channel_name);
+        if (channel_chat_view != null) {
+            channel_chat_view.set_usernames (usernames);
         }
     }
 

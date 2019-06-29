@@ -34,6 +34,8 @@ public abstract class Iridium.Models.PrivateMessageText : Iridium.Models.RichTex
         buffer.get_end_iter (out iter);
 
         // Display username
+        // TODO: Check if the last username displayed is the same username. If so,
+        //       don't display it again.
         var username = message.username;
         if (username.length > USERNAME_SPACING) {
             username = username.substring (0, USERNAME_SPACING - 3);

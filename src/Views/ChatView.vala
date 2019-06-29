@@ -24,10 +24,13 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     // TODO: Disable or somehow indicate that you are disconnected from a server
     //       and cannot send messages.
 
+    // TODO: Should toggle these colors slightly depending on whether user is in dark mode or not
     // Colors defined by the elementary OS Human Interface Guidelines
-    private static string COLOR_STRAWBERRY = "#c6262e";
-    private static string COLOR_LIME = "#68b723";
-    private static string COLOR_BLUEBERRY = "#3689e6";
+    private static string COLOR_STRAWBERRY = "#ed5353"; // "#c6262e";
+    private static string COLOR_ORANGE = "#ffa154"; // "#f37329";
+    private static string COLOR_LIME = "#9bdb4d"; // "#68b723";
+    private static string COLOR_BLUEBERRY = "#64baff"; // "#3689e6";
+    //  private static string COLOR_GRAPE = "#a56de2";
 
     protected Gtk.TextView text_view;
 
@@ -97,7 +100,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         var buffer = text_view.get_buffer ();
         var color = Gdk.RGBA ();
 
-        // Username
+        // Other usernames
         color.parse (COLOR_BLUEBERRY);
         unowned Gtk.TextTag username_tag = buffer.create_tag ("username");
         username_tag.foreground_rgba = color;
@@ -114,6 +117,16 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         unowned Gtk.TextTag error_tag = buffer.create_tag ("error");
         error_tag.foreground_rgba = color;
         error_tag.weight = Pango.Weight.SEMIBOLD;
+
+        // Inline usernames
+        color.parse (COLOR_ORANGE);
+        unowned Gtk.TextTag inline_username_tag = buffer.create_tag ("inline-username");
+        inline_username_tag.foreground_rgba = color;
+
+        // Inline self username
+        color.parse (COLOR_LIME);
+        unowned Gtk.TextTag inline_self_username_tag = buffer.create_tag ("inline-self-username");
+        inline_self_username_tag.foreground_rgba = color;
     }
 
     // TODO: Need to figure out a good way to lock scrolling... Might be annoying
@@ -126,21 +139,12 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         }
     }
 
-    public void display_self_private_msg (Iridium.Services.Message message) {
-        var rich_text = new Iridium.Models.SelfPrivateMessageText (message);
-        rich_text.display (text_view.get_buffer ());
-        do_autoscroll ();
-    }
-
-    public void display_server_msg (Iridium.Services.Message message) {
-        var rich_text = new Iridium.Models.ServerMessageText (message);
-        rich_text.display (text_view.get_buffer ());
-        do_autoscroll ();
-    }
-
     public void set_entry_focus () {
         entry.grab_focus_without_selecting ();
     }
+
+    public abstract void display_self_private_msg (Iridium.Services.Message message);
+    public abstract void display_server_msg (Iridium.Services.Message message);
 
     protected abstract int get_indent ();
 

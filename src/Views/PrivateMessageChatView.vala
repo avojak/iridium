@@ -25,6 +25,18 @@ public class Iridium.Views.PrivateMessageChatView : Iridium.Views.ChatView {
         return -140; // TODO: Figure out how to compute this
     }
 
+    public override void display_self_private_msg (Iridium.Services.Message message) {
+        var rich_text = new Iridium.Models.SelfPrivateMessageText (message);
+        rich_text.display (text_view.get_buffer ());
+        do_autoscroll ();
+    }
+
+    public override void display_server_msg (Iridium.Services.Message message) {
+        var rich_text = new Iridium.Models.ServerMessageText (message);
+        rich_text.display (text_view.get_buffer ());
+        do_autoscroll ();
+    }
+
     public void display_private_msg (Iridium.Services.Message message) {
         var rich_text = new Iridium.Models.OthersPrivateMessageText (message);
         rich_text.display (text_view.get_buffer ());
