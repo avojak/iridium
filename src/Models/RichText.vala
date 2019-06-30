@@ -21,6 +21,11 @@
 
 public abstract class Iridium.Models.RichText : GLib.Object {
 
+    // https://github.com/didrocks/geary/blob/master/src/client/util/util-webkit.vala
+    private static string URI_REGEX_STR = "(?i)\\b((?:[a-z][\\w-]+:(?:/{1,3}|[a-z0-9%])|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,4}/)(?:[^\\s()<>]+|\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\))+(?:\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’]))";
+
+    private static GLib.Regex URI_REGEX;
+
     public Iridium.Services.Message message { get; construct; }
 
     //  private string self_username;
@@ -30,6 +35,15 @@ public abstract class Iridium.Models.RichText : GLib.Object {
         Object (
             message: message
         );
+    }
+
+    static construct {
+        try {
+            URI_REGEX = new GLib.Regex (URI_REGEX_STR, GLib.RegexCompileFlags.OPTIMIZE);
+        } catch (GLib.RegexError e) {
+            // TODO: Handle errors!
+            // This should never ever happen
+        }
     }
 
     // Set our username so we can check for it and apply different styling
@@ -46,6 +60,9 @@ public abstract class Iridium.Models.RichText : GLib.Object {
         // Display the rich text in the buffer
         do_display (buffer);
 
+        // Apply tag for URIs
+        apply_uri_tags (buffer);
+
         // Apply tags for usernames
         apply_username_tags (buffer);
 
@@ -57,6 +74,22 @@ public abstract class Iridium.Models.RichText : GLib.Object {
         } else {
             buffer.move_mark_by_name ("buffer-end", iter);
         }
+    }
+
+    private void apply_uri_tags (Gtk.TextBuffer buffer) {
+        Gtk.TextIter search_start;
+        buffer.get_end_iter (out search_start);
+        search_start.backward_chars (message.message.length + 1); // +1 for newline char
+        Gtk.TextIter search_end;
+        buffer.get_end_iter (out search_end);
+        search_end.backward_chars (1); // 1 for newline char
+
+        var text = buffer.get_text (search_start, search_end, false);
+
+        GLib.MatchInfo match_info;
+        URI_REGEX.match_all (text, 0, out match_info);
+        var num_matches = match_info.get_match_count ();
+        //  print ("Found " + num_matches.to_string () + " URIs\n");
     }
 
     private void apply_username_tags (Gtk.TextBuffer buffer) {

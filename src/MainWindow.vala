@@ -725,20 +725,23 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     private void update_channel_users_list (string server_name, string channel_name) {
+        var usernames = connection_handler.get_users (server_name, channel_name);
+
+        // Update the users for the channel chat view so it knows which usernames 
+        // to display in a different style. Do this regardless of whether the view
+        // is currently selected and displayed.
+        var channel_chat_view = main_layout.get_channel_chat_view (channel_name);
+        if (channel_chat_view != null) {
+            channel_chat_view.set_usernames (usernames);
+        }
+
         // Check if the current view matches the server and channel
         var selected_row = side_panel.get_selected_row ();
         if (selected_row == null) {
             return;
         }
-        var usernames = connection_handler.get_users (server_name, channel_name);
         if (selected_row.get_server_name () == server_name && selected_row.get_channel_name () == channel_name) {
             header_bar.set_channel_users (usernames);
-        }
-        // Update the users for the channel chat view so it knows which usernames 
-        // to display in a different style.
-        var channel_chat_view = main_layout.get_channel_chat_view (channel_name);
-        if (channel_chat_view != null) {
-            channel_chat_view.set_usernames (usernames);
         }
     }
 

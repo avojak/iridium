@@ -37,6 +37,9 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     private Gtk.ScrolledWindow scrolled_window;
     private Gtk.Entry entry;
 
+    private Gdk.Cursor cursor_pointer;
+    private Gdk.Cursor cursor_text;
+
     public ChatView () {
         Object (
             orientation: Gtk.Orientation.VERTICAL
@@ -74,6 +77,9 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
 
         create_text_tags ();
 
+        cursor_pointer = new Gdk.Cursor.from_name (text_view.get_display (), "pointer");
+        cursor_text = new Gdk.Cursor.from_name (text_view.get_display (), "text");
+
         entry.activate.connect (() => {
             message_to_send (entry.get_text ());
             entry.set_text ("");
@@ -94,6 +100,34 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         /* scrolled_window.get_vadjustment ().value_changed.connect (() => {
             print (scrolled_window.get_vadjustment ().value.to_string () + "\n");
         }); */
+
+        // https://www.kksou.com/php-gtk2/sample-codes/insert-links-in-GtkTextView-Part-4-Change-Cursor-over-Link.php
+        text_view.motion_notify_event.connect ((event) => {
+            int buffer_x;
+            int buffer_y;
+            text_view.window_to_buffer_coords (Gtk.TextWindowType.TEXT, (int) event.x, (int) event.y, out buffer_x, out buffer_y);
+
+            Gtk.TextIter pos;
+            text_view.get_iter_at_location (out pos, buffer_x, buffer_y);
+
+            var inline_username_tag = text_view.get_buffer ().get_tag_table ().lookup ("inline-username");
+            var window = text_view.get_window (Gtk.TextWindowType.TEXT);
+            if (window != null) {
+                if (inline_username_tag != null && pos.has_tag (inline_username_tag)) {
+                    window.set_cursor (cursor_pointer);
+                } else {
+                    window.set_cursor (cursor_text);
+                }
+            }
+        });
+
+        //  text_view.button_release_event.connect ((event) => {
+        //      // Ensure this was a click from mouse button 1
+        //      if (event.type != Gdk.BUTTON_RELEASE || event.state != Gdk.BUTTON1_MASK) {
+        //          return false;
+        //      }
+        //      print ("Click!!!! \n");
+        //  });
     }
 
     private void create_text_tags () {
@@ -127,6 +161,11 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         color.parse (COLOR_LIME);
         unowned Gtk.TextTag inline_self_username_tag = buffer.create_tag ("inline-self-username");
         inline_self_username_tag.foreground_rgba = color;
+
+        // Hyperlinks
+        color.parse (COLOR_BLUEBERRY);
+        unowned Gtk.TextTag hyperlink_tag = buffer.create_tag ("hyperlink");
+        hyperlink_tag.foreground_rgba = color;
     }
 
     // TODO: Need to figure out a good way to lock scrolling... Might be annoying
