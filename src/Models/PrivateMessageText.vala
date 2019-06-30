@@ -48,7 +48,9 @@ public abstract class Iridium.Models.PrivateMessageText : Iridium.Models.RichTex
         // Format the username
         Gtk.TextIter username_start = iter;
         username_start.backward_chars (username.length);
-        buffer.apply_tag_by_name (get_tag_name (), username_start, iter);
+        Gtk.TextIter username_end = username_start;
+        username_end.forward_chars (message.username.length);
+        buffer.apply_tag_by_name (get_tag_name (), username_start, username_end);
         buffer.insert_text (ref iter, message.message, message.message.length);
         buffer.insert (ref iter, "\n", 1);
     }

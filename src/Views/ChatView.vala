@@ -101,6 +101,8 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
             print (scrolled_window.get_vadjustment ().value.to_string () + "\n");
         }); */
 
+        // This approach for detecting the mouse motion over a TextTag and changin the cursor
+        // was adapted from: 
         // https://www.kksou.com/php-gtk2/sample-codes/insert-links-in-GtkTextView-Part-4-Change-Cursor-over-Link.php
         text_view.motion_notify_event.connect ((event) => {
             int buffer_x;
@@ -110,10 +112,16 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
             Gtk.TextIter pos;
             text_view.get_iter_at_location (out pos, buffer_x, buffer_y);
 
+            // TODO: Maybe also add self username?
+            var username_tag = text_view.get_buffer ().get_tag_table ().lookup ("username");
+            var self_username_tag = text_view.get_buffer ().get_tag_table ().lookup ("self-username");
             var inline_username_tag = text_view.get_buffer ().get_tag_table ().lookup ("inline-username");
+            //  var inline_self_username_tag = text_view.get_buffer ().get_tag_table ().lookup ("inline-self-username");
             var window = text_view.get_window (Gtk.TextWindowType.TEXT);
             if (window != null) {
-                if (inline_username_tag != null && pos.has_tag (inline_username_tag)) {
+                if ((username_tag != null && pos.has_tag (username_tag)) ||
+                    (self_username_tag != null && pos.has_tag (self_username_tag)) ||
+                    (inline_username_tag != null && pos.has_tag (inline_username_tag))) {
                     window.set_cursor (cursor_pointer);
                 } else {
                     window.set_cursor (cursor_text);
@@ -139,12 +147,14 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         unowned Gtk.TextTag username_tag = buffer.create_tag ("username");
         username_tag.foreground_rgba = color;
         username_tag.weight = Pango.Weight.SEMIBOLD;
+        username_tag.event.connect (on_username_clicked);
 
         // Self username
         color.parse (COLOR_LIME);
         unowned Gtk.TextTag self_username_tag = buffer.create_tag ("self-username");
         self_username_tag.foreground_rgba = color;
         self_username_tag.weight = Pango.Weight.SEMIBOLD;
+        self_username_tag.event.connect (on_username_clicked);
 
         // Errors
         color.parse (COLOR_STRAWBERRY);
@@ -156,6 +166,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         color.parse (COLOR_ORANGE);
         unowned Gtk.TextTag inline_username_tag = buffer.create_tag ("inline-username");
         inline_username_tag.foreground_rgba = color;
+        inline_username_tag.event.connect (on_username_clicked);
 
         // Inline self username
         color.parse (COLOR_LIME);
@@ -180,6 +191,25 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
 
     public void set_entry_focus () {
         entry.grab_focus_without_selecting ();
+        entry.set_position (-1);
+    }
+
+    private bool on_username_clicked (Gtk.TextTag source, GLib.Object event_object, Gdk.Event event, Gtk.TextIter iter) {
+        if (event.type == Gdk.EventType.BUTTON_RELEASE) {
+            iter.backward_word_start ();
+            Gtk.TextIter word_start = iter;
+            iter.forward_word_end ();
+            Gtk.TextIter word_end = iter;
+            var username = word_start.get_text (word_end);
+            if (entry.text.length == 0) {
+                entry.text = username + ": ";
+                set_entry_focus ();
+            } else {
+                entry.text += username;
+                set_entry_focus ();
+            }
+        }
+        return false;
     }
 
     public abstract void display_self_private_msg (Iridium.Services.Message message);
