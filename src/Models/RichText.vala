@@ -76,6 +76,7 @@ public abstract class Iridium.Models.RichText : GLib.Object {
         }
     }
 
+    // TODO: Figure this out...
     private void apply_uri_tags (Gtk.TextBuffer buffer) {
         Gtk.TextIter search_start;
         buffer.get_end_iter (out search_start);
@@ -88,7 +89,7 @@ public abstract class Iridium.Models.RichText : GLib.Object {
 
         GLib.MatchInfo match_info;
         URI_REGEX.match_all (text, 0, out match_info);
-        var num_matches = match_info.get_match_count ();
+        //  var num_matches = match_info.get_match_count ();
         //  print ("Found " + num_matches.to_string () + " URIs\n");
     }
 

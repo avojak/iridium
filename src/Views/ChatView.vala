@@ -117,6 +117,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
             var self_username_tag = text_view.get_buffer ().get_tag_table ().lookup ("self-username");
             var inline_username_tag = text_view.get_buffer ().get_tag_table ().lookup ("inline-username");
             //  var inline_self_username_tag = text_view.get_buffer ().get_tag_table ().lookup ("inline-self-username");
+
             var window = text_view.get_window (Gtk.TextWindowType.TEXT);
             if (window != null) {
                 if ((username_tag != null && pos.has_tag (username_tag)) ||
@@ -127,15 +128,30 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
                     window.set_cursor (cursor_text);
                 }
             }
+
+            // Handle the underline
+            Gtk.TextIter word_start = pos;
+            word_start.backward_word_start ();
+            Gtk.TextIter word_end = pos;
+            word_end.forward_word_end ();
+
+            if ((username_tag != null && pos.has_tag (username_tag)) ||
+                (self_username_tag != null && pos.has_tag (self_username_tag)) ||
+                (inline_username_tag != null && pos.has_tag (inline_username_tag))) {
+                // Make sure we're not over a 'word' that has a spaces in it
+                if (!text_view.get_buffer ().get_text (word_start, word_end, false).contains (" ")) {
+                    text_view.get_buffer ().apply_tag_by_name ("underline", word_start, word_end);
+                }
+            } else {
+                Gtk.TextIter buffer_start;
+                text_view.get_buffer ().get_start_iter (out buffer_start);
+                Gtk.TextIter buffer_end;
+                text_view.get_buffer ().get_end_iter (out buffer_end);
+                text_view.get_buffer ().remove_tag_by_name ("underline", buffer_start, buffer_end);
+            }
+            
         });
 
-        //  text_view.button_release_event.connect ((event) => {
-        //      // Ensure this was a click from mouse button 1
-        //      if (event.type != Gdk.BUTTON_RELEASE || event.state != Gdk.BUTTON1_MASK) {
-        //          return false;
-        //      }
-        //      print ("Click!!!! \n");
-        //  });
     }
 
     private void create_text_tags () {
@@ -177,6 +193,10 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         color.parse (COLOR_BLUEBERRY);
         unowned Gtk.TextTag hyperlink_tag = buffer.create_tag ("hyperlink");
         hyperlink_tag.foreground_rgba = color;
+
+        // Underline
+        unowned Gtk.TextTag underline_tag = buffer.create_tag ("underline");
+        underline_tag.underline = Pango.Underline.SINGLE;
     }
 
     // TODO: Need to figure out a good way to lock scrolling... Might be annoying
@@ -195,6 +215,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     }
 
     private bool on_username_clicked (Gtk.TextTag source, GLib.Object event_object, Gdk.Event event, Gtk.TextIter iter) {
+        // TODO: Check for right click and show some options in a popup menu (eg. block, PM, etc.)
         if (event.type == Gdk.EventType.BUTTON_RELEASE) {
             iter.backward_word_start ();
             Gtk.TextIter word_start = iter;
