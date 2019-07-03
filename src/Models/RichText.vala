@@ -79,16 +79,37 @@ public abstract class Iridium.Models.RichText : GLib.Object {
     // TODO: Figure this out...
     private void apply_uri_tags (Gtk.TextBuffer buffer) {
         Gtk.TextIter search_start;
+        Gtk.TextIter search_end;
+        Gtk.TextIter match_start;
+        Gtk.TextIter match_end;
+        Gtk.TextIter iter;
+        
         buffer.get_end_iter (out search_start);
         search_start.backward_chars (message.message.length + 1); // +1 for newline char
-        Gtk.TextIter search_end;
         buffer.get_end_iter (out search_end);
         search_end.backward_chars (1); // 1 for newline char
 
         var text = buffer.get_text (search_start, search_end, false);
+        Gee.Set<string> tokens = new Gee.HashSet<string>();
+        tokens.add_all_array (text.split (" "));
 
-        GLib.MatchInfo match_info;
-        URI_REGEX.match_all (text, 0, out match_info);
+        foreach (string token in tokens) {
+            print (token + "\n");
+            if (URI_REGEX.match (token)) {
+                print ("\tMATCH!!!\n");
+                iter = search_start;
+                while (iter.forward_search (token, Gtk.TextSearchFlags.CASE_INSENSITIVE, out match_start, out match_end, search_end)) {
+                    // TODO: This word check isn't good enough...
+                    if (match_start.starts_word () && match_end.ends_word ()) {
+                        buffer.apply_tag_by_name ("hyperlink", match_start, match_end);
+                    }
+                    iter = match_end;
+                }
+            }
+        }
+
+        //  GLib.MatchInfo match_info;
+        //  URI_REGEX.match_all (text, 0, out match_info);
         //  var num_matches = match_info.get_match_count ();
         //  print ("Found " + num_matches.to_string () + " URIs\n");
     }
