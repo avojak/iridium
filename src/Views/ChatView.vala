@@ -47,17 +47,18 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     }
 
     construct {
+        // TODO: WHY CANT YOU CLICK AND DRAG TO SELECT TEXT???
         text_view = new Gtk.TextView ();
-        text_view.pixels_below_lines = 3;
-        text_view.border_width = 12;
-        text_view.wrap_mode = Gtk.WrapMode.WORD_CHAR;
+        text_view.set_pixels_below_lines (3);
+        text_view.set_border_width (12);
+        text_view.set_wrap_mode (Gtk.WrapMode.WORD_CHAR);
         /* text_view.left_margin = 140; */
-        text_view.indent = get_indent ();
-        text_view.monospace = true;
-        text_view.editable = false;
-        text_view.cursor_visible = false;
-        text_view.vexpand = true;
-        text_view.hexpand = true;
+        text_view.set_indent (get_indent ());
+        text_view.set_monospace (true);
+        text_view.set_editable (false);
+        text_view.set_cursor_visible (false);
+        text_view.set_vexpand (true);
+        text_view.set_hexpand (true);
 
         // Initialize the buffer iterator
         Gtk.TextIter iter;
@@ -112,17 +113,11 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
             Gtk.TextIter pos;
             text_view.get_iter_at_location (out pos, buffer_x, buffer_y);
 
-            // TODO: Maybe also add self username?
-            var username_tag = text_view.get_buffer ().get_tag_table ().lookup ("username");
-            var self_username_tag = text_view.get_buffer ().get_tag_table ().lookup ("self-username");
-            var inline_username_tag = text_view.get_buffer ().get_tag_table ().lookup ("inline-username");
-            //  var inline_self_username_tag = text_view.get_buffer ().get_tag_table ().lookup ("inline-self-username");
+            var selectable_tag = text_view.get_buffer ().get_tag_table ().lookup ("selectable");
 
             var window = text_view.get_window (Gtk.TextWindowType.TEXT);
             if (window != null) {
-                if ((username_tag != null && pos.has_tag (username_tag)) ||
-                    (self_username_tag != null && pos.has_tag (self_username_tag)) ||
-                    (inline_username_tag != null && pos.has_tag (inline_username_tag))) {
+                if (selectable_tag != null && pos.has_tag (selectable_tag)) {
                     window.set_cursor (cursor_pointer);
                 } else {
                     window.set_cursor (cursor_text);
@@ -130,17 +125,15 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
             }
 
             // Handle the underline
-            Gtk.TextIter word_start = pos;
-            word_start.backward_word_start ();
-            Gtk.TextIter word_end = pos;
-            word_end.forward_word_end ();
+            Gtk.TextIter tag_start = pos;
+            tag_start.backward_to_tag_toggle (selectable_tag);
+            Gtk.TextIter tag_end = pos;
+            tag_end.forward_to_tag_toggle (selectable_tag);
 
-            if ((username_tag != null && pos.has_tag (username_tag)) ||
-                (self_username_tag != null && pos.has_tag (self_username_tag)) ||
-                (inline_username_tag != null && pos.has_tag (inline_username_tag))) {
+            if (selectable_tag != null && pos.has_tag (selectable_tag)) {
                 // Make sure we're not over a 'word' that has a spaces in it
-                if (!text_view.get_buffer ().get_text (word_start, word_end, false).contains (" ")) {
-                    text_view.get_buffer ().apply_tag_by_name ("underline", word_start, word_end);
+                if (!text_view.get_buffer ().get_text (tag_start, tag_end, false).contains (" ")) {
+                    text_view.get_buffer ().apply_tag_by_name ("underline", tag_start, tag_end);
                 }
             } else {
                 Gtk.TextIter buffer_start;
@@ -189,10 +182,14 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         unowned Gtk.TextTag inline_self_username_tag = buffer.create_tag ("inline-self-username");
         inline_self_username_tag.foreground_rgba = color;
 
+        // Selectable
+        buffer.create_tag ("selectable");
+
         // Hyperlinks
         color.parse (COLOR_BLUEBERRY);
         unowned Gtk.TextTag hyperlink_tag = buffer.create_tag ("hyperlink");
         hyperlink_tag.foreground_rgba = color;
+        hyperlink_tag.event.connect (on_hyperlink_clicked);
 
         // Underline
         unowned Gtk.TextTag underline_tag = buffer.create_tag ("underline");
@@ -217,11 +214,11 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     private bool on_username_clicked (Gtk.TextTag source, GLib.Object event_object, Gdk.Event event, Gtk.TextIter iter) {
         // TODO: Check for right click and show some options in a popup menu (eg. block, PM, etc.)
         if (event.type == Gdk.EventType.BUTTON_RELEASE) {
-            iter.backward_word_start ();
-            Gtk.TextIter word_start = iter;
-            iter.forward_word_end ();
-            Gtk.TextIter word_end = iter;
-            var username = word_start.get_text (word_end);
+            var username = get_selectable_text (iter);
+            if (username == null) {
+                // TODO: Log this - it shouldn't happen
+                return false;
+            }
             if (entry.text.length == 0) {
                 entry.text = username + ": ";
                 set_entry_focus ();
@@ -231,6 +228,37 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
             }
         }
         return false;
+    }
+
+    private bool on_hyperlink_clicked (Gtk.TextTag source, GLib.Object event_object, Gdk.Event event, Gtk.TextIter iter) {
+        if (event.type == Gdk.EventType.BUTTON_RELEASE) {
+            var hyperlink = get_selectable_text (iter);
+            if (hyperlink == null) {
+                // TODO: Log this - it shouldn't happen
+                return false;
+            }
+            try {
+                AppInfo.launch_default_for_uri (hyperlink, null);
+            } catch (Error e) {
+                warning ("%s\n", e.message);
+            }
+        }
+        return false;
+    }
+
+    private string? get_selectable_text (Gtk.TextIter pos) {
+        var selectable_tag = text_view.get_buffer ().get_tag_table ().lookup ("selectable");
+
+        if (!pos.has_tag (selectable_tag)) {
+            return null;
+        }
+            
+        Gtk.TextIter tag_start = pos;
+        tag_start.backward_to_tag_toggle (selectable_tag);
+        Gtk.TextIter tag_end = pos;
+        tag_end.forward_to_tag_toggle (selectable_tag);
+
+        return tag_start.get_text (tag_end);
     }
 
     public abstract void display_self_private_msg (Iridium.Services.Message message);

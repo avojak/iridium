@@ -102,6 +102,7 @@ public abstract class Iridium.Models.RichText : GLib.Object {
                     // TODO: This word check isn't good enough...
                     if (match_start.starts_word () && match_end.ends_word ()) {
                         buffer.apply_tag_by_name ("hyperlink", match_start, match_end);
+                        buffer.apply_tag_by_name ("selectable", match_start, match_end);
                     }
                     iter = match_end;
                 }
@@ -129,6 +130,7 @@ public abstract class Iridium.Models.RichText : GLib.Object {
             while (search_start.forward_search (username, Gtk.TextSearchFlags.CASE_INSENSITIVE, out match_start, out match_end, search_end)) {
                 if (match_start.starts_word () && match_end.ends_word ()) {
                     buffer.apply_tag_by_name ("inline-username", match_start, match_end);
+                    buffer.apply_tag_by_name ("selectable", match_start, match_end);
                 }
                 search_start = match_end; 
             }
