@@ -49,8 +49,7 @@ executable(
         dependency('gtk+-3.0', version: '>= 3.6.4'),
         dependency('gee-0.8', version: '>= 0.8.5'),
         dependency('glib-2.0', version: '>= 2.30.0'),
-        dependency('granite', version: '>= 0.5.1'),
-        dependency('libsoup-2.4', version: '>= 2.62.1')
+        dependency('granite', version: '>= 0.5.1')
     ],
     install: true
 )

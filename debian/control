@@ -8,8 +8,7 @@ Build-Depends: debhelper (>= 10.5.1),
                meson,
                valac (>= 0.28.0),
                libgranite-dev,
-               libgee-0.8-dev,
-               libsoup2.4-dev
+               libgee-0.8-dev
 Standards-Version: 4.1.1
 
 Package: com.github.avojak.iridium
