@@ -86,11 +86,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 main_layout.show_welcome_view ();
                 return;
             }
-            // Dummy selected
-            //  if (item.name.strip ().length == 0) {
-            //      header_bar.set_channel_join_button_enabled (false);
-            //      return;
-            //  }
+
             // Item selected
             main_layout.show_chat_view (item.name);
 

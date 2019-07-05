@@ -66,7 +66,7 @@ This project is very much in-progress and has a lot of remaining work. Here is a
 - [x] Auto-scrolling for new messages
 - [x] Unread message badges for channels
 - [ ] Support authentication for servers
-- [ ] Special formatting for usernames and URLs in messages
+- [x] Special formatting for usernames and URLs in messages
 - [ ] Favorite channels
 - [x] Save and restore state when closing and re-opening
 - [x] Display channel users list
@@ -74,3 +74,4 @@ This project is very much in-progress and has a lot of remaining work. Here is a
 - [ ] Display available channel list
 - [x] Respond to network loss and re-connection
 - [ ] Lock scrolling when reading old messages
+- [ ] Display message of the day

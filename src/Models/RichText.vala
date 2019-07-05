@@ -21,11 +21,6 @@
 
 public abstract class Iridium.Models.RichText : GLib.Object {
 
-    // https://github.com/didrocks/geary/blob/master/src/client/util/util-webkit.vala
-    private static string URI_REGEX_STR = "(?i)\\b((?:[a-z][\\w-]+:(?:/{1,3}|[a-z0-9%])|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,4}/)(?:[^\\s()<>]+|\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\))+(?:\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’]))";
-
-    private static GLib.Regex URI_REGEX;
-
     public Iridium.Services.Message message { get; construct; }
 
     //  private string self_username;
@@ -35,15 +30,6 @@ public abstract class Iridium.Models.RichText : GLib.Object {
         Object (
             message: message
         );
-    }
-
-    static construct {
-        try {
-            URI_REGEX = new GLib.Regex (URI_REGEX_STR, GLib.RegexCompileFlags.OPTIMIZE);
-        } catch (GLib.RegexError e) {
-            // TODO: Handle errors!
-            // This should never ever happen
-        }
     }
 
     // Set our username so we can check for it and apply different styling
@@ -60,11 +46,12 @@ public abstract class Iridium.Models.RichText : GLib.Object {
         // Display the rich text in the buffer
         do_display (buffer);
 
+        // Apply tags for usernames first (this prevents 'username:' being picked up
+        // as a URI)
+        apply_username_tags (buffer);
+
         // Apply tag for URIs
         apply_uri_tags (buffer);
-
-        // Apply tags for usernames
-        apply_username_tags (buffer);
 
         // Update the "buffer-end" mark to be at the end of the buffer
         Gtk.TextIter iter;
@@ -76,7 +63,6 @@ public abstract class Iridium.Models.RichText : GLib.Object {
         }
     }
 
-    // TODO: Figure this out...
     private void apply_uri_tags (Gtk.TextBuffer buffer) {
         Gtk.TextIter search_start;
         Gtk.TextIter search_end;
@@ -93,26 +79,21 @@ public abstract class Iridium.Models.RichText : GLib.Object {
         Gee.Set<string> tokens = new Gee.HashSet<string>();
         tokens.add_all_array (text.split (" "));
 
+        var selectable_tag = buffer.get_tag_table ().lookup ("selectable");
         foreach (string token in tokens) {
-            print (token + "\n");
-            if (URI_REGEX.match (token)) {
-                print ("\tMATCH!!!\n");
+            if (new Soup.URI (token) != null) {
                 iter = search_start;
+                // Make sure we're not trying to tag something that's already selectable (i.e. a username)
+                if (iter.has_tag (selectable_tag)) {
+                    continue;
+                }
                 while (iter.forward_search (token, Gtk.TextSearchFlags.CASE_INSENSITIVE, out match_start, out match_end, search_end)) {
-                    // TODO: This word check isn't good enough...
-                    if (match_start.starts_word () && match_end.ends_word ()) {
-                        buffer.apply_tag_by_name ("hyperlink", match_start, match_end);
-                        buffer.apply_tag_by_name ("selectable", match_start, match_end);
-                    }
+                    buffer.apply_tag_by_name ("hyperlink", match_start, match_end);
+                    buffer.apply_tag_by_name ("selectable", match_start, match_end);
                     iter = match_end;
                 }
             }
         }
-
-        //  GLib.MatchInfo match_info;
-        //  URI_REGEX.match_all (text, 0, out match_info);
-        //  var num_matches = match_info.get_match_count ();
-        //  print ("Found " + num_matches.to_string () + " URIs\n");
     }
 
     private void apply_username_tags (Gtk.TextBuffer buffer) {

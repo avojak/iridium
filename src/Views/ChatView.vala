@@ -68,12 +68,17 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         scrolled_window.set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
         scrolled_window.add (text_view);
 
+        var event_box = new Gtk.EventBox ();
+        event_box.add (scrolled_window);
+        event_box.set_events (Gdk.EventMask.ENTER_NOTIFY_MASK);
+        event_box.set_events (Gdk.EventMask.LEAVE_NOTIFY_MASK);
+
         entry = new Gtk.Entry ();
         entry.hexpand = true;
         entry.margin = 6;
         entry.secondary_icon_tooltip_text = "Clear";
 
-        attach (scrolled_window, 0, 0, 1, 1);
+        attach (event_box, 0, 0, 1, 1);
         attach (entry, 0, 1, 1, 1);
 
         create_text_tags ();
@@ -102,7 +107,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
             print (scrolled_window.get_vadjustment ().value.to_string () + "\n");
         }); */
 
-        // This approach for detecting the mouse motion over a TextTag and changin the cursor
+        // This approach for detecting the mouse motion over a TextTag and changing the cursor
         // was adapted from: 
         // https://www.kksou.com/php-gtk2/sample-codes/insert-links-in-GtkTextView-Part-4-Change-Cursor-over-Link.php
         text_view.motion_notify_event.connect ((event) => {
@@ -124,25 +129,32 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
                 }
             }
 
-            // Handle the underline
+            // Handle the selectable underline
             Gtk.TextIter tag_start = pos;
             tag_start.backward_to_tag_toggle (selectable_tag);
             Gtk.TextIter tag_end = pos;
             tag_end.forward_to_tag_toggle (selectable_tag);
 
+            var selectable_underline_tag = text_view.get_buffer ().get_tag_table ().lookup ("selectable-underline");
             if (selectable_tag != null && pos.has_tag (selectable_tag)) {
                 // Make sure we're not over a 'word' that has a spaces in it
                 if (!text_view.get_buffer ().get_text (tag_start, tag_end, false).contains (" ")) {
-                    text_view.get_buffer ().apply_tag_by_name ("underline", tag_start, tag_end);
+                    // Don't repeatedly apply the tag, and clear other underlines first to ensure that
+                    // we don't have multiple strings underlined at the same time
+                    if (!pos.has_tag (selectable_underline_tag)) {
+                        clear_selectable_underlining ();
+                        text_view.get_buffer ().apply_tag_by_name ("selectable-underline", tag_start, tag_end);
+                    }
                 }
             } else {
-                Gtk.TextIter buffer_start;
-                text_view.get_buffer ().get_start_iter (out buffer_start);
-                Gtk.TextIter buffer_end;
-                text_view.get_buffer ().get_end_iter (out buffer_end);
-                text_view.get_buffer ().remove_tag_by_name ("underline", buffer_start, buffer_end);
+                clear_selectable_underlining ();
             }
             
+        });
+
+        // Clear the underlining when the mouse leaves the event box around the text view
+        event_box.leave_notify_event.connect ((event) => {
+            clear_selectable_underlining ();
         });
 
     }
@@ -185,15 +197,23 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         // Selectable
         buffer.create_tag ("selectable");
 
+        // Selectable underline
+        unowned Gtk.TextTag selectable_underline_tag = buffer.create_tag ("selectable-underline");
+        selectable_underline_tag.underline = Pango.Underline.SINGLE;
+
         // Hyperlinks
         color.parse (COLOR_BLUEBERRY);
         unowned Gtk.TextTag hyperlink_tag = buffer.create_tag ("hyperlink");
         hyperlink_tag.foreground_rgba = color;
         hyperlink_tag.event.connect (on_hyperlink_clicked);
+    }
 
-        // Underline
-        unowned Gtk.TextTag underline_tag = buffer.create_tag ("underline");
-        underline_tag.underline = Pango.Underline.SINGLE;
+    private void clear_selectable_underlining () {
+        Gtk.TextIter buffer_start;
+        text_view.get_buffer ().get_start_iter (out buffer_start);
+        Gtk.TextIter buffer_end;
+        text_view.get_buffer ().get_end_iter (out buffer_end);
+        text_view.get_buffer ().remove_tag_by_name ("selectable-underline", buffer_start, buffer_end);
     }
 
     // TODO: Need to figure out a good way to lock scrolling... Might be annoying
