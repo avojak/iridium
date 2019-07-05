@@ -23,9 +23,12 @@ public abstract class Iridium.Models.PrivateMessageText : Iridium.Models.RichTex
 
     private static uint16 USERNAME_SPACING = 20;
 
+    public bool suppress_sender_username { get; set; }
+
     public PrivateMessageText (Iridium.Services.Message message) {
         Object (
-            message: message
+            message: message,
+            suppress_sender_username: false
         );
     }
 
@@ -34,10 +37,10 @@ public abstract class Iridium.Models.PrivateMessageText : Iridium.Models.RichTex
         buffer.get_end_iter (out iter);
 
         // Display username
-        // TODO: Check if the last username displayed is the same username. If so,
-        //       don't display it again.
         var username = message.username;
-        if (username.length > USERNAME_SPACING) {
+        if (suppress_sender_username) {
+            username = string.nfill (USERNAME_SPACING, ' ');
+        } else if (username.length > USERNAME_SPACING) {
             username = username.substring (0, USERNAME_SPACING - 3);
             username += "...";
         } else {
