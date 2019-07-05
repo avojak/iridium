@@ -75,3 +75,4 @@ This project is very much in-progress and has a lot of remaining work. Here is a
 - [x] Respond to network loss and re-connection
 - [ ] Lock scrolling when reading old messages
 - [ ] Display message of the day
+- [ ] Support message formatting (See: [IRC Formatting](https://modern.ircdocs.horse/formatting.html))
