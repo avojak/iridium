@@ -21,6 +21,10 @@
 
 public abstract class Iridium.Models.RichText : GLib.Object {
 
+    // https://github.com/didrocks/geary/blob/master/src/client/util/util-webkit.vala
+    private static string URI_REGEX_STR = "(?i)\\b((?:[a-z][\\w-]+:(?:/{1,3}|[a-z0-9%])|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,4}/)(?:[^\\s()<>]+|\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\))+(?:\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’]))";
+    private static GLib.Regex URI_REGEX;
+
     public Iridium.Services.Message message { get; construct; }
 
     //  private string self_username;
@@ -30,6 +34,15 @@ public abstract class Iridium.Models.RichText : GLib.Object {
         Object (
             message: message
         );
+    }
+
+    static construct {
+        try {
+            URI_REGEX = new GLib.Regex (URI_REGEX_STR, GLib.RegexCompileFlags.OPTIMIZE);
+        } catch (GLib.RegexError e) {
+            // TODO: Handle errors!
+            // This should never ever happen
+        }
     }
 
     // Set our username so we can check for it and apply different styling
@@ -81,7 +94,7 @@ public abstract class Iridium.Models.RichText : GLib.Object {
 
         var selectable_tag = buffer.get_tag_table ().lookup ("selectable");
         foreach (string token in tokens) {
-            if (new Soup.URI (token) != null) {
+            if (URI_REGEX.match (token)) {
                 iter = search_start;
                 // Make sure we're not trying to tag something that's already selectable (i.e. a username)
                 if (iter.has_tag (selectable_tag)) {
