@@ -74,6 +74,6 @@ This project is very much in-progress and has a lot of remaining work. Here is a
 - [ ] Display available channel list
 - [x] Respond to network loss and re-connection
 - [ ] Lock scrolling when reading old messages
-- [ ] Display message of the day
+- [ ] Display channel topic
 - [ ] Support message formatting (See: [IRC Formatting](https://modern.ircdocs.horse/formatting.html))
 - [ ] Allow suppressing of join/part messages
