@@ -77,6 +77,9 @@ public abstract class Iridium.Models.RichText : GLib.Object {
     }
 
     private void apply_uri_tags (Gtk.TextBuffer buffer) {
+        // TODO: Need to update the regex because it matches certain punctuation around a URI
+        //       For example, it matches "(www.example.com)." instead of just "www.example.com"
+        
         Gtk.TextIter search_start;
         Gtk.TextIter search_end;
         Gtk.TextIter match_start;

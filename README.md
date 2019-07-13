@@ -74,6 +74,12 @@ This project is very much in-progress and has a lot of remaining work. Here is a
 - [ ] Display available channel list
 - [x] Respond to network loss and re-connection
 - [ ] Lock scrolling when reading old messages
-- [ ] Display channel topic
-- [ ] Support message formatting (See: [IRC Formatting](https://modern.ircdocs.horse/formatting.html))
+- [x] Display channel topic
 - [ ] Allow suppressing of join/part messages
+- [ ] Display date/time information in the chat view after a certain amount of time has passed
+- [ ] Display an indicator for where the last read message is in the chat view
+
+These are some ideas I think might been cool to implement, but may add too much complexity or clutter to the UI and the project as a whole:
+
+- [ ] Toast notification when mentioned in a channel
+- [ ] Support message formatting (See: [IRC Formatting](https://modern.ircdocs.horse/formatting.html))

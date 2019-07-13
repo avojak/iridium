@@ -21,6 +21,9 @@
 
 public class Iridium.Widgets.UsersPopover.ChannelUsersPopover : Gtk.Popover {
 
+    // TODO: Need to handle usernames for OPs and other special cases where the
+    //       username starts with a symbol (e.g. @)
+
     private Gtk.SearchEntry search_entry;
     private Gtk.ScrolledWindow scrolled_window;
     private Gtk.ListBox list_box;

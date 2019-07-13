@@ -30,6 +30,8 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     private Gee.Map<string, Gee.List<string>> channel_users = new Gee.HashMap<string, Gee.List<string>> ();
     private Gee.Map<string, Gee.List<string>> username_buffer = new Gee.HashMap<string, Gee.List<string>> ();
 
+    private Gee.Map<string, string> channel_topics = new Gee.HashMap<string, string> ();
+
     public ServerConnection (Iridium.Services.ServerConnectionDetails connection_details) {
         Object (
             connection_details: connection_details
@@ -169,6 +171,19 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             case Iridium.Services.NumericCodes.RPL_ENDOFNAMES:
                 end_of_usernames (message.params[1]);
                 break;
+            case Iridium.Services.MessageCommands.TOPIC:
+                on_channel_topic_received (message.params[0], message.message);
+                break;
+            case Iridium.Services.NumericCodes.RPL_TOPIC:
+                on_channel_topic_received (message.params[1], message.message);
+                break;
+            case Iridium.Services.NumericCodes.RPL_TOPICWHOTIME:
+                // TODO: Implement
+                break;
+            case Iridium.Services.NumericCodes.RPL_NOTOPIC:
+                on_channel_topic_received (message.params[1], "");
+                break;
+            
             // Errors
             case Iridium.Services.NumericCodes.ERR_NICKNAMEINUSE:
                 nickname_in_use (message);
@@ -249,9 +264,9 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         return channel_users.get (channel_name);
     }
 
-    private void send_output (string response) {
+    private void send_output (string output) {
         try {
-            output_stream.put_string (@"$response\r\n");
+            output_stream.put_string (@"$output\r\n");
         } catch (GLib.IOError e) {
             // TODO: Handle errors!!
         }
@@ -311,6 +326,18 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         user_quit_server (username, channels, message);
     }
 
+    private void on_channel_topic_received (string channel_name, string? topic) {
+        channel_topics.set (channel_name, topic);
+        channel_topic_received (channel_name);
+    }
+
+    public string? get_channel_topic (string channel_name) {
+        if (!channel_topics.has_key (channel_name)) {
+            return "";
+        }
+        return channel_topics.get (channel_name);
+    }
+
     public signal void open_successful (Iridium.Services.Message message);
     public signal void open_failed (string error_message);
     public signal void connection_closed ();
@@ -320,6 +347,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     public signal void server_quit (string message);
     public signal void user_quit_server (string username, Gee.List<string> channels, Iridium.Services.Message message);
     public signal void channel_users_received (string channel);
+    public signal void channel_topic_received (string channel);
     public signal void nickname_in_use (Iridium.Services.Message message);
     public signal void channel_joined (string channel);
     public signal void channel_left (string channel);

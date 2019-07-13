@@ -21,8 +21,33 @@
 
 public class Iridium.Views.ChannelChatView : Iridium.Views.ChatView {
 
+    private static string TOPIC_PLACEHOLDER = "No channel topic has been set";
+
     private Gee.List<string> usernames = new Gee.ArrayList<string> ();
     private string last_sender = null;
+
+    private Gtk.Entry topic_entry;
+
+    construct {
+        topic_entry = new Gtk.Entry ();
+        topic_entry.hexpand = true;
+        topic_entry.margin = 6;
+        topic_entry.editable = false; // TODO: Enable this to allow changing the channel topic
+        //  topic_entry.secondary_icon_tooltip_text = "Channel Topic Info";
+        topic_entry.placeholder_text = TOPIC_PLACEHOLDER;
+
+        insert_row (0);
+        attach (topic_entry, 0, 0, 1, 1);
+
+        topic_entry.changed.connect (() => {
+            // TODO: Implement this at some point to display who set the topic and when
+            //  if (topic_entry.text != "") {
+            //      topic_entry.secondary_icon_name = "dialog-information-symbolic";
+            //  } else {
+            //      topic_entry.secondary_icon_name = null;
+            //  }
+        });
+    }
 
     protected override int get_indent () {
         return -140; // TODO: Figure out how to compute this
@@ -63,6 +88,12 @@ public class Iridium.Views.ChannelChatView : Iridium.Views.ChatView {
 
     public void set_usernames (Gee.List<string> usernames) {
         this.usernames = usernames;
+    }
+
+    public void set_channel_topic (string? topic) {
+        var trimmed_topic = topic == null ? "" : topic.chomp ().chug ();
+        topic_entry.set_text (trimmed_topic);
+        topic_entry.set_tooltip_text (trimmed_topic == "" ? TOPIC_PLACEHOLDER : trimmed_topic);
     }
 
 }

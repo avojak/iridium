@@ -37,6 +37,8 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         var server_connect_button = new Gtk.Button.from_icon_name ("com.github.avojak.iridium.network-server-new", Gtk.IconSize.BUTTON);
         /* var server_connect_button = new Gtk.Button.from_icon_name ("network-server", Gtk.IconSize.BUTTON); */
         server_connect_button.tooltip_text = "Connect to a Server";
+        server_connect_button.relief = Gtk.ReliefStyle.NONE;
+		server_connect_button.valign = Gtk.Align.CENTER;
         // TODO: Support keyboard accelerator
         server_connect_button.clicked.connect (() => {
             server_connect_button_clicked ();
@@ -45,6 +47,8 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         channel_join_button = new Gtk.Button.from_icon_name ("com.github.avojak.iridium.internet-chat-new", Gtk.IconSize.BUTTON);
         /* var channel_join_button = new Gtk.Button.from_icon_name ("internet-chat", Gtk.IconSize.BUTTON); */
         channel_join_button.tooltip_text = "Join a Channel";
+        channel_join_button.relief = Gtk.ReliefStyle.NONE;
+		channel_join_button.valign = Gtk.Align.CENTER;
         // TODO: Support keyboard accelerator
         channel_join_button.sensitive = false;
         channel_join_button.clicked.connect (() => {
@@ -61,11 +65,13 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         channel_users_popover.username_selected.connect (on_username_selected);
         channel_users_button.popover = channel_users_popover;
 
-        var settings_button = new Gtk.MenuButton ();
-        settings_button.set_image (new Gtk.Image.from_icon_name ("preferences-system-symbolic", Gtk.IconSize.BUTTON));
-        settings_button.tooltip_text = "Settings";
-
-        // TODO: Create settings popup or popover
+        //  var preferences_button = new Gtk.Button.from_icon_name ("preferences-system-symbolic", Gtk.IconSize.BUTTON);
+        //  preferences_button.tooltip_text = "Preferences";
+        //  preferences_button.relief = Gtk.ReliefStyle.NONE;
+        //  preferences_button.valign = Gtk.Align.CENTER;
+        //  preferences_button.clicked.connect (() => {
+        //      preferences_button_clicked ();
+        //  });
 
         // TODO: Move this to a settings menu
         var mode_switch = new Granite.ModeSwitch.from_icon_name ("display-brightness-symbolic", "weather-clear-night-symbolic");
@@ -84,7 +90,7 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         pack_start (channel_join_button);
 
         pack_end (mode_switch);
-        pack_end (settings_button);
+        //  pack_end (preferences_button);
         pack_end (channel_users_button);
         pack_end (new Gtk.Separator (Gtk.Orientation.VERTICAL));
     }
@@ -117,6 +123,7 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
 
     public signal void server_connect_button_clicked ();
     public signal void channel_join_button_clicked ();
+    //  public signal void preferences_button_clicked ();
     public signal void username_selected (string username);
 
 }
