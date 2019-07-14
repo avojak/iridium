@@ -50,8 +50,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             var port = Iridium.Services.ServerConnectionDetails.DEFAULT_PORT;
             SocketConnection connection = connect_to_server (address, port);
 
-            print ("Connected to server\n");
-
             input_stream = new DataInputStream (connection.input_stream);
             output_stream = new DataOutputStream (connection.output_stream);
 
@@ -224,8 +222,10 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
         try {
             if (input_stream != null) {
-                input_stream.clear_pending ();
-                input_stream.close ();
+                if (input_stream is GLib.DataInputStream && !input_stream.is_closed ()) {
+                    input_stream.clear_pending ();
+                    input_stream.close ();
+                }
                 input_stream = null;
             }
         } catch (GLib.IOError e) {
@@ -234,9 +234,11 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
         try {
             if (output_stream != null) {
-                output_stream.clear_pending ();
-                output_stream.flush ();
-                output_stream.close ();
+                if (output_stream is GLib.DataOutputStream && !output_stream.is_closed ()) {
+                    output_stream.clear_pending ();
+                    output_stream.flush ();
+                    output_stream.close ();
+                }
                 output_stream = null;
             }
         } catch (GLib.Error e) {
@@ -247,7 +249,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     }
 
     public void send_user_message (string text) {
-        // TODO: Some issues sending messages to the server... FIX PLZ
         send_output (text);
     }
 

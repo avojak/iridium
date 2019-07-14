@@ -21,31 +21,35 @@
 
 public class Iridium.Views.ChannelChatView : Iridium.Views.ChatView {
 
-    private static string TOPIC_PLACEHOLDER = "No channel topic has been set";
+    private static string TOPIC_PLACEHOLDER_MARKUP = "<i>No channel topic has been set</i>";
 
     private Gee.List<string> usernames = new Gee.ArrayList<string> ();
     private string last_sender = null;
 
-    private Gtk.Entry topic_entry;
+    private Gtk.Label topic_label;
 
     construct {
-        topic_entry = new Gtk.Entry ();
-        topic_entry.hexpand = true;
-        topic_entry.margin = 6;
-        topic_entry.editable = false; // TODO: Enable this to allow changing the channel topic
-        //  topic_entry.secondary_icon_tooltip_text = "Channel Topic Info";
-        topic_entry.placeholder_text = TOPIC_PLACEHOLDER;
+        topic_label = new Gtk.Label (null);
+        topic_label.justify = Gtk.Justification.LEFT;
+        topic_label.ellipsize = Pango.EllipsizeMode.END;
+        topic_label.margin = 6;
+        topic_label.wrap = false;
+        topic_label.set_markup (TOPIC_PLACEHOLDER_MARKUP);
 
         insert_row (0);
-        attach (topic_entry, 0, 0, 1, 1);
+        attach (topic_label, 0, 0, 1, 1);
 
-        topic_entry.changed.connect (() => {
-            // TODO: Implement this at some point to display who set the topic and when
-            //  if (topic_entry.text != "") {
-            //      topic_entry.secondary_icon_name = "dialog-information-symbolic";
-            //  } else {
-            //      topic_entry.secondary_icon_name = null;
-            //  }
+        // TODO: Add a GUI way to update the channel topic
+        //       Maybe an edit icon with a simple popup dialog?
+        //       That would allow the popup to close, then not update
+        //       the label until we get the message from the server.
+
+        topic_label.activate_link.connect ((uri) => {
+            try {
+                AppInfo.launch_default_for_uri (uri, null);
+            } catch (Error e) {
+                warning ("%s\n", e.message);
+            }
         });
     }
 
@@ -92,8 +96,13 @@ public class Iridium.Views.ChannelChatView : Iridium.Views.ChatView {
 
     public void set_channel_topic (string? topic) {
         var trimmed_topic = topic == null ? "" : topic.chomp ().chug ();
-        topic_entry.set_text (trimmed_topic);
-        topic_entry.set_tooltip_text (trimmed_topic == "" ? TOPIC_PLACEHOLDER : trimmed_topic);
+        if (trimmed_topic == "") {
+            topic_label.set_markup (TOPIC_PLACEHOLDER_MARKUP);
+            topic_label.set_tooltip_markup ("");
+        } else {
+            topic_label.set_markup (trimmed_topic);
+            topic_label.set_tooltip_markup (trimmed_topic);
+        }
     }
 
 }

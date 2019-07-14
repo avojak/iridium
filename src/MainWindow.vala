@@ -449,7 +449,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     private void send_server_command (string server_name, string text) {
-        // TODO: Check for commands (eg. /me, etc.)
+        // TODO: Check for actions (eg. /me, etc.)
         connection_handler.send_user_message (server_name, text);
     }
 
@@ -550,8 +550,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     private void on_server_connection_closed (string server_name) {
-        // TODO: Implement - display disconnect message and disable the server
-        //       and all associated channel rows
+        // TODO: Implement - display disconnect message
         side_panel.disable_server_row (server_name);
     }
 
