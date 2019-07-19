@@ -39,7 +39,8 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
     }
 
     construct {
-        icon = new GLib.ThemedIcon ("user-available");
+        //  icon = new GLib.ThemedIcon ("user-available");
+        icon = new GLib.ThemedIcon ("internet-chat");
     }
 
     public new string get_server_name () {
@@ -54,7 +55,9 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
         if (is_enabled) {
             return;
         }
-        icon = new GLib.ThemedIcon ("user-available");
+        //  icon = new GLib.ThemedIcon ("user-available");
+        icon = new GLib.ThemedIcon ("internet-chat");
+        //  icon = null;
         markup = null;
         is_enabled = true;
     }
@@ -63,13 +66,17 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
         if (!is_enabled) {
             return;
         }
-        icon = new GLib.ThemedIcon ("user-offline");
+        //  icon = new GLib.ThemedIcon ("user-offline");
+        //  icon = null;
         markup = "<i>" + channel_name + "</i>";
         is_enabled = false;
     }
 
     public new void updating () {
-        icon = new GLib.ThemedIcon ("mail-unread");
+        //  icon = new GLib.ThemedIcon ("mail-unread");
+        // Maybe add the symbolic chat and user icons so we can specifically use them when not loading?
+        // Could also create "disabled" versions of each that are greyed out slightly
+        icon = new GLib.ThemedIcon ("com.github.avojak.iridium.image-loading-symbolic");
         markup = "<i>" + channel_name + "</i>";
         is_enabled = false;
     }

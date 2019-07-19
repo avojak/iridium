@@ -35,7 +35,8 @@ public class Iridium.Widgets.SidePanel.PrivateMessageRow : Granite.Widgets.Sourc
     }
 
     construct {
-        icon = new GLib.ThemedIcon ("user-available");
+        //  icon = new GLib.ThemedIcon ("user-available");
+        icon = new GLib.ThemedIcon ("system-users");
     }
 
     public new string get_server_name () {
@@ -50,7 +51,8 @@ public class Iridium.Widgets.SidePanel.PrivateMessageRow : Granite.Widgets.Sourc
         if (is_enabled) {
             return;
         }
-        icon = new GLib.ThemedIcon ("user-available");
+        //  icon = new GLib.ThemedIcon ("user-available");
+        icon = new GLib.ThemedIcon ("system-users");
         markup = null;
         is_enabled = true;
     }
@@ -59,13 +61,14 @@ public class Iridium.Widgets.SidePanel.PrivateMessageRow : Granite.Widgets.Sourc
         if (!is_enabled) {
             return;
         }
-        icon = new GLib.ThemedIcon ("user-offline");
+        //  icon = new GLib.ThemedIcon ("user-offline");
         markup = "<i>" + username + "</i>";
         is_enabled = false;
     }
 
     public new void updating () {
-        icon = new GLib.ThemedIcon ("mail-unread");
+        //  icon = new GLib.ThemedIcon ("mail-unread");
+        icon = new GLib.ThemedIcon ("com.github.avojak.iridium.image-loading-symbolic");
         markup = "<i>" + username + "</i>";
         is_enabled = false;
     }

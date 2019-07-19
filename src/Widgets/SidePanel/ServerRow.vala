@@ -50,10 +50,13 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
             return -1;
         } else if (a is Iridium.Widgets.SidePanel.PrivateMessageRow && b is Iridium.Widgets.SidePanel.ChannelRow) {
             return 1;
-        } else {
+        } else if (a is Iridium.Widgets.SidePanel.PrivateMessageRow && b is Iridium.Widgets.SidePanel.PrivateMessageRow) {
             var pm_a = a as Iridium.Widgets.SidePanel.PrivateMessageRow;
             var pm_b = b as Iridium.Widgets.SidePanel.PrivateMessageRow;
             return pm_a.username.ascii_casecmp (pm_b.username);
+        } else {
+            // TODO: Log this undefined behavior that should never happen
+            return 0;
         }
     }
 

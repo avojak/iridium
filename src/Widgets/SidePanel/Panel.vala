@@ -30,6 +30,8 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
     private Gee.Map<string, Granite.Widgets.SourceList.ExpandableItem> server_items;
 
     public Panel () {
+        // TODO: Refactor these ExpandableItems to be a subclass that implements the sortable interface
+        //       so that we can sort servers and favorite channels.
         favorites_category = new Granite.Widgets.SourceList.ExpandableItem ("Favorite Channels");
         favorites_dummy = new Granite.Widgets.SourceList.Item ("");
         favorites_dummy.selectable = false;
@@ -104,9 +106,11 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         // Check if this channel row already exists
         var server_item = server_items.get (server_name);
         foreach (var child in server_item.children) {
-            unowned Iridium.Widgets.SidePanel.ChannelRow channel_item = (Iridium.Widgets.SidePanel.ChannelRow) child;
-            if (channel_item.channel_name == channel_name) {
-                return;
+            if (child is Iridium.Widgets.SidePanel.ChannelRow) {
+                unowned Iridium.Widgets.SidePanel.ChannelRow channel_item = (Iridium.Widgets.SidePanel.ChannelRow) child;
+                if (channel_item.channel_name == channel_name) {
+                    return;
+                }
             }
         }
 
