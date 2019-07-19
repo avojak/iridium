@@ -19,7 +19,7 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.ExpandableItem, Iridium.Widgets.SidePanel.Row {
+public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.ExpandableItem, Granite.Widgets.SourceListSortable, Iridium.Widgets.SidePanel.Row {
 
     public string server_name { get; construct; }
 
@@ -33,7 +33,28 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
     }
 
     construct {
-        icon = new GLib.ThemedIcon ("user-available");
+        //  icon = new GLib.ThemedIcon ("user-available");
+        icon = new GLib.ThemedIcon ("network-server");
+    }
+
+    public new bool allow_dnd_sorting () {
+        return false;
+    }
+
+    public new int compare (Granite.Widgets.SourceList.Item a, Granite.Widgets.SourceList.Item b) {
+        if (a is Iridium.Widgets.SidePanel.ChannelRow && b is Iridium.Widgets.SidePanel.ChannelRow) {
+            var channel_a = a as Iridium.Widgets.SidePanel.ChannelRow;
+            var channel_b = b as Iridium.Widgets.SidePanel.ChannelRow;
+            return channel_a.channel_name.ascii_casecmp (channel_b.channel_name);
+        } else if (a is Iridium.Widgets.SidePanel.ChannelRow && b is Iridium.Widgets.SidePanel.PrivateMessageRow) {
+            return -1;
+        } else if (a is Iridium.Widgets.SidePanel.PrivateMessageRow && b is Iridium.Widgets.SidePanel.ChannelRow) {
+            return 1;
+        } else {
+            var pm_a = a as Iridium.Widgets.SidePanel.PrivateMessageRow;
+            var pm_b = b as Iridium.Widgets.SidePanel.PrivateMessageRow;
+            return pm_a.username.ascii_casecmp (pm_b.username);
+        }
     }
 
     public new string get_server_name () {
@@ -48,7 +69,8 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
         if (is_enabled) {
             return;
         }
-        icon = new GLib.ThemedIcon ("user-available");
+        //  icon = new GLib.ThemedIcon ("user-available");
+        icon = new GLib.ThemedIcon ("network-server");
         markup = null;
         is_enabled = true;
     }
@@ -57,13 +79,14 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
         if (!is_enabled) {
             return;
         }
-        icon = new GLib.ThemedIcon ("user-offline");
+        //  icon = new GLib.ThemedIcon ("user-offline");
         markup = "<i>" + server_name + "</i>";
         is_enabled = false;
     }
 
     public new void updating () {
-        icon = new GLib.ThemedIcon ("mail-unread");
+        //  icon = new GLib.ThemedIcon ("mail-unread");
+        icon = new GLib.ThemedIcon ("com.github.avojak.iridium.image-loading-symbolic");
         markup = "<i>" + server_name + "</i>";
         is_enabled = false;
     }
