@@ -25,9 +25,13 @@ executable(
     join_paths('Services', 'MessageCommands.vala'),
     join_paths('Services', 'NumericCodes.vala'),
     join_paths('Services', 'ServerConnection.vala'),
+    join_paths('Services', 'ServerConnectionDAO.vala'),
     join_paths('Services', 'ServerConnectionDetails.vala'),
     join_paths('Services', 'ServerConnectionHandler.vala'),
     join_paths('Services', 'Settings.vala'),
+    join_paths('Services', 'Channel.vala'),
+    join_paths('Services', 'Server.vala'),
+    join_paths('Services', 'SQLClient.vala'),
     join_paths('Views', 'ChatView.vala'),
     join_paths('Views', 'ChannelChatView.vala'),
     join_paths('Views', 'PrivateMessageChatView.vala'),
@@ -49,7 +53,8 @@ executable(
         dependency('gtk+-3.0', version: '>= 3.6.4'),
         dependency('gee-0.8', version: '>= 0.8.5'),
         dependency('glib-2.0', version: '>= 2.30.0'),
-        dependency('granite', version: '>= 0.5.1')
+        dependency('granite', version: '>= 0.5.1'),
+        dependency('sqlite3', version: '>')
     ],
     install: true
 )

@@ -21,15 +21,17 @@
 
 public class Iridium.Application : Gtk.Application {
 
-    public static Iridium.Services.Settings settings;
+    public static string ID = "com.github.avojak.iridium";
 
+    public static Iridium.Services.Settings settings;
+    public static Iridium.Services.ServerConnectionDAO connection_dao;
     private static Iridium.Services.ServerConnectionHandler connection_handler;
 
     private bool is_network_available;
 
     public Application () {
         Object (
-            application_id: "com.github.avojak.iridium",
+            application_id: ID,
             flags: ApplicationFlags.FLAGS_NONE
         );
     }
@@ -37,11 +39,15 @@ public class Iridium.Application : Gtk.Application {
     static construct {
         settings = new Iridium.Services.Settings ();
         connection_handler = new Iridium.Services.ServerConnectionHandler ();
+        connection_dao = new Iridium.Services.ServerConnectionDAO ();
     }
 
     protected override void activate () {
         var main_window = new Iridium.MainWindow (this, connection_handler);
         main_window.show_all ();
+
+        // This must happen here because the main event loops will have started
+        connection_dao.sql_client = Iridium.Services.SQLClient.get_instance ();
 
         // TODO: Connect to signals to save window size and position in settings
 
@@ -70,10 +76,9 @@ public class Iridium.Application : Gtk.Application {
     }
 
     private void restore_state (Iridium.MainWindow main_window) {
-        var servers = settings.get_servers_list ();
-        var channels = settings.get_channels_list ();
-        var connection_details = settings.get_connection_details_map ();
-        main_window.initialize (servers, channels, connection_details);
+        var servers = connection_dao.get_servers ();
+        var channels = connection_dao.get_channels ();
+        main_window.initialize (servers, channels);
     }
 
     public static int main (string[] args) {

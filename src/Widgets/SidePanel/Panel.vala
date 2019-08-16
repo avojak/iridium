@@ -21,6 +21,10 @@
 
 public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
 
+    // TODO: Look into custom implementation of SourceList to add CellRendererSpinner as an option for
+    //       the row items. Might allow us to display a spinner while connecting to a server or joining
+    //       a channel.
+
     private Granite.Widgets.SourceList.ExpandableItem favorites_category;
     private Granite.Widgets.SourceList.ExpandableItem others_category;
 

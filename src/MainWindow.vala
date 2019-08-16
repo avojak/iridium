@@ -120,11 +120,16 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             header_bar.set_channel_join_button_enabled (true);
         });
         side_panel.connect_to_server.connect ((server_name) => {
-            var connection_details_map = Iridium.Application.settings.get_connection_details_map ();
-            var connection_details = connection_details_map.get (server_name);
+            //  var connection_details_map = Iridium.Application.settings.get_connection_details_map ();
+            //  var connection_details = connection_details_map.get (server_name);
+            //  if (connection_details == null) {
+            //      return;
+            //  }
+            var connection_details = get_connection_details_for_server (server_name);
             if (connection_details == null) {
                 return;
             }
+
             var server_connection = connection_handler.connect_to_server (connection_details);
             Idle.add (() => {
                 side_panel.updating_server_row (server_name);
@@ -144,7 +149,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         side_panel.join_channel.connect ((server_name, channel_name) => {
             // If we're not connected to the server yet, connect to it first before joining the channel
             if (!connection_handler.has_connection (server_name)) {
-                var connection_details = Iridium.Application.settings.get_connection_details_map ().get (server_name);
+                //  var connection_details = Iridium.Application.settings.get_connection_details_map ().get (server_name);
+                var connection_details = get_connection_details_for_server (server_name);
                 if (connection_details == null) {
                     // TODO: Handle this
                     return;
@@ -195,19 +201,28 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         connection_handler.private_message_received.connect (on_private_message_received);
 
         // Connect to all of the side panel signals to make settings changes
-        side_panel.server_row_added.connect (Iridium.Application.settings.on_server_row_added);
-        side_panel.server_row_removed.connect (Iridium.Application.settings.on_server_row_removed);
-        side_panel.server_row_enabled.connect (Iridium.Application.settings.on_server_row_enabled);
-        side_panel.server_row_disabled.connect (Iridium.Application.settings.on_server_row_disabled);
-        side_panel.channel_row_added.connect (Iridium.Application.settings.on_channel_row_added);
-        side_panel.channel_row_removed.connect (Iridium.Application.settings.on_channel_row_removed);
-        side_panel.channel_row_enabled.connect (Iridium.Application.settings.on_channel_row_enabled);
-        side_panel.channel_row_disabled.connect (Iridium.Application.settings.on_channel_row_disabled);
+        //  side_panel.server_row_added.connect (Iridium.Application.settings.on_server_row_added);
+        //  side_panel.server_row_removed.connect (Iridium.Application.settings.on_server_row_removed);
+        //  side_panel.server_row_enabled.connect (Iridium.Application.settings.on_server_row_enabled);
+        //  side_panel.server_row_disabled.connect (Iridium.Application.settings.on_server_row_disabled);
+        //  side_panel.channel_row_added.connect (Iridium.Application.settings.on_channel_row_added);
+        //  side_panel.channel_row_removed.connect (Iridium.Application.settings.on_channel_row_removed);
+        //  side_panel.channel_row_enabled.connect (Iridium.Application.settings.on_channel_row_enabled);
+        //  side_panel.channel_row_disabled.connect (Iridium.Application.settings.on_channel_row_disabled);
+        side_panel.server_row_added.connect (Iridium.Application.connection_dao.on_server_row_added);
+        side_panel.server_row_removed.connect (Iridium.Application.connection_dao.on_server_row_removed);
+        side_panel.server_row_enabled.connect (Iridium.Application.connection_dao.on_server_row_enabled);
+        side_panel.server_row_disabled.connect (Iridium.Application.connection_dao.on_server_row_disabled);
+        side_panel.channel_row_added.connect (Iridium.Application.connection_dao.on_channel_row_added);
+        side_panel.channel_row_removed.connect (Iridium.Application.connection_dao.on_channel_row_removed);
+        side_panel.channel_row_enabled.connect (Iridium.Application.connection_dao.on_channel_row_enabled);
+        side_panel.channel_row_disabled.connect (Iridium.Application.connection_dao.on_channel_row_disabled);
 
         // Connect to the connection handler signal to make settings changes for new connections
         connection_handler.server_connection_successful.connect ((server_name, message) => {
             var connection_details = connection_handler.get_connection_details (server_name);
-            Iridium.Application.settings.on_server_connection_successful (connection_details);
+            //  Iridium.Application.settings.on_server_connection_successful (connection_details);
+            Iridium.Application.connection_dao.on_server_connection_successful (connection_details);
         });
 
         // Close connections when the window is closed
@@ -215,7 +230,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             // Disconnect this signal so that we don't modify the setting to
             // show servers as disabled, when in reality they were enabled prior
             // to closing the application.
-            side_panel.server_row_disabled.disconnect (Iridium.Application.settings.on_server_row_disabled);
+            //  side_panel.server_row_disabled.disconnect (Iridium.Application.settings.on_server_row_disabled);
+            side_panel.server_row_disabled.disconnect (Iridium.Application.connection_dao.on_server_row_disabled);
 
             // TODO: Not sure if this is right...
             connection_handler.close_all_connections ();
@@ -223,112 +239,131 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         });
     }
 
+    private Iridium.Services.ServerConnectionDetails? get_connection_details_for_server (string server_name) {
+        foreach (Iridium.Services.Server server in Iridium.Application.connection_dao.get_servers ()) {
+            if (server.connection_details.server == server_name) {
+                return server.connection_details;
+            }
+        }
+        return null;
+    }
+
     // TODO: Restore private messages from the side panel
-    public void initialize (Gee.List<string> servers_list, Gee.List<string> channels_list, Gee.Map<string, Iridium.Services.ServerConnectionDetails> connection_details_map) {
+    public void initialize (Gee.List<Iridium.Services.Server> servers, Gee.List<Iridium.Services.Channel> channels) {
         begin_initialization ();
+
+        // Handle case were there's nothing to initialize!
+        if (servers.size == 0) {
+            on_initialization_complete ();
+            return;
+        }
 
         // Map the server names to their initialization status (success or fail)
         Gee.Map<string, bool> initialization_status = new Gee.HashMap<string, bool> ();
-
-        Gee.List<string> server_rows = new Gee.ArrayList<string> ();
-        Gee.List<string> enabled_servers = new Gee.ArrayList<string> ();
-        foreach (string entry in servers_list) {
-            string[] tokens = entry.split ("\n");
-            var server_name = tokens[0].split ("=")[1];
-            var enabled = bool.parse (tokens[1].split ("=")[1]);
-            server_rows.add (server_name);
-            if (enabled) {
-                enabled_servers.add (server_name);
+        var num_enabled_servers = 0;
+        foreach (Iridium.Services.Server server in servers) {
+            if (server.enabled) {
+                num_enabled_servers++;
             }
         }
 
-        Gee.Map<string, Gee.List<string>> channel_rows = new Gee.HashMap<string, Gee.ArrayList<string>> ();
-        Gee.Map<string, Gee.List<string>> enabled_channels = new Gee.HashMap<string, Gee.ArrayList<string>> ();
-        Gee.Map<string, Gee.List<string>> disabled_channels = new Gee.HashMap<string, Gee.ArrayList<string>> ();
-        foreach (string entry in channels_list) {
-            string[] tokens = entry.split ("\n");
-            var server_name = tokens[0].split ("=")[1];
-            var channel_name = tokens[1].split ("=")[1];
-            var enabled = bool.parse (tokens[2].split ("=")[1]);
-
-            if (!channel_rows.has_key (server_name)) {
-                channel_rows.set (server_name, new Gee.ArrayList<string> ());
-                enabled_channels.set (server_name, new Gee.ArrayList<string> ());
-                disabled_channels.set (server_name, new Gee.ArrayList<string> ());
-            }
-
-            channel_rows.get (server_name).add (channel_name);
-            if (enabled) {
-                enabled_channels.get (server_name).add (channel_name);
-            } else {
-                disabled_channels.get (server_name).add (channel_name);
-            }
-        }
-
-        Idle.add (() => {
-            foreach (string server_name in server_rows) {
+        // Initialize the UI with disabled rows for everything
+        foreach (Iridium.Services.Server server in servers) {
+            var server_id = server.id;
+            var server_name = server.connection_details.server;
+            Idle.add (() => {
                 side_panel.add_server (server_name);
                 side_panel.disable_server_row (server_name);
-            }
-            foreach (Gee.Map.Entry<string, Gee.List<string>> entry in channel_rows.entries) {
-                var server_name = entry.key;
-                foreach (string channel_name in entry.value) {
+                return false;
+            });
+            foreach (Iridium.Services.Channel channel in channels) {
+                //  var channel_id = channel.id;
+                var channel_server_id = channel.server_id;
+                var channel_name = channel.name;
+                if (channel_server_id != server_id) {
+                    // This channel isn't for the current server
+                    continue;
+                }
+                Idle.add (() => {
                     side_panel.add_channel (server_name, channel_name);
                     side_panel.disable_channel_row (server_name, channel_name);
-                }
+                    return false;
+                });
             }
-            return false;
-        });
 
-        foreach (string server_name in enabled_servers) {
-            var connection_details = connection_details_map.get (server_name);
+        }
+
+        // Open connections to enabled servers
+        foreach (Iridium.Services.Server server in servers) {
+            var server_id = server.id;
+            var connection_details = server.connection_details;
+            var server_name = connection_details.server;
+            var server_enabled = server.enabled;
+            if (!server_enabled) {
+                continue;
+            }
             var server_connection = connection_handler.connect_to_server (connection_details);
             Idle.add (() => {
                 side_panel.updating_server_row (server_name);
                 return false;
             });
             server_connection.open_successful.connect (() => {
-                foreach (string channel_name in enabled_channels.get (server_name)) {
+                foreach (Iridium.Services.Channel channel in channels) {
+                    //  var channel_id = channel.id;
+                    var channel_server_id = channel.server_id;
+                    var channel_name = channel.name;
+                    var channel_enabled = channel.enabled;
+                    if (channel_server_id != server_id) {
+                        // This channel isn't for the current server
+                        continue;
+                    }
+
+                    // Still add chat views for channels that aren't joined yet.
+                    // This is needed in case a user clicks a channel item in the
+                    // side panel when the channel hasn't been joined yet.
+                    // 
+                    // TODO: This causes a bug when initializing and a server is
+                    //       present in the side bar, but not connected. Selecting
+                    //       the item will not show a view because it hasn't been
+                    //       created here. Maybe make the panel item not selectable?
+                    //       It also causes the app header to change when it shouldn't.
+                    Idle.add (() => {
+                        var chat_view = new Iridium.Views.ChannelChatView ();
+                        main_layout.add_chat_view (chat_view, channel_name);
+                        return false;
+                    });
+
+                    if (!channel_enabled) {
+                        continue;
+                    }
                     connection_handler.join_channel (server_name, channel_name);
                     Idle.add (() => {
                         side_panel.updating_channel_row (server_name, channel_name);
                         return false;
                     });
                 }
-                // Still add chat views for channels that aren't joined yet.
-                // This is needed in case a user clicks a channel item in the
-                // side panel when the channel hasn't been joined yet.
 
-                // TODO: This causes a bug when initializing and a server is
-                //       present in the side bar, but not connected. Selecting
-                //       the item will not show a view because it hasn't been
-                //       created here. Maybe make the panel item not selectable?
-
-                Idle.add (() => {
-                    foreach (string channel_name in disabled_channels.get (server_name)) {
-                        var chat_view = new Iridium.Views.ChannelChatView ();
-                        main_layout.add_chat_view (chat_view, channel_name);
-                    }
-                    return false;
-                });
             });
             server_connection.open_successful.connect (() => {
                 initialization_status.set (server_name, true);
-                if (initialization_status.size == enabled_servers.size) {
+                print ("\tInitialization status: " + initialization_status.size.to_string () + "/" + num_enabled_servers.to_string () + "\n");
+                if (initialization_status.size == num_enabled_servers) {
                     on_initialization_complete ();
                 }
             });
             server_connection.open_failed.connect (() => {
                 // TODO: Give some user feedback, maybe a toast? Don't want the UI to get too busy though
                 initialization_status.set (server_name, false);
-                if (initialization_status.size == enabled_servers.size) {
+                if (initialization_status.size == num_enabled_servers) {
                     on_initialization_complete ();
                 }
             });
         }
-        // Handle case were there's nothing to initialize!
-        if (enabled_servers.size == 0) {
+
+        // We've initialized the UI, but if there aren't any connections to wait on, we're done
+        if (num_enabled_servers == 0) {
             on_initialization_complete ();
+            return;
         }
     }
 

@@ -19,15 +19,11 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Services.ServerConnectionDetails : GLib.Object {
-
-    // TODO: Support non-default port numbers
-    public const uint16 DEFAULT_PORT = 6667;
-
-    public string server;
-    public string nickname;
-    public string username;
-    public string realname;
-    public string password;
+public class Iridium.Services.Channel : GLib.Object {
+    
+    public int id { get; set; }
+    public int server_id { get; set; }
+    public string name { get; set; }
+    public bool enabled { get; set; }
 
 }
