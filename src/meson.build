@@ -54,7 +54,7 @@ executable(
         dependency('gee-0.8', version: '>= 0.8.5'),
         dependency('glib-2.0', version: '>= 2.30.0'),
         dependency('granite', version: '>= 0.5.1'),
-        dependency('sqlite3', version: '>')
+        dependency('sqlite3', version: '>= 3.22.0')
     ],
     install: true
 )
