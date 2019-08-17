@@ -365,6 +365,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             on_initialization_complete ();
             return;
         }
+
+        // TODO: There's a bug where chat views created here are cannot be used to send messages...
+        //       Messages can be received, but attempts to send messages fail.
     }
 
     private void begin_initialization () {
