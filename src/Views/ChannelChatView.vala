@@ -58,6 +58,10 @@ public class Iridium.Views.ChannelChatView : Iridium.Views.ChatView {
         return -140; // TODO: Figure out how to compute this
     }
 
+    protected override string get_disabled_message () {
+        return "You must join this channel to begin chatting";
+    }
+
     public override void display_self_private_msg (Iridium.Services.Message message) {
         var rich_text = new Iridium.Models.SelfPrivateMessageText (message);
         rich_text.set_usernames (usernames);

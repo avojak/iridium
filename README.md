@@ -78,8 +78,11 @@ This project is very much in-progress and has a lot of remaining work. Here is a
 - [ ] Allow suppressing of join/part messages
 - [ ] Display date/time information in the chat view after a certain amount of time has passed
 - [ ] Display an indicator for where the last read message is in the chat view
+- [ ] Display badge count of unread messages in the dock
+- [ ] Integrate with the OS notifications
+- [ ] Audio notification when a message is received
 
 These are some ideas I think might been cool to implement, but may add too much complexity or clutter to the UI and the project as a whole:
 
-- [ ] Toast notification when mentioned in a channel
+- [ ] Toast notification when mentioned in a channel, regardless of where you are currently in the app
 - [ ] Support message formatting (See: [IRC Formatting](https://modern.ircdocs.horse/formatting.html))

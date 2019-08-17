@@ -267,13 +267,22 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             }
         }
 
-        // Initialize the UI with disabled rows for everything
+        // Initialize the UI with disabled rows and chat views for everything
         foreach (Iridium.Services.Server server in servers) {
             var server_id = server.id;
             var server_name = server.connection_details.server;
             Idle.add (() => {
                 side_panel.add_server (server_name);
                 side_panel.disable_server_row (server_name);
+                return false;
+            });
+            Idle.add (() => {
+                var chat_view = new Iridium.Views.ServerChatView ();
+                main_layout.add_chat_view (chat_view, server_name);
+                chat_view.message_to_send.connect ((message_to_send) => {
+                    send_server_message (server_name, message_to_send, chat_view);
+                });
+                chat_view.set_enabled (false);
                 return false;
             });
             foreach (Iridium.Services.Channel channel in channels) {
@@ -289,8 +298,16 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                     side_panel.disable_channel_row (server_name, channel_name);
                     return false;
                 });
+                Idle.add (() => {
+                    var chat_view = new Iridium.Views.ChannelChatView ();
+                    main_layout.add_chat_view (chat_view, channel_name);
+                    chat_view.message_to_send.connect ((user_message) => {
+                        send_channel_message (server_name, channel_name, user_message, chat_view);
+                    });
+                    chat_view.set_enabled (false);
+                    return false;
+                });
             }
-
         }
 
         // Open connections to enabled servers
@@ -317,22 +334,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                         // This channel isn't for the current server
                         continue;
                     }
-
-                    // Still add chat views for channels that aren't joined yet.
-                    // This is needed in case a user clicks a channel item in the
-                    // side panel when the channel hasn't been joined yet.
-                    // 
-                    // TODO: This causes a bug when initializing and a server is
-                    //       present in the side bar, but not connected. Selecting
-                    //       the item will not show a view because it hasn't been
-                    //       created here. Maybe make the panel item not selectable?
-                    //       It also causes the app header to change when it shouldn't.
-                    Idle.add (() => {
-                        var chat_view = new Iridium.Views.ChannelChatView ();
-                        main_layout.add_chat_view (chat_view, channel_name);
-                        return false;
-                    });
-
                     if (!channel_enabled) {
                         continue;
                     }
@@ -366,8 +367,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             return;
         }
 
-        // TODO: There's a bug where chat views created here are cannot be used to send messages...
-        //       Messages can be received, but attempts to send messages fail.
     }
 
     private void begin_initialization () {
@@ -559,6 +558,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 });
                 main_layout.add_chat_view (chat_view, server_name);
             }
+            chat_view.set_enabled (true);
 
             chat_view.display_server_msg (message);
 
@@ -589,6 +589,13 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     private void on_server_connection_closed (string server_name) {
         // TODO: Implement - display disconnect message
+        Idle.add (() => {
+            var chat_view = main_layout.get_server_chat_view (server_name);
+            if (chat_view != null) {
+                chat_view.set_enabled (false);
+            }
+            return false;
+        });
         side_panel.disable_server_row (server_name);
     }
 
@@ -688,6 +695,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                     send_channel_message (server_name, channel_name, user_message, chat_view);
                 });
             }
+            chat_view.set_enabled (true);
 
             side_panel.add_channel (server_name, channel_name);
             side_panel.enable_channel_row (server_name, channel_name);
@@ -707,6 +715,13 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     private void on_channel_left (string server_name, string channel_name) {
         // TODO: Display a message that we've left the channel
+        Idle.add (() => {
+            var chat_view = main_layout.get_channel_chat_view (channel_name);
+            if (chat_view != null) {
+                chat_view.set_enabled (false);
+            }
+            return false;
+        });
 
         side_panel.disable_channel_row (server_name, channel_name);
         //  update_channel_users_list (server_name, channel_name);
@@ -724,6 +739,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                     send_channel_message (server_name, channel_name, user_message, chat_view);
                 });
             }
+            chat_view.set_enabled (true);
             side_panel.add_channel (server_name, channel_name);
             chat_view.display_private_msg (message);
             side_panel.increment_channel_badge (server_name, channel_name);
@@ -770,6 +786,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                     send_channel_message (server_name, username, user_message, chat_view);
                 });
             }
+            chat_view.set_enabled (true);
             side_panel.add_private_message (server_name, username);
             chat_view.display_private_msg (message);
             side_panel.increment_channel_badge (server_name, username);

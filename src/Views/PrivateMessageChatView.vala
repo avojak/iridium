@@ -27,6 +27,10 @@ public class Iridium.Views.PrivateMessageChatView : Iridium.Views.ChatView {
         return -140; // TODO: Figure out how to compute this
     }
 
+    protected override string get_disabled_message () {
+        return ""; // TODO: Does this even make sense since we don't allow disabled PM items?
+    }
+
     public override void display_self_private_msg (Iridium.Services.Message message) {
         var rich_text = new Iridium.Models.SelfPrivateMessageText (message);
         rich_text.suppress_sender_username = is_repeat_sender (message);

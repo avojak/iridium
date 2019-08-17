@@ -156,7 +156,6 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         event_box.leave_notify_event.connect ((event) => {
             clear_selectable_underlining ();
         });
-
     }
 
     private void create_text_tags () {
@@ -227,8 +226,24 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     }
 
     public void set_entry_focus () {
-        entry.grab_focus_without_selecting ();
-        entry.set_position (-1);
+        if (entry.get_can_focus ()) {
+            entry.grab_focus_without_selecting ();
+            entry.set_position (-1);
+        }
+    }
+
+    public void set_enabled (bool enabled) {
+        entry.set_can_focus (enabled);
+        entry.set_editable (enabled);
+        entry.set_text ("");
+        entry.set_placeholder_text (enabled ? "" : get_disabled_message ());
+        if (!enabled) {
+            text_view.grab_focus ();
+        }
+        // TODO: Would be nice to auto-grab focus back to the entry if enabled,
+        //       but I'm having issues where it will grab focus even if this
+        //       chat view isn't currently visible. This means you would be
+        //       typing in a view that isn't visible.
     }
 
     private bool on_username_clicked (Gtk.TextTag source, GLib.Object event_object, Gdk.Event event, Gtk.TextIter iter) {
@@ -285,6 +300,8 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     public abstract void display_server_msg (Iridium.Services.Message message);
 
     protected abstract int get_indent ();
+
+    protected abstract string get_disabled_message ();
 
     public signal void message_to_send (string message);
 
