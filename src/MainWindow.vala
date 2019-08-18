@@ -120,11 +120,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             header_bar.set_channel_join_button_enabled (true);
         });
         side_panel.connect_to_server.connect ((server_name) => {
-            //  var connection_details_map = Iridium.Application.settings.get_connection_details_map ();
-            //  var connection_details = connection_details_map.get (server_name);
-            //  if (connection_details == null) {
-            //      return;
-            //  }
             var connection_details = get_connection_details_for_server (server_name);
             if (connection_details == null) {
                 return;
@@ -149,7 +144,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         side_panel.join_channel.connect ((server_name, channel_name) => {
             // If we're not connected to the server yet, connect to it first before joining the channel
             if (!connection_handler.has_connection (server_name)) {
-                //  var connection_details = Iridium.Application.settings.get_connection_details_map ().get (server_name);
                 var connection_details = get_connection_details_for_server (server_name);
                 if (connection_details == null) {
                     // TODO: Handle this
@@ -201,14 +195,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         connection_handler.private_message_received.connect (on_private_message_received);
 
         // Connect to all of the side panel signals to make settings changes
-        //  side_panel.server_row_added.connect (Iridium.Application.settings.on_server_row_added);
-        //  side_panel.server_row_removed.connect (Iridium.Application.settings.on_server_row_removed);
-        //  side_panel.server_row_enabled.connect (Iridium.Application.settings.on_server_row_enabled);
-        //  side_panel.server_row_disabled.connect (Iridium.Application.settings.on_server_row_disabled);
-        //  side_panel.channel_row_added.connect (Iridium.Application.settings.on_channel_row_added);
-        //  side_panel.channel_row_removed.connect (Iridium.Application.settings.on_channel_row_removed);
-        //  side_panel.channel_row_enabled.connect (Iridium.Application.settings.on_channel_row_enabled);
-        //  side_panel.channel_row_disabled.connect (Iridium.Application.settings.on_channel_row_disabled);
         side_panel.server_row_added.connect (Iridium.Application.connection_dao.on_server_row_added);
         side_panel.server_row_removed.connect (Iridium.Application.connection_dao.on_server_row_removed);
         side_panel.server_row_enabled.connect (Iridium.Application.connection_dao.on_server_row_enabled);
@@ -221,7 +207,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         // Connect to the connection handler signal to make settings changes for new connections
         connection_handler.server_connection_successful.connect ((server_name, message) => {
             var connection_details = connection_handler.get_connection_details (server_name);
-            //  Iridium.Application.settings.on_server_connection_successful (connection_details);
             Iridium.Application.connection_dao.on_server_connection_successful (connection_details);
         });
 
@@ -230,7 +215,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             // Disconnect this signal so that we don't modify the setting to
             // show servers as disabled, when in reality they were enabled prior
             // to closing the application.
-            //  side_panel.server_row_disabled.disconnect (Iridium.Application.settings.on_server_row_disabled);
             side_panel.server_row_disabled.disconnect (Iridium.Application.connection_dao.on_server_row_disabled);
 
             // TODO: Not sure if this is right...
