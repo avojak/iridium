@@ -277,11 +277,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 return false;
             });
             Idle.add (() => {
-                var chat_view = new Iridium.Views.ServerChatView ();
-                main_layout.add_chat_view (chat_view, server_name);
-                chat_view.message_to_send.connect ((message_to_send) => {
-                    send_server_message (server_name, message_to_send, chat_view);
-                });
+                var chat_view = create_and_add_server_chat_view (server_name);
                 chat_view.set_enabled (false);
                 return false;
             });
@@ -299,11 +295,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                     return false;
                 });
                 Idle.add (() => {
-                    var chat_view = new Iridium.Views.ChannelChatView ();
-                    main_layout.add_chat_view (chat_view, channel_name);
-                    chat_view.message_to_send.connect ((user_message) => {
-                        send_channel_message (server_name, channel_name, user_message, chat_view);
-                    });
+                    var chat_view = create_and_add_channel_chat_view (server_name, channel_name);
                     chat_view.set_enabled (false);
                     return false;
                 });
@@ -385,6 +377,33 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             }
             return false;
         });
+    }
+
+    private Iridium.Views.ServerChatView create_and_add_server_chat_view (string server_name) {
+        var chat_view = new Iridium.Views.ServerChatView ();
+        main_layout.add_chat_view (chat_view, server_name);
+        chat_view.message_to_send.connect ((message_to_send) => {
+            send_server_message (server_name, message_to_send, chat_view);
+        });
+        return chat_view;
+    }
+
+    private Iridium.Views.ChannelChatView create_and_add_channel_chat_view (string server_name, string channel_name) {
+        var chat_view = new Iridium.Views.ChannelChatView ();
+        main_layout.add_chat_view (chat_view, channel_name);
+        chat_view.message_to_send.connect ((user_message) => {
+            send_channel_message (server_name, channel_name, user_message, chat_view);
+        });
+        return chat_view;
+    }
+
+    private Iridium.Views.PrivateMessageChatView create_and_add_private_message_chat_view (string server_name, string username) {
+        var chat_view = new Iridium.Views.PrivateMessageChatView ();
+        main_layout.add_chat_view (chat_view, username);
+        chat_view.message_to_send.connect ((user_message) => {
+            send_channel_message (server_name, username, user_message, chat_view);
+        });
+        return chat_view;
     }
 
     private void show_server_connection_dialog () {
@@ -529,13 +548,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         var server_name = selected_row.get_server_name ();
         Idle.add (() => {
             // Check if the chat view already exists before creating a new one
-            var chat_view = main_layout.get_private_message_chat_view (username);
-            if (chat_view == null) {
-                chat_view = new Iridium.Views.PrivateMessageChatView ();
-                main_layout.add_chat_view (chat_view, username);
-                chat_view.message_to_send.connect ((user_message) => {
-                    send_channel_message (server_name, username, user_message, chat_view);
-                });
+            if (main_layout.get_private_message_chat_view (username) == null) {
+                create_and_add_private_message_chat_view (server_name, username);
             }
             side_panel.add_private_message (server_name, username);
             side_panel.select_private_message_row (server_name, username);
@@ -552,14 +566,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             // Check if the chat view already exists before creating a new one
             var chat_view = main_layout.get_server_chat_view (server_name);
             if (chat_view == null) {
-                chat_view = new Iridium.Views.ServerChatView ();
-                chat_view.message_to_send.connect ((message_to_send) => {
-                    send_server_message (server_name, message_to_send, chat_view);
-                });
-                main_layout.add_chat_view (chat_view, server_name);
+                chat_view = create_and_add_server_chat_view (server_name);
             }
             chat_view.set_enabled (true);
-
             chat_view.display_server_msg (message);
 
             side_panel.add_server (server_name);
@@ -689,11 +698,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             // Check if the chat view already exists before creating a new one
             var chat_view = main_layout.get_channel_chat_view (channel_name);
             if (chat_view == null) {
-                chat_view = new Iridium.Views.ChannelChatView ();
-                main_layout.add_chat_view (chat_view, channel_name);
-                chat_view.message_to_send.connect ((user_message) => {
-                    send_channel_message (server_name, channel_name, user_message, chat_view);
-                });
+                chat_view = create_and_add_channel_chat_view (server_name, channel_name);
             }
             chat_view.set_enabled (true);
 
@@ -733,11 +738,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             // Check if the chat view already exists before creating a new one
             var chat_view = main_layout.get_channel_chat_view (channel_name);
             if (chat_view == null) {
-                chat_view = new Iridium.Views.ChannelChatView ();
-                main_layout.add_chat_view (chat_view, channel_name);
-                chat_view.message_to_send.connect ((user_message) => {
-                    send_channel_message (server_name, channel_name, user_message, chat_view);
-                });
+                chat_view = create_and_add_channel_chat_view (server_name, channel_name);
             }
             chat_view.set_enabled (true);
             side_panel.add_channel (server_name, channel_name);
@@ -780,11 +781,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             // Check if the chat view already exists before creating a new one
             var chat_view = main_layout.get_private_message_chat_view (username);
             if (chat_view == null) {
-                chat_view = new Iridium.Views.PrivateMessageChatView ();
-                main_layout.add_chat_view (chat_view, username);
-                chat_view.message_to_send.connect ((user_message) => {
-                    send_channel_message (server_name, username, user_message, chat_view);
-                });
+                chat_view = create_and_add_private_message_chat_view (server_name, username);
             }
             chat_view.set_enabled (true);
             side_panel.add_private_message (server_name, username);
