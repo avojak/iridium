@@ -92,12 +92,12 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             }
 
             // Item selected
-            main_layout.show_chat_view (item.name);
-
-            // Update the header bar title
             unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) item;
             var server_name = row.get_server_name ();
             var channel_name = row.get_channel_name ();
+            main_layout.show_chat_view (server_name, channel_name);
+
+            // Update the header bar title
             if (channel_name != null) {
                 header_bar.update_title (channel_name, server_name);
             } else {
@@ -365,7 +365,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     private Iridium.Views.ServerChatView create_and_add_server_chat_view (string server_name) {
         var chat_view = new Iridium.Views.ServerChatView ();
-        main_layout.add_chat_view (chat_view, server_name);
+        main_layout.add_server_chat_view (chat_view, server_name);
         chat_view.message_to_send.connect ((message_to_send) => {
             send_server_message (server_name, message_to_send, chat_view);
         });
@@ -374,7 +374,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     private Iridium.Views.ChannelChatView create_and_add_channel_chat_view (string server_name, string channel_name) {
         var chat_view = new Iridium.Views.ChannelChatView ();
-        main_layout.add_chat_view (chat_view, channel_name);
+        main_layout.add_channel_chat_view (chat_view, server_name, channel_name);
         chat_view.message_to_send.connect ((user_message) => {
             send_channel_message (server_name, channel_name, user_message, chat_view);
         });
@@ -383,7 +383,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     private Iridium.Views.PrivateMessageChatView create_and_add_private_message_chat_view (string server_name, string username) {
         var chat_view = new Iridium.Views.PrivateMessageChatView ();
-        main_layout.add_chat_view (chat_view, username);
+        main_layout.add_private_message_chat_view (chat_view, server_name, username);
         chat_view.message_to_send.connect ((user_message) => {
             send_channel_message (server_name, username, user_message, chat_view);
         });
@@ -532,7 +532,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         var server_name = selected_row.get_server_name ();
         Idle.add (() => {
             // Check if the chat view already exists before creating a new one
-            if (main_layout.get_private_message_chat_view (username) == null) {
+            if (main_layout.get_private_message_chat_view (server_name, username) == null) {
                 create_and_add_private_message_chat_view (server_name, username);
             }
             side_panel.add_private_message (server_name, username);
@@ -626,7 +626,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         // Display a message in any channel that the user was in
         Idle.add (() => {
             foreach (string channel in channels) {
-                var channel_chat_view = main_layout.get_channel_chat_view (channel);
+                var channel_chat_view = main_layout.get_channel_chat_view (server_name, channel);
                 if (channel_chat_view != null) {
                     var message_to_display = new Iridium.Services.Message ();
                     message_to_display.message = username + " has quit";
@@ -643,7 +643,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         // If the user was in a private message chat view, display the message there
         Idle.add (() => {
             // Display a message in the channel chat view
-            var private_message_chat_view = main_layout.get_private_message_chat_view (username);
+            var private_message_chat_view = main_layout.get_private_message_chat_view (server_name, username);
             if (private_message_chat_view != null) {
                 var message_to_display = new Iridium.Services.Message ();
                 message_to_display.message = username + " has quit";
@@ -680,7 +680,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     private void on_channel_joined (string server_name, string channel_name) {
         Idle.add (() => {
             // Check if the chat view already exists before creating a new one
-            var chat_view = main_layout.get_channel_chat_view (channel_name);
+            var chat_view = main_layout.get_channel_chat_view (server_name, channel_name);
             if (chat_view == null) {
                 chat_view = create_and_add_channel_chat_view (server_name, channel_name);
             }
@@ -705,7 +705,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     private void on_channel_left (string server_name, string channel_name) {
         // TODO: Display a message that we've left the channel
         Idle.add (() => {
-            var chat_view = main_layout.get_channel_chat_view (channel_name);
+            var chat_view = main_layout.get_channel_chat_view (server_name, channel_name);
             if (chat_view != null) {
                 chat_view.set_enabled (false);
             }
@@ -720,7 +720,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     private void on_channel_message_received (string server_name, string channel_name, Iridium.Services.Message message) {
         Idle.add (() => {
             // Check if the chat view already exists before creating a new one
-            var chat_view = main_layout.get_channel_chat_view (channel_name);
+            var chat_view = main_layout.get_channel_chat_view (server_name, channel_name);
             if (chat_view == null) {
                 chat_view = create_and_add_channel_chat_view (server_name, channel_name);
             }
@@ -735,7 +735,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     private void on_user_joined_channel (string server_name, string channel_name, string username) {
         Idle.add (() => {
             // Display a message in the channel chat view
-            var channel_chat_view = main_layout.get_channel_chat_view (channel_name);
+            var channel_chat_view = main_layout.get_channel_chat_view (server_name, channel_name);
             if (channel_chat_view != null) {
                 var message = new Iridium.Services.Message ();
                 message.message = username + " has joined";
@@ -749,7 +749,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     private void on_user_left_channel (string server_name, string channel_name, string username) {
         Idle.add (() => {
             // Display a message in the channel chat view
-            var channel_chat_view = main_layout.get_channel_chat_view (channel_name);
+            var channel_chat_view = main_layout.get_channel_chat_view (server_name, channel_name);
             if (channel_chat_view != null) {
                 var message = new Iridium.Services.Message ();
                 message.message = username + " has left";
@@ -763,7 +763,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     private void on_private_message_received (string server_name, string username, Iridium.Services.Message message) {
         Idle.add (() => {
             // Check if the chat view already exists before creating a new one
-            var chat_view = main_layout.get_private_message_chat_view (username);
+            var chat_view = main_layout.get_private_message_chat_view (server_name, username);
             if (chat_view == null) {
                 chat_view = create_and_add_private_message_chat_view (server_name, username);
             }
@@ -781,7 +781,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         // Update the users for the channel chat view so it knows which usernames 
         // to display in a different style. Do this regardless of whether the view
         // is currently selected and displayed.
-        var channel_chat_view = main_layout.get_channel_chat_view (channel_name);
+        var channel_chat_view = main_layout.get_channel_chat_view (server_name, channel_name);
         if (channel_chat_view != null) {
             channel_chat_view.set_usernames (usernames);
         }
@@ -810,7 +810,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         var topic = connection_handler.get_topic (server_name, channel_name);
         // Ensures that this runs only after the channel chat view has been created and added to the main layout
         Idle.add (() => {
-            var channel_chat_view = main_layout.get_channel_chat_view (channel_name);
+            var channel_chat_view = main_layout.get_channel_chat_view (server_name, channel_name);
             if (channel_chat_view != null) {
                 channel_chat_view.set_channel_topic (topic);
             }
