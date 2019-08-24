@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
-  <schema path="/com/github/avojak/iridium/" id="com.github.avojak.iridium">
+  <schema path="@schema-path@" id="@appid@">
     <key name="prefer-dark-style" type="b">
       <default>false</default>
       <summary>If the dark Gtk stylesheet should be used</summary>

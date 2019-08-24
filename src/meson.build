@@ -1,5 +1,6 @@
 conf_data = configuration_data()
-conf_data.set('PROJECT_NAME', 'Iridium')
+conf_data.set('APP_ID', application_id)
+conf_data.set('APP_NAME', application_name)
 conf_data.set('VERSION', meson.project_version())
 
 config_header = configure_file(
@@ -10,7 +11,7 @@ config_header = configure_file(
 
 # Create a new executable, list the files we want to compile, list the dependencies we need, and install
 executable(
-    meson.project_name(),
+    application_id,
     join_paths('Application.vala'),
     join_paths('MainWindow.vala'),
     join_paths('Layouts', 'MainLayout.vala'),
@@ -56,5 +57,6 @@ executable(
         dependency('granite', version: '>= 0.5.1'),
         dependency('sqlite3', version: '>= 3.22.0')
     ],
+    vala_args: vala_args,
     install: true
 )

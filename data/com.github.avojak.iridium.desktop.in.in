@@ -1,10 +1,10 @@
 [Desktop Entry]
-Name=Iridium
+Name=@name@
 GenericName=IRC Client
 Comment=Friendly IRC client
 Categories=Network;Utility;Chat;IRCClient;
-Exec=com.github.avojak.iridium
-Icon=com.github.avojak.iridium
+Exec=@binary@
+Icon=@icon@
 Terminal=false
 Type=Application
 Keywords=IRC;IM;Chat;

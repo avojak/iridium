@@ -24,7 +24,7 @@ public class Iridium.Services.Settings : Granite.Services.Settings {
     public bool prefer_dark_style { get; set; }
 
     public Settings () {
-        base (Iridium.Application.ID);
+        base (Constants.APP_ID);
     }
 
 }

@@ -38,7 +38,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
     }
 
     private void initialize_database () {
-        var config_dir_path = GLib.Environment.get_user_config_dir () + "/" + Iridium.Application.ID;
+        var config_dir_path = GLib.Environment.get_user_config_dir () + "/" + Constants.APP_ID;
         var config_dir_file = GLib.File.new_for_path (config_dir_path);
         try {
             if (!config_dir_file.query_exists ()) {

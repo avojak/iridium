@@ -294,7 +294,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     }
 
     private void ctcp_version_query_received (Iridium.Services.Message message) {
-        send_output (Iridium.Services.MessageCommands.VERSION + " " + Constants.PROJECT_NAME + " " + Constants.VERSION);
+        send_output (Iridium.Services.MessageCommands.VERSION + " " + Constants.APP_ID + " " + Constants.VERSION);
         var display_message = new Iridium.Services.Message ();
         display_message.message = "Received a CTCP VERSION query from " + message.username;
         server_message_received (display_message);

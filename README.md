@@ -25,7 +25,9 @@ dependencies required:
 - `meson`
 - `valac (>= 0.28.0)`
 
-## Building
+## Building and Running
+
+To build:
 
 ```
 $ meson build --prefix=/usr
@@ -33,11 +35,23 @@ $ cd build
 $ ninja
 ```
 
-## Running
+To run:
 
 ```
 $ sudo ninja install
 $ com.github.avojak.iridium
+```
+
+### Development Build
+
+You can also install a development build alongside a stable version by specifying the dev profile:
+
+```
+$ meson build --prefix=/usr -Dprofile=dev
+$ cd build
+$ ninja
+$ sudo ninja install
+$ com.github.avojak.iridium-dev
 ```
 
 ### Updating Translations

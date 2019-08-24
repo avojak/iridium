@@ -21,8 +21,6 @@
 
 public class Iridium.Application : Gtk.Application {
 
-    public static string ID = "com.github.avojak.iridium";
-
     public static Iridium.Services.Settings settings;
     public static Iridium.Services.ServerConnectionDAO connection_dao;
     private static Iridium.Services.ServerConnectionHandler connection_handler;
@@ -31,7 +29,7 @@ public class Iridium.Application : Gtk.Application {
 
     public Application () {
         Object (
-            application_id: ID,
+            application_id: Constants.APP_ID,
             flags: ApplicationFlags.FLAGS_NONE
         );
     }

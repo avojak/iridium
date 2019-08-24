@@ -28,13 +28,13 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
 
     public HeaderBar () {
         Object (
-            title: "Iridium",
+            title: Constants.APP_NAME,
             show_close_button: true
         );
     }
 
     construct {
-        var server_connect_button = new Gtk.Button.from_icon_name ("com.github.avojak.iridium.network-server-new", Gtk.IconSize.BUTTON);
+        var server_connect_button = new Gtk.Button.from_icon_name (Constants.APP_ID + ".network-server-new", Gtk.IconSize.BUTTON);
         /* var server_connect_button = new Gtk.Button.from_icon_name ("network-server", Gtk.IconSize.BUTTON); */
         server_connect_button.tooltip_text = "Connect to a Server";
         server_connect_button.relief = Gtk.ReliefStyle.NONE;
@@ -44,7 +44,7 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
             server_connect_button_clicked ();
         });
 
-        channel_join_button = new Gtk.Button.from_icon_name ("com.github.avojak.iridium.internet-chat-new", Gtk.IconSize.BUTTON);
+        channel_join_button = new Gtk.Button.from_icon_name (Constants.APP_ID + ".internet-chat-new", Gtk.IconSize.BUTTON);
         /* var channel_join_button = new Gtk.Button.from_icon_name ("internet-chat", Gtk.IconSize.BUTTON); */
         channel_join_button.tooltip_text = "Join a Channel";
         channel_join_button.relief = Gtk.ReliefStyle.NONE;

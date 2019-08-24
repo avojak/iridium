@@ -76,7 +76,7 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
         //  icon = new GLib.ThemedIcon ("mail-unread");
         // Maybe add the symbolic chat and user icons so we can specifically use them when not loading?
         // Could also create "disabled" versions of each that are greyed out slightly
-        icon = new GLib.ThemedIcon ("com.github.avojak.iridium.image-loading-symbolic");
+        icon = new GLib.ThemedIcon (Constants.APP_ID + ".image-loading-symbolic");
         markup = "<i>" + channel_name + "</i>";
         is_enabled = false;
     }

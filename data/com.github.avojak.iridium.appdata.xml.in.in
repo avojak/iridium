@@ -1,24 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright 2019 Andrew Vojak <andrew.vojak@gmail.com> -->
 <component type="desktop">
-  <id>com.github.avojak.iridium</id>
+  <id>@appid@</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0+</project_license>
-  <name>Iridium</name>
+  <name>@name@</name>
   <summary>Friendly IRC Client</summary>
   <description>
     <p>TODO</p>
   </description>
+  <provides>
+	@appid@
+  </provides>
   <screenshots>
     <screenshot type="default">
       <image>https://raw.githubusercontent.com/avojak/iridium/master/data/assets/screenshots/iridium-screenshot-01.png</image>
     </screenshot>
   </screenshots>
   <developer_name>Andrew Vojak</developer_name>
+  <launchable type="desktop-id">@appid@.desktop</launchable>
   <url type="homepage">https://github.com/avojak/iridium</url>
-	<url type="bugtracker">https://github.com/avojak/iridium/issues</url>
-	<url type="help">https://github.com/avojak/iridium/issues</url>
-	<update_contact>andrew.vojak@gmail.com</update_contact>
+  <url type="bugtracker">https://github.com/avojak/iridium/issues</url>
+  <url type="help">https://github.com/avojak/iridium/issues</url>
+  <update_contact>andrew.vojak@gmail.com</update_contact>
   <content_rating type="oars-1.1">
 		<content_attribute id="violence-cartoon">none</content_attribute>
 		<content_attribute id="violence-fantasy">none</content_attribute>
