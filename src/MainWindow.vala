@@ -530,15 +530,26 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             return;
         }
         var server_name = selected_row.get_server_name ();
+        var trimmed_username = strip_username_prefix (username);
         Idle.add (() => {
             // Check if the chat view already exists before creating a new one
-            if (main_layout.get_private_message_chat_view (server_name, username) == null) {
-                create_and_add_private_message_chat_view (server_name, username);
+            if (main_layout.get_private_message_chat_view (server_name, trimmed_username) == null) {
+                create_and_add_private_message_chat_view (server_name, trimmed_username);
             }
-            side_panel.add_private_message (server_name, username);
-            side_panel.select_private_message_row (server_name, username);
+            side_panel.add_private_message (server_name, trimmed_username);
+            side_panel.select_private_message_row (server_name, trimmed_username);
             return false;
         });
+    }
+
+    private string strip_username_prefix (string username) {
+        var prefixes = new string[] { "@", "&" };
+        foreach (string prefix in prefixes) {
+            if (username.has_prefix (prefix)) {
+                return username.substring(1, username.length - 1);
+            }
+        }
+        return username;
     }
 
     //
