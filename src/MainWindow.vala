@@ -203,6 +203,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         side_panel.channel_row_removed.connect (Iridium.Application.connection_dao.on_channel_row_removed);
         side_panel.channel_row_enabled.connect (Iridium.Application.connection_dao.on_channel_row_enabled);
         side_panel.channel_row_disabled.connect (Iridium.Application.connection_dao.on_channel_row_disabled);
+        side_panel.channel_favorite_added.connect (Iridium.Application.connection_dao.on_channel_favorite_added);
+        side_panel.channel_favorite_removed.connect (Iridium.Application.connection_dao.on_channel_favorite_removed);
 
         // Connect to the connection handler signal to make settings changes for new connections
         connection_handler.server_connection_successful.connect ((server_name, message) => {
@@ -276,6 +278,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 Idle.add (() => {
                     side_panel.add_channel (server_name, channel_name);
                     side_panel.disable_channel_row (server_name, channel_name);
+                    if (channel.favorite) {
+                        side_panel.favorite_channel (server_name, channel_name);
+                    }
                     return false;
                 });
                 Idle.add (() => {

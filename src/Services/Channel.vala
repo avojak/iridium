@@ -25,5 +25,6 @@ public class Iridium.Services.Channel : GLib.Object {
     public int server_id { get; set; }
     public string name { get; set; }
     public bool enabled { get; set; }
+    public bool favorite { get; set; }
 
 }

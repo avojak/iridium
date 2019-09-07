@@ -25,17 +25,6 @@ public class Iridium.Services.ServerConnectionDAO : GLib.Object {
 
     public void on_server_connection_successful (Iridium.Services.ServerConnectionDetails connection_details) {
         lock (sql_client) {
-            // Remove the existing server and associated channels now so that if the app is closed
-            // during initialization, it will still be in the database to attempt connection again
-            //  var existing_server = sql_client.get_server (connection_details.server);
-            //  if (existing_server == null) {
-            //      print ("\tServer is null: " + connection_details.server + "\n");
-            //  }
-            //  if (existing_server != null) {
-            //      sql_client.remove_server (existing_server.connection_details.server);
-            //      sql_client.remove_channels (existing_server.id);
-            //  }
-
             // Don't add a duplicate server
             if (sql_client.get_server (connection_details.server) != null) {
                 return;
@@ -45,14 +34,6 @@ public class Iridium.Services.ServerConnectionDAO : GLib.Object {
             var server = new Iridium.Services.Server ();
             server.connection_details = connection_details;
             sql_client.insert_server (server);
-
-            //  print ("\ton_server_connection_successful\n");
-            //  if (sql_client.get_server (connection_details.server) == null) {
-            //      print ("\tsql_client doesn't have server, inserting...\n");
-            //      var server = new Iridium.Services.Server ();
-            //      server.connection_details = connection_details;
-            //      sql_client.insert_server (server);
-            //  }
         }
     }
 
@@ -62,19 +43,32 @@ public class Iridium.Services.ServerConnectionDAO : GLib.Object {
 
     public void on_server_row_removed (string server_name) {
         lock (sql_client) {
+            var server = sql_client.get_server (server_name);
+            if (server == null) {
+                return;
+            }
             sql_client.remove_server (server_name);
+
+            var channels = sql_client.get_channels ();
+            foreach (var channel in channels) {
+                if (channel.server_id == server.id) {
+                    sql_client.remove_channel (channel.id);
+                }
+            }
         }
     }
 
     public void on_server_row_enabled (string server_name) {
-        lock (sql_client) {
-            sql_client.set_server_enabled (server_name, true);
-        }
+        set_server_row_enabled (server_name, true);
     }
 
     public void on_server_row_disabled (string server_name) {
+        set_server_row_enabled (server_name, false);
+    }
+
+    private void set_server_row_enabled (string server_name, bool enabled) {
         lock (sql_client) {
-            sql_client.set_server_enabled (server_name, false);
+            sql_client.set_server_enabled (server_name, enabled);
         }
     }
 
@@ -94,6 +88,7 @@ public class Iridium.Services.ServerConnectionDAO : GLib.Object {
             channel.server_id = server.id;
             channel.name = channel_name;
             channel.enabled = false;
+            channel.favorite = false;
 
             sql_client.insert_channel (server.id, channel);
         }
@@ -114,20 +109,14 @@ public class Iridium.Services.ServerConnectionDAO : GLib.Object {
     }
 
     public void on_channel_row_enabled (string server_name, string channel_name) {
-        lock (sql_client) {
-            var server = sql_client.get_server (server_name);
-            if (server == null) {
-                return;
-            }
-            var channel = sql_client.get_channel (server.id, channel_name);
-            if (channel == null) {
-                return;
-            }
-            sql_client.set_channel_enabled (channel.id, true);
-        }
+            set_channel_row_enabled (server_name, channel_name, true);
     }
 
     public void on_channel_row_disabled (string server_name, string channel_name) {
+            set_channel_row_enabled (server_name, channel_name, false);
+    }
+
+    private void set_channel_row_enabled (string server_name, string channel_name, bool enabled) {
         lock (sql_client) {
             var server = sql_client.get_server (server_name);
             if (server == null) {
@@ -137,7 +126,29 @@ public class Iridium.Services.ServerConnectionDAO : GLib.Object {
             if (channel == null) {
                 return;
             }
-            sql_client.set_channel_enabled (channel.id, false);
+            sql_client.set_channel_enabled (channel.id, enabled);
+        }
+    }
+
+    public void on_channel_favorite_added (string server_name, string channel_name) {
+            set_channel_favorite (server_name, channel_name, true);
+    }
+
+    public void on_channel_favorite_removed (string server_name, string channel_name) {
+            set_channel_favorite (server_name, channel_name, false);
+    }
+
+    private void set_channel_favorite (string server_name, string channel_name, bool favorite) {
+        lock (sql_client) {
+            var server = sql_client.get_server (server_name);
+            if (server == null) {
+                return;
+            }
+            var channel = sql_client.get_channel (server.id, channel_name);
+            if (channel == null) {
+                return;
+            }
+            sql_client.set_channel_favorite (channel.id, favorite);
         }
     }
 

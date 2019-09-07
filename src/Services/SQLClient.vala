@@ -76,7 +76,8 @@ public class Iridium.Services.SQLClient : GLib.Object {
                 "id" INTEGER PRIMARY KEY AUTOINCREMENT,
                 "server_id" INTEGER,
                 "channel" TEXT,
-                "enabled" BOOL
+                "enabled" BOOL,
+                "favorite" BOOL
             );
             """;
 		database.exec(sql);
@@ -173,8 +174,8 @@ public class Iridium.Services.SQLClient : GLib.Object {
 
     public void insert_channel (int server_id, Iridium.Services.Channel channel) {
         var sql = """
-            INSERT INTO channels (server_id, channel, enabled) 
-            VALUES ($SERVER_ID, $CHANNEL, $ENABLED);
+            INSERT INTO channels (server_id, channel, enabled, favorite) 
+            VALUES ($SERVER_ID, $CHANNEL, $ENABLED, $FAVORITE);
             """;
 
         Sqlite.Statement statement;
@@ -187,6 +188,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
         statement.bind_int (1, server_id);
         statement.bind_text (2, channel.name);
         statement.bind_int (3, bool_to_int(channel.enabled));
+        statement.bind_int (4, bool_to_int(channel.favorite));
 
         statement.step ();
         statement.reset ();
@@ -298,6 +300,21 @@ public class Iridium.Services.SQLClient : GLib.Object {
         return channels;
     }
 
+    public void set_channel_favorite (int channel_id, bool favorite) {
+        var sql = "UPDATE channels SET favorite = $FAVORITE WHERE id = $ID;";
+        Sqlite.Statement statement;
+        if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
+            // TODO: Log this
+            stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
+		    return;
+        }
+        statement.bind_int (1, bool_to_int (favorite));
+        statement.bind_int (2, channel_id);
+        
+        statement.step ();
+        statement.reset ();
+    }
+
     private Iridium.Services.Server parse_server_row (Sqlite.Statement statement) {
         var num_columns = statement.column_count ();
         var server = new Iridium.Services.Server ();
@@ -351,6 +368,9 @@ public class Iridium.Services.SQLClient : GLib.Object {
                     break;
                 case "enabled":
                     channel.enabled = int_to_bool (statement.column_int (i));
+                    break;
+                case "favorite":
+                    channel.favorite = int_to_bool (statement.column_int (i));
                     break;
                 default:
                     break;

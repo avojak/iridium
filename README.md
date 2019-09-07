@@ -81,7 +81,7 @@ This project is very much in-progress and has a lot of remaining work. Here is a
 - [x] Unread message badges for channels
 - [ ] Support authentication for servers
 - [x] Special formatting for usernames and URLs in messages
-- [ ] Favorite channels
+- [x] Favorite channels
 - [x] Save and restore state when closing and re-opening
 - [x] Display channel users list
 - [x] Easy way to initiate a private message chat view

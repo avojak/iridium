@@ -19,16 +19,13 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-// TODO: Might be able to set the visibility to hide/show when it's a
-//       favorite or when it's been un-favorited? ie. two items, one
-//       that's a favorite and one that isn't. This might be easier than
-//       trying to move or re-create the row.
 public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.Item, Iridium.Widgets.SidePanel.Row {
 
     public string channel_name { get; construct; }
     public string server_name { get; construct; }
 
     private bool is_enabled = true;
+    private bool is_favorite = false;
 
     public ChannelRow (string channel_name, string server_name) {
         Object (
@@ -58,7 +55,11 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
         //  icon = new GLib.ThemedIcon ("user-available");
         icon = new GLib.ThemedIcon ("internet-chat");
         //  icon = null;
-        markup = null;
+        if (is_favorite) {
+            markup = channel_name + " <small>" + server_name + "</small>";
+        } else {
+            markup = null;
+        }
         is_enabled = true;
     }
 
@@ -68,7 +69,11 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
         }
         //  icon = new GLib.ThemedIcon ("user-offline");
         //  icon = null;
-        markup = "<i>" + channel_name + "</i>";
+        if (is_favorite) {
+            markup = "<i>" + channel_name + " <small>" + server_name + "</small></i>";
+        } else {
+            markup = "<i>" + channel_name + "</i>";
+        }
         is_enabled = false;
     }
 
@@ -77,7 +82,11 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
         // Maybe add the symbolic chat and user icons so we can specifically use them when not loading?
         // Could also create "disabled" versions of each that are greyed out slightly
         icon = new GLib.ThemedIcon (Constants.APP_ID + ".image-loading-symbolic");
-        markup = "<i>" + channel_name + "</i>";
+        if (is_favorite) {
+            markup = "<i>" + channel_name + " <small>" + server_name + "</small></i>";
+        } else {
+            markup = "<i>" + channel_name + "</i>";
+        }
         is_enabled = false;
     }
 
@@ -85,12 +94,34 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
         return is_enabled;
     }
 
+    public void set_favorite (bool favorite) {
+        is_favorite = favorite;
+        if (favorite) {
+            if (is_enabled) {
+                markup = channel_name + " <small>" + server_name + "</small>";
+            } else {
+                markup = "<i>" + channel_name + " <small>" + server_name + "</small></i>";
+            }
+        } else {
+            if (is_enabled) {
+                markup = null;
+            } else {
+                markup = "<i>" + channel_name + "</i>";
+            }
+        }
+    }
+
     public override Gtk.Menu? get_context_menu () {
         var menu = new Gtk.Menu ();
 
         var favorite_item = new Gtk.MenuItem.with_label ("Add to favorites");
         favorite_item.activate.connect (() => {
-            // TODO: Implement
+            favorite_channel ();
+        });
+
+        var remove_favorite_item = new Gtk.MenuItem.with_label ("Remove from favorites");
+        remove_favorite_item.activate.connect (() => {
+            remove_favorite_channel ();
         });
 
         var join_item = new Gtk.MenuItem.with_label ("Join channel");
@@ -111,7 +142,11 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
             remove_channel ();
         });
 
-        menu.append (favorite_item);
+        if (is_favorite) {
+            menu.append (remove_favorite_item);
+        } else {
+            menu.append (favorite_item);
+        }
         menu.append (new Gtk.SeparatorMenuItem ());
         if (is_enabled) {
             menu.append (leave_item);
@@ -125,6 +160,8 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
         return menu;
     }
 
+    public signal void favorite_channel ();
+    public signal void remove_favorite_channel ();
     public signal void join_channel ();
     public signal void leave_channel ();
     public signal void remove_channel ();
