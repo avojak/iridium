@@ -29,6 +29,7 @@ public class Iridium.Views.ChannelChatView : Iridium.Views.ChatView {
     private Gtk.Label topic_label;
 
     construct {
+        // TODO: Use a Gtk.Revealer here (see: https://github.com/elementary/code/blob/master/src/MainWindow.vala#L265)
         // TODO: Might still be nice to make this have a horizontal scrollbar if needed
         topic_label = new Gtk.Label (null);
         topic_label.justify = Gtk.Justification.LEFT;

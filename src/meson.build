@@ -42,6 +42,7 @@ executable(
     join_paths('Widgets', 'HeaderBar.vala'),
     join_paths('Widgets', 'NetworkInfoBar.vala'),
     join_paths('Widgets', 'ServerConnectionDialog.vala'),
+    join_paths('Widgets', 'StatusBar.vala'),
     join_paths('Widgets', 'SidePanel', 'Panel.vala'),
     join_paths('Widgets', 'SidePanel', 'Row.vala'),
     join_paths('Widgets', 'SidePanel', 'ServerRow.vala'),

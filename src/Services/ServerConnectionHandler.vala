@@ -101,6 +101,15 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         return servers;
     }
 
+    public Gee.List<string> get_channels (string server_name) {
+        var connection = open_connections.get (server_name);
+        if (connection == null) {
+            print ("no connection\n");
+            return new Gee.ArrayList<string> ();
+        }
+        return connection.get_joined_channels ();
+    }
+
     public bool has_connection (string server) {
         return open_connections.has_key (server);
     }

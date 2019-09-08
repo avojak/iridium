@@ -23,12 +23,12 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
 
     public unowned Iridium.MainWindow main_window { get; construct; }
     public string[] servers { get; construct; }
-    public string current_server { get; construct; }
+    public string? current_server { get; construct; }
 
     private Gtk.Spinner spinner;
     private Gtk.Label status_label;
 
-    public ChannelJoinDialog (Iridium.MainWindow main_window, string[] servers, string current_server) {
+    public ChannelJoinDialog (Iridium.MainWindow main_window, string[] servers, string? current_server) {
         Object (
             deletable: false,
             resizable: false,
@@ -74,12 +74,12 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
         form_grid.column_spacing = 20;
 
         var list_store = new Gtk.ListStore (1, typeof (string));
-        var active_index = 0;
+        var active_index = -1;
         for (int i = 0; i < servers.length; i++) {
             Gtk.TreeIter iter;
             list_store.append (out iter);
             list_store.set (iter, 0, servers[i]);
-            if (servers[i] == current_server) {
+            if (current_server != null && servers[i] == current_server) {
                 active_index = i;
             }
         }
@@ -129,6 +129,11 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
             status_label.label = "";
             // TODO: Get values from entries
             join_button_clicked ("irc.freenode.net", "#irchacks");
+        });
+
+        join_button.sensitive = server_combo.get_active () != -1;
+        server_combo.changed.connect (() => {
+            join_button.sensitive = server_combo.get_active () != -1;
         });
 
         add_action_widget (not_now_button, 0);

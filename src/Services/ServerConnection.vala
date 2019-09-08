@@ -27,6 +27,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     private DataOutputStream output_stream;
     private bool should_exit = false;
 
+    private Gee.List<string> joined_channels = new Gee.ArrayList<string> ();
     private Gee.Map<string, Gee.List<string>> channel_users = new Gee.HashMap<string, Gee.List<string>> ();
     private Gee.Map<string, Gee.List<string>> username_buffer = new Gee.HashMap<string, Gee.List<string>> ();
 
@@ -135,6 +136,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 break;
             case Iridium.Services.MessageCommands.JOIN:
                 if ((message.message == null || message.message.strip () == "") && message.username == connection_details.nickname) {
+                    joined_channels.add (message.params[0]);
                     channel_joined (message.params[0]);
                 } else {
                     on_user_joined_channel (message.params[0], message.username);
@@ -144,6 +146,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 // If the the message username is our nickname, we're the one
                 // leaving. Otherwise, it's another user leaving.
                 if (message.username == connection_details.nickname) {
+                    joined_channels.remove (message.params[0]);
                     channel_left (message.params[0]);
                 } else {
                     on_user_left_channel (message.params[0], message.username);
@@ -263,6 +266,10 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             return new Gee.LinkedList<string> ();
         }
         return channel_users.get (channel_name);
+    }
+
+    public Gee.List<string> get_joined_channels () {
+        return joined_channels;
     }
 
     private void send_output (string output) {

@@ -95,6 +95,7 @@ This project is very much in-progress and has a lot of remaining work. Here is a
 - [ ] Display badge count of unread messages in the dock
 - [ ] Integrate with the OS notifications
 - [ ] Audio notification when a message is received
+- [ ] Add server/channel history even when a connection is closed so that you can open from history in the welcome view
 
 These are some ideas I think might been cool to implement, but may add too much complexity or clutter to the UI and the project as a whole:
 

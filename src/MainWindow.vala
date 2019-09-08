@@ -30,6 +30,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     private Iridium.Views.Welcome welcome_view;
     private Iridium.Widgets.HeaderBar header_bar;
     private Iridium.Widgets.SidePanel.Panel side_panel;
+    private Iridium.Widgets.StatusBar status_bar;
     private Iridium.Layouts.MainLayout main_layout;
 
     private Gtk.Overlay overlay;
@@ -57,7 +58,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
         welcome_view = new Iridium.Views.Welcome ();
         side_panel = new Iridium.Widgets.SidePanel.Panel ();
-        main_layout = new Iridium.Layouts.MainLayout (welcome_view, side_panel);
+        status_bar = new Iridium.Widgets.StatusBar ();
+        main_layout = new Iridium.Layouts.MainLayout (welcome_view, side_panel, status_bar);
 
         var grid = new Gtk.Grid ();
 
@@ -73,12 +75,12 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         resize (1000, 600);
 
         // Connect to signals
-        header_bar.server_connect_button_clicked.connect (() => {
-            show_server_connection_dialog ();
-        });
-        header_bar.channel_join_button_clicked.connect (() => {
-            show_channel_join_dialog ();
-        });
+        //  header_bar.server_connect_button_clicked.connect (() => {
+        //      show_server_connection_dialog ();
+        //  });
+        //  header_bar.channel_join_button_clicked.connect (() => {
+        //      show_channel_join_dialog ();
+        //  });
         //  header_bar.preferences_button_clicked.connect (() => {
         //      show_preferences_dialog ();
         //  });
@@ -86,7 +88,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         side_panel.item_selected.connect ((item) => {
             // No item selected
             if (item == null) {
-                header_bar.set_channel_join_button_enabled (false);
+                //  header_bar.set_channel_join_button_enabled (false);
                 main_layout.show_welcome_view ();
                 return;
             }
@@ -117,7 +119,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             // We have enough context to join a channel
             // TODO: This should probably still be enabled as long as there's
             //       at least one open connection.
-            header_bar.set_channel_join_button_enabled (true);
+            //  header_bar.set_channel_join_button_enabled (true);
         });
         side_panel.connect_to_server.connect ((server_name) => {
             var connection_details = get_connection_details_for_server (server_name);
@@ -171,6 +173,12 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         });
         side_panel.leave_channel.connect ((server_name, channel_name) => {
             connection_handler.leave_channel (server_name, channel_name);
+        });
+        status_bar.server_connect_button_clicked.connect (() => {
+            show_server_connection_dialog ();
+        });
+        status_bar.channel_join_button_clicked.connect (() => {
+            show_channel_join_dialog ();
         });
         welcome_view.new_connection_button_clicked.connect (() => {
             show_server_connection_dialog ();
@@ -451,11 +459,20 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     //  }
 
     private void join_channel (string server_name, string channel_name) {
+        // Check if we're already in this channel
+        if (connection_handler.get_channels (server_name).index_of (channel_name) != -1) {
+            channel_join_dialog.display_error ("You've already joined this channel");
+            return;
+        }
         // Validate channel name
         // TODO: Look into what other restrictions exist
         if (!channel_name.has_prefix ("#") && !channel_name.has_prefix ("&")) {
             // TODO: Eventually validate that the dialog is non-null, and handle accordingly
             channel_join_dialog.display_error ("Channel must begin with '#' or '&'");
+            return;
+        }
+        if (!channel_name.length < 2) {
+            channel_join_dialog.display_error ("Enter a channel name");
             return;
         }
         connection_handler.join_channel (server_name, channel_name);
