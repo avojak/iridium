@@ -471,7 +471,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             channel_join_dialog.display_error ("Channel must begin with '#' or '&'");
             return;
         }
-        if (!channel_name.length < 2) {
+        if (channel_name.length < 2) {
             channel_join_dialog.display_error ("Enter a channel name");
             return;
         }
