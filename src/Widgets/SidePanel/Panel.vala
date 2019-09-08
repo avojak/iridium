@@ -88,6 +88,9 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         }
 
         var server_item = new Iridium.Widgets.SidePanel.ServerRow (server_name);
+        server_item.join_channel.connect (() => {
+            join_channel_for_server (server_name);
+        });
         server_item.disconnect_from_server.connect ((should_close) => {
             disconnect_from_server (server_name);
         });
@@ -419,6 +422,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         }
     }
 
+    public signal void join_channel_for_server (string server_name);
     public signal void join_channel (string server_name, string channel_name);
     public signal void leave_channel (string server_name, string channel_name);
     public signal void channel_favorite_added (string server_name, string channel_name);

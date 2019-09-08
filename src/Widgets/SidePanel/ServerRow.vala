@@ -101,9 +101,9 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
     public override Gtk.Menu? get_context_menu () {
         var menu = new Gtk.Menu ();
 
-        var edit_item = new Gtk.MenuItem.with_label ("Edit settings...");
-        edit_item.activate.connect (() => {
-            // TODO: Implement
+        var join_item = new Gtk.MenuItem.with_label ("Join a Channel...");
+        join_item.activate.connect (() => {
+            join_channel ();
         });
 
         var connect_item = new Gtk.MenuItem.with_label ("Connect");
@@ -124,9 +124,9 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
             remove_server ();
         });
 
-        menu.append (edit_item);
-        menu.append (new Gtk.SeparatorMenuItem ());
         if (is_enabled) {
+            menu.append (join_item);
+            menu.append (new Gtk.SeparatorMenuItem ());
             menu.append (disconnect_item);
         } else {
             menu.append (connect_item);
@@ -138,6 +138,7 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
         return menu;
     }
 
+    public signal void join_channel ();
     public signal void disconnect_from_server ();
     public signal void connect_to_server ();
     public signal void remove_server ();

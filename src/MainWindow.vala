@@ -143,6 +143,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             // TODO: Might need to disable the join channel header button!
             connection_handler.disconnect_from_server (server_name);
         });
+        side_panel.join_channel_for_server.connect ((server_name) => {
+            show_channel_join_dialog (server_name);
+        });
         side_panel.join_channel.connect ((server_name, channel_name) => {
             // If we're not connected to the server yet, connect to it first before joining the channel
             if (!connection_handler.has_connection (server_name)) {
@@ -178,7 +181,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             show_server_connection_dialog ();
         });
         status_bar.channel_join_button_clicked.connect (() => {
-            show_channel_join_dialog ();
+            show_channel_join_dialog (side_panel.get_current_server ());
         });
         welcome_view.new_connection_button_clicked.connect (() => {
             show_server_connection_dialog ();
@@ -431,11 +434,11 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         connection_dialog.present ();
     }
 
-    private void show_channel_join_dialog () {
+    private void show_channel_join_dialog (string? target_server) {
         if (channel_join_dialog == null) {
             var connected_servers = connection_handler.get_connected_servers ();
-            var current_server = side_panel.get_current_server ();
-            channel_join_dialog = new Iridium.Widgets.ChannelJoinDialog (this, connected_servers, current_server);
+            //  var current_server = side_panel.get_current_server ();
+            channel_join_dialog = new Iridium.Widgets.ChannelJoinDialog (this, connected_servers, target_server);
             channel_join_dialog.show_all ();
             channel_join_dialog.join_button_clicked.connect ((server_name, channel_name) => {
                 join_channel (server_name, channel_name);
@@ -597,7 +600,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 connection_dialog.dismiss ();
 
                 side_panel.select_server_row (server_name);
-                show_channel_join_dialog ();
+                show_channel_join_dialog (server_name);
             }
 
             return false;
