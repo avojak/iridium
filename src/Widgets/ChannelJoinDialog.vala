@@ -25,6 +25,8 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
     public string[] servers { get; construct; }
     public string? current_server { get; construct; }
 
+    private bool is_favorite = false;
+
     private Gtk.Spinner spinner;
     private Gtk.Label status_label;
 
@@ -59,11 +61,22 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
         header_title.margin_end = 10;
         header_title.set_line_wrap (true);
 
+        var favorite_event_box = new Gtk.EventBox ();
         var favorite_image = new Gtk.Image.from_icon_name ("non-starred", Gtk.IconSize.DIALOG);
+        favorite_event_box.add (favorite_image);
+        favorite_event_box.button_press_event.connect (() => {
+            if (is_favorite) {
+                favorite_image.icon_name = "non-starred";
+                is_favorite = false;
+            } else {
+                favorite_image.icon_name = "starred";
+                is_favorite = true;
+            }
+        });
 
         header_grid.attach (header_image, 0, 0, 1, 1);
         header_grid.attach (header_title, 1, 0, 1, 1);
-        header_grid.attach (favorite_image, 2, 0, 1, 1);
+        header_grid.attach (favorite_event_box, 2, 0, 1, 1);
 
         body.add (header_grid);
 
@@ -138,6 +151,10 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
 
         add_action_widget (not_now_button, 0);
         add_action_widget (join_button, 1);
+    }
+
+    public bool is_favorite_button_selected () {
+        return is_favorite;
     }
 
     public void dismiss () {

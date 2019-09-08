@@ -726,8 +726,11 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             //       boolean check (ie. only select if we're not initializing).
             /* side_panel.select_channel_row (server_name, channel_name); */
             if (channel_join_dialog != null) {
+                var is_favorite = channel_join_dialog.is_favorite_button_selected ();
                 channel_join_dialog.dismiss ();
-
+                if (is_favorite) {
+                    side_panel.favorite_channel (server_name, channel_name);
+                }
                 side_panel.select_channel_row (server_name, channel_name);
             }
             set_channel_users_button_enabled (server_name, channel_name, true);
