@@ -133,7 +133,11 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
             // TODO: Validate entries first!
             spinner.start ();
             status_label.label = "";
-            connect_button_clicked ("irc.freenode.net", "iridium", "iridium", "Iridium IRC Client");
+            var server_name = server_entry.get_text ().chomp ().chug ();
+            var nickname = nickname_entry.get_text ().chomp ().chug ();
+            var username = username_entry.get_text ().chomp ().chug ();
+            var realname = server_entry.get_text ().chomp ().chug ();
+            connect_button_clicked (server_name, nickname, username, realname);
         });
 
         add_action_widget (cancel_button, 0);

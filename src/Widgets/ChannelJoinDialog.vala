@@ -98,9 +98,9 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
             }
         }
         var server_combo = new Gtk.ComboBox.with_model (list_store);
-        var cell = new Gtk.CellRendererText ();
-        server_combo.pack_start (cell, false);
-        server_combo.set_attributes (cell, "text", 0);
+        var server_cell = new Gtk.CellRendererText ();
+        server_combo.pack_start (server_cell, false);
+        server_combo.set_attributes (server_cell, "text", 0);
         server_combo.set_active (active_index);
 
         var channel_label = new Gtk.Label ("Channel");
@@ -141,8 +141,9 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
             // TODO: Validate entries first!
             spinner.start ();
             status_label.label = "";
-            // TODO: Get values from entries
-            join_button_clicked ("irc.freenode.net", "#irchacks");
+            var server_name = server_cell.text;
+            var channel_name = channel_entry.get_text ().chug ().chomp ();
+            join_button_clicked (server_name, channel_name);
         });
 
         join_button.sensitive = server_combo.get_active () != -1;
