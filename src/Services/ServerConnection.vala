@@ -346,6 +346,10 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         return channel_topics.get (channel_name);
     }
 
+    public void set_channel_topic (string channel_name, string topic) {
+        send_output (Iridium.Services.MessageCommands.TOPIC + " " + channel_name + " :" + topic);
+    }
+
     public signal void open_successful (Iridium.Services.Message message);
     public signal void open_failed (string error_message);
     public signal void connection_closed ();

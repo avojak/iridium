@@ -152,6 +152,14 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         return connection.get_channel_topic (channel_name);
     }
 
+    public void set_channel_topic (string server_name, string channel_name, string topic) {
+        var connection = open_connections.get (server_name);
+        if (connection == null) {
+            return;
+        }
+        connection.set_channel_topic (channel_name, topic);
+    }
+
     //
     // ServerConnection Callbacks
     //

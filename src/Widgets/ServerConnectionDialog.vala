@@ -32,6 +32,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
             resizable: false,
             title: "Connect to a Server",
             transient_for: main_window,
+            modal: true,
             main_window: main_window
         );
     }

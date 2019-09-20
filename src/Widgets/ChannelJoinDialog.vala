@@ -36,6 +36,7 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
             resizable: false,
             title: "Join a Channel",
             transient_for: main_window,
+            modal: true,
             main_window: main_window,
             servers: servers,
             current_server: current_server
