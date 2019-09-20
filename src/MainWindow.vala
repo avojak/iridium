@@ -210,6 +210,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         connection_handler.user_joined_channel.connect (on_user_joined_channel);
         connection_handler.user_left_channel.connect (on_user_left_channel);
         connection_handler.private_message_received.connect (on_private_message_received);
+        connection_handler.insufficient_privs_received.connect (on_insufficient_privs_received);
 
         // Connect to all of the side panel signals to make settings changes
         side_panel.server_row_added.connect (Iridium.Application.connection_dao.on_server_row_added);
@@ -883,6 +884,18 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             var channel_chat_view = main_layout.get_channel_chat_view (server_name, channel_name);
             if (channel_chat_view != null) {
                 channel_chat_view.set_channel_topic (topic);
+            }
+            return false;
+        });
+    }
+
+    private void on_insufficient_privs_received (string server_name, string channel_name, Iridium.Services.Message message) {
+        Idle.add (() => {
+            // Display a message in the channel chat view
+            var channel_chat_view = main_layout.get_channel_chat_view (server_name, channel_name);
+            if (channel_chat_view != null) {
+                // TODO: Maybe make this more specific?
+                channel_chat_view.display_channel_error_msg (message);
             }
             return false;
         });

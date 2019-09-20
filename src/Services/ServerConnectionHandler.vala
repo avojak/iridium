@@ -50,6 +50,7 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         server_connection.user_joined_channel.connect (on_user_joined_channel);
         server_connection.user_left_channel.connect (on_user_left_channel);
         server_connection.private_message_received.connect (on_private_message_received);
+        server_connection.insufficient_privs.connect (on_insufficient_privs_received);
 
         // TODO: This may cause a bug since we're not yet sure whether the
         //       connection attempt was successful. Maybe do this in the
@@ -227,6 +228,10 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         private_message_received (source.connection_details.server, username, message);
     }
 
+    private void on_insufficient_privs_received (Iridium.Services.ServerConnection source, string channel_name, Iridium.Services.Message message) {
+        insufficient_privs_received (source.connection_details.server, channel_name, message);
+    }
+
     //
     // Signals
     //
@@ -247,5 +252,6 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
     public signal void user_joined_channel (string server_name, string channel_name, string username);
     public signal void user_left_channel (string server_name, string channel_name, string username);
     public signal void private_message_received (string server_name, string username, Iridium.Services.Message message);
+    public signal void insufficient_privs_received (string server_name, string channel_name, Iridium.Services.Message message);
 
 }

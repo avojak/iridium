@@ -135,19 +135,33 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 }
                 break;
             case Iridium.Services.MessageCommands.JOIN:
-                if ((message.message == null || message.message.strip () == "") && message.username == connection_details.nickname) {
-                    joined_channels.add (message.params[0]);
-                    channel_joined (message.params[0]);
+                if (message.username == connection_details.nickname) {
+                    if (message.message == null || message.message.strip () == "") {
+                        joined_channels.add (message.params[0]);
+                        channel_joined (message.params[0]);
+                    } else {
+                        joined_channels.add (message.message);
+                        channel_joined (message.message);
+                    }
                 } else {
-                    on_user_joined_channel (message.params[0], message.username);
+                    if (message.message == null || message.message.strip () == "") {
+                        on_user_joined_channel (message.params[0], message.username);
+                    } else {
+                        on_user_joined_channel (message.message, message.username);
+                    }
                 }
                 break;
             case Iridium.Services.MessageCommands.PART:
                 // If the the message username is our nickname, we're the one
                 // leaving. Otherwise, it's another user leaving.
                 if (message.username == connection_details.nickname) {
-                    joined_channels.remove (message.params[0]);
-                    channel_left (message.params[0]);
+                    if (message.message == null || message.message.strip () == "") {
+                        joined_channels.remove (message.params[0]);
+                        channel_left (message.params[0]);
+                    } else {
+                        joined_channels.remove (message.message);
+                        channel_left (message.message);
+                    }
                 } else {
                     on_user_left_channel (message.params[0], message.username);
                 }
@@ -189,6 +203,11 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             case Iridium.Services.NumericCodes.ERR_NICKNAMEINUSE:
                 nickname_in_use (message);
                 break;
+            case Iridium.Services.NumericCodes.ERR_CHANOPRIVSNEEDED:
+                insufficient_privs (message.params[1], message);
+                // Can remove this once errors are implemented in the channel chat view
+                server_error_received (message);
+                break;
             case Iridium.Services.NumericCodes.ERR_UNKNOWNCOMMAND:
             case Iridium.Services.NumericCodes.ERR_NOSUCHNICK: 
                 // TODO: Handle no such nick for sending a PM. Should display the server 
@@ -200,7 +219,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             case Iridium.Services.NumericCodes.ERR_NOTREGISTERED:
             case Iridium.Services.NumericCodes.ERR_NEEDMOREPARAMS:
             case Iridium.Services.NumericCodes.ERR_UNKNOWNMODE:
-            case Iridium.Services.NumericCodes.ERR_CHANOPRIVSNEEDED:
                 server_error_received (message);
                 break;
             default:
@@ -367,5 +385,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     public signal void user_joined_channel (string channel_name, string username);
     public signal void user_left_channel (string channel_name, string username);
     public signal void private_message_received (string username, Iridium.Services.Message message);
+    public signal void insufficient_privs (string channel_name, Iridium.Services.Message message);
 
 }

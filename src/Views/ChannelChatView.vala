@@ -143,7 +143,10 @@ public class Iridium.Views.ChannelChatView : Iridium.Views.ChatView {
     }
 
     public void display_channel_error_msg (Iridium.Services.Message message) {
-        // TODO: Implement
+        // TODO: Maybe use more specific methods in this class for different errors?
+        if (topic_edit_dialog != null) {
+            topic_edit_dialog.display_error (message.message);
+        }
     }
 
     public void set_usernames (Gee.List<string> usernames) {
