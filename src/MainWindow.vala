@@ -626,10 +626,14 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             /* main_layout.show_chat_view (server_name);
             show_channel_join_dialog (); */
             if (connection_dialog != null) {
+                // Use the destroy signal to ensure that the channel dialog only shows
+                // after the server connection dialog has closed
+                connection_dialog.destroy.connect (() => {
+                    show_channel_join_dialog (server_name);
+                });
                 connection_dialog.dismiss ();
 
                 side_panel.select_server_row (server_name);
-                show_channel_join_dialog (server_name);
             }
 
             return false;
