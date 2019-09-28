@@ -97,6 +97,8 @@ This project is very much in-progress and has a lot of remaining work. Here is a
 - [ ] Audio notification when a message is received
 - [ ] Add server/channel history even when a connection is closed so that you can open from history in the welcome view
 - [ ] Use the display name given by the IRC server when connecting (NETWORK=...)
+- [ ] Associate `irc://` links to open in-app
+- [ ] Support downloading files from channels ([#4](https://github.com/avojak/iridium/issues/4))
 
 These are some ideas I think might been cool to implement, but may add too much complexity or clutter to the UI and the project as a whole:
 
