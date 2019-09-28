@@ -52,10 +52,9 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         server_connection.private_message_received.connect (on_private_message_received);
         server_connection.insufficient_privs.connect (on_insufficient_privs_received);
 
-        // TODO: This may cause a bug since we're not yet sure whether the
-        //       connection attempt was successful. Maybe do this in the
-        //       callback instead?
-        open_connections.set (server, server_connection);
+        server_connection.open_successful.connect (() => {
+            open_connections.set (server, server_connection);
+        });
 
         server_connection.open ();
         return server_connection;
