@@ -19,16 +19,20 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Services.ServerConnectionDetails : GLib.Object {
+public enum Iridium.Models.AuthenticationMethod { 
+    
+    NONE,
+    SERVER_PASSWORD;
 
-    // TODO: Support non-default port numbers
-    public const uint16 DEFAULT_PORT = 6667;
-
-    public string server;
-    public string nickname;
-    public string username;
-    public string realname;
-    public string auth_method;
-    public string auth_token;
+    public string get_display_string () {
+        switch (this) {
+            case NONE:
+                return "None";
+            case SERVER_PASSWORD:
+                return "Server Password";
+            default:
+                assert_not_reached ();
+        }
+    }
 
 }

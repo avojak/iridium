@@ -22,6 +22,8 @@ dependencies required:
 - `gettext`
 - `libgtk-3-dev (>= 3.10)`
 - `libgee-0.8-dev`
+- `libsecret-1-dev`
+- `libsqlite3-dev`
 - `meson`
 - `valac (>= 0.28.0)`
 - `libsqlite3-dev`

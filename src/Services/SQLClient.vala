@@ -69,7 +69,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
                 "nickname" TEXT,
                 "username" TEXT,
                 "realname" TEXT,
-                "password" TEXT,
+                "auth_method" TEXT,
                 "enabled" BOOL
             );
             CREATE TABLE IF NOT EXISTS "channels" (
@@ -84,10 +84,9 @@ public class Iridium.Services.SQLClient : GLib.Object {
     }
 
     public void insert_server (Iridium.Services.Server server) {
-        print ("\tinsert_server\n");
         var sql = """
-            INSERT INTO servers (hostname, port, nickname, username, realname, password, enabled) 
-            VALUES ($HOSTNAME, $PORT, $NICKNAME, $USERNAME, $REALNAME, $PASSWORD, $ENABLED);
+            INSERT INTO servers (hostname, port, nickname, username, realname, auth_method, enabled) 
+            VALUES ($HOSTNAME, $PORT, $NICKNAME, $USERNAME, $REALNAME, $AUTH_METHOD, $ENABLED);
             """;
 
         Sqlite.Statement statement;
@@ -102,7 +101,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
         statement.bind_text (3, server.connection_details.nickname);
         statement.bind_text (4, server.connection_details.username);
         statement.bind_text (5, server.connection_details.realname);
-        statement.bind_text (6, server.connection_details.password);
+        statement.bind_text (6, server.connection_details.auth_method);
         statement.bind_int (7, bool_to_int (server.enabled));
 
         statement.step ();
@@ -338,8 +337,8 @@ public class Iridium.Services.SQLClient : GLib.Object {
                 case "realname":
                     connection_details.realname = statement.column_text (i);
                     break;
-                case "password":
-                    connection_details.password = statement.column_text (i);
+                case "auth_method":
+                    connection_details.auth_method = statement.column_text (i);
                     break;
                 case "enabled":
                     server.enabled = int_to_bool (statement.column_int (i));
