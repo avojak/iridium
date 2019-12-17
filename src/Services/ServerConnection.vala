@@ -26,6 +26,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     private DataInputStream input_stream;
     private DataOutputStream output_stream;
     private bool should_exit = false;
+    private bool is_registered = false;
 
     private Gee.List<string> joined_channels = new Gee.ArrayList<string> ();
     private Gee.Map<string, Gee.List<string>> channel_users = new Gee.HashMap<string, Gee.List<string>> ();
@@ -93,13 +94,53 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         var realname = connection_details.realname;
         var mode = "+i";
 
-        // TODO: Password?
-        send_output (@"NICK $nickname");
-        send_output (@"USER $username 0 * :$realname");
-        send_output (@"MODE $username $mode");
+        // Handle the various auth methods
+        switch (Iridium.Models.AuthenticationMethod.get_value_by_name (connection_details.auth_method)) {
+            case Iridium.Models.AuthenticationMethod.NONE:
+                send_output (@"NICK $nickname");
+                send_output (@"USER $username 0 * :$realname");
+                send_output (@"MODE $username $mode");
+                break;
+            case Iridium.Models.AuthenticationMethod.SERVER_PASSWORD:
+                // TODO: This won't work because it's connecting the same signal many times...
+                Iridium.Application.secret_manager.password_retrieved.connect ((server, port, user, password) => {
+                    if (server == connection_details.server && port == connection_details.port && user == connection_details.user) {
+                        if (password == null) {
+                            // TODO: Handle this better!
+                            debug ("No password found for server: " + server);
+                        }
+                        send_output (@"PASS $password");
+                        send_output (@"NICK $nickname");
+                        send_output (@"USER $username 0 * :$realname");
+                        send_output (@"MODE $username $mode");
+                    }
+                });
+                break;
+            default:
+                assert_not_reached ();
+        }
     }
 
-    private void handle_line (string line) {
+    //  private void authenticate (string password) {
+    //      send_output (@"PASS $password");
+
+    //      string line = "";
+    //      do {
+    //          try {
+    //              line = input_stream.read_line (null);
+    //          } catch (GLib.IOError e) {
+    //              stderr.printf ("IOError while reading: %s\n", e.message);
+    //          }
+    //          var message = new Iridium.Services.Message (line);
+    //          if (message.command == "ERROR") {
+    //              throw new GLib.IOError.PERMISSION_DENIED(message.message);
+    //          }
+    //          handle_line (line);
+    //      } while (line != null && !is_authenticated);
+    //      print ("Authentication successful\n");
+    //  }
+
+    private void handle_line (string? line) {
         if (line == null) {
             close ();
             return;
@@ -109,6 +150,12 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         switch (message.command) {
             case "PING":
                 send_output ("PONG " + message.message);
+                break;
+            case "ERROR":
+                if (!is_registered) {
+                    open_failed (message.message);
+                }
+                server_error_received (message);
                 break;
             case Iridium.Services.MessageCommands.NOTICE:
             case Iridium.Services.NumericCodes.RPL_MOTD:
@@ -125,6 +172,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 server_message_received (message);
                 break;
             case Iridium.Services.NumericCodes.RPL_WELCOME:
+                is_registered = true;
                 open_successful (message);
                 break;
             case Iridium.Services.MessageCommands.QUIT:

@@ -52,8 +52,11 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         server_connection.private_message_received.connect (on_private_message_received);
         server_connection.insufficient_privs.connect (on_insufficient_privs_received);
 
-        server_connection.open_successful.connect (() => {
+        //  server_connection.open_successful.connect (() => {
             open_connections.set (server, server_connection);
+        //  });
+        server_connection.open_failed.connect (() => {
+            open_connections.unset (server);
         });
 
         server_connection.open ();

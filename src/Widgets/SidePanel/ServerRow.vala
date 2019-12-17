@@ -79,13 +79,21 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
     }
 
     public new void disable () {
-        if (!is_enabled) {
-            return;
-        }
+        //  if (!is_enabled) {
+        //      return;
+        //  }
         //  icon = new GLib.ThemedIcon ("user-offline");
+        icon = new GLib.ThemedIcon ("network-server");
         markup = "<i>" + server_name + "</i>";
         is_enabled = false;
     }
+
+    //  public new void error () {
+        //  print ("SERVERROW ERROR\n");
+        //  icon = new GLib.ThemedIcon ("dialog-error");
+        //  markup = "<i>" + server_name + "</i>";
+        //  is_enabled = false;
+    //  }
 
     public new void updating () {
         //  icon = new GLib.ThemedIcon ("mail-unread");

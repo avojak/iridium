@@ -26,6 +26,10 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
     private Gtk.Spinner spinner;
     private Gtk.Label status_label;
 
+    enum Column {
+        AUTH_METHOD
+    }
+
     public ServerConnectionDialog (Iridium.MainWindow main_window) {
         Object (
             deletable: false,
@@ -70,33 +74,38 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         form_grid.row_spacing = 12;
         form_grid.column_spacing = 20;
 
-        var server_label = new Gtk.Label ("Server");
+        var server_label = new Gtk.Label ("Server:");
         server_label.halign = Gtk.Align.END;
 
         var server_entry = new Gtk.Entry ();
         server_entry.hexpand = true;
         server_entry.placeholder_text = "irc.freenode.net";
 
-        var nickname_label = new Gtk.Label ("Nickname");
+        var nickname_label = new Gtk.Label ("Nickname:");
         nickname_label.halign = Gtk.Align.END;
 
         var nickname_entry = new Gtk.Entry ();
         nickname_entry.hexpand = true;
         nickname_entry.placeholder_text = "iridium";
 
-        var username_label = new Gtk.Label ("Username");
+        var username_label = new Gtk.Label ("Username:");
         username_label.halign = Gtk.Align.END;
 
         var username_entry = new Gtk.Entry ();
         username_entry.hexpand = true;
         username_entry.placeholder_text = "iridium";
 
-        var realname_label = new Gtk.Label ("Real Name");
+        var realname_label = new Gtk.Label ("Real Name:");
         realname_label.halign = Gtk.Align.END;
 
         var realname_entry = new Gtk.Entry ();
         realname_entry.hexpand = true;
         realname_entry.placeholder_text = "Iridium IRC Client";
+
+        // TODO: It would be nice to do some sizing work here so that the
+        //       dialog doesn't resize horizontally the section expands
+        var expander = new Gtk.Expander ("Advanced");
+        expander.add (create_advanced_settings_view ());
 
         form_grid.attach (server_label, 0, 0, 1, 1);
         form_grid.attach (server_entry, 1, 0, 1, 1);
@@ -106,6 +115,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         form_grid.attach (username_entry, 1, 2, 1, 1);
         form_grid.attach (realname_label, 0, 3, 1, 1);
         form_grid.attach (realname_entry, 1, 3, 1, 1);
+        form_grid.attach (expander, 0, 4, 2, 1);
 
         body.add (form_grid);
 
@@ -136,12 +146,72 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
             var server_name = server_entry.get_text ().chomp ().chug ();
             var nickname = nickname_entry.get_text ().chomp ().chug ();
             var username = username_entry.get_text ().chomp ().chug ();
-            var realname = server_entry.get_text ().chomp ().chug ();
+            var realname = realname_entry.get_text ().chomp ().chug ();
             connect_button_clicked (server_name, nickname, username, realname);
         });
 
         add_action_widget (cancel_button, 0);
         add_action_widget (connect_button, 1);
+    }
+
+    private Gtk.Grid create_advanced_settings_view () {
+        var advanced_settings_view = new Gtk.Grid ();
+        advanced_settings_view.margin = 0;
+        advanced_settings_view.margin_top = 12;
+        advanced_settings_view.row_spacing = 12;
+        advanced_settings_view.column_spacing = 20;
+
+        var port_label = new Gtk.Label ("Port:");
+        port_label.halign = Gtk.Align.END;
+
+        var port_entry = new Gtk.Entry ();
+        port_entry.hexpand = true;
+        port_entry.placeholder_text = "6667";
+
+        var auth_method_label = new Gtk.Label ("Authentication Method:");
+        auth_method_label.halign = Gtk.Align.END;
+
+        var list_store = new Gtk.ListStore (1, typeof (string));
+        var auth_methods = new Gee.HashMap<int, string> ();
+		auth_methods.set (0, "None");
+		auth_methods.set (1, Iridium.Models.AuthenticationMethod.SERVER_PASSWORD.get_display_string ());
+        for (int i = 0; i < auth_methods.size; i++) {
+            Gtk.TreeIter iter;
+            list_store.append (out iter);
+            list_store.set (iter, Column.AUTH_METHOD, auth_methods[i]);
+        }
+        var auth_method_combo = new Gtk.ComboBox.with_model (list_store);
+        var auth_method_cell = new Gtk.CellRendererText ();
+        auth_method_combo.pack_start (auth_method_cell, false);
+        auth_method_combo.set_attributes (auth_method_cell, "text", 0);
+        auth_method_combo.set_active (0);
+
+        var password_label = new Gtk.Label ("Password:");
+        password_label.halign = Gtk.Align.END;
+
+        var password_entry = new Gtk.Entry ();
+        password_entry.hexpand = true;
+		password_entry.visibility = false;
+		password_entry.set_icon_from_icon_name (Gtk.EntryIconPosition.SECONDARY, "changes-prevent-symbolic");
+		password_entry.icon_press.connect ((pos, event) => {
+			if (pos == Gtk.EntryIconPosition.SECONDARY) {
+				password_entry.visibility = !password_entry.visibility;
+			}
+ 			if (password_entry.visibility) {
+				password_entry.set_icon_from_icon_name (Gtk.EntryIconPosition.SECONDARY, "changes-allow-symbolic");
+			} else {
+				password_entry.set_icon_from_icon_name (Gtk.EntryIconPosition.SECONDARY, "changes-prevent-symbolic");
+			}
+		});
+
+        advanced_settings_view.attach (port_label, 0, 0, 1, 1);
+        advanced_settings_view.attach (port_entry, 1, 0, 1, 1);
+        advanced_settings_view.attach (auth_method_label, 0, 1, 1, 1);
+        advanced_settings_view.attach (auth_method_combo, 1, 1, 1, 1);
+        advanced_settings_view.attach (password_label, 0, 2, 1, 1);
+        advanced_settings_view.attach (password_entry, 1, 2, 1, 1);
+
+        return advanced_settings_view;
     }
 
     public void dismiss () {

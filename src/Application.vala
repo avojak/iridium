@@ -23,6 +23,8 @@ public class Iridium.Application : Gtk.Application {
 
     public static Iridium.Services.Settings settings;
     public static Iridium.Services.ServerConnectionDAO connection_dao;
+    public static Iridium.Services.SecretManager secret_manager;
+
     private static Iridium.Services.ServerConnectionHandler connection_handler;
 
     private bool is_network_available;
@@ -36,8 +38,9 @@ public class Iridium.Application : Gtk.Application {
 
     static construct {
         settings = new Iridium.Services.Settings ();
-        connection_handler = new Iridium.Services.ServerConnectionHandler ();
         connection_dao = new Iridium.Services.ServerConnectionDAO ();
+        secret_manager = new Iridium.Services.SecretManager ();
+        connection_handler = new Iridium.Services.ServerConnectionHandler ();
     }
 
     protected override void activate () {
