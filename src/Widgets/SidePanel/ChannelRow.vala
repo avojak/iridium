@@ -119,7 +119,7 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
             favorite_channel ();
         });
 
-        var remove_favorite_item = new Gtk.MenuItem.with_label ("Remove from favorites");
+        var remove_favorite_item = new Gtk.MenuItem.with_label (_("Remove from favorites"));
         remove_favorite_item.activate.connect (() => {
             remove_favorite_channel ();
         });

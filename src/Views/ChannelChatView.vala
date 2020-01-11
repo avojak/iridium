@@ -21,7 +21,7 @@
 
 public class Iridium.Views.ChannelChatView : Iridium.Views.ChatView {
 
-    private static string TOPIC_PLACEHOLDER = "<i>No channel topic has been set</i>";
+    private static string TOPIC_PLACEHOLDER = "<i>" + _("No channel topic has been set") + "</i>";
 
     public unowned Iridium.MainWindow main_window { get; construct; }
 
@@ -62,7 +62,7 @@ public class Iridium.Views.ChannelChatView : Iridium.Views.ChatView {
         edit_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         edit_button.relief = Gtk.ReliefStyle.NONE;
         edit_button.valign = Gtk.Align.CENTER;
-        edit_button.set_tooltip_text ("Edit topic...");
+        edit_button.set_tooltip_text (_("Edit topic..."));
         edit_button.clicked.connect (() => {
             show_topic_edit_dialog ();
         });
@@ -95,7 +95,7 @@ public class Iridium.Views.ChannelChatView : Iridium.Views.ChatView {
     }
 
     protected override string get_disabled_message () {
-        return "You must join this channel to begin chatting";
+        return _("You must join this channel to begin chatting")
     }
 
     private void show_topic_edit_dialog () {
@@ -163,7 +163,7 @@ public class Iridium.Views.ChannelChatView : Iridium.Views.ChatView {
         } else {
             info_label.set_use_markup (false);
             info_label.set_text (trimmed_topic);
-            info_bar.set_tooltip_text ("Channel topic: " + trimmed_topic);
+            info_bar.set_tooltip_text (_("Channel topic: ") + trimmed_topic);
         }
         // Close the edit dialog if it's open
         if (topic_edit_dialog != null) {

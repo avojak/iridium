@@ -370,7 +370,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     private void begin_initialization () {
         if (overlay_bar == null) {
             overlay_bar = new Granite.Widgets.OverlayBar (overlay);
-            overlay_bar.label = "Restoring server connections";
+            overlay_bar.label = _("Restoring server connections");
             overlay_bar.active = true;
             overlay.show_all ();
         }
@@ -473,7 +473,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     private void join_channel (string server_name, string channel_name) {
         // Check if we're already in this channel
         if (connection_handler.get_channels (server_name).index_of (channel_name) != -1) {
-            channel_join_dialog.display_error ("You've already joined this channel");
+            channel_join_dialog.display_error (_("You've already joined this channel"));
             return;
         }
         // Validate channel name
@@ -484,7 +484,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             return;
         }
         if (channel_name.length < 2) {
-            channel_join_dialog.display_error ("Enter a channel name");
+            channel_join_dialog.display_error (_("Enter a channel name"));
             return;
         }
         connection_handler.join_channel (server_name, channel_name);
