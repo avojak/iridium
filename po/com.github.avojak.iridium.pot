@@ -1,0 +1,236 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the com.github.avojak.iridium package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: com.github.avojak.iridium\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-01-11 17:22+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/Views/ChannelChatView.vala:24
+msgid "No channel topic has been set"
+msgstr ""
+
+#: src/Views/ChannelChatView.vala:65
+msgid "Edit topic..."
+msgstr ""
+
+#: src/Views/ChannelChatView.vala:98
+msgid "You must join this channel to begin chatting"
+msgstr ""
+
+#: src/Views/ChannelChatView.vala:166
+msgid "Channel topic: "
+msgstr ""
+
+#: src/Views/ChatView.vala:79
+msgid "Clear"
+msgstr ""
+
+#: src/Views/ServerChatView.vala:29
+msgid "You are not connected to this server"
+msgstr ""
+
+#: src/Views/Welcome.vala:26
+msgid "Welcome to Iridium"
+msgstr ""
+
+#: src/Views/Welcome.vala:27
+msgid "Connect to Any IRC Server"
+msgstr ""
+
+#: src/Views/Welcome.vala:39
+msgid "Add a New Server"
+msgstr ""
+
+#: src/Views/Welcome.vala:39
+msgid "Connect to a Server and Save It in Servers List"
+msgstr ""
+
+#: src/Widgets/SidePanel/ChannelRow.vala:117
+msgid "Add to favorites"
+msgstr ""
+
+#: src/Widgets/SidePanel/ChannelRow.vala:122
+msgid "Remove from favorites"
+msgstr ""
+
+#: src/Widgets/SidePanel/ChannelRow.vala:127
+msgid "Join channel"
+msgstr ""
+
+#: src/Widgets/SidePanel/ChannelRow.vala:132
+msgid "Leave channel"
+msgstr ""
+
+#: src/Widgets/SidePanel/ChannelRow.vala:137
+#: src/Widgets/SidePanel/PrivateMessageRow.vala:83
+#: src/Widgets/SidePanel/ServerRow.vala:119
+msgid "Close"
+msgstr ""
+
+#: src/Widgets/SidePanel/Panel.vala:42
+msgid "Favorite Channels"
+msgstr ""
+
+#: src/Widgets/SidePanel/Panel.vala:57
+msgid "Servers"
+msgstr ""
+
+#: src/Widgets/SidePanel/ServerRow.vala:104 src/Widgets/StatusBar.vala:28
+msgid "Join a Channel..."
+msgstr ""
+
+#: src/Widgets/SidePanel/ServerRow.vala:109
+#: src/Widgets/ServerConnectionDialog.vala:130
+msgid "Connect"
+msgstr ""
+
+#: src/Widgets/SidePanel/ServerRow.vala:114
+msgid "Disconnect"
+msgstr ""
+
+#: src/Widgets/UsersPopover/ChannelUsersPopover.vala:38
+msgid "No users"
+msgstr ""
+
+#: src/Widgets/ChannelJoinDialog.vala:37 src/Widgets/ChannelJoinDialog.vala:58
+msgid "Join a Channel"
+msgstr ""
+
+#: src/Widgets/ChannelJoinDialog.vala:106
+msgid "Channel"
+msgstr ""
+
+#: src/Widgets/ChannelJoinDialog.vala:133
+msgid "Not Now"
+msgstr ""
+
+#: src/Widgets/ChannelJoinDialog.vala:138
+msgid "Join"
+msgstr ""
+
+#: src/Widgets/ChannelTopicEditDialog.vala:37
+#: src/Widgets/ChannelTopicEditDialog.vala:57
+msgid "Edit Channel Topic"
+msgstr ""
+
+#: src/Widgets/ChannelTopicEditDialog.vala:112
+#: src/Widgets/ServerConnectionDialog.vala:125
+msgid "Cancel"
+msgstr ""
+
+#: src/Widgets/ChannelTopicEditDialog.vala:117
+#: src/Widgets/ChannelTopicEditDialog.vala:134
+msgid "Submit"
+msgstr ""
+
+#: src/Widgets/ChannelTopicEditDialog.vala:132
+msgid "Clear topic"
+msgstr ""
+
+#: src/Widgets/HeaderBar.vala:79
+msgid "Channel users"
+msgstr ""
+
+#: src/Widgets/HeaderBar.vala:97
+msgid "Light background"
+msgstr ""
+
+#: src/Widgets/HeaderBar.vala:98
+msgid "Dark background"
+msgstr ""
+
+#: src/Widgets/NetworkInfoBar.vala:35
+msgid "Network is not available"
+msgstr ""
+
+#: src/Widgets/NetworkInfoBar.vala:38
+msgid "Network Settings..."
+msgstr ""
+
+#: src/Widgets/ServerConnectionDialog.vala:33
+msgid "Connect to a Server"
+msgstr ""
+
+#: src/Widgets/ServerConnectionDialog.vala:52
+msgid "New Connection"
+msgstr ""
+
+#: src/Widgets/ServerConnectionDialog.vala:73
+msgid "Server"
+msgstr ""
+
+#: src/Widgets/ServerConnectionDialog.vala:80
+msgid "Nickname"
+msgstr ""
+
+#: src/Widgets/ServerConnectionDialog.vala:87
+msgid "Username"
+msgstr ""
+
+#: src/Widgets/ServerConnectionDialog.vala:94
+msgid "Real Name"
+msgstr ""
+
+#: src/Widgets/ServerConnectionDialog.vala:99
+msgid "Iridium IRC Client"
+msgstr ""
+
+#: src/Widgets/StatusBar.vala:27
+msgid "Connect to a Server..."
+msgstr ""
+
+#: src/Widgets/StatusBar.vala:38
+msgid "Join a Server or Channel"
+msgstr ""
+
+#: src/MainWindow.vala:373
+msgid "Restoring server connections"
+msgstr ""
+
+#: src/MainWindow.vala:425
+msgid "Already connected to this server!"
+msgstr ""
+
+#: src/MainWindow.vala:476
+msgid "You've already joined this channel"
+msgstr ""
+
+#: src/MainWindow.vala:483
+msgid "Channel must begin with '#' or '&'"
+msgstr ""
+
+#: src/MainWindow.vala:487
+msgid "Enter a channel name"
+msgstr ""
+
+#: src/MainWindow.vala:500
+msgid "Start your message with a /"
+msgstr ""
+
+#: src/MainWindow.vala:701 src/MainWindow.vala:718
+msgid " has quit"
+msgstr ""
+
+#: src/MainWindow.vala:740
+msgid "Nickname already in use."
+msgstr ""
+
+#: src/MainWindow.vala:816
+msgid " has joined"
+msgstr ""
+
+#: src/MainWindow.vala:830
+msgid " has left"
+msgstr ""
