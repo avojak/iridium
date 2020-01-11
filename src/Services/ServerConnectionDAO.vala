@@ -38,7 +38,7 @@ public class Iridium.Services.ServerConnectionDAO : GLib.Object {
     }
 
     public void on_server_row_added (string server_name) {
-        // TODO: Implement - maybe do nothing...?
+        // TODO: Implement - maybe do nothing…?
     }
 
     public void on_server_row_removed (string server_name) {

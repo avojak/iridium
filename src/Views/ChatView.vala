@@ -215,9 +215,9 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         text_view.get_buffer ().remove_tag_by_name ("selectable-underline", buffer_start, buffer_end);
     }
 
-    // TODO: Need to figure out a good way to lock scrolling... Might be annoying
+    // TODO: Need to figure out a good way to lock scrolling… Might be annoying
     //       to experience the auto-scroll when you're looking back at old
-    //       messages...
+    //       messages…
     protected void do_autoscroll () {
         var buffer_end_mark = text_view.get_buffer ().get_mark ("buffer-end");
         if (buffer_end_mark != null) {

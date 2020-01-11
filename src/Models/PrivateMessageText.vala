@@ -42,7 +42,7 @@ public abstract class Iridium.Models.PrivateMessageText : Iridium.Models.RichTex
             username = string.nfill (USERNAME_SPACING, ' ');
         } else if (username.length > USERNAME_SPACING) {
             username = username.substring (0, USERNAME_SPACING - 3);
-            username += "...";
+            username += "…";
         } else {
             username += string.nfill (USERNAME_SPACING - username.length, ' ');
         }
