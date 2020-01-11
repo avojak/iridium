@@ -1,15 +1,20 @@
+src/Views/ChannelChatView.vala
 src/Views/ChatView.vala
+src/Views/ServerChatView.vala
 src/Views/Welcome.vala
 
 src/Widgets/SidePanel/ChannelRow.vala
-src/Widgets/SidePanel/DirectMessageRow.vala
+src/Widgets/SidePanel/PrivateMessageRow.vala
 src/Widgets/SidePanel/Panel.vala
 src/Widgets/SidePanel/ServerRow.vala
 
 src/Widgets/UsersPopover/ChannelUsersPopover.vala
 
 src/Widgets/ChannelJoinDialog.vala
+src/Widgets/ChannelTopicEditDialog.vala
 src/Widgets/HeaderBar.vala
+src/Widgets/NetworkInfoBar.vala
 src/Widgets/ServerConnectionDialog.vala
+src/Widgets/StatusBar.vala
 
 src/MainWindow.vala
