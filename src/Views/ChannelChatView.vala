@@ -95,7 +95,7 @@ public class Iridium.Views.ChannelChatView : Iridium.Views.ChatView {
     }
 
     protected override string get_disabled_message () {
-        return _("You must join this channel to begin chatting")
+        return _("You must join this channel to begin chatting");
     }
 
     private void show_topic_edit_dialog () {
