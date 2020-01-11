@@ -261,7 +261,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         if (selected.name == "") {
             return null;
         }
-        // TODO: This feels wrong...
+        // TODO: This feels wrong…
         unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) selected;
         return row.get_server_name ();
     }
