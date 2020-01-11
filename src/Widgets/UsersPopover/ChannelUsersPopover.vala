@@ -21,6 +21,9 @@
 
 public class Iridium.Widgets.UsersPopover.ChannelUsersPopover : Gtk.Popover {
 
+    // TODO: Need to handle usernames for OPs and other special cases where the
+    //       username starts with a symbol (e.g. @)
+
     private Gtk.SearchEntry search_entry;
     private Gtk.ScrolledWindow scrolled_window;
     private Gtk.ListBox list_box;
@@ -48,21 +51,10 @@ public class Iridium.Widgets.UsersPopover.ChannelUsersPopover : Gtk.Popover {
         list_box.set_placeholder (placeholder);
         scrolled_window.add (list_box);
 
-        // TODO: Refactor these out...
-        list_box.set_filter_func ((row) => {
-            if (search_entry.text == null || search_entry.text.length == 0) {
-                return true;
-            }
-            Iridium.Widgets.UsersPopover.UserListBoxRow user_row = (Iridium.Widgets.UsersPopover.UserListBoxRow) row;
-            return user_row.username.contains (search_entry.text);
-        });
-        // Sort alphabetically
-        list_box.set_sort_func ((row1, row2) => {
-            Iridium.Widgets.UsersPopover.UserListBoxRow user_row1 = (Iridium.Widgets.UsersPopover.UserListBoxRow) row1;
-            Iridium.Widgets.UsersPopover.UserListBoxRow user_row2 = (Iridium.Widgets.UsersPopover.UserListBoxRow) row2;
-            return user_row1.username.collate (user_row2.username);
-        });
+        list_box.set_filter_func (filter_func);
+        list_box.set_sort_func (sort_func);
         // TODO: User header_func to add header for Ops/Owners/Others?
+        // list_box.set_header_func ();
 
         search_entry = new Gtk.SearchEntry ();
         search_entry.margin = 6;
@@ -90,6 +82,20 @@ public class Iridium.Widgets.UsersPopover.ChannelUsersPopover : Gtk.Popover {
             search_entry.set_text ("");
             list_box.select_row (null);
         });
+    }
+
+    private bool filter_func (Gtk.ListBoxRow row) {
+        if (search_entry.text == null || search_entry.text.length == 0) {
+            return true;
+        }
+        Iridium.Widgets.UsersPopover.UserListBoxRow user_row = (Iridium.Widgets.UsersPopover.UserListBoxRow) row;
+        return user_row.username.contains (search_entry.text);
+    }
+
+    private int sort_func (Gtk.ListBoxRow row1, Gtk.ListBoxRow row2) {
+        Iridium.Widgets.UsersPopover.UserListBoxRow user_row1 = (Iridium.Widgets.UsersPopover.UserListBoxRow) row1;
+        Iridium.Widgets.UsersPopover.UserListBoxRow user_row2 = (Iridium.Widgets.UsersPopover.UserListBoxRow) row2;
+        return user_row1.username.collate (user_row2.username);
     }
 
     public void set_users (Gee.List<string> usernames) {

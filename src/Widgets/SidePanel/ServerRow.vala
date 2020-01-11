@@ -19,7 +19,7 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.ExpandableItem, Iridium.Widgets.SidePanel.Row {
+public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.ExpandableItem, Granite.Widgets.SourceListSortable, Iridium.Widgets.SidePanel.Row {
 
     public string server_name { get; construct; }
 
@@ -33,7 +33,31 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
     }
 
     construct {
-        icon = new GLib.ThemedIcon ("user-available");
+        //  icon = new GLib.ThemedIcon ("user-available");
+        icon = new GLib.ThemedIcon ("network-server");
+    }
+
+    public new bool allow_dnd_sorting () {
+        return false;
+    }
+
+    public new int compare (Granite.Widgets.SourceList.Item a, Granite.Widgets.SourceList.Item b) {
+        if (a is Iridium.Widgets.SidePanel.ChannelRow && b is Iridium.Widgets.SidePanel.ChannelRow) {
+            var channel_a = a as Iridium.Widgets.SidePanel.ChannelRow;
+            var channel_b = b as Iridium.Widgets.SidePanel.ChannelRow;
+            return channel_a.channel_name.ascii_casecmp (channel_b.channel_name);
+        } else if (a is Iridium.Widgets.SidePanel.ChannelRow && b is Iridium.Widgets.SidePanel.PrivateMessageRow) {
+            return -1;
+        } else if (a is Iridium.Widgets.SidePanel.PrivateMessageRow && b is Iridium.Widgets.SidePanel.ChannelRow) {
+            return 1;
+        } else if (a is Iridium.Widgets.SidePanel.PrivateMessageRow && b is Iridium.Widgets.SidePanel.PrivateMessageRow) {
+            var pm_a = a as Iridium.Widgets.SidePanel.PrivateMessageRow;
+            var pm_b = b as Iridium.Widgets.SidePanel.PrivateMessageRow;
+            return pm_a.username.ascii_casecmp (pm_b.username);
+        } else {
+            // TODO: Log this undefined behavior that should never happen
+            return 0;
+        }
     }
 
     public new string get_server_name () {
@@ -48,7 +72,8 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
         if (is_enabled) {
             return;
         }
-        icon = new GLib.ThemedIcon ("user-available");
+        //  icon = new GLib.ThemedIcon ("user-available");
+        icon = new GLib.ThemedIcon ("network-server");
         markup = null;
         is_enabled = true;
     }
@@ -57,22 +82,33 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
         if (!is_enabled) {
             return;
         }
-        icon = new GLib.ThemedIcon ("user-offline");
+        //  icon = new GLib.ThemedIcon ("user-offline");
         markup = "<i>" + server_name + "</i>";
         is_enabled = false;
+    }
+
+    public new void updating () {
+        //  icon = new GLib.ThemedIcon ("mail-unread");
+        icon = new GLib.ThemedIcon (Constants.APP_ID + ".image-loading-symbolic");
+        markup = "<i>" + server_name + "</i>";
+        is_enabled = false;
+    }
+
+    public new bool get_enabled () {
+        return is_enabled;
     }
 
     public override Gtk.Menu? get_context_menu () {
         var menu = new Gtk.Menu ();
 
-        var edit_item = new Gtk.MenuItem.with_label (_("Edit settings..."));
-        edit_item.activate.connect (() => {
-            // TODO: Implement
+        var join_item = new Gtk.MenuItem.with_label (_("Join a Channel..."));
+        join_item.activate.connect (() => {
+            join_channel ();
         });
 
         var connect_item = new Gtk.MenuItem.with_label (_("Connect"));
         connect_item.activate.connect (() => {
-            // TODO: Implement
+            connect_to_server ();
         });
 
         var disconnect_item = new Gtk.MenuItem.with_label (_("Disconnect"));
@@ -88,9 +124,9 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
             remove_server ();
         });
 
-        menu.append (edit_item);
-        menu.append (new Gtk.SeparatorMenuItem ());
         if (is_enabled) {
+            menu.append (join_item);
+            menu.append (new Gtk.SeparatorMenuItem ());
             menu.append (disconnect_item);
         } else {
             menu.append (connect_item);
@@ -102,7 +138,9 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
         return menu;
     }
 
+    public signal void join_channel ();
     public signal void disconnect_from_server ();
+    public signal void connect_to_server ();
     public signal void remove_server ();
 
 }

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=@name@
+GenericName=IRC Client
+Comment=Friendly IRC client
+Categories=Network;Utility;Chat;IRCClient;
+Exec=@binary@
+Icon=@icon@
+Terminal=false
+Type=Application
+Keywords=IRC;IM;Chat;

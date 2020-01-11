@@ -19,32 +19,43 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Views.ServerChatView : Iridium.Views.ChatView {
+public class Iridium.Views.PrivateMessageChatView : Iridium.Views.ChatView {
+
+    private string last_sender = null;
 
     protected override int get_indent () {
-        return 0;
+        return -140; // TODO: Figure out how to compute this
     }
 
     protected override string get_disabled_message () {
-        return "You are not connected to this server";
+        return ""; // TODO: Does this even make sense since we don't allow disabled PM items?
     }
 
     public override void display_self_private_msg (Iridium.Services.Message message) {
         var rich_text = new Iridium.Models.SelfPrivateMessageText (message);
+        rich_text.suppress_sender_username = is_repeat_sender (message);
         rich_text.display (text_view.get_buffer ());
         do_autoscroll ();
+        last_sender = message.username;
     }
 
     public override void display_server_msg (Iridium.Services.Message message) {
         var rich_text = new Iridium.Models.ServerMessageText (message);
         rich_text.display (text_view.get_buffer ());
         do_autoscroll ();
+        last_sender = null;
     }
 
-    public void display_server_error_msg (Iridium.Services.Message message) {
-        var rich_text = new Iridium.Models.ServerErrorMessageText (message);
+    public void display_private_msg (Iridium.Services.Message message) {
+        var rich_text = new Iridium.Models.OthersPrivateMessageText (message);
+        rich_text.suppress_sender_username = is_repeat_sender (message);
         rich_text.display (text_view.get_buffer ());
         do_autoscroll ();
+        last_sender = message.username;
+    }
+
+    private bool is_repeat_sender (Iridium.Services.Message message) {
+        return last_sender == message.username;
     }
 
 }

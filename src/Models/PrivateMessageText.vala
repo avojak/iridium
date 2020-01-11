@@ -19,13 +19,16 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public abstract class Iridium.Models.PrivMessageText : Iridium.Models.RichText {
+public abstract class Iridium.Models.PrivateMessageText : Iridium.Models.RichText {
 
     private static uint16 USERNAME_SPACING = 20;
 
-    public PrivMessageText (Iridium.Services.Message message) {
+    public bool suppress_sender_username { get; set; }
+
+    public PrivateMessageText (Iridium.Services.Message message) {
         Object (
-            message: message
+            message: message,
+            suppress_sender_username: false
         );
     }
 
@@ -35,7 +38,9 @@ public abstract class Iridium.Models.PrivMessageText : Iridium.Models.RichText {
 
         // Display username
         var username = message.username;
-        if (username.length > USERNAME_SPACING) {
+        if (suppress_sender_username) {
+            username = string.nfill (USERNAME_SPACING, ' ');
+        } else if (username.length > USERNAME_SPACING) {
             username = username.substring (0, USERNAME_SPACING - 3);
             username += "...";
         } else {
@@ -46,7 +51,10 @@ public abstract class Iridium.Models.PrivMessageText : Iridium.Models.RichText {
         // Format the username
         Gtk.TextIter username_start = iter;
         username_start.backward_chars (username.length);
-        buffer.apply_tag_by_name (get_tag_name (), username_start, iter);
+        Gtk.TextIter username_end = username_start;
+        username_end.forward_chars (message.username.length);
+        buffer.apply_tag_by_name (get_tag_name (), username_start, username_end);
+        buffer.apply_tag_by_name ("selectable", username_start, username_end);
         buffer.insert_text (ref iter, message.message, message.message.length);
         buffer.insert (ref iter, "\n", 1);
     }

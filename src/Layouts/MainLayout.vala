@@ -23,14 +23,16 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
 
     public weak Iridium.Views.Welcome welcome_view { get; construct; }
     public unowned Iridium.Widgets.SidePanel.Panel side_panel { get; construct; }
+    public unowned Iridium.Widgets.StatusBar status_bar { get; construct; }
 
     private Gtk.Stack main_stack;
 
-    public MainLayout (Iridium.Views.Welcome welcome_view, Iridium.Widgets.SidePanel.Panel side_panel) {
+    public MainLayout (Iridium.Views.Welcome welcome_view, Iridium.Widgets.SidePanel.Panel side_panel, Iridium.Widgets.StatusBar status_bar) {
         Object (
             orientation: Gtk.Orientation.HORIZONTAL,
             welcome_view: welcome_view,
-            side_panel: side_panel
+            side_panel: side_panel,
+            status_bar: status_bar
         );
     }
 
@@ -40,15 +42,34 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
         main_stack = new Gtk.Stack ();
         main_stack.add_named (welcome_view, "welcome");
 
-        pack1 (side_panel, false, false);
+        var side_grid = new Gtk.Grid ();
+        side_grid.orientation = Gtk.Orientation.VERTICAL;
+        side_grid.add (side_panel);
+        side_grid.add (status_bar);
+
+        pack1 (side_grid, false, false);
         pack2 (main_stack, true, false);
     }
 
-    public void add_chat_view (Iridium.Views.ChatView view, string name) {
-        if (get_chat_view (name) != null) {
+    public void add_server_chat_view (Iridium.Views.ServerChatView view, string server_name) {
+        if (get_server_chat_view (server_name) != null) {
             return;
         }
-        main_stack.add_named (view, name);
+        main_stack.add_named (view, server_name);
+    }
+
+    public void add_channel_chat_view (Iridium.Views.ChatView view, string server_name, string channel_name) {
+        if (get_channel_chat_view (server_name, channel_name) != null) {
+            return;
+        }
+        main_stack.add_named (view, server_name + ";" + channel_name);
+    }
+
+    public void add_private_message_chat_view (Iridium.Views.PrivateMessageChatView view, string server_name, string username) {
+        if (get_private_message_chat_view (server_name, username) != null) {
+            return;
+        }
+        main_stack.add_named (view, server_name + ";" + username);
     }
 
     public void show_welcome_view () {
@@ -56,37 +77,39 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
         main_stack.set_visible_child_full ("welcome", Gtk.StackTransitionType.SLIDE_RIGHT);
     }
 
-    public Iridium.Views.ChatView? get_chat_view (string name) {
-        var view = main_stack.get_child_by_name (name);
-        return (Iridium.Views.ChatView) view;
-    }
-
-    // TODO: Add methods here so we don't have to do type-casting at the consumer level
-
-    public Iridium.Views.ChannelChatView? get_channel_chat_view (string name) {
+    public Iridium.Views.ChannelChatView? get_channel_chat_view (string server_name, string channel_name) {
+        var name = server_name + ";" + channel_name;
         return main_stack.get_child_by_name (name) as Iridium.Views.ChannelChatView;
     }
 
-    public Iridium.Views.ServerChatView? get_server_chat_view (string name) {
-        return main_stack.get_child_by_name (name) as Iridium.Views.ServerChatView;
+    public Iridium.Views.ServerChatView? get_server_chat_view (string server_name) {
+        return main_stack.get_child_by_name (server_name) as Iridium.Views.ServerChatView;
     }
 
-    public Iridium.Views.DirectMessageChatView? get_direct_message_chat_view (string name) {
-        return main_stack.get_child_by_name (name) as Iridium.Views.DirectMessageChatView;
+    public Iridium.Views.PrivateMessageChatView? get_private_message_chat_view (string server_name, string username) {
+        var name = server_name + ";" + username;
+        return main_stack.get_child_by_name (name) as Iridium.Views.PrivateMessageChatView;
     }
 
-    public void show_chat_view (string name) {
-        var chat_view = get_chat_view (name);
+    public void show_chat_view (string server_name, string? channel_name) {
+        var chat_view = get_chat_view (server_name, channel_name);
         if (chat_view == null) {
             return;
         }
         chat_view.show_all ();
+        var name = server_name + (channel_name == null ? "" : (";" + channel_name));
         main_stack.set_visible_child_full (name, Gtk.StackTransitionType.SLIDE_RIGHT);
         // Set focus on the text entry
         Idle.add (() => {
             chat_view.set_entry_focus ();
             return false;
         });
+    }
+
+    private Iridium.Views.ChatView? get_chat_view (string server_name, string? channel_name) {
+        var name = server_name + (channel_name == null ? "" : (";" + channel_name));
+        var view = main_stack.get_child_by_name (name);
+        return (Iridium.Views.ChatView) view;
     }
 
 }

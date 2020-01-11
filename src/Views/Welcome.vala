@@ -36,7 +36,7 @@ public class Iridium.Views.Welcome : Granite.Widgets.Welcome {
         // TODO: Instead, simply have an option to connect to a new server. We
         //       can maybe have a separate star icon for favoriting?
         // TODO: Revisit the wording based on human interface guidelines
-        append ("com.github.avojak.iridium.network-server-new", _("Add a New Server"), _("Connect to a Server and Save It in Servers List"));
+        append (Constants.APP_ID + ".network-server-new", _("Add a New Server"), _("Connect to a Server and Save It in Servers List"));
 
         // TODO: Have an option for connecting to a server from a list of
         //       popular/common servers?

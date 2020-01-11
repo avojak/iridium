@@ -33,7 +33,6 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         if (open_connections.has_key (server)) {
             return open_connections.get (server);
         }
-        // Check if we've been connected and can re-use everything
         Iridium.Services.ServerConnection server_connection = new Iridium.Services.ServerConnection (connection_details);
         server_connection.open_successful.connect (on_server_connection_successful);
         server_connection.open_failed.connect (on_server_connection_failed);
@@ -42,18 +41,20 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         server_connection.server_error_received.connect (on_server_error_received);
         server_connection.server_quit.connect (on_server_quit);
         server_connection.user_quit_server.connect (on_user_quit_server);
+        server_connection.channel_users_received.connect (on_channel_users_received);
+        server_connection.channel_topic_received.connect (on_channel_topic_received);
         server_connection.nickname_in_use.connect (on_nickname_in_use);
         server_connection.channel_joined.connect (on_channel_joined);
         server_connection.channel_left.connect (on_channel_left);
         server_connection.channel_message_received.connect (on_channel_message_received);
         server_connection.user_joined_channel.connect (on_user_joined_channel);
         server_connection.user_left_channel.connect (on_user_left_channel);
-        server_connection.direct_message_received.connect (on_direct_message_received);
+        server_connection.private_message_received.connect (on_private_message_received);
+        server_connection.insufficient_privs.connect (on_insufficient_privs_received);
 
-        // TODO: This may cause a bug since we're not yet sure whether the
-        //       connection attempt was successful. Maybe do this in the
-        //       callback instead?
-        open_connections.set (server, server_connection);
+        server_connection.open_successful.connect (() => {
+            open_connections.set (server, server_connection);
+        });
 
         server_connection.open ();
         return server_connection;
@@ -66,6 +67,22 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         }
         connection.close ();
         open_connections.unset (server);
+    }
+
+    public Iridium.Services.ServerConnectionDetails? get_connection_details (string server_name) {
+        var connection = open_connections.get (server_name);
+        if (connection == null) {
+            return null;
+        }
+        return connection.connection_details;
+    }
+
+    public void join_channel (string server_name, string channel_name) {
+        var connection = open_connections.get (server_name);
+        if (connection == null) {
+            return;
+        }
+        connection.join_channel (channel_name);
     }
 
     public void leave_channel (string server, string channel) {
@@ -84,6 +101,14 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         return servers;
     }
 
+    public Gee.List<string> get_channels (string server_name) {
+        var connection = open_connections.get (server_name);
+        if (connection == null) {
+            return new Gee.ArrayList<string> ();
+        }
+        return connection.get_joined_channels ();
+    }
+
     public bool has_connection (string server) {
         return open_connections.has_key (server);
     }
@@ -93,10 +118,6 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
             connection.value.close ();
         }
     }
-
-    //
-    // Newer stuff
-    //
 
     public void send_user_message (string server_name, string message) {
         var connection = open_connections.get (server_name);
@@ -114,14 +135,6 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         return connection.connection_details.nickname;
     }
 
-    public void join_channel (string server_name, string channel_name) {
-        var connection = open_connections.get (server_name);
-        if (connection == null) {
-            return;
-        }
-        connection.join_channel (channel_name);
-    }
-
     public Gee.List<string> get_users (string server_name, string channel_name) {
         var connection = open_connections.get (server_name);
         if (connection == null) {
@@ -130,12 +143,20 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         return connection.get_users (channel_name);
     }
 
-    public Iridium.Services.ServerConnectionDetails? get_connection_details (string server_name) {
+    public string get_topic (string server_name, string channel_name) {
         var connection = open_connections.get (server_name);
         if (connection == null) {
-            return null;
+            return "";
         }
-        return connection.connection_details;
+        return connection.get_channel_topic (channel_name);
+    }
+
+    public void set_channel_topic (string server_name, string channel_name, string topic) {
+        var connection = open_connections.get (server_name);
+        if (connection == null) {
+            return;
+        }
+        connection.set_channel_topic (channel_name, topic);
     }
 
     //
@@ -170,6 +191,14 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         user_quit_server (source.connection_details.server, username, channels, message);
     }
 
+    private void on_channel_users_received (Iridium.Services.ServerConnection source, string channel_name) {
+        channel_users_received (source.connection_details.server, channel_name);
+    }
+
+    private void on_channel_topic_received (Iridium.Services.ServerConnection source, string channel_name) {
+        channel_topic_received (source.connection_details.server, channel_name);
+    }
+
     private void on_nickname_in_use (Iridium.Services.ServerConnection source, Iridium.Services.Message message) {
         nickname_in_use (source.connection_details.server, message);
     }
@@ -194,8 +223,12 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         user_left_channel (source.connection_details.server, channel_name, username);
     }
 
-    private void on_direct_message_received (Iridium.Services.ServerConnection source, string username, Iridium.Services.Message message) {
-        direct_message_received (source.connection_details.server, username, message);
+    private void on_private_message_received (Iridium.Services.ServerConnection source, string username, Iridium.Services.Message message) {
+        private_message_received (source.connection_details.server, username, message);
+    }
+
+    private void on_insufficient_privs_received (Iridium.Services.ServerConnection source, string channel_name, Iridium.Services.Message message) {
+        insufficient_privs_received (source.connection_details.server, channel_name, message);
     }
 
     //
@@ -209,12 +242,15 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
     public signal void server_error_received (string server_name, Iridium.Services.Message message);
     public signal void server_quit (string server_name, string message);
     public signal void user_quit_server (string server_name, string username, Gee.List<string> channels, Iridium.Services.Message message);
+    public signal void channel_users_received (string server_name, string channel_name);
+    public signal void channel_topic_received (string server_name, string channel_name);
     public signal void nickname_in_use (string server_name, Iridium.Services.Message message);
     public signal void channel_joined (string server_name, string channel_name);
     public signal void channel_left (string server_name, string channel_name);
     public signal void channel_message_received (string server_name, string channel_name, Iridium.Services.Message message);
     public signal void user_joined_channel (string server_name, string channel_name, string username);
     public signal void user_left_channel (string server_name, string channel_name, string username);
-    public signal void direct_message_received (string server_name, string username, Iridium.Services.Message message);
+    public signal void private_message_received (string server_name, string username, Iridium.Services.Message message);
+    public signal void insufficient_privs_received (string server_name, string channel_name, Iridium.Services.Message message);
 
 }

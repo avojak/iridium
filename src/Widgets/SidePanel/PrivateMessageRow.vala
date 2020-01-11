@@ -19,18 +19,14 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-// TODO: Implement for direct messages from other users.
-//       The context menu will need to be slightly different, as the only
-//       option should be "close".
-
-public class Iridium.Widgets.SidePanel.DirectMessageRow : Granite.Widgets.SourceList.ExpandableItem, Iridium.Widgets.SidePanel.Row {
+public class Iridium.Widgets.SidePanel.PrivateMessageRow : Granite.Widgets.SourceList.ExpandableItem, Iridium.Widgets.SidePanel.Row {
 
     public string username { get; construct; }
     public string server_name { get; construct; }
 
     private bool is_enabled = true;
 
-    public DirectMessageRow (string username, string server_name) {
+    public PrivateMessageRow (string username, string server_name) {
         Object (
             name: username,
             username: username,
@@ -39,7 +35,8 @@ public class Iridium.Widgets.SidePanel.DirectMessageRow : Granite.Widgets.Source
     }
 
     construct {
-        icon = new GLib.ThemedIcon ("user-available");
+        //  icon = new GLib.ThemedIcon ("user-available");
+        icon = new GLib.ThemedIcon ("system-users");
     }
 
     public new string get_server_name () {
@@ -54,7 +51,8 @@ public class Iridium.Widgets.SidePanel.DirectMessageRow : Granite.Widgets.Source
         if (is_enabled) {
             return;
         }
-        icon = new GLib.ThemedIcon ("user-available");
+        //  icon = new GLib.ThemedIcon ("user-available");
+        icon = new GLib.ThemedIcon ("system-users");
         markup = null;
         is_enabled = true;
     }
@@ -63,9 +61,20 @@ public class Iridium.Widgets.SidePanel.DirectMessageRow : Granite.Widgets.Source
         if (!is_enabled) {
             return;
         }
-        icon = new GLib.ThemedIcon ("user-offline");
-        markup = "<i>" + server_name + "</i>";
+        //  icon = new GLib.ThemedIcon ("user-offline");
+        markup = "<i>" + username + "</i>";
         is_enabled = false;
+    }
+
+    public new void updating () {
+        //  icon = new GLib.ThemedIcon ("mail-unread");
+        icon = new GLib.ThemedIcon (Constants.APP_ID + ".image-loading-symbolic");
+        markup = "<i>" + username + "</i>";
+        is_enabled = false;
+    }
+
+    public new bool get_enabled () {
+        return is_enabled;
     }
 
     public override Gtk.Menu? get_context_menu () {
@@ -73,7 +82,7 @@ public class Iridium.Widgets.SidePanel.DirectMessageRow : Granite.Widgets.Source
 
         var close_item = new Gtk.MenuItem.with_label (_("Close"));
         close_item.activate.connect (() => {
-            close_direct_message ();
+            close_private_message ();
         });
 
         menu.append (close_item);
@@ -82,6 +91,6 @@ public class Iridium.Widgets.SidePanel.DirectMessageRow : Granite.Widgets.Source
         return menu;
     }
 
-    public signal void close_direct_message ();
+    public signal void close_private_message ();
 
 }

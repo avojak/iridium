@@ -27,8 +27,11 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     private DataOutputStream output_stream;
     private bool should_exit = false;
 
+    private Gee.List<string> joined_channels = new Gee.ArrayList<string> ();
     private Gee.Map<string, Gee.List<string>> channel_users = new Gee.HashMap<string, Gee.List<string>> ();
     private Gee.Map<string, Gee.List<string>> username_buffer = new Gee.HashMap<string, Gee.List<string>> ();
+
+    private Gee.Map<string, string> channel_topics = new Gee.HashMap<string, string> ();
 
     public ServerConnection (Iridium.Services.ServerConnectionDetails connection_details) {
         Object (
@@ -47,8 +50,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             InetAddress address = resolve_server_hostname (connection_details.server);
             var port = Iridium.Services.ServerConnectionDetails.DEFAULT_PORT;
             SocketConnection connection = connect_to_server (address, port);
-
-            print ("Connected to server\n");
 
             input_stream = new DataInputStream (connection.input_stream);
             output_stream = new DataOutputStream (connection.output_stream);
@@ -81,6 +82,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
     private SocketConnection connect_to_server (InetAddress address, uint16 port) throws GLib.Error {
         SocketClient client = new SocketClient ();
+        // TODO: Could use the NetworkMonitor to check the InetSocketAddress prior to attempting a connection
         SocketConnection connection = client.connect (new InetSocketAddress (address, port));
         return connection;
     }
@@ -133,17 +135,33 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 }
                 break;
             case Iridium.Services.MessageCommands.JOIN:
-                if ((message.message == null || message.message.strip () == "") && message.username == connection_details.nickname) {
-                    channel_joined (message.params[0]);
+                if (message.username == connection_details.nickname) {
+                    if (message.message == null || message.message.strip () == "") {
+                        joined_channels.add (message.params[0]);
+                        channel_joined (message.params[0]);
+                    } else {
+                        joined_channels.add (message.message);
+                        channel_joined (message.message);
+                    }
                 } else {
-                    on_user_joined_channel (message.params[0], message.username);
+                    if (message.message == null || message.message.strip () == "") {
+                        on_user_joined_channel (message.params[0], message.username);
+                    } else {
+                        on_user_joined_channel (message.message, message.username);
+                    }
                 }
                 break;
             case Iridium.Services.MessageCommands.PART:
                 // If the the message username is our nickname, we're the one
                 // leaving. Otherwise, it's another user leaving.
                 if (message.username == connection_details.nickname) {
-                    channel_left (message.params[0]);
+                    if (message.message == null || message.message.strip () == "") {
+                        joined_channels.remove (message.params[0]);
+                        channel_left (message.params[0]);
+                    } else {
+                        joined_channels.remove (message.message);
+                        channel_left (message.message);
+                    }
                 } else {
                     on_user_left_channel (message.params[0], message.username);
                 }
@@ -157,7 +175,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 // If the first param is our nickname, it's a PM. Otherwise, it's
                 // a general message on a channel
                 if (message.params[0] == connection_details.nickname) {
-                    direct_message_received (message.username, message);
+                    private_message_received (message.username, message);
                 } else {
                     channel_message_received (message.params[0], message);
                 }
@@ -168,12 +186,32 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             case Iridium.Services.NumericCodes.RPL_ENDOFNAMES:
                 end_of_usernames (message.params[1]);
                 break;
+            case Iridium.Services.MessageCommands.TOPIC:
+                on_channel_topic_received (message.params[0], message.message);
+                break;
+            case Iridium.Services.NumericCodes.RPL_TOPIC:
+                on_channel_topic_received (message.params[1], message.message);
+                break;
+            case Iridium.Services.NumericCodes.RPL_TOPICWHOTIME:
+                // TODO: Implement
+                break;
+            case Iridium.Services.NumericCodes.RPL_NOTOPIC:
+                on_channel_topic_received (message.params[1], "");
+                break;
+            
             // Errors
             case Iridium.Services.NumericCodes.ERR_NICKNAMEINUSE:
                 nickname_in_use (message);
                 break;
+            case Iridium.Services.NumericCodes.ERR_CHANOPRIVSNEEDED:
+                insufficient_privs (message.params[1], message);
+                // Can remove this once errors are implemented in the channel chat view
+                server_error_received (message);
+                break;
             case Iridium.Services.NumericCodes.ERR_UNKNOWNCOMMAND:
-            case Iridium.Services.NumericCodes.ERR_NOSUCHNICK:
+            case Iridium.Services.NumericCodes.ERR_NOSUCHNICK: 
+                // TODO: Handle no such nick for sending a PM. Should display the server 
+                //       error in the channel view, not the server view.
             case Iridium.Services.NumericCodes.ERR_NOSUCHCHANNEL:
             case Iridium.Services.NumericCodes.ERR_NOMOTD:
             case Iridium.Services.NumericCodes.ERR_USERNOTINCHANNEL:
@@ -181,7 +219,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             case Iridium.Services.NumericCodes.ERR_NOTREGISTERED:
             case Iridium.Services.NumericCodes.ERR_NEEDMOREPARAMS:
             case Iridium.Services.NumericCodes.ERR_UNKNOWNMODE:
-            case Iridium.Services.NumericCodes.ERR_CHANOPRIVSNEEDED:
                 server_error_received (message);
                 break;
             default:
@@ -197,25 +234,34 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         debug ("Closing connection for server: " + connection_details.server);
         should_exit = true;
         send_output (Iridium.Services.MessageCommands.QUIT + " :Iridium IRC Client");
+        channel_users.clear ();
         do_close ();
     }
 
-    public void do_close () {
+    private void do_close () {
         should_exit = true;
 
         try {
-            input_stream.clear_pending ();
-            input_stream.close ();
-            input_stream = null;
+            if (input_stream != null) {
+                if (input_stream is GLib.DataInputStream && !input_stream.is_closed ()) {
+                    input_stream.clear_pending ();
+                    input_stream.close ();
+                }
+                input_stream = null;
+            }
         } catch (GLib.IOError e) {
             // TODO: Handle errors!
         }
 
         try {
-            output_stream.clear_pending ();
-            output_stream.flush ();
-            output_stream.close ();
-            output_stream = null;
+            if (output_stream != null) {
+                if (output_stream is GLib.DataOutputStream && !output_stream.is_closed ()) {
+                    output_stream.clear_pending ();
+                    output_stream.flush ();
+                    output_stream.close ();
+                }
+                output_stream = null;
+            }
         } catch (GLib.Error e) {
             // TODO: Handle errors!
         }
@@ -224,12 +270,13 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     }
 
     public void send_user_message (string text) {
-        // TODO: Some issues sending messages to the server... FIX PLZ
         send_output (text);
     }
 
     public void leave_channel (string channel_name) {
         send_output (Iridium.Services.MessageCommands.PART + " " + channel_name);
+        // Clear out our list of channel users
+        channel_users.set (channel_name, new Gee.LinkedList<string> ());
     }
 
     public Gee.List<string> get_users (string channel_name) {
@@ -239,9 +286,13 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         return channel_users.get (channel_name);
     }
 
-    private void send_output (string response) {
+    public Gee.List<string> get_joined_channels () {
+        return joined_channels;
+    }
+
+    private void send_output (string output) {
         try {
-            output_stream.put_string (@"$response\r\n");
+            output_stream.put_string (@"$output\r\n");
         } catch (GLib.IOError e) {
             // TODO: Handle errors!!
         }
@@ -263,10 +314,12 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         channel_users.set (channel_name, username_buffer.get (channel_name));
         // Clear the buffered usernames
         username_buffer.unset (channel_name);
+        // Send the signal
+        channel_users_received (channel_name);
     }
 
     private void ctcp_version_query_received (Iridium.Services.Message message) {
-        send_output (Iridium.Services.MessageCommands.VERSION + " " + Constants.PROJECT_NAME + " " + Constants.VERSION);
+        send_output (Iridium.Services.MessageCommands.VERSION + " " + Constants.APP_ID + " " + Constants.VERSION);
         var display_message = new Iridium.Services.Message ();
         display_message.message = "Received a CTCP VERSION query from " + message.username;
         server_message_received (display_message);
@@ -299,6 +352,22 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         user_quit_server (username, channels, message);
     }
 
+    private void on_channel_topic_received (string channel_name, string? topic) {
+        channel_topics.set (channel_name, topic);
+        channel_topic_received (channel_name);
+    }
+
+    public string? get_channel_topic (string channel_name) {
+        if (!channel_topics.has_key (channel_name)) {
+            return "";
+        }
+        return channel_topics.get (channel_name);
+    }
+
+    public void set_channel_topic (string channel_name, string topic) {
+        send_output (Iridium.Services.MessageCommands.TOPIC + " " + channel_name + " :" + topic);
+    }
+
     public signal void open_successful (Iridium.Services.Message message);
     public signal void open_failed (string error_message);
     public signal void connection_closed ();
@@ -307,12 +376,15 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     public signal void server_error_received (Iridium.Services.Message message);
     public signal void server_quit (string message);
     public signal void user_quit_server (string username, Gee.List<string> channels, Iridium.Services.Message message);
+    public signal void channel_users_received (string channel);
+    public signal void channel_topic_received (string channel);
     public signal void nickname_in_use (Iridium.Services.Message message);
     public signal void channel_joined (string channel);
     public signal void channel_left (string channel);
     public signal void channel_message_received (string channel_name, Iridium.Services.Message message);
     public signal void user_joined_channel (string channel_name, string username);
     public signal void user_left_channel (string channel_name, string username);
-    public signal void direct_message_received (string username, Iridium.Services.Message message);
+    public signal void private_message_received (string username, Iridium.Services.Message message);
+    public signal void insufficient_privs (string channel_name, Iridium.Services.Message message);
 
 }
