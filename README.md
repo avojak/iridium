@@ -28,6 +28,8 @@ dependencies required:
 - `valac (>= 0.28.0)`
 - `libsqlite3-dev`
 
+An `install-dev-dependencies.sh` script is available to help developers get up and running.
+
 ## Building and Running
 
 To build:
