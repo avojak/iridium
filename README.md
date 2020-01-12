@@ -1,4 +1,4 @@
-![Travis (.com)](https://img.shields.io/travis/com/avojak/iridium.svg?branch=master)
+[![Build Status](https://travis-ci.com/avojak/iridium.svg?branch=master)](https://travis-ci.com/avojak/iridium)
 ![GitHub](https://img.shields.io/github/license/avojak/iridium.svg?color=blue)
 
 <p align="center">
