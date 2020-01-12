@@ -101,7 +101,7 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
     public override Gtk.Menu? get_context_menu () {
         var menu = new Gtk.Menu ();
 
-        var join_item = new Gtk.MenuItem.with_label (_("Join a Channel..."));
+        var join_item = new Gtk.MenuItem.with_label (_("Join a Channel…"));
         join_item.activate.connect (() => {
             join_channel ();
         });

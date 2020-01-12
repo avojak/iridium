@@ -62,7 +62,7 @@ public class Iridium.Views.ChannelChatView : Iridium.Views.ChatView {
         edit_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
         edit_button.relief = Gtk.ReliefStyle.NONE;
         edit_button.valign = Gtk.Align.CENTER;
-        edit_button.set_tooltip_text (_("Edit topic..."));
+        edit_button.set_tooltip_text (_("Edit topic…"));
         edit_button.clicked.connect (() => {
             show_topic_edit_dialog ();
         });

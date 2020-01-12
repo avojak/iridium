@@ -1,4 +1,4 @@
-![Travis (.com)](https://img.shields.io/travis/com/avojak/iridium.svg)
+![Travis (.com)](https://img.shields.io/travis/com/avojak/iridium.svg?branch=master)
 ![GitHub](https://img.shields.io/github/license/avojak/iridium.svg?color=blue)
 
 <p align="center">
@@ -96,7 +96,7 @@ This project is very much in-progress and has a lot of remaining work. Here is a
 - [ ] Integrate with the OS notifications
 - [ ] Audio notification when a message is received
 - [ ] Add server/channel history even when a connection is closed so that you can open from history in the welcome view
-- [ ] Use the display name given by the IRC server when connecting (NETWORK=...)
+- [ ] Use the display name given by the IRC server when connecting (NETWORK=…)
 - [ ] Associate `irc://` links to open in-app
 - [ ] Support downloading files from channels ([#4](https://github.com/avojak/iridium/issues/4))
 

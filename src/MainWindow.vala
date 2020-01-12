@@ -237,7 +237,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             // to closing the application.
             side_panel.server_row_disabled.disconnect (Iridium.Application.connection_dao.on_server_row_disabled);
 
-            // TODO: Not sure if this is right...
+            // TODO: Not sure if this is right…
             connection_handler.close_all_connections ();
             GLib.Process.exit (0);
         });
