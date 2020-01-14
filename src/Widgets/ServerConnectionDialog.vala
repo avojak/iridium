@@ -23,6 +23,12 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
 
     public unowned Iridium.MainWindow main_window { get; construct; }
 
+    private Gee.Map<int, Iridium.Models.AuthenticationMethod> auth_methods;
+    private Gee.Map<int, string> auth_method_display_strings;
+    private Gtk.ComboBox auth_method_combo;
+    private Gtk.Entry password_entry;
+    private Gtk.Entry port_entry;
+
     private Gtk.Spinner spinner;
     private Gtk.Label status_label;
 
@@ -147,7 +153,13 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
             var nickname = nickname_entry.get_text ().chomp ().chug ();
             var username = username_entry.get_text ().chomp ().chug ();
             var realname = realname_entry.get_text ().chomp ().chug ();
-            connect_button_clicked (server_name, nickname, username, realname);
+            var port = (uint16) port_entry.get_text ().chomp ().chug ().to_int ();
+            if (port == 0) {
+                port = Iridium.Services.ServerConnectionDetails.DEFAULT_PORT;
+            }
+            var auth_method = auth_methods.get (auth_method_combo.get_active ());
+            var auth_token = password_entry.get_text ();
+            connect_button_clicked (server_name, nickname, username, realname, port, auth_method, auth_token);
         });
 
         add_action_widget (cancel_button, 0);
@@ -164,7 +176,8 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         var port_label = new Gtk.Label ("Port:");
         port_label.halign = Gtk.Align.END;
 
-        var port_entry = new Gtk.Entry ();
+        // TODO: Force numeric input
+        port_entry = new Gtk.Entry ();
         port_entry.hexpand = true;
         port_entry.placeholder_text = "6667";
 
@@ -172,15 +185,19 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         auth_method_label.halign = Gtk.Align.END;
 
         var list_store = new Gtk.ListStore (1, typeof (string));
-        var auth_methods = new Gee.HashMap<int, string> ();
-		auth_methods.set (0, "None");
-		auth_methods.set (1, Iridium.Models.AuthenticationMethod.SERVER_PASSWORD.get_display_string ());
-        for (int i = 0; i < auth_methods.size; i++) {
+        // TODO: This can be handled better
+        auth_methods = new Gee.HashMap<int, Iridium.Models.AuthenticationMethod> ();
+        auth_method_display_strings = new Gee.HashMap<int, string> ();
+        auth_methods.set(0, Iridium.Models.AuthenticationMethod.NONE);
+        auth_method_display_strings.set (0, Iridium.Models.AuthenticationMethod.NONE.get_display_string ());
+        auth_methods.set(1, Iridium.Models.AuthenticationMethod.SERVER_PASSWORD);
+		auth_method_display_strings.set (1, Iridium.Models.AuthenticationMethod.SERVER_PASSWORD.get_display_string ());
+        for (int i = 0; i < auth_method_display_strings.size; i++) {
             Gtk.TreeIter iter;
             list_store.append (out iter);
-            list_store.set (iter, Column.AUTH_METHOD, auth_methods[i]);
+            list_store.set (iter, Column.AUTH_METHOD, auth_method_display_strings[i]);
         }
-        var auth_method_combo = new Gtk.ComboBox.with_model (list_store);
+        auth_method_combo = new Gtk.ComboBox.with_model (list_store);
         var auth_method_cell = new Gtk.CellRendererText ();
         auth_method_combo.pack_start (auth_method_cell, false);
         auth_method_combo.set_attributes (auth_method_cell, "text", 0);
@@ -189,9 +206,9 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         var password_label = new Gtk.Label ("Password:");
         password_label.halign = Gtk.Align.END;
 
-        var password_entry = new Gtk.Entry ();
+        password_entry = new Gtk.Entry ();
         password_entry.hexpand = true;
-		password_entry.visibility = false;
+        password_entry.visibility = false;
 		password_entry.set_icon_from_icon_name (Gtk.EntryIconPosition.SECONDARY, "changes-prevent-symbolic");
 		password_entry.icon_press.connect ((pos, event) => {
 			if (pos == Gtk.EntryIconPosition.SECONDARY) {
@@ -225,6 +242,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         status_label.label = message;
     }
 
-    public signal void connect_button_clicked (string server, string nickname, string username, string realname);
+    public signal void connect_button_clicked (string server, string nickname, string username, string realname, 
+        uint16 port, Iridium.Models.AuthenticationMethod auth_method, string auth_token);
 
 }

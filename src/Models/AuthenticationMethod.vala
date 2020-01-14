@@ -27,12 +27,29 @@ public enum Iridium.Models.AuthenticationMethod {
     public string get_display_string () {
         switch (this) {
             case NONE:
-                return "None";
+                return _("None");
             case SERVER_PASSWORD:
-                return "Server Password";
+                return _("Server Password");
             default:
                 assert_not_reached ();
         }
+    }
+
+    public static AuthenticationMethod get_value_by_name (string name) {
+        EnumClass enumc = (EnumClass) typeof (AuthenticationMethod).class_ref ();
+        unowned EnumValue? eval = enumc.get_value_by_name (name);
+        if (eval == null) {
+			assert_not_reached ();
+		}
+		return (AuthenticationMethod) eval.value;
+        //  switch (display) {
+        //      case "None":
+        //          return NONE;
+        //      case "Server Password":
+        //          return SERVER_PASSWORD;
+        //      default:
+        //          assert_not_reached ();
+        //  }
     }
 
 }

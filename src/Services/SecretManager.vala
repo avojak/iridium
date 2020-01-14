@@ -43,7 +43,7 @@ public class Iridium.Services.SecretManager : GLib.Object {
         });
     }
 
-    public string? retrieve_password (string server, int port, string user) {
+    public void retrieve_password (string server, int port, string user) {
         var attributes = new GLib.HashTable<string, string> (str_hash, str_equal);
         attributes.insert ("version", "1");
         attributes.insert ("server", server);

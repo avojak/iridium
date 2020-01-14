@@ -97,11 +97,11 @@ public class Iridium.Services.SQLClient : GLib.Object {
         }
 
         statement.bind_text (1, server.connection_details.server);
-        statement.bind_int (2, Iridium.Services.ServerConnectionDetails.DEFAULT_PORT);
+        statement.bind_int (2, server.connection_details.port);
         statement.bind_text (3, server.connection_details.nickname);
         statement.bind_text (4, server.connection_details.username);
         statement.bind_text (5, server.connection_details.realname);
-        statement.bind_text (6, server.connection_details.auth_method);
+        statement.bind_text (6, server.connection_details.auth_method.to_string ());
         statement.bind_int (7, bool_to_int (server.enabled));
 
         statement.step ();
@@ -327,6 +327,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
                     connection_details.server = statement.column_text (i);
                     break;
                 case "port":
+                    connection_details.port = (uint16) statement.column_int (i);
                     break;
                 case "nickname":
                     connection_details.nickname = statement.column_text (i);
@@ -338,7 +339,13 @@ public class Iridium.Services.SQLClient : GLib.Object {
                     connection_details.realname = statement.column_text (i);
                     break;
                 case "auth_method":
-                    connection_details.auth_method = statement.column_text (i);
+                    EnumClass enumc = (EnumClass) typeof (Iridium.Models.AuthenticationMethod).class_ref ();
+                    unowned EnumValue? eval = enumc.get_value_by_name (statement.column_text (i));
+                    if (eval == null) {
+                        // TODO: Handle this 
+                        break;
+                    }
+                    connection_details.auth_method = (Iridium.Models.AuthenticationMethod) eval.value;
                     break;
                 case "enabled":
                     server.enabled = int_to_bool (statement.column_int (i));

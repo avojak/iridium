@@ -25,10 +25,11 @@ public class Iridium.Services.ServerConnectionDetails : GLib.Object {
     public const uint16 DEFAULT_PORT = 6667;
 
     public string server;
+    public uint16 port;
     public string nickname;
     public string username;
     public string realname;
-    public string auth_method;
+    public Iridium.Models.AuthenticationMethod auth_method;
     public string auth_token;
 
 }

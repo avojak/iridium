@@ -49,7 +49,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     private int do_connect () {
         try {
             InetAddress address = resolve_server_hostname (connection_details.server);
-            var port = Iridium.Services.ServerConnectionDetails.DEFAULT_PORT;
+            var port = connection_details.port;
             SocketConnection connection = connect_to_server (address, port);
 
             input_stream = new DataInputStream (connection.input_stream);
@@ -95,7 +95,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         var mode = "+i";
 
         // Handle the various auth methods
-        switch (Iridium.Models.AuthenticationMethod.get_value_by_name (connection_details.auth_method)) {
+        switch (connection_details.auth_method) {
             case Iridium.Models.AuthenticationMethod.NONE:
                 send_output (@"NICK $nickname");
                 send_output (@"USER $username 0 * :$realname");
@@ -104,7 +104,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             case Iridium.Models.AuthenticationMethod.SERVER_PASSWORD:
                 // TODO: This won't work because it's connecting the same signal many times...
                 Iridium.Application.secret_manager.password_retrieved.connect ((server, port, user, password) => {
-                    if (server == connection_details.server && port == connection_details.port && user == connection_details.user) {
+                    if (server == connection_details.server && port == connection_details.port && user == connection_details.username) {
                         if (password == null) {
                             // TODO: Handle this better!
                             debug ("No password found for server: " + server);

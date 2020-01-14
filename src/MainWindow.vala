@@ -241,6 +241,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             if (connection_details.auth_token == null) {
                 return;
             }
+            if (connection_details.auth_method == Iridium.Models.AuthenticationMethod.NONE) {
+                return;
+            }
             Iridium.Application.secret_manager.store_password (connection_details.server, Iridium.Services.ServerConnectionDetails.DEFAULT_PORT, 
                 connection_details.nickname, connection_details.auth_token);
         });
@@ -434,7 +437,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         if (connection_dialog == null) {
             connection_dialog = new Iridium.Widgets.ServerConnectionDialog (this);
             connection_dialog.show_all ();
-            connection_dialog.connect_button_clicked.connect ((server, nickname, username, realname) => {
+            connection_dialog.connect_button_clicked.connect ((server, nickname, username, realname, port, auth_method, auth_token) => {
                 // Prevent duplicate connections
                 if (connection_handler.has_connection (server)) {
                     connection_dialog.display_error ("Already connected to this server!");
@@ -444,12 +447,12 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 // Create the connection details
                 var connection_details = new Iridium.Services.ServerConnectionDetails ();
                 connection_details.server = server;
+                connection_details.port = port;
                 connection_details.nickname = nickname;
                 connection_details.username = username;
                 connection_details.realname = realname;
-                // TODO: Get this from dialog
-                connection_details.auth_method = Iridium.Models.AuthenticationMethod.SERVER_PASSWORD.to_string ();
-                connection_details.auth_token = "s3cret";
+                connection_details.auth_method = auth_method;
+                connection_details.auth_token = auth_token;
 
                 // Attempt the server connection
                 connection_handler.connect_to_server (connection_details);
