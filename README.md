@@ -24,6 +24,7 @@ dependencies required:
 - `libgee-0.8-dev`
 - `meson`
 - `valac (>= 0.28.0)`
+- `libsqlite3-dev`
 
 ## Building and Running
 
