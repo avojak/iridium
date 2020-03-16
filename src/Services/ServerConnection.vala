@@ -103,18 +103,25 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 break;
             case Iridium.Models.AuthenticationMethod.SERVER_PASSWORD:
                 // TODO: This won't work because it's connecting the same signal many times...
-                Iridium.Application.secret_manager.password_retrieved.connect ((server, port, user, password) => {
-                    if (server == connection_details.server && port == connection_details.port && user == connection_details.username) {
-                        if (password == null) {
-                            // TODO: Handle this better!
-                            debug ("No password found for server: " + server);
-                        }
-                        send_output (@"PASS $password");
-                        send_output (@"NICK $nickname");
-                        send_output (@"USER $username 0 * :$realname");
-                        send_output (@"MODE $username $mode");
-                    }
-                });
+                // Do we even need to do this here? Instead, retrieve the password on startup, and by this point
+                // we should have a fully populated connection_details object
+                //  Iridium.Application.secret_manager.password_retrieved.connect ((server, port, user, password) => {
+                //      if (server == connection_details.server && port == connection_details.port && user == connection_details.username) {
+                //          if (password == null) {
+                //              // TODO: Handle this better!
+                //              debug ("No password found for server: " + server);
+                //          }
+                //          send_output (@"PASS $password");
+                //          send_output (@"NICK $nickname");
+                //          send_output (@"USER $username 0 * :$realname");
+                //          send_output (@"MODE $username $mode");
+                //      }
+                //  });
+                var password = connection_details.auth_token;
+                send_output (@"PASS $password");
+                send_output (@"NICK $nickname");
+                send_output (@"USER $username 0 * :$realname");
+                send_output (@"MODE $username $mode");
                 break;
             default:
                 assert_not_reached ();
