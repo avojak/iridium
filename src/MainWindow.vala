@@ -336,6 +336,14 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             if (!server_enabled) {
                 continue;
             }
+            //  switch (connection_details.auth_method) {
+            //      case Iridium.Models.AuthenticationMethod.NONE:
+            //          break;
+            //      case Iridium.Models.AuthenticationMethod.SERVER_PASSWORD:
+            //          break;
+            //      default:
+            //          assert_not_reached ();
+            //  }
             var server_connection = connection_handler.connect_to_server (connection_details);
             Idle.add (() => {
                 side_panel.updating_server_row (server_name);

@@ -43,16 +43,26 @@ public class Iridium.Services.SecretManager : GLib.Object {
         });
     }
 
-    public void retrieve_password (string server, int port, string user) {
+    public string? retrieve_password (string server, int port, string user) {
         var attributes = new GLib.HashTable<string, string> (str_hash, str_equal);
         attributes.insert ("version", "1");
         attributes.insert ("server", server);
         attributes.insert ("port", port.to_string ());
         attributes.insert ("user", user);
+        //  Secret.password_lookupv.begin (schema, attributes, null, (obj, async_res) => {
+        //      string password = Secret.password_lookup.end (async_res);
+        //      password_retrieved (server, port, user, password);
+        //  });
+
+        //  https://mail.gnome.org/archives/vala-list/2016-January/msg00021.html
+        string password = null;
+        var loop = new MainLoop ();
         Secret.password_lookupv.begin (schema, attributes, null, (obj, async_res) => {
-            string password = Secret.password_lookup.end (async_res);
-            password_retrieved (server, port, user, password);
+            password = Secret.password_lookup.end (async_res);
+            loop.quit ();
         });
+        loop.run ();
+        return password;
     }
 
     public signal void password_retrieved (string server, int port, string user, string? password);

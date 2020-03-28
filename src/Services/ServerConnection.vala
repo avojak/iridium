@@ -97,14 +97,30 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         // Handle the various auth methods
         switch (connection_details.auth_method) {
             case Iridium.Models.AuthenticationMethod.NONE:
-                send_output (@"NICK $nickname");
-                send_output (@"USER $username 0 * :$realname");
-                send_output (@"MODE $username $mode");
+                debug("AuthenticationMethod is NONE");
                 break;
             case Iridium.Models.AuthenticationMethod.SERVER_PASSWORD:
+                debug("AuthenticationMethod is SERVER_PASSWORD");
+                string password = null;
+                // Check if we're passed an auth token
+                if (connection_details.auth_token != null) {
+                    debug("Server password passed with request to open connection");
+                    password = connection_details.auth_token;
+                } else {
+                    debug("Retrieving server password from secret manager");
+                    var server = connection_details.server;
+                    var port = connection_details.port;
+                    password = Iridium.Application.secret_manager.retrieve_password (server, port, username);
+                    if (password == null) {
+                        // TODO: Handle this better!
+                        debug ("No password found for server: " + server);
+                    }
+                }
+                send_output (@"PASS $password");
+
                 // TODO: This won't work because it's connecting the same signal many times...
                 // Do we even need to do this here? Instead, retrieve the password on startup, and by this point
-                // we should have a fully populated connection_details object
+                // we should have a fully populated connection_details object.
                 //  Iridium.Application.secret_manager.password_retrieved.connect ((server, port, user, password) => {
                 //      if (server == connection_details.server && port == connection_details.port && user == connection_details.username) {
                 //          if (password == null) {
@@ -117,15 +133,14 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 //          send_output (@"MODE $username $mode");
                 //      }
                 //  });
-                var password = connection_details.auth_token;
-                send_output (@"PASS $password");
-                send_output (@"NICK $nickname");
-                send_output (@"USER $username 0 * :$realname");
-                send_output (@"MODE $username $mode");
+
                 break;
             default:
                 assert_not_reached ();
         }
+        send_output (@"NICK $nickname");
+        send_output (@"USER $username 0 * :$realname");
+        send_output (@"MODE $username $mode");
     }
 
     //  private void authenticate (string password) {
