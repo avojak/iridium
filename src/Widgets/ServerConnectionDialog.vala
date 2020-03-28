@@ -206,6 +206,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         var password_label = new Gtk.Label ("Password:");
         password_label.halign = Gtk.Align.END;
 
+        // TODO: Disable entry when the dropdown is set to None
         password_entry = new Gtk.Entry ();
         password_entry.hexpand = true;
         password_entry.visibility = false;

@@ -76,6 +76,14 @@ Generate translations for the languages listed in the `po/LINGUAS` files:
 $ ninja com.github.avojak.iridium-update-po
 ```
 
+### Testing
+
+To facilitate testing, a `test-server.py` script is available which starts a local IRC server using Docker.
+
+```bash
+$ ./test-server.py [-h] {create|start|watch|stop|reset}
+```
+
 ## Feature TODO List
 
 This project is very much in-progress and has a lot of remaining work. Here is a list of features I plan on implementing that I will update upon completion:
