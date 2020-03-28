@@ -22,7 +22,8 @@
 public enum Iridium.Models.AuthenticationMethod { 
     
     NONE,
-    SERVER_PASSWORD;
+    SERVER_PASSWORD,
+    NICKSERV_MSG;
 
     public string get_display_string () {
         switch (this) {
@@ -30,6 +31,8 @@ public enum Iridium.Models.AuthenticationMethod {
                 return _("None");
             case SERVER_PASSWORD:
                 return _("Server Password");
+            case NICKSERV_MSG:
+                return _("NickServ");
             default:
                 assert_not_reached ();
         }

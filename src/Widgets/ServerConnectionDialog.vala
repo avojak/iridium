@@ -191,7 +191,9 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         auth_methods.set(0, Iridium.Models.AuthenticationMethod.NONE);
         auth_method_display_strings.set (0, Iridium.Models.AuthenticationMethod.NONE.get_display_string ());
         auth_methods.set(1, Iridium.Models.AuthenticationMethod.SERVER_PASSWORD);
-		auth_method_display_strings.set (1, Iridium.Models.AuthenticationMethod.SERVER_PASSWORD.get_display_string ());
+        auth_method_display_strings.set (1, Iridium.Models.AuthenticationMethod.SERVER_PASSWORD.get_display_string ());
+        auth_methods.set(2, Iridium.Models.AuthenticationMethod.NICKSERV_MSG);
+        auth_method_display_strings.set (2, Iridium.Models.AuthenticationMethod.NICKSERV_MSG.get_display_string ());
         for (int i = 0; i < auth_method_display_strings.size; i++) {
             Gtk.TreeIter iter;
             list_store.append (out iter);

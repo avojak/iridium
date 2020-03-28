@@ -117,6 +117,9 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                     }
                 }
                 send_output (@"PASS $password");
+                send_output (@"NICK $nickname");
+                send_output (@"USER $username 0 * :$realname");
+                send_output (@"MODE $username $mode");
 
                 // TODO: This won't work because it's connecting the same signal many times...
                 // Do we even need to do this here? Instead, retrieve the password on startup, and by this point
@@ -135,12 +138,31 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 //  });
 
                 break;
+            case Iridium.Models.AuthenticationMethod.NICKSERV_MSG:
+                debug("AuthenticationMethod is NICKSERV_MSG");
+                string password = null;
+                // Check if we're passed an auth token
+                if (connection_details.auth_token != null) {
+                    debug("NickServ password passed with request to open connection");
+                    password = connection_details.auth_token;
+                } else {
+                    debug("Retrieving NickServ password from secret manager");
+                    var server = connection_details.server;
+                    var port = connection_details.port;
+                    password = Iridium.Application.secret_manager.retrieve_password (server, port, username);
+                    if (password == null) {
+                        // TODO: Handle this better!
+                        debug ("No password found for server: " + server);
+                    }
+                }
+                send_output (@"NICK $nickname");
+                send_output (@"USER $username 0 * :$realname");
+                send_output (@"MODE $username $mode");
+                send_output (@"NickServ identify $password");
+                break;
             default:
                 assert_not_reached ();
         }
-        send_output (@"NICK $nickname");
-        send_output (@"USER $username 0 * :$realname");
-        send_output (@"MODE $username $mode");
     }
 
     //  private void authenticate (string password) {
