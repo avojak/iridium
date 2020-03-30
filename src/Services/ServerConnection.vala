@@ -139,20 +139,20 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
                 break;
             case Iridium.Models.AuthenticationMethod.NICKSERV_MSG:
-                debug("AuthenticationMethod is NICKSERV_MSG");
+                print ("AuthenticationMethod is NICKSERV_MSG\n");
                 string password = null;
                 // Check if we're passed an auth token
                 if (connection_details.auth_token != null) {
-                    debug("NickServ password passed with request to open connection");
+                    print ("NickServ password passed with request to open connection\n");
                     password = connection_details.auth_token;
                 } else {
-                    debug("Retrieving NickServ password from secret manager");
+                    print ("Retrieving NickServ password from secret manager\n");
                     var server = connection_details.server;
                     var port = connection_details.port;
                     password = Iridium.Application.secret_manager.retrieve_password (server, port, username);
                     if (password == null) {
                         // TODO: Handle this better!
-                        debug ("No password found for server: " + server);
+                        print ("No password found for server: " + server + ", port: " + port.to_string () + ", username: " + username + "\n");
                     }
                 }
                 send_output (@"NICK $nickname");
