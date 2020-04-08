@@ -21,7 +21,7 @@
 
 public class Iridium.Application : Gtk.Application {
 
-    public static Iridium.Services.Settings settings;
+    public static GLib.Settings settings;
     public static Iridium.Services.ServerConnectionDAO connection_dao;
     private static Iridium.Services.ServerConnectionHandler connection_handler;
 
@@ -35,7 +35,7 @@ public class Iridium.Application : Gtk.Application {
     }
 
     static construct {
-        settings = new Iridium.Services.Settings ();
+        settings = new GLib.Settings (Constants.APP_ID);
         connection_handler = new Iridium.Services.ServerConnectionHandler ();
         connection_dao = new Iridium.Services.ServerConnectionDAO ();
     }

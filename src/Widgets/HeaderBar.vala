@@ -99,9 +99,9 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         mode_switch.valign = Gtk.Align.CENTER;
         mode_switch.bind_property ("active", Iridium.Application.settings, "prefer-dark-style");
         mode_switch.notify.connect (() => {
-            Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = Iridium.Application.settings.prefer_dark_style;
+            Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = Iridium.Application.settings.get_boolean ("prefer-dark-style");
         });
-        if (Iridium.Application.settings.prefer_dark_style) {
+        if (Iridium.Application.settings.get_boolean ("prefer-dark-style")) {
             mode_switch.active = true;
         }
 
