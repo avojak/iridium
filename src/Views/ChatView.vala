@@ -40,7 +40,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     private Gdk.Cursor cursor_pointer;
     private Gdk.Cursor cursor_text;
 
-    public ChatView () {
+    protected ChatView () {
         Object (
             orientation: Gtk.Orientation.VERTICAL
         );
