@@ -110,7 +110,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                     debug("Retrieving server password from secret manager");
                     var server = connection_details.server;
                     var port = connection_details.port;
-                    password = Iridium.Application.secret_manager.retrieve_password (server, port, username);
+                    password = Iridium.Application.secret_manager.retrieve_secret (server, port, username);
                     if (password == null) {
                         // TODO: Handle this better!
                         debug ("No password found for server: " + server);
@@ -120,22 +120,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 send_output (@"NICK $nickname");
                 send_output (@"USER $username 0 * :$realname");
                 send_output (@"MODE $username $mode");
-
-                // TODO: This won't work because it's connecting the same signal many times...
-                // Do we even need to do this here? Instead, retrieve the password on startup, and by this point
-                // we should have a fully populated connection_details object.
-                //  Iridium.Application.secret_manager.password_retrieved.connect ((server, port, user, password) => {
-                //      if (server == connection_details.server && port == connection_details.port && user == connection_details.username) {
-                //          if (password == null) {
-                //              // TODO: Handle this better!
-                //              debug ("No password found for server: " + server);
-                //          }
-                //          send_output (@"PASS $password");
-                //          send_output (@"NICK $nickname");
-                //          send_output (@"USER $username 0 * :$realname");
-                //          send_output (@"MODE $username $mode");
-                //      }
-                //  });
 
                 break;
             case Iridium.Models.AuthenticationMethod.NICKSERV_MSG:
@@ -149,7 +133,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                     print ("Retrieving NickServ password from secret manager\n");
                     var server = connection_details.server;
                     var port = connection_details.port;
-                    password = Iridium.Application.secret_manager.retrieve_password (server, port, username);
+                    password = Iridium.Application.secret_manager.retrieve_secret (server, port, username);
                     if (password == null) {
                         // TODO: Handle this better!
                         print ("No password found for server: " + server + ", port: " + port.to_string () + ", username: " + username + "\n");
@@ -164,25 +148,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 assert_not_reached ();
         }
     }
-
-    //  private void authenticate (string password) {
-    //      send_output (@"PASS $password");
-
-    //      string line = "";
-    //      do {
-    //          try {
-    //              line = input_stream.read_line (null);
-    //          } catch (GLib.IOError e) {
-    //              stderr.printf ("IOError while reading: %s\n", e.message);
-    //          }
-    //          var message = new Iridium.Services.Message (line);
-    //          if (message.command == "ERROR") {
-    //              throw new GLib.IOError.PERMISSION_DENIED(message.message);
-    //          }
-    //          handle_line (line);
-    //      } while (line != null && !is_authenticated);
-    //      print ("Authentication successful\n");
-    //  }
 
     private void handle_line (string? line) {
         if (line == null) {

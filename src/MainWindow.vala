@@ -244,8 +244,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             if (connection_details.auth_method == Iridium.Models.AuthenticationMethod.NONE) {
                 return;
             }
-            Iridium.Application.secret_manager.store_password (connection_details.server, Iridium.Services.ServerConnectionDetails.DEFAULT_PORT, 
-                connection_details.nickname, connection_details.auth_token);
+            Iridium.Application.secret_manager.store_secret (connection_details.server, connection_details.port, connection_details.username, connection_details.auth_token);
         });
 
         // Close connections when the window is closed

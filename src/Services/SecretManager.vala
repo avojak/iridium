@@ -32,90 +32,50 @@ public class Iridium.Services.SecretManager : GLib.Object {
         "user", Secret.SchemaAttributeType.STRING
     );
 
-    public void store_password (string server, int port, string user, string password) throws GLib.Error {
-        // First attempt to create the collection. If the collection already exists, the existing collection is returned.
-        try {
-            Secret.Collection.create_sync (null, "Iridium IRC Client Secret Collection", Constants.APP_ID, Secret.CollectionCreateFlags.COLLECTION_CREATE_NONE, null);
-        } catch (Error e) {
-            print ("Failed to create secret collection: \"%s\"\n", e.message);
-        }
+    public void store_secret (string server, int port, string user, string secret) throws GLib.Error {
+        print ("Storing secret for server: %s, port: %s, user: %s\n", server, port.to_string (), user);
 
         var attributes = new GLib.HashTable<string, string> (str_hash, str_equal);
         attributes.insert ("version", SCHEMA_VERSION);
         attributes.insert ("server", server);
         attributes.insert ("port", port.to_string ());
         attributes.insert ("user", user);
-        Secret.password_storev.begin (schema, attributes, Constants.APP_ID, "Iridium password", password, null, (obj, async_res) => {
-            bool res = Secret.password_store.end (async_res);
-            // TODO: Do something now that the password has been stored...
-            print ("STORED SECRET " + res.to_string () + " (" + password + ")\n");
+        var label = Constants.APP_ID + ":" + user + "@" + server + ":" + port.to_string ();
+        Secret.password_storev.begin (schema, attributes, null, label, secret, null, (obj, async_res) => {
+            if (Secret.password_store.end (async_res)) {
+                print ("Stored secret \"%s\"\n", label);
+            } else {
+                // TODO: Handle this better
+                print ("Failed to store secret \"%s\"\n", label);
+            }
         });
     }
 
-    public string? retrieve_password (string server, int port, string user) {
-        // Passwords are stored under the collection, so retrieve that first
-        Secret.Collection secret_collection = null;
-        try {
-            secret_collection = Secret.Collection.for_alias_sync (null, Constants.APP_ID, Secret.CollectionFlags.LOAD_ITEMS);
-        } catch (Error e) {
-            print ("Failed to retrieve secret collection: \"%s\"\n", e.message);
-            return null;
-        }
-        if (secret_collection == null) {
-            print ("No secret collection for alias\n");
-            return null;
-        }
-        if (!secret_collection.load_items_sync ()) {
-            // TODO: Handle this!
-            print ("Failed to load items from secret collection\n");
-            return null;
-        }
+    public string? retrieve_secret (string server, int port, string user) {
+        print ("Retrieving password for server: %s, port: %s, user: %s\n", server, port.to_string (), user);
 
-        // Search the collection using the attributes
+        // This is a dirty, dirty hack. Force authentication check by storing a dummy secret. Otherwise,
+        // we get a null secret back and no prompt for authentication if needed.
+        var dummy_label = Constants.APP_ID + ":dummy@example.com:6667";
+        var dummy_attributes = new GLib.HashTable<string, string> (str_hash, str_equal);
+        dummy_attributes.insert ("version", SCHEMA_VERSION);
+        dummy_attributes.insert ("server", "example.com");
+        dummy_attributes.insert ("port", "6667");
+        dummy_attributes.insert ("user", "dummy");
+        Secret.password_storev_sync (schema, dummy_attributes, null, dummy_label, "fake_not_real", null);
+
+        var label = Constants.APP_ID + ":" + user + "@" + server + ":" + port.to_string ();
         var attributes = new GLib.HashTable<string, string> (str_hash, str_equal);
         attributes.insert ("version", SCHEMA_VERSION);
         attributes.insert ("server", server);
         attributes.insert ("port", port.to_string ());
         attributes.insert ("user", user);
-
-        var items = secret_collection.search_sync (schema, attributes, Secret.SearchFlags.UNLOCK);
-        if (items.length () == 0) {
-            // TODO: Handle this!
-            print ("No secret found matching attributes\n");
-            return null;
+        // We can do this synchronously because each connection is already handled in its own thread
+        string? secret = Secret.password_lookupv_sync (schema, attributes);
+        if (secret == null) {
+            print ("Failed to load secret: \"%s\"\n", label);
         }
-        if (items.length () > 1) {
-            // TODO: Handle this!
-            print ("Multiple secrets found matching attributes - using the first one\n");
-        }
-        var item = items.nth_data (0);
-        var val = item.get_secret ();
-        if (val == null) {
-            // TODO: Handle this!
-            print ("Secret item is either locked or has not yet been loaded\n");
-            return null;
-        }
-        return val.get_text ();
-
-        //  Secret.password_lookupv.begin (schema, attributes, null, (obj, async_res) => {
-        //      string password = Secret.password_lookup.end (async_res);
-        //      password_retrieved (server, port, user, password);
-        //  });
-
-        // https://mail.gnome.org/archives/vala-list/2016-January/msg00021.html
-        // This should be safe to block because each connection will be calling this function
-        // directly, and each connection is already its own thread.
-        //  string password = null;
-        //  var loop = new MainLoop ();
-        //  Secret.password_lookupv.begin (schema, attributes, null, (obj, async_res) => {
-        //      password = Secret.password_lookup.end (async_res);
-        //      loop.quit ();
-        //  });
-        //  loop.run ();
-        //  return password;
-        //  return Secret.password_lookupv_sync (schema, attributes, null);
+        return secret;
     }
-
-    //  public signal void password_retrieved (string server, int port, string user, string? password);
 
 }
