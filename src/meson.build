@@ -29,7 +29,6 @@ executable(
     join_paths('Services', 'ServerConnectionDAO.vala'),
     join_paths('Services', 'ServerConnectionDetails.vala'),
     join_paths('Services', 'ServerConnectionHandler.vala'),
-    join_paths('Services', 'Settings.vala'),
     join_paths('Services', 'Channel.vala'),
     join_paths('Services', 'Server.vala'),
     join_paths('Services', 'SQLClient.vala'),
