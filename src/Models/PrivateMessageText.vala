@@ -25,7 +25,7 @@ public abstract class Iridium.Models.PrivateMessageText : Iridium.Models.RichTex
 
     public bool suppress_sender_username { get; set; }
 
-    public PrivateMessageText (Iridium.Services.Message message) {
+    protected PrivateMessageText (Iridium.Services.Message message) {
         Object (
             message: message,
             suppress_sender_username: false

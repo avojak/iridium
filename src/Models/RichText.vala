@@ -30,7 +30,7 @@ public abstract class Iridium.Models.RichText : GLib.Object {
     //  private string self_username;
     private Gee.List<string> usernames = new Gee.ArrayList<string> ();
 
-    public RichText (Iridium.Services.Message message) {
+    protected RichText (Iridium.Services.Message message) {
         Object (
             message: message
         );
