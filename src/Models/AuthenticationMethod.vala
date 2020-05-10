@@ -45,14 +45,6 @@ public enum Iridium.Models.AuthenticationMethod {
 			assert_not_reached ();
 		}
 		return (AuthenticationMethod) eval.value;
-        //  switch (display) {
-        //      case "None":
-        //          return NONE;
-        //      case "Server Password":
-        //          return SERVER_PASSWORD;
-        //      default:
-        //          assert_not_reached ();
-        //  }
     }
 
 }
