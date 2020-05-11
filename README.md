@@ -22,9 +22,13 @@ dependencies required:
 - `gettext`
 - `libgtk-3-dev (>= 3.10)`
 - `libgee-0.8-dev`
+- `libsecret-1-dev`
+- `libsqlite3-dev`
 - `meson`
 - `valac (>= 0.28.0)`
 - `libsqlite3-dev`
+
+An `install-dev-dependencies.sh` script is available to help developers get up and running.
 
 ## Building and Running
 
@@ -70,6 +74,14 @@ Generate translations for the languages listed in the `po/LINGUAS` files:
 
 ```
 $ ninja com.github.avojak.iridium-update-po
+```
+
+### Testing
+
+To facilitate testing, a `test-server.py` script is available which starts a local IRC server using Docker.
+
+```bash
+$ ./test-server.py [-h] {create|start|watch|stop|reset}
 ```
 
 ## Feature TODO List

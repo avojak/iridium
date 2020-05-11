@@ -19,17 +19,32 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Services.ServerConnectionDetails : GLib.Object {
+public enum Iridium.Models.AuthenticationMethod { 
+    
+    NONE,
+    SERVER_PASSWORD,
+    NICKSERV_MSG;
 
-    // TODO: Support non-default port numbers
-    public const uint16 DEFAULT_PORT = 6667;
+    public string get_display_string () {
+        switch (this) {
+            case NONE:
+                return _("None");
+            case SERVER_PASSWORD:
+                return _("Server Password");
+            case NICKSERV_MSG:
+                return _("NickServ");
+            default:
+                assert_not_reached ();
+        }
+    }
 
-    public string server;
-    public uint16 port;
-    public string nickname;
-    public string username;
-    public string realname;
-    public Iridium.Models.AuthenticationMethod auth_method;
-    public string auth_token;
+    public static AuthenticationMethod get_value_by_name (string name) {
+        EnumClass enumc = (EnumClass) typeof (AuthenticationMethod).class_ref ();
+        unowned EnumValue? eval = enumc.get_value_by_name (name);
+        if (eval == null) {
+			assert_not_reached ();
+		}
+		return (AuthenticationMethod) eval.value;
+    }
 
 }

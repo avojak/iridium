@@ -66,6 +66,9 @@ public class Iridium.Widgets.SidePanel.PrivateMessageRow : Granite.Widgets.Sourc
         is_enabled = false;
     }
 
+    //  public new void error () {
+    //  }
+
     public new void updating () {
         //  icon = new GLib.ThemedIcon ("mail-unread");
         icon = new GLib.ThemedIcon (Constants.APP_ID + ".image-loading-symbolic");
