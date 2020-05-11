@@ -40,7 +40,7 @@ public class Iridium.Widgets.StatusBar : Gtk.ActionBar {
         add_menu_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
 
         var manage_connections_button = new Gtk.Button.from_icon_name ("edit-symbolic", Gtk.IconSize.MENU);
-        manage_connections_button.tooltip_text = "Manage connections...";
+        manage_connections_button.tooltip_text = _("Manage connections…");
         manage_connections_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
 
         pack_start (add_menu_button);

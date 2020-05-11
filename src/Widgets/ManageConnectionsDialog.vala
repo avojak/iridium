@@ -31,7 +31,7 @@ public class Iridium.Widgets.ManageConnectionsDialog : Gtk.Dialog {
         Object (
             deletable: false,
             resizable: false,
-            title: "Manage Connections",
+            title: _("Manage Connections"),
             transient_for: main_window,
             modal: true,
             main_window: main_window,
@@ -51,7 +51,7 @@ public class Iridium.Widgets.ManageConnectionsDialog : Gtk.Dialog {
 
         var header_image = new Gtk.Image.from_icon_name ("network-server", Gtk.IconSize.DIALOG);
         
-        var header_title = new Gtk.Label ("Manage Connections");
+        var header_title = new Gtk.Label (_("Manage Connections"));
         header_title.get_style_context ().add_class (Granite.STYLE_CLASS_H2_LABEL);
         header_title.halign = Gtk.Align.START;
         header_title.hexpand = true;
@@ -82,19 +82,19 @@ public class Iridium.Widgets.ManageConnectionsDialog : Gtk.Dialog {
         //  server_combo.set_active (servers.size == 0 ? -1 : 0);
         server_combo.set_active (-1);
 
-        var nickname_label = new Gtk.Label ("Nickname");
+        var nickname_label = new Gtk.Label (_("Nickname"));
         nickname_label.halign = Gtk.Align.END;
 
         var nickname_entry = new Gtk.Entry ();
         nickname_entry.hexpand = true;
 
-        var username_label = new Gtk.Label ("Username");
+        var username_label = new Gtk.Label (_("Username"));
         username_label.halign = Gtk.Align.END;
 
         var username_entry = new Gtk.Entry ();
         username_entry.hexpand = true;
 
-        var realname_label = new Gtk.Label ("Real Name");
+        var realname_label = new Gtk.Label (_("Real Name"));
         realname_label.halign = Gtk.Align.END;
 
         var realname_entry = new Gtk.Entry ();
@@ -123,12 +123,12 @@ public class Iridium.Widgets.ManageConnectionsDialog : Gtk.Dialog {
         body.add (status_label);
 
        // Add action buttons
-       var close_button = new Gtk.Button.with_label ("Close");
+       var close_button = new Gtk.Button.with_label (_("Close"));
        close_button.clicked.connect (() => {
            close ();
        });
 
-       var save_button = new Gtk.Button.with_label ("Save");
+       var save_button = new Gtk.Button.with_label (_("Save"));
        save_button.get_style_context ().add_class ("suggested-action");
        save_button.clicked.connect (() => {
            spinner.start ();

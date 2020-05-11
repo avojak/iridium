@@ -110,7 +110,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
 
         // TODO: It would be nice to do some sizing work here so that the
         //       dialog doesn't resize horizontally the section expands
-        var expander = new Gtk.Expander ("Advanced");
+        var expander = new Gtk.Expander (_("Advanced"));
         expander.add (create_advanced_settings_view ());
 
         form_grid.attach (server_label, 0, 0, 1, 1);
@@ -173,7 +173,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         advanced_settings_view.row_spacing = 12;
         advanced_settings_view.column_spacing = 20;
 
-        var port_label = new Gtk.Label ("Port:");
+        var port_label = new Gtk.Label (_("Port:"));
         port_label.halign = Gtk.Align.END;
 
         // TODO: Force numeric input
@@ -181,7 +181,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         port_entry.hexpand = true;
         port_entry.placeholder_text = "6667";
 
-        var auth_method_label = new Gtk.Label ("Authentication Method:");
+        var auth_method_label = new Gtk.Label (_("Authentication Method:"));
         auth_method_label.halign = Gtk.Align.END;
 
         var list_store = new Gtk.ListStore (1, typeof (string));
@@ -205,7 +205,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         auth_method_combo.set_attributes (auth_method_cell, "text", 0);
         auth_method_combo.set_active (0);
 
-        var password_label = new Gtk.Label ("Password:");
+        var password_label = new Gtk.Label (_("Password:"));
         password_label.halign = Gtk.Align.END;
 
         // TODO: Disable entry when the dropdown is set to None

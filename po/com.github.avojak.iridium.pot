@@ -8,21 +8,73 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.avojak.iridium\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-11 17:22+0100\n"
+"POT-Creation-Date: 2020-05-11 17:47+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: src/MainWindow.vala:390
+msgid "Restoring server connections"
+msgstr ""
+
+#: src/MainWindow.vala:442
+msgid "Already connected to this server!"
+msgstr ""
+
+#: src/MainWindow.vala:508
+msgid "You've already joined this channel"
+msgstr ""
+
+#: src/MainWindow.vala:515
+msgid "Channel must begin with '#' or '&'"
+msgstr ""
+
+#: src/MainWindow.vala:519
+msgid "Enter a channel name"
+msgstr ""
+
+#: src/MainWindow.vala:532
+msgid "Start your message with a /"
+msgstr ""
+
+#: src/MainWindow.vala:734 src/MainWindow.vala:751
+msgid " has quit"
+msgstr ""
+
+#: src/MainWindow.vala:773
+msgid "Nickname already in use."
+msgstr ""
+
+#: src/MainWindow.vala:849
+msgid " has joined"
+msgstr ""
+
+#: src/MainWindow.vala:863
+msgid " has left"
+msgstr ""
+
+#: src/Models/AuthenticationMethod.vala:31
+msgid "None"
+msgstr ""
+
+#: src/Models/AuthenticationMethod.vala:33
+msgid "Server Password"
+msgstr ""
+
+#: src/Models/AuthenticationMethod.vala:35
+msgid "NickServ"
+msgstr ""
 
 #: src/Views/ChannelChatView.vala:24
 msgid "No channel topic has been set"
 msgstr ""
 
 #: src/Views/ChannelChatView.vala:65
-msgid "Edit topic..."
+msgid "Edit topic…"
 msgstr ""
 
 #: src/Views/ChannelChatView.vala:98
@@ -57,59 +109,12 @@ msgstr ""
 msgid "Connect to a Server and Save It in Servers List"
 msgstr ""
 
-#: src/Widgets/SidePanel/ChannelRow.vala:117
-msgid "Add to favorites"
-msgstr ""
-
-#: src/Widgets/SidePanel/ChannelRow.vala:122
-msgid "Remove from favorites"
-msgstr ""
-
-#: src/Widgets/SidePanel/ChannelRow.vala:127
-msgid "Join channel"
-msgstr ""
-
-#: src/Widgets/SidePanel/ChannelRow.vala:132
-msgid "Leave channel"
-msgstr ""
-
-#: src/Widgets/SidePanel/ChannelRow.vala:137
-#: src/Widgets/SidePanel/PrivateMessageRow.vala:83
-#: src/Widgets/SidePanel/ServerRow.vala:119
-msgid "Close"
-msgstr ""
-
-#: src/Widgets/SidePanel/Panel.vala:42
-msgid "Favorite Channels"
-msgstr ""
-
-#: src/Widgets/SidePanel/Panel.vala:57
-msgid "Servers"
-msgstr ""
-
-#: src/Widgets/SidePanel/ServerRow.vala:104 src/Widgets/StatusBar.vala:28
-msgid "Join a Channel..."
-msgstr ""
-
-#: src/Widgets/SidePanel/ServerRow.vala:109
-#: src/Widgets/ServerConnectionDialog.vala:130
-msgid "Connect"
-msgstr ""
-
-#: src/Widgets/SidePanel/ServerRow.vala:114
-msgid "Disconnect"
-msgstr ""
-
-#: src/Widgets/UsersPopover/ChannelUsersPopover.vala:38
-msgid "No users"
-msgstr ""
-
 #: src/Widgets/ChannelJoinDialog.vala:37 src/Widgets/ChannelJoinDialog.vala:58
 msgid "Join a Channel"
 msgstr ""
 
 #: src/Widgets/ChannelJoinDialog.vala:106
-msgid "Channel"
+msgid "Channel:"
 msgstr ""
 
 #: src/Widgets/ChannelJoinDialog.vala:133
@@ -126,7 +131,7 @@ msgid "Edit Channel Topic"
 msgstr ""
 
 #: src/Widgets/ChannelTopicEditDialog.vala:112
-#: src/Widgets/ServerConnectionDialog.vala:125
+#: src/Widgets/ServerConnectionDialog.vala:141
 msgid "Cancel"
 msgstr ""
 
@@ -151,86 +156,135 @@ msgstr ""
 msgid "Dark background"
 msgstr ""
 
+#: src/Widgets/ManageConnectionsDialog.vala:34
+#: src/Widgets/ManageConnectionsDialog.vala:54
+msgid "Manage Connections"
+msgstr ""
+
+#: src/Widgets/ManageConnectionsDialog.vala:85
+msgid "Nickname"
+msgstr ""
+
+#: src/Widgets/ManageConnectionsDialog.vala:91
+msgid "Username"
+msgstr ""
+
+#: src/Widgets/ManageConnectionsDialog.vala:97
+msgid "Real Name"
+msgstr ""
+
+#: src/Widgets/ManageConnectionsDialog.vala:126
+#: src/Widgets/SidePanel/ChannelRow.vala:141
+#: src/Widgets/SidePanel/PrivateMessageRow.vala:86
+#: src/Widgets/SidePanel/ServerRow.vala:127
+msgid "Close"
+msgstr ""
+
+#: src/Widgets/ManageConnectionsDialog.vala:131
+msgid "Save"
+msgstr ""
+
 #: src/Widgets/NetworkInfoBar.vala:35
 msgid "Network is not available"
 msgstr ""
 
 #: src/Widgets/NetworkInfoBar.vala:38
-msgid "Network Settings..."
+msgid "Network Settings…"
 msgstr ""
 
-#: src/Widgets/ServerConnectionDialog.vala:33
+#: src/Widgets/ServerConnectionDialog.vala:43
 msgid "Connect to a Server"
 msgstr ""
 
-#: src/Widgets/ServerConnectionDialog.vala:52
+#: src/Widgets/ServerConnectionDialog.vala:62
 msgid "New Connection"
 msgstr ""
 
-#: src/Widgets/ServerConnectionDialog.vala:73
-msgid "Server"
+#: src/Widgets/ServerConnectionDialog.vala:83
+msgid "Server:"
 msgstr ""
 
-#: src/Widgets/ServerConnectionDialog.vala:80
-msgid "Nickname"
+#: src/Widgets/ServerConnectionDialog.vala:90
+msgid "Nickname:"
 msgstr ""
 
-#: src/Widgets/ServerConnectionDialog.vala:87
-msgid "Username"
+#: src/Widgets/ServerConnectionDialog.vala:97
+msgid "Username:"
 msgstr ""
 
-#: src/Widgets/ServerConnectionDialog.vala:94
-msgid "Real Name"
+#: src/Widgets/ServerConnectionDialog.vala:104
+msgid "Real Name:"
 msgstr ""
 
-#: src/Widgets/ServerConnectionDialog.vala:99
+#: src/Widgets/ServerConnectionDialog.vala:109
 msgid "Iridium IRC Client"
 msgstr ""
 
+#: src/Widgets/ServerConnectionDialog.vala:113
+msgid "Advanced"
+msgstr ""
+
+#: src/Widgets/ServerConnectionDialog.vala:146
+#: src/Widgets/SidePanel/ServerRow.vala:117
+msgid "Connect"
+msgstr ""
+
+#: src/Widgets/ServerConnectionDialog.vala:176
+msgid "Port:"
+msgstr ""
+
+#: src/Widgets/ServerConnectionDialog.vala:184
+msgid "Authentication Method:"
+msgstr ""
+
+#: src/Widgets/ServerConnectionDialog.vala:208
+msgid "Password:"
+msgstr ""
+
 #: src/Widgets/StatusBar.vala:27
-msgid "Connect to a Server..."
+msgid "Connect to a Server…"
+msgstr ""
+
+#: src/Widgets/StatusBar.vala:28 src/Widgets/SidePanel/ServerRow.vala:112
+msgid "Join a Channel…"
 msgstr ""
 
 #: src/Widgets/StatusBar.vala:38
 msgid "Join a Server or Channel"
 msgstr ""
 
-#: src/MainWindow.vala:373
-msgid "Restoring server connections"
+#: src/Widgets/StatusBar.vala:43
+msgid "Manage connections…"
 msgstr ""
 
-#: src/MainWindow.vala:425
-msgid "Already connected to this server!"
+#: src/Widgets/SidePanel/ChannelRow.vala:121
+msgid "Add to favorites"
 msgstr ""
 
-#: src/MainWindow.vala:476
-msgid "You've already joined this channel"
+#: src/Widgets/SidePanel/ChannelRow.vala:126
+msgid "Remove from favorites"
 msgstr ""
 
-#: src/MainWindow.vala:483
-msgid "Channel must begin with '#' or '&'"
+#: src/Widgets/SidePanel/ChannelRow.vala:131
+msgid "Join channel"
 msgstr ""
 
-#: src/MainWindow.vala:487
-msgid "Enter a channel name"
+#: src/Widgets/SidePanel/ChannelRow.vala:136
+msgid "Leave channel"
 msgstr ""
 
-#: src/MainWindow.vala:500
-msgid "Start your message with a /"
+#: src/Widgets/SidePanel/Panel.vala:42
+msgid "Favorite Channels"
 msgstr ""
 
-#: src/MainWindow.vala:701 src/MainWindow.vala:718
-msgid " has quit"
+#: src/Widgets/SidePanel/Panel.vala:57
+msgid "Servers"
 msgstr ""
 
-#: src/MainWindow.vala:740
-msgid "Nickname already in use."
+#: src/Widgets/SidePanel/ServerRow.vala:122
+msgid "Disconnect"
 msgstr ""
 
-#: src/MainWindow.vala:816
-msgid " has joined"
-msgstr ""
-
-#: src/MainWindow.vala:830
-msgid " has left"
+#: src/Widgets/UsersPopover/ChannelUsersPopover.vala:38
+msgid "No users"
 msgstr ""
