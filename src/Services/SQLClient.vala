@@ -69,7 +69,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
                 "nickname" TEXT,
                 "username" TEXT,
                 "realname" TEXT,
-                "password" TEXT,
+                "auth_method" TEXT,
                 "enabled" BOOL
             );
             CREATE TABLE IF NOT EXISTS "channels" (
@@ -84,10 +84,9 @@ public class Iridium.Services.SQLClient : GLib.Object {
     }
 
     public void insert_server (Iridium.Services.Server server) {
-        print ("\tinsert_server\n");
         var sql = """
-            INSERT INTO servers (hostname, port, nickname, username, realname, password, enabled) 
-            VALUES ($HOSTNAME, $PORT, $NICKNAME, $USERNAME, $REALNAME, $PASSWORD, $ENABLED);
+            INSERT INTO servers (hostname, port, nickname, username, realname, auth_method, enabled) 
+            VALUES ($HOSTNAME, $PORT, $NICKNAME, $USERNAME, $REALNAME, $AUTH_METHOD, $ENABLED);
             """;
 
         Sqlite.Statement statement;
@@ -98,11 +97,11 @@ public class Iridium.Services.SQLClient : GLib.Object {
         }
 
         statement.bind_text (1, server.connection_details.server);
-        statement.bind_int (2, Iridium.Services.ServerConnectionDetails.DEFAULT_PORT);
+        statement.bind_int (2, server.connection_details.port);
         statement.bind_text (3, server.connection_details.nickname);
         statement.bind_text (4, server.connection_details.username);
         statement.bind_text (5, server.connection_details.realname);
-        statement.bind_text (6, server.connection_details.password);
+        statement.bind_text (6, server.connection_details.auth_method.to_string ());
         statement.bind_int (7, bool_to_int (server.enabled));
 
         statement.step ();
@@ -328,6 +327,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
                     connection_details.server = statement.column_text (i);
                     break;
                 case "port":
+                    connection_details.port = (uint16) statement.column_int (i);
                     break;
                 case "nickname":
                     connection_details.nickname = statement.column_text (i);
@@ -338,8 +338,14 @@ public class Iridium.Services.SQLClient : GLib.Object {
                 case "realname":
                     connection_details.realname = statement.column_text (i);
                     break;
-                case "password":
-                    connection_details.password = statement.column_text (i);
+                case "auth_method":
+                    EnumClass enumc = (EnumClass) typeof (Iridium.Models.AuthenticationMethod).class_ref ();
+                    unowned EnumValue? eval = enumc.get_value_by_name (statement.column_text (i));
+                    if (eval == null) {
+                        // TODO: Handle this 
+                        break;
+                    }
+                    connection_details.auth_method = (Iridium.Models.AuthenticationMethod) eval.value;
                     break;
                 case "enabled":
                     server.enabled = int_to_bool (statement.column_int (i));

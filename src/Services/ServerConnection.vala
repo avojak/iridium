@@ -26,6 +26,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     private DataInputStream input_stream;
     private DataOutputStream output_stream;
     private bool should_exit = false;
+    private bool is_registered = false;
 
     private Gee.List<string> joined_channels = new Gee.ArrayList<string> ();
     private Gee.Map<string, Gee.List<string>> channel_users = new Gee.HashMap<string, Gee.List<string>> ();
@@ -48,7 +49,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     private int do_connect () {
         try {
             InetAddress address = resolve_server_hostname (connection_details.server);
-            var port = Iridium.Services.ServerConnectionDetails.DEFAULT_PORT;
+            var port = connection_details.port;
             SocketConnection connection = connect_to_server (address, port);
 
             input_stream = new DataInputStream (connection.input_stream);
@@ -93,13 +94,62 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         var realname = connection_details.realname;
         var mode = "+i";
 
-        // TODO: Password?
-        send_output (@"NICK $nickname");
-        send_output (@"USER $username 0 * :$realname");
-        send_output (@"MODE $username $mode");
+        // Handle the various auth methods
+        switch (connection_details.auth_method) {
+            case Iridium.Models.AuthenticationMethod.NONE:
+                debug("AuthenticationMethod is NONE");
+                break;
+            case Iridium.Models.AuthenticationMethod.SERVER_PASSWORD:
+                debug("AuthenticationMethod is SERVER_PASSWORD");
+                string password = null;
+                // Check if we're passed an auth token
+                if (connection_details.auth_token != null) {
+                    debug("Server password passed with request to open connection");
+                    password = connection_details.auth_token;
+                } else {
+                    debug("Retrieving server password from secret manager");
+                    var server = connection_details.server;
+                    var port = connection_details.port;
+                    password = Iridium.Application.secret_manager.retrieve_secret (server, port, username);
+                    if (password == null) {
+                        // TODO: Handle this better!
+                        debug ("No password found for server: " + server);
+                    }
+                }
+                send_output (@"PASS $password");
+                send_output (@"NICK $nickname");
+                send_output (@"USER $username 0 * :$realname");
+                send_output (@"MODE $username $mode");
+
+                break;
+            case Iridium.Models.AuthenticationMethod.NICKSERV_MSG:
+                print ("AuthenticationMethod is NICKSERV_MSG\n");
+                string password = null;
+                // Check if we're passed an auth token
+                if (connection_details.auth_token != null) {
+                    print ("NickServ password passed with request to open connection\n");
+                    password = connection_details.auth_token;
+                } else {
+                    print ("Retrieving NickServ password from secret manager\n");
+                    var server = connection_details.server;
+                    var port = connection_details.port;
+                    password = Iridium.Application.secret_manager.retrieve_secret (server, port, username);
+                    if (password == null) {
+                        // TODO: Handle this better!
+                        print ("No password found for server: " + server + ", port: " + port.to_string () + ", username: " + username + "\n");
+                    }
+                }
+                send_output (@"NICK $nickname");
+                send_output (@"USER $username 0 * :$realname");
+                send_output (@"MODE $username $mode");
+                send_output (@"NickServ identify $password");
+                break;
+            default:
+                assert_not_reached ();
+        }
     }
 
-    private void handle_line (string line) {
+    private void handle_line (string? line) {
         if (line == null) {
             close ();
             return;
@@ -109,6 +159,12 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         switch (message.command) {
             case "PING":
                 send_output ("PONG " + message.message);
+                break;
+            case "ERROR":
+                if (!is_registered) {
+                    open_failed (message.message);
+                }
+                server_error_received (message);
                 break;
             case Iridium.Services.MessageCommands.NOTICE:
             case Iridium.Services.NumericCodes.RPL_MOTD:
@@ -125,6 +181,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 server_message_received (message);
                 break;
             case Iridium.Services.NumericCodes.RPL_WELCOME:
+                is_registered = true;
                 open_successful (message);
                 break;
             case Iridium.Services.MessageCommands.QUIT:

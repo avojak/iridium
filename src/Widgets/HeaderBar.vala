@@ -97,13 +97,8 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         mode_switch.primary_icon_tooltip_text = _("Light background");
         mode_switch.secondary_icon_tooltip_text = _("Dark background");
         mode_switch.valign = Gtk.Align.CENTER;
-        mode_switch.bind_property ("active", Iridium.Application.settings, "prefer-dark-style");
-        mode_switch.notify.connect (() => {
-            Gtk.Settings.get_default ().gtk_application_prefer_dark_theme = Iridium.Application.settings.prefer_dark_style;
-        });
-        if (Iridium.Application.settings.prefer_dark_style) {
-            mode_switch.active = true;
-        }
+        mode_switch.bind_property ("active", Gtk.Settings.get_default (), "gtk_application_prefer_dark_theme");
+        Iridium.Application.settings.bind ("prefer-dark-style", mode_switch, "active", GLib.SettingsBindFlags.DEFAULT);
 
         //  pack_start (server_connect_button);
         //  pack_start (channel_join_button);

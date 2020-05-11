@@ -19,12 +19,32 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Services.Settings : Granite.Services.Settings {
+public enum Iridium.Models.AuthenticationMethod { 
+    
+    NONE,
+    SERVER_PASSWORD,
+    NICKSERV_MSG;
 
-    public bool prefer_dark_style { get; set; }
+    public string get_display_string () {
+        switch (this) {
+            case NONE:
+                return _("None");
+            case SERVER_PASSWORD:
+                return _("Server Password");
+            case NICKSERV_MSG:
+                return _("NickServ");
+            default:
+                assert_not_reached ();
+        }
+    }
 
-    public Settings () {
-        base (Constants.APP_ID);
+    public static AuthenticationMethod get_value_by_name (string name) {
+        EnumClass enumc = (EnumClass) typeof (AuthenticationMethod).class_ref ();
+        unowned EnumValue? eval = enumc.get_value_by_name (name);
+        if (eval == null) {
+			assert_not_reached ();
+		}
+		return (AuthenticationMethod) eval.value;
     }
 
 }

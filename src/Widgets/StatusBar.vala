@@ -39,14 +39,23 @@ public class Iridium.Widgets.StatusBar : Gtk.ActionBar {
         add_menu_button.add (new Gtk.Image.from_icon_name ("list-add-symbolic", Gtk.IconSize.MENU));
         add_menu_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
 
-        pack_start (add_menu_button);
+        var manage_connections_button = new Gtk.Button.from_icon_name ("edit-symbolic", Gtk.IconSize.MENU);
+        manage_connections_button.tooltip_text = "Manage connections...";
+        manage_connections_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
 
-        server_connect_menu_item.activate.connect(() => {
+        pack_start (add_menu_button);
+        //  pack_end (manage_connections_button);
+
+        server_connect_menu_item.activate.connect (() => {
             server_connect_button_clicked ();
         });
 
-        channel_join_menu_item.activate.connect(() => {
+        channel_join_menu_item.activate.connect (() => {
             channel_join_button_clicked ();
+        });
+
+        manage_connections_button.clicked.connect (() => {
+            manage_connections_button_clicked ();
         });
     }
 
@@ -60,5 +69,6 @@ public class Iridium.Widgets.StatusBar : Gtk.ActionBar {
 
     public signal void server_connect_button_clicked ();
     public signal void channel_join_button_clicked ();
+    public signal void manage_connections_button_clicked ();
     
 }

@@ -25,6 +25,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     public Iridium.Widgets.ServerConnectionDialog? connection_dialog = null;
     public Iridium.Widgets.ChannelJoinDialog? channel_join_dialog = null;
+    public Iridium.Widgets.ManageConnectionsDialog? manage_connections_dialog = null;
     //  public Iridium.Widgets.PreferencesDialog? preferences_dialog = null;
 
     private Iridium.Views.Welcome welcome_view;
@@ -189,6 +190,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         status_bar.channel_join_button_clicked.connect (() => {
             show_channel_join_dialog (side_panel.get_current_server ());
         });
+        status_bar.manage_connections_button_clicked.connect (() => {
+            show_manage_connections_dialog ();
+        });
         welcome_view.new_connection_button_clicked.connect (() => {
             show_server_connection_dialog ();
         });
@@ -213,6 +217,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         connection_handler.insufficient_privs_received.connect (on_insufficient_privs_received);
 
         // Connect to all of the side panel signals to make settings changes
+        // TODO: Should these connect to the connection handler signals rather than the side panel...?
         side_panel.server_row_added.connect (Iridium.Application.connection_dao.on_server_row_added);
         side_panel.server_row_removed.connect (Iridium.Application.connection_dao.on_server_row_removed);
         side_panel.server_row_enabled.connect (Iridium.Application.connection_dao.on_server_row_enabled);
@@ -228,6 +233,18 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         connection_handler.server_connection_successful.connect ((server_name, message) => {
             var connection_details = connection_handler.get_connection_details (server_name);
             Iridium.Application.connection_dao.on_server_connection_successful (connection_details);
+        });
+
+        // Connect to the connection handler signal to store the password as a secret for new connections
+        connection_handler.server_connection_successful.connect ((server_name, message) => {
+            var connection_details = connection_handler.get_connection_details (server_name);
+            if (connection_details.auth_token == null) {
+                return;
+            }
+            if (connection_details.auth_method == Iridium.Models.AuthenticationMethod.NONE) {
+                return;
+            }
+            Iridium.Application.secret_manager.store_secret (connection_details.server, connection_details.port, connection_details.username, connection_details.auth_token);
         });
 
         // Close connections when the window is closed
@@ -419,7 +436,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         if (connection_dialog == null) {
             connection_dialog = new Iridium.Widgets.ServerConnectionDialog (this);
             connection_dialog.show_all ();
-            connection_dialog.connect_button_clicked.connect ((server, nickname, username, realname) => {
+            connection_dialog.connect_button_clicked.connect ((server, nickname, username, realname, port, auth_method, auth_token) => {
                 // Prevent duplicate connections
                 if (connection_handler.has_connection (server)) {
                     connection_dialog.display_error (_("Already connected to this server!"));
@@ -429,9 +446,12 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 // Create the connection details
                 var connection_details = new Iridium.Services.ServerConnectionDetails ();
                 connection_details.server = server;
+                connection_details.port = port;
                 connection_details.nickname = nickname;
                 connection_details.username = username;
                 connection_details.realname = realname;
+                connection_details.auth_method = auth_method;
+                connection_details.auth_token = auth_token;
 
                 // Attempt the server connection
                 connection_handler.connect_to_server (connection_details);
@@ -457,6 +477,18 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             });
         }
         channel_join_dialog.present ();
+    }
+
+    private void show_manage_connections_dialog () {
+        if (manage_connections_dialog == null) {
+            var servers = Iridium.Application.connection_dao.get_servers ();
+            manage_connections_dialog = new Iridium.Widgets.ManageConnectionsDialog (this, servers);
+            manage_connections_dialog.show_all ();
+            manage_connections_dialog.destroy.connect (() => {
+                manage_connections_dialog = null;
+            });
+        }
+        manage_connections_dialog.present ();
     }
 
     //  private void show_preferences_dialog () {
@@ -647,6 +679,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             }
             return false;
         });
+        side_panel.disable_server_row (server_name);
     }
 
     private void on_server_connection_closed (string server_name) {

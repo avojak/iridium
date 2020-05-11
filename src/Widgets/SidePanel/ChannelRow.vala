@@ -68,6 +68,7 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
             return;
         }
         //  icon = new GLib.ThemedIcon ("user-offline");
+        icon = new GLib.ThemedIcon ("internet-chat");
         //  icon = null;
         if (is_favorite) {
             markup = "<i>" + channel_name + " <small>" + server_name + "</small></i>";
@@ -76,6 +77,9 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
         }
         is_enabled = false;
     }
+
+    //  public new void error () {
+    //  }
 
     public new void updating () {
         //  icon = new GLib.ThemedIcon ("mail-unread");
