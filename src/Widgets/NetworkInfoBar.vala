@@ -32,10 +32,10 @@ public class Iridium.Widgets.NetworkInfoBar : Gtk.InfoBar {
     }
 
     construct {
-        var network_info_label = new Gtk.Label ("Network is not available");
+        var network_info_label = new Gtk.Label (_("Network is not available"));
         get_content_area ().add (network_info_label);
         get_style_context ().add_class ("inline");
-        add_button ("Network Settings…", 0);
+        add_button (_("Network Settings…"), 0);
 
         this.response.connect ((response) => {
             if (response == 0) {

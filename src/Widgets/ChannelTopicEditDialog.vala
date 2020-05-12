@@ -34,7 +34,7 @@ public class Iridium.Widgets.ChannelTopicEditDialog : Gtk.Dialog {
         Object (
             deletable: false,
             resizable: false,
-            title: "Edit Channel Topic",
+            title: _("Edit Channel Topic"),
             transient_for: main_window,
             modal: true,
             main_window: main_window,
@@ -54,7 +54,7 @@ public class Iridium.Widgets.ChannelTopicEditDialog : Gtk.Dialog {
 
         var header_image = new Gtk.Image.from_icon_name ("edit", Gtk.IconSize.DIALOG);
         
-        var header_title = new Gtk.Label ("Edit Channel Topic");
+        var header_title = new Gtk.Label (_("Edit Channel Topic"));
         header_title.get_style_context ().add_class (Granite.STYLE_CLASS_H2_LABEL);
         header_title.halign = Gtk.Align.START;
         header_title.hexpand = true;
@@ -109,12 +109,12 @@ public class Iridium.Widgets.ChannelTopicEditDialog : Gtk.Dialog {
         body.add (status_label);
 
         // Add action buttons
-        var cancel_button = new Gtk.Button.with_label ("Cancel");
+        var cancel_button = new Gtk.Button.with_label (_("Cancel"));
         cancel_button.clicked.connect (() => {
             close ();
         });
 
-        var submit_button = new Gtk.Button.with_label ("Submit");
+        var submit_button = new Gtk.Button.with_label (_("Submit"));
         submit_button.get_style_context ().add_class ("suggested-action");
         submit_button.clicked.connect (() => {
             spinner.start ();
@@ -129,9 +129,9 @@ public class Iridium.Widgets.ChannelTopicEditDialog : Gtk.Dialog {
             if (new_topic.length == 0 && current_topic.length != 0) {
                 // Make sure current topic isn't empty - doesn't make sense to clear
                 // something that's already empty
-                submit_button.set_label ("Clear topic");
+                submit_button.set_label (_("Clear topic"));
             } else {
-                submit_button.set_label ("Submit");
+                submit_button.set_label (_("Submit"));
             }
         });
 

@@ -26,7 +26,7 @@ public class Iridium.Views.ServerChatView : Iridium.Views.ChatView {
     }
 
     protected override string get_disabled_message () {
-        return "You are not connected to this server";
+        return _("You are not connected to this server");
     }
 
     public override void display_self_private_msg (Iridium.Services.Message message) {

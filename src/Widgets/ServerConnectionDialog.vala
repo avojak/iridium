@@ -40,7 +40,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         Object (
             deletable: false,
             resizable: false,
-            title: "Connect to a Server",
+            title: _("Connect to a Server"),
             transient_for: main_window,
             modal: true,
             main_window: main_window
@@ -59,7 +59,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
 
         var header_image = new Gtk.Image.from_icon_name ("network-server", Gtk.IconSize.DIALOG);
 
-        var header_title = new Gtk.Label ("New Connection");
+        var header_title = new Gtk.Label (_("New Connection"));
         header_title.get_style_context ().add_class (Granite.STYLE_CLASS_H2_LABEL);
         header_title.halign = Gtk.Align.START;
         header_title.hexpand = true;
@@ -80,37 +80,37 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         form_grid.row_spacing = 12;
         form_grid.column_spacing = 20;
 
-        var server_label = new Gtk.Label ("Server:");
+        var server_label = new Gtk.Label (_("Server:"));
         server_label.halign = Gtk.Align.END;
 
         var server_entry = new Gtk.Entry ();
         server_entry.hexpand = true;
         server_entry.placeholder_text = "irc.freenode.net";
 
-        var nickname_label = new Gtk.Label ("Nickname:");
+        var nickname_label = new Gtk.Label (_("Nickname:"));
         nickname_label.halign = Gtk.Align.END;
 
         var nickname_entry = new Gtk.Entry ();
         nickname_entry.hexpand = true;
         nickname_entry.placeholder_text = "iridium";
 
-        var username_label = new Gtk.Label ("Username:");
+        var username_label = new Gtk.Label (_("Username:"));
         username_label.halign = Gtk.Align.END;
 
         var username_entry = new Gtk.Entry ();
         username_entry.hexpand = true;
         username_entry.placeholder_text = "iridium";
 
-        var realname_label = new Gtk.Label ("Real Name:");
+        var realname_label = new Gtk.Label (_("Real Name:"));
         realname_label.halign = Gtk.Align.END;
 
         var realname_entry = new Gtk.Entry ();
         realname_entry.hexpand = true;
-        realname_entry.placeholder_text = "Iridium IRC Client";
+        realname_entry.placeholder_text = _("Iridium IRC Client");
 
         // TODO: It would be nice to do some sizing work here so that the
         //       dialog doesn't resize horizontally the section expands
-        var expander = new Gtk.Expander ("Advanced");
+        var expander = new Gtk.Expander (_("Advanced"));
         expander.add (create_advanced_settings_view ());
 
         form_grid.attach (server_label, 0, 0, 1, 1);
@@ -138,12 +138,12 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         body.add (status_label);
 
         // Add action buttons
-        var cancel_button = new Gtk.Button.with_label ("Cancel");
+        var cancel_button = new Gtk.Button.with_label (_("Cancel"));
         cancel_button.clicked.connect (() => {
             close ();
         });
 
-        var connect_button = new Gtk.Button.with_label ("Connect");
+        var connect_button = new Gtk.Button.with_label (_("Connect"));
         connect_button.get_style_context ().add_class ("suggested-action");
         connect_button.clicked.connect (() => {
             // TODO: Validate entries first!
@@ -173,7 +173,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         advanced_settings_view.row_spacing = 12;
         advanced_settings_view.column_spacing = 20;
 
-        var port_label = new Gtk.Label ("Port:");
+        var port_label = new Gtk.Label (_("Port:"));
         port_label.halign = Gtk.Align.END;
 
         // TODO: Force numeric input
@@ -181,7 +181,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         port_entry.hexpand = true;
         port_entry.placeholder_text = "6667";
 
-        var auth_method_label = new Gtk.Label ("Authentication Method:");
+        var auth_method_label = new Gtk.Label (_("Authentication Method:"));
         auth_method_label.halign = Gtk.Align.END;
 
         var list_store = new Gtk.ListStore (1, typeof (string));
@@ -205,7 +205,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         auth_method_combo.set_attributes (auth_method_cell, "text", 0);
         auth_method_combo.set_active (0);
 
-        var password_label = new Gtk.Label ("Password:");
+        var password_label = new Gtk.Label (_("Password:"));
         password_label.halign = Gtk.Align.END;
 
         // TODO: Disable entry when the dropdown is set to None

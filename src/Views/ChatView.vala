@@ -76,7 +76,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         entry = new Gtk.Entry ();
         entry.hexpand = true;
         entry.margin = 6;
-        entry.secondary_icon_tooltip_text = "Clear";
+        entry.secondary_icon_tooltip_text = _("Clear");
 
         attach (event_box, 0, 0, 1, 1);
         attach (entry, 0, 1, 1, 1);

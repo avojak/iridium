@@ -387,7 +387,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     private void begin_initialization () {
         if (overlay_bar == null) {
             overlay_bar = new Granite.Widgets.OverlayBar (overlay);
-            overlay_bar.label = "Restoring server connections";
+            overlay_bar.label = _("Restoring server connections");
             overlay_bar.active = true;
             overlay.show_all ();
         }
@@ -439,7 +439,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             connection_dialog.connect_button_clicked.connect ((server, nickname, username, realname, port, auth_method, auth_token) => {
                 // Prevent duplicate connections
                 if (connection_handler.has_connection (server)) {
-                    connection_dialog.display_error ("Already connected to this server!");
+                    connection_dialog.display_error (_("Already connected to this server!"));
                     return;
                 }
 
@@ -505,18 +505,18 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     private void join_channel (string server_name, string channel_name) {
         // Check if we're already in this channel
         if (connection_handler.get_channels (server_name).index_of (channel_name) != -1) {
-            channel_join_dialog.display_error ("You've already joined this channel");
+            channel_join_dialog.display_error (_("You've already joined this channel"));
             return;
         }
         // Validate channel name
         // TODO: Look into what other restrictions exist
         if (!channel_name.has_prefix ("#") && !channel_name.has_prefix ("&")) {
             // TODO: Eventually validate that the dialog is non-null, and handle accordingly
-            channel_join_dialog.display_error ("Channel must begin with '#' or '&'");
+            channel_join_dialog.display_error (_("Channel must begin with '#' or '&'"));
             return;
         }
         if (channel_name.length < 2) {
-            channel_join_dialog.display_error ("Enter a channel name");
+            channel_join_dialog.display_error (_("Enter a channel name"));
             return;
         }
         connection_handler.join_channel (server_name, channel_name);
@@ -529,7 +529,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         // Make sure the message text starts with a '/'
         if (text[0] != '/') {
             var message = new Iridium.Services.Message ();
-            message.message = "Start your message with a /";
+            message.message = _("Start your message with a /");
             chat_view.display_server_error_msg (message);
             return;
         }
@@ -731,7 +731,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 var channel_chat_view = main_layout.get_channel_chat_view (server_name, channel);
                 if (channel_chat_view != null) {
                     var message_to_display = new Iridium.Services.Message ();
-                    message_to_display.message = username + " has quit";
+                    message_to_display.message = username + _(" has quit");
                     if (message.message != null && message.message.strip () != "") {
                         message_to_display.message += " (" + message.message + ")";
                     }
@@ -748,7 +748,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             var private_message_chat_view = main_layout.get_private_message_chat_view (server_name, username);
             if (private_message_chat_view != null) {
                 var message_to_display = new Iridium.Services.Message ();
-                message_to_display.message = username + " has quit";
+                message_to_display.message = username + _(" has quit");
                 if (message.message != null && message.message.strip () != "") {
                     message_to_display.message += " (" + message.message + ")";
                 }
@@ -770,7 +770,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         if (connection_dialog != null) {
             // TODO: Should this be outside the if-statement?
             connection_handler.disconnect_from_server (server_name);
-            connection_dialog.display_error ("Nickname already in use.");
+            connection_dialog.display_error (_("Nickname already in use."));
         } else {
             // TODO: This should be an error
             var chat_view = main_layout.get_server_chat_view (server_name);
@@ -846,7 +846,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             var channel_chat_view = main_layout.get_channel_chat_view (server_name, channel_name);
             if (channel_chat_view != null) {
                 var message = new Iridium.Services.Message ();
-                message.message = username + " has joined";
+                message.message = username + _(" has joined");
                 channel_chat_view.display_server_msg (message);
             }
             update_channel_users_list (server_name, channel_name);
@@ -860,7 +860,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             var channel_chat_view = main_layout.get_channel_chat_view (server_name, channel_name);
             if (channel_chat_view != null) {
                 var message = new Iridium.Services.Message ();
-                message.message = username + " has left";
+                message.message = username + _(" has left");
                 channel_chat_view.display_server_msg (message);
             }
             update_channel_users_list (server_name, channel_name);

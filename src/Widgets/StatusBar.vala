@@ -24,8 +24,8 @@ public class Iridium.Widgets.StatusBar : Gtk.ActionBar {
     private Gtk.MenuItem channel_join_menu_item;
 
     construct {
-        var server_connect_menu_item = new Gtk.MenuItem.with_label ("Connect to a Server…");
-        channel_join_menu_item = new Gtk.MenuItem.with_label ("Join a Channel…");
+        var server_connect_menu_item = new Gtk.MenuItem.with_label (_("Connect to a Server…"));
+        channel_join_menu_item = new Gtk.MenuItem.with_label (_("Join a Channel…"));
         
         var menu = new Gtk.Menu ();
         menu.append (server_connect_menu_item);
@@ -35,12 +35,12 @@ public class Iridium.Widgets.StatusBar : Gtk.ActionBar {
         var add_menu_button = new Gtk.MenuButton ();
         add_menu_button.direction = Gtk.ArrowType.UP;
         add_menu_button.popup = menu;
-        add_menu_button.tooltip_text = "Join a Server or Channel";
+        add_menu_button.tooltip_text = _("Join a Server or Channel");
         add_menu_button.add (new Gtk.Image.from_icon_name ("list-add-symbolic", Gtk.IconSize.MENU));
         add_menu_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
 
         var manage_connections_button = new Gtk.Button.from_icon_name ("edit-symbolic", Gtk.IconSize.MENU);
-        manage_connections_button.tooltip_text = "Manage connections...";
+        manage_connections_button.tooltip_text = _("Manage connections…");
         manage_connections_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
 
         pack_start (add_menu_button);

@@ -37,7 +37,7 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
     construct {
         //  var server_connect_button = new Gtk.Button.from_icon_name (Constants.APP_ID + ".network-server-new", Gtk.IconSize.LARGE_TOOLBAR);
         //  /* var server_connect_button = new Gtk.Button.from_icon_name ("network-server", Gtk.IconSize.BUTTON); */
-        //  server_connect_button.tooltip_text = "Connect to a Server";
+        //  server_connect_button.tooltip_text = _("Connect to a Server");
         //  server_connect_button.relief = Gtk.ReliefStyle.NONE;
 		//  server_connect_button.valign = Gtk.Align.CENTER;
         //  // TODO: Support keyboard accelerator
@@ -47,7 +47,7 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
 
         //  channel_join_button = new Gtk.Button.from_icon_name (Constants.APP_ID + ".internet-chat-new", Gtk.IconSize.LARGE_TOOLBAR);
         //  /* var channel_join_button = new Gtk.Button.from_icon_name ("internet-chat", Gtk.IconSize.BUTTON); */
-        //  channel_join_button.tooltip_text = "Join a Channel";
+        //  channel_join_button.tooltip_text = _("Join a Channel");
         //  channel_join_button.relief = Gtk.ReliefStyle.NONE;
 		//  channel_join_button.valign = Gtk.Align.CENTER;
         //  // TODO: Support keyboard accelerator
@@ -61,22 +61,22 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         //       and an edit item.
         //  channel_topic_button = new Gtk.ToggleButton ();
         //  channel_topic_button.set_image (new Gtk.Image.from_icon_name ("help-faq-symbolic", Gtk.IconSize.BUTTON));
-        //  channel_topic_button.tooltip_text = "Show channel topic"; // TODO: Enable accelerator
+        //  channel_topic_button.tooltip_text = _("Show channel topic"); // TODO: Enable accelerator
         //  channel_topic_button.relief = Gtk.ReliefStyle.NONE;
         //  channel_topic_button.valign = Gtk.Align.CENTER;
         //  channel_topic_button.toggled.connect (() => {
         //      var active = channel_topic_button.get_active ();
         //      if (active) {
-        //          channel_topic_button.tooltip_text = "Hide channel topic";
+        //          channel_topic_button.tooltip_text = _("Hide channel topic");
         //      } else {
-        //          channel_topic_button.tooltip_text = "Show channel topic";
+        //          channel_topic_button.tooltip_text = _("Show channel topic");
         //      }
         //      channel_topic_toggled (active);
         //  });
 
         channel_users_button = new Gtk.MenuButton ();
         channel_users_button.set_image (new Gtk.Image.from_icon_name ("system-users-symbolic", Gtk.IconSize.BUTTON));
-        channel_users_button.tooltip_text = "Channel users"; // TODO: Enable accelerator
+        channel_users_button.tooltip_text = _("Channel users"); // TODO: Enable accelerator
         channel_users_button.relief = Gtk.ReliefStyle.NONE;
 		channel_users_button.valign = Gtk.Align.CENTER;
 
@@ -85,7 +85,7 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         channel_users_button.popover = channel_users_popover;
 
         //  var preferences_button = new Gtk.Button.from_icon_name ("preferences-system-symbolic", Gtk.IconSize.BUTTON);
-        //  preferences_button.tooltip_text = "Preferences";
+        //  preferences_button.tooltip_text = _("Preferences");
         //  preferences_button.relief = Gtk.ReliefStyle.NONE;
         //  preferences_button.valign = Gtk.Align.CENTER;
         //  preferences_button.clicked.connect (() => {
@@ -94,8 +94,8 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
 
         // TODO: Move this to a settings menu
         var mode_switch = new Granite.ModeSwitch.from_icon_name ("display-brightness-symbolic", "weather-clear-night-symbolic");
-        mode_switch.primary_icon_tooltip_text = "Light background";
-        mode_switch.secondary_icon_tooltip_text = "Dark background";
+        mode_switch.primary_icon_tooltip_text = _("Light background");
+        mode_switch.secondary_icon_tooltip_text = _("Dark background");
         mode_switch.valign = Gtk.Align.CENTER;
         mode_switch.bind_property ("active", Gtk.Settings.get_default (), "gtk_application_prefer_dark_theme");
         Iridium.Application.settings.bind ("prefer-dark-style", mode_switch, "active", GLib.SettingsBindFlags.DEFAULT);

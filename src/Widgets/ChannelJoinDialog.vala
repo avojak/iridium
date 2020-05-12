@@ -34,7 +34,7 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
         Object (
             deletable: false,
             resizable: false,
-            title: "Join a Channel",
+            title: _("Join a Channel"),
             transient_for: main_window,
             modal: true,
             main_window: main_window,
@@ -55,7 +55,7 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
 
         var header_image = new Gtk.Image.from_icon_name ("internet-chat", Gtk.IconSize.DIALOG);
 
-        var header_title = new Gtk.Label ("Join a Channel");
+        var header_title = new Gtk.Label (_("Join a Channel"));
         header_title.get_style_context ().add_class (Granite.STYLE_CLASS_H2_LABEL);
         header_title.halign = Gtk.Align.START;
         header_title.hexpand = true;
@@ -103,7 +103,7 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
         server_combo.set_attributes (server_cell, "text", 0);
         server_combo.set_active (active_index);
 
-        var channel_label = new Gtk.Label ("Channel:");
+        var channel_label = new Gtk.Label (_("Channel:"));
         channel_label.halign = Gtk.Align.END;
 
         var channel_entry = new Gtk.Entry ();
@@ -130,12 +130,12 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
         body.add (status_label);
 
         // Add action buttons
-        var not_now_button = new Gtk.Button.with_label ("Not Now");
+        var not_now_button = new Gtk.Button.with_label (_("Not Now"));
         not_now_button.clicked.connect (() => {
             close ();
         });
 
-        var join_button = new Gtk.Button.with_label ("Join");
+        var join_button = new Gtk.Button.with_label (_("Join"));
         join_button.get_style_context ().add_class ("suggested-action");
         join_button.clicked.connect (() => {
             // TODO: Validate entries first!

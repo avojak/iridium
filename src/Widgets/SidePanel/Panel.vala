@@ -39,7 +39,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
     public Panel () {
         // TODO: Refactor these ExpandableItems to be a subclass that implements the sortable interface
         //       so that we can sort servers and favorite channels.
-        favorites_category = new Granite.Widgets.SourceList.ExpandableItem ("Favorite Channels");
+        favorites_category = new Granite.Widgets.SourceList.ExpandableItem (_("Favorite Channels"));
         favorites_dummy = new Granite.Widgets.SourceList.Item ("");
         favorites_dummy.selectable = false;
         favorites_category.add (favorites_dummy);
@@ -54,7 +54,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
             }
         });
 
-        servers_category = new Granite.Widgets.SourceList.ExpandableItem ("Servers");
+        servers_category = new Granite.Widgets.SourceList.ExpandableItem (_("Servers"));
         servers_dummy = new Granite.Widgets.SourceList.Item ("");
         servers_dummy.selectable = false;
         servers_category.add (servers_dummy);
