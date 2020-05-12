@@ -92,7 +92,9 @@ This project is very much in-progress and has a lot of remaining work. Here is a
 - [x] Support leaving channels and disconnecting from servers
 - [x] Auto-scrolling for new messages
 - [x] Unread message badges for channels
-- [ ] Support authentication for servers
+- [x] Support authentication for servers
+- [ ] Support SASL
+- [ ] Support SSL
 - [x] Special formatting for usernames and URLs in messages
 - [x] Favorite channels
 - [x] Save and restore state when closing and re-opening
