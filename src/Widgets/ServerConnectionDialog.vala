@@ -240,7 +240,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
     }
 
     public void display_error (string message) {
-        // TODO: We can make the error messaging better
+        // TODO: We can make the error messaging better (wrap text!)
         spinner.stop ();
         status_label.label = message;
     }

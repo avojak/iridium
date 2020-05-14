@@ -247,6 +247,13 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             Iridium.Application.secret_manager.store_secret (connection_details.server, connection_details.port, connection_details.username, connection_details.auth_token);
         });
 
+        // When a server row is removed and the user is presented with the welcome view again, be sure the channel users button is hidden
+        side_panel.server_row_removed.connect ((server_name) => {
+            if (welcome_view.is_visible ()) {
+                header_bar.set_channel_users_button_visible (false);
+            }
+        });
+
         // Close connections when the window is closed
         this.destroy.connect (() => {
             // Disconnect this signal so that we don't modify the setting to
