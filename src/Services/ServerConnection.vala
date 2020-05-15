@@ -192,6 +192,8 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 }
                 break;
             case Iridium.Services.MessageCommands.JOIN:
+                // If the message username is our nickname, we're the one
+                // joining. Otherwise, it's another user joining.
                 if (message.username == connection_details.nickname) {
                     if (message.message == null || message.message.strip () == "") {
                         joined_channels.add (message.params[0]);
@@ -209,7 +211,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 }
                 break;
             case Iridium.Services.MessageCommands.PART:
-                // If the the message username is our nickname, we're the one
+                // If the message username is our nickname, we're the one
                 // leaving. Otherwise, it's another user leaving.
                 if (message.username == connection_details.nickname) {
                     if (message.message == null || message.message.strip () == "") {
@@ -333,7 +335,10 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     public void leave_channel (string channel_name) {
         send_output (Iridium.Services.MessageCommands.PART + " " + channel_name);
         // Clear out our list of channel users
-        channel_users.set (channel_name, new Gee.LinkedList<string> ());
+        if (!channel_users.has_key (channel_name)) {
+            // TODO: Might be better to initialize this to an empty list when we join the channel
+            channel_users.set (channel_name, new Gee.LinkedList<string> ());
+        }
     }
 
     public Gee.List<string> get_users (string channel_name) {
