@@ -84,38 +84,8 @@ To facilitate testing, a `test-server.py` script is available which starts a loc
 $ ./test-server.py [-h] {create|start|watch|stop|reset}
 ```
 
-## Feature TODO List
+## Project Status
 
-This project is very much in-progress and has a lot of remaining work. Here is a list of features I plan on implementing that I will update upon completion:
+This project is very much in-progress and has a lot of remaining work. Check out the [Projects](https://github.com/avojak/iridium/projects) page to track progress towards the next milestone.
 
-- [x] Automatically open chat views for joined channels and incoming direct messages
-- [x] Support leaving channels and disconnecting from servers
-- [x] Auto-scrolling for new messages
-- [x] Unread message badges for channels
-- [x] Support authentication for servers
-- [ ] Support SASL
-- [ ] Support SSL
-- [x] Special formatting for usernames and URLs in messages
-- [x] Favorite channels
-- [x] Save and restore state when closing and re-opening
-- [x] Display channel users list
-- [x] Easy way to initiate a private message chat view
-- [ ] Display available channel list
-- [x] Respond to network loss and re-connection
-- [ ] Lock scrolling when reading old messages
-- [x] Display channel topic
-- [ ] Allow suppressing of join/part messages
-- [ ] Display date/time information in the chat view after a certain amount of time has passed
-- [ ] Display an indicator for where the last read message is in the chat view
-- [ ] Display badge count of unread messages in the dock
-- [ ] Integrate with the OS notifications
-- [ ] Audio notification when a message is received
-- [ ] Add server/channel history even when a connection is closed so that you can open from history in the welcome view
-- [ ] Use the display name given by the IRC server when connecting (NETWORK=…)
-- [ ] Associate `irc://` links to open in-app
-- [ ] Support downloading files from channels ([#4](https://github.com/avojak/iridium/issues/4))
-
-These are some ideas I think might been cool to implement, but may add too much complexity or clutter to the UI and the project as a whole:
-
-- [ ] Toast notification when mentioned in a channel, regardless of where you are currently in the app
-- [ ] Support message formatting (See: [IRC Formatting](https://modern.ircdocs.horse/formatting.html))
+Please keep in mind that at this time I am developing Iridium as a personal project in my limited free time to learn Vala and contribute back to the elementary OS community, so do not be offended if I reject a pull request or other contribution.
