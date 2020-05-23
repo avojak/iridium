@@ -83,9 +83,77 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
     private SocketConnection connect_to_server (InetAddress address, uint16 port) throws GLib.Error {
         SocketClient client = new SocketClient ();
+        client.set_tls (true);
+        //  client.set_tls_validation_flags (TlsCertificateFlags.VALIDATE_ALL);
+        client.set_tls_validation_flags (TlsCertificateFlags.UNKNOWN_CA);
+        client.event.connect (on_socket_client_event);
+
+        // TODO: Set a timeout on the client (Might already have a default?)
+
         // TODO: Could use the NetworkMonitor to check the InetSocketAddress prior to attempting a connection
         SocketConnection connection = client.connect (new InetSocketAddress (address, port));
         return connection;
+    }
+
+    private void on_socket_client_event (SocketClientEvent event, SocketConnectable connectable, IOStream? connection) {
+        // See https://valadoc.org/gio-2.0/GLib.SocketClient.event.html for event definitions
+        switch (event) {
+            case SocketClientEvent.COMPLETE:
+                print ("SocketClientEvent.COMPLETE\n");
+                break;
+            case SocketClientEvent.CONNECTED:
+                print ("SocketClientEvent.CONNECTED\n");
+                break;
+            case SocketClientEvent.CONNECTING:
+                print ("SocketClientEvent.CONNECTING\n");
+                break;
+            case SocketClientEvent.PROXY_NEGOTIATED:
+                print ("SocketClientEvent.PROXY_NEGOTIATED\n");
+                break;
+            case SocketClientEvent.PROXY_NEGOTIATING:
+                print ("SocketClientEvent.PROXY_NEGOTIATING\n");
+                break;
+            case SocketClientEvent.RESOLVED:
+                print ("SocketClientEvent.RESOLVED\n");
+                break;
+            case SocketClientEvent.RESOLVING:
+                print ("SocketClientEvent.RESOLVING\n");
+                break;
+            case SocketClientEvent.TLS_HANDSHAKED:
+                print ("SocketClientEvent.TLS_HANDSHAKED\n");
+                break;
+            case SocketClientEvent.TLS_HANDSHAKING:
+                print ("SocketClientEvent.TLS_HANDSHAKING\n");
+                ((TlsClientConnection) connection).accept_certificate.connect (on_invalid_certificate);
+                break;
+            default:
+                // Do nothing - per documentation, unrecognized events should be ignored as there may be
+                // additional event values in the future
+                break;
+        }
+    }
+
+    private bool on_invalid_certificate (TlsCertificate peer_cert, TlsCertificateFlags errors) {
+        // TODO: Also see https://github.com/jangernert/FeedReader/blob/master/src/Utils.vala#L212
+
+        TlsCertificateFlags[] flags = new TlsCertificateFlags[] {
+            TlsCertificateFlags.BAD_IDENTITY,
+            TlsCertificateFlags.EXPIRED,
+            TlsCertificateFlags.GENERIC_ERROR,
+            TlsCertificateFlags.INSECURE,
+            TlsCertificateFlags.NOT_ACTIVATED,
+            TlsCertificateFlags.REVOKED,
+            TlsCertificateFlags.UNKNOWN_CA
+        };
+        string error_string = "";
+        foreach (var flag in flags) {
+            if (flag in errors) {
+                error_string += @"$(flag), ";
+            }
+        }
+        print (@"TLS certificate errors: $(error_string)\n");
+        print (peer_cert.certificate_pem);
+        return false;
     }
 
     private void register (Iridium.Services.ServerConnectionDetails connection_details) {
@@ -98,6 +166,9 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         switch (connection_details.auth_method) {
             case Iridium.Models.AuthenticationMethod.NONE:
                 debug("AuthenticationMethod is NONE");
+                send_output (@"NICK $nickname");
+                send_output (@"USER $username 0 * :$realname");
+                send_output (@"MODE $username $mode");
                 break;
             case Iridium.Models.AuthenticationMethod.SERVER_PASSWORD:
                 debug("AuthenticationMethod is SERVER_PASSWORD");
