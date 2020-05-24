@@ -22,7 +22,8 @@
 public class Iridium.Services.ServerConnectionDetails : GLib.Object {
 
     // TODO: Support non-default port numbers
-    public const uint16 DEFAULT_PORT = 6667;
+    public const uint16 DEFAULT_SECURE_PORT = 6697;
+    public const uint16 DEFAULT_INSECURE_PORT = 6667;
 
     public string server;
     public uint16 port;
@@ -31,6 +32,7 @@ public class Iridium.Services.ServerConnectionDetails : GLib.Object {
     public string realname;
     public Iridium.Models.AuthenticationMethod auth_method;
     public string auth_token;
-    public bool tls = true; // TODO: Make this configurable
+    public bool tls;
+    public Iridium.Models.InvalidCertificatePolicy invalid_cert_policy;
 
 }

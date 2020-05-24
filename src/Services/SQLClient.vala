@@ -70,6 +70,8 @@ public class Iridium.Services.SQLClient : GLib.Object {
                 "username" TEXT,
                 "realname" TEXT,
                 "auth_method" TEXT,
+                "tls" BOOL,
+                "invalid_cert_policy" TEXT,
                 "enabled" BOOL
             );
             CREATE TABLE IF NOT EXISTS "channels" (
@@ -85,8 +87,8 @@ public class Iridium.Services.SQLClient : GLib.Object {
 
     public void insert_server (Iridium.Services.Server server) {
         var sql = """
-            INSERT INTO servers (hostname, port, nickname, username, realname, auth_method, enabled) 
-            VALUES ($HOSTNAME, $PORT, $NICKNAME, $USERNAME, $REALNAME, $AUTH_METHOD, $ENABLED);
+            INSERT INTO servers (hostname, port, nickname, username, realname, auth_method, tls, invalid_cert_policy, enabled) 
+            VALUES ($HOSTNAME, $PORT, $NICKNAME, $USERNAME, $REALNAME, $AUTH_METHOD, $TLS, $INVALID_CERT_POLICY, $ENABLED);
             """;
 
         Sqlite.Statement statement;
@@ -102,7 +104,9 @@ public class Iridium.Services.SQLClient : GLib.Object {
         statement.bind_text (4, server.connection_details.username);
         statement.bind_text (5, server.connection_details.realname);
         statement.bind_text (6, server.connection_details.auth_method.to_string ());
-        statement.bind_int (7, bool_to_int (server.enabled));
+        statement.bind_int (7, bool_to_int (server.connection_details.tls));
+        statement.bind_text (8, server.connection_details.invalid_cert_policy.to_string ());
+        statement.bind_int (9, bool_to_int (server.enabled));
 
         statement.step ();
         statement.reset ();
@@ -346,6 +350,18 @@ public class Iridium.Services.SQLClient : GLib.Object {
                         break;
                     }
                     connection_details.auth_method = (Iridium.Models.AuthenticationMethod) eval.value;
+                    break;
+                case "tls": 
+                    connection_details.tls = int_to_bool (statement.column_int (i));
+                    break;
+                case "invalid_cert_policy":
+                    EnumClass enumc = (EnumClass) typeof (Iridium.Models.InvalidCertificatePolicy).class_ref ();
+                    unowned EnumValue? eval = enumc.get_value_by_name (statement.column_text (i));
+                    if (eval == null) {
+                        // TODO: Handle this
+                        break;
+                    }
+                    connection_details.invalid_cert_policy = (Iridium.Models.InvalidCertificatePolicy) eval.value;
                     break;
                 case "enabled":
                     server.enabled = int_to_bool (statement.column_int (i));

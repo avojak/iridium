@@ -23,12 +23,21 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
 
     public unowned Iridium.MainWindow main_window { get; construct; }
 
+    private Gtk.Entry server_entry;
+    private Gtk.Entry nickname_entry;
+    private Gtk.Entry username_entry;
+    private Gtk.Entry realname_entry;
     private Gee.Map<int, Iridium.Models.AuthenticationMethod> auth_methods;
     private Gee.Map<int, string> auth_method_display_strings;
     private Gtk.ComboBox auth_method_combo;
     private Gtk.Entry password_entry;
+    private Gtk.Switch ssl_tls_switch;
+    private Gee.Map<int, Iridium.Models.InvalidCertificatePolicy> invalid_cert_policies;
+    private Gee.Map<int, string> invalid_cert_policies_display_strings;
+    private Gtk.ComboBox cert_validation_policy_combo;
     private Gtk.Entry port_entry;
 
+    private Gtk.Image security_image;
     private Gtk.Spinner spinner;
     private Gtk.Label status_label;
 
@@ -63,67 +72,34 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         header_title.get_style_context ().add_class (Granite.STYLE_CLASS_H2_LABEL);
         header_title.halign = Gtk.Align.START;
         header_title.hexpand = true;
-        /* header_title.margin_end = 10; */
+        header_title.margin_end = 10;
         header_title.set_line_wrap (true);
 
-        /* var favorite_image = new Gtk.Image.from_icon_name ("non-starred", Gtk.IconSize.DIALOG); */
+        security_image = new Gtk.Image.from_icon_name ("security-high", Gtk.IconSize.DIALOG);
 
         header_grid.attach (header_image, 0, 0, 1, 1);
         header_grid.attach (header_title, 1, 0, 1, 1);
-        /* header_grid.attach (favorite_image, 2, 0, 1, 1); */
+        header_grid.attach (security_image, 2, 0, 1, 1);
 
         body.add (header_grid);
 
-        // Create the form
-        var form_grid = new Gtk.Grid ();
-        form_grid.margin = 30;
-        form_grid.row_spacing = 12;
-        form_grid.column_spacing = 20;
+        var stack_grid = new Gtk.Grid ();
+        stack_grid.expand = true;
+        stack_grid.margin_top = 20;
 
-        var server_label = new Gtk.Label (_("Server:"));
-        server_label.halign = Gtk.Align.END;
+        var stack_switcher = new Gtk.StackSwitcher ();
+        stack_switcher.halign = Gtk.Align.CENTER;
+        stack_grid.attach (stack_switcher, 0, 0, 1, 1);
 
-        var server_entry = new Gtk.Entry ();
-        server_entry.hexpand = true;
-        server_entry.placeholder_text = "irc.freenode.net";
+        var stack = new Gtk.Stack ();
+        stack.expand = true;
+        stack_switcher.stack = stack;
 
-        var nickname_label = new Gtk.Label (_("Nickname:"));
-        nickname_label.halign = Gtk.Align.END;
+        stack.add_titled (create_basic_form (), "basic", _("Basic"));
+        stack.add_titled (create_advanced_form (), "advanced", _("Advanced"));
+        stack_grid.attach (stack, 0, 1, 1, 1);
 
-        var nickname_entry = new Gtk.Entry ();
-        nickname_entry.hexpand = true;
-        nickname_entry.placeholder_text = "iridium";
-
-        var username_label = new Gtk.Label (_("Username:"));
-        username_label.halign = Gtk.Align.END;
-
-        var username_entry = new Gtk.Entry ();
-        username_entry.hexpand = true;
-        username_entry.placeholder_text = "iridium";
-
-        var realname_label = new Gtk.Label (_("Real Name:"));
-        realname_label.halign = Gtk.Align.END;
-
-        var realname_entry = new Gtk.Entry ();
-        realname_entry.hexpand = true;
-        realname_entry.placeholder_text = _("Iridium IRC Client");
-
-        // TODO: It would be nice to do some sizing work here so that the
-        //       dialog doesn't resize horizontally the section expands
-        var expander = new Gtk.Expander (_("Advanced"));
-        expander.add (create_advanced_settings_view ());
-
-        form_grid.attach (server_label, 0, 0, 1, 1);
-        form_grid.attach (server_entry, 1, 0, 1, 1);
-        form_grid.attach (nickname_label, 0, 1, 1, 1);
-        form_grid.attach (nickname_entry, 1, 1, 1, 1);
-        form_grid.attach (username_label, 0, 2, 1, 1);
-        form_grid.attach (username_entry, 1, 2, 1, 1);
-        form_grid.attach (realname_label, 0, 3, 1, 1);
-        form_grid.attach (realname_entry, 1, 3, 1, 1);
-        form_grid.attach (expander, 0, 4, 2, 1);
-
-        body.add (form_grid);
+        body.add (stack_grid);
 
         spinner = new Gtk.Spinner ();
         body.add (spinner);
@@ -155,31 +131,52 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
             var realname = realname_entry.get_text ().chomp ().chug ();
             var port = (uint16) port_entry.get_text ().chomp ().chug ().to_int ();
             if (port == 0) {
-                port = Iridium.Services.ServerConnectionDetails.DEFAULT_PORT;
+                port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT;
             }
             var auth_method = auth_methods.get (auth_method_combo.get_active ());
             var auth_token = password_entry.get_text ();
-            connect_button_clicked (server_name, nickname, username, realname, port, auth_method, auth_token);
+            var tls = ssl_tls_switch.get_active ();
+            var invalid_cert_policy = invalid_cert_policies.get (cert_validation_policy_combo.get_active ());
+            connect_button_clicked (server_name, nickname, username, realname, port, auth_method, tls, invalid_cert_policy, auth_token);
         });
 
         add_action_widget (cancel_button, 0);
         add_action_widget (connect_button, 1);
     }
 
-    private Gtk.Grid create_advanced_settings_view () {
-        var advanced_settings_view = new Gtk.Grid ();
-        advanced_settings_view.margin = 0;
-        advanced_settings_view.margin_top = 12;
-        advanced_settings_view.row_spacing = 12;
-        advanced_settings_view.column_spacing = 20;
+    private Gtk.Grid create_basic_form () {
+        var basic_form_grid = new Gtk.Grid ();
+        basic_form_grid.margin = 30;
+        basic_form_grid.row_spacing = 12;
+        basic_form_grid.column_spacing = 20;
 
-        var port_label = new Gtk.Label (_("Port:"));
-        port_label.halign = Gtk.Align.END;
+        var server_label = new Gtk.Label (_("Server:"));
+        server_label.halign = Gtk.Align.END;
 
-        // TODO: Force numeric input
-        port_entry = new Gtk.Entry ();
-        port_entry.hexpand = true;
-        port_entry.placeholder_text = "6667";
+        server_entry = new Gtk.Entry ();
+        server_entry.hexpand = true;
+        server_entry.placeholder_text = "irc.freenode.net";
+
+        var nickname_label = new Gtk.Label (_("Nickname:"));
+        nickname_label.halign = Gtk.Align.END;
+
+        nickname_entry = new Gtk.Entry ();
+        nickname_entry.hexpand = true;
+        nickname_entry.placeholder_text = "iridium";
+
+        var username_label = new Gtk.Label (_("Username:"));
+        username_label.halign = Gtk.Align.END;
+
+        username_entry = new Gtk.Entry ();
+        username_entry.hexpand = true;
+        username_entry.placeholder_text = "iridium";
+
+        var realname_label = new Gtk.Label (_("Real Name:"));
+        realname_label.halign = Gtk.Align.END;
+
+        realname_entry = new Gtk.Entry ();
+        realname_entry.hexpand = true;
+        realname_entry.placeholder_text = _("Iridium IRC Client");
 
         var auth_method_label = new Gtk.Label (_("Authentication Method:"));
         auth_method_label.halign = Gtk.Align.END;
@@ -205,33 +202,131 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         auth_method_combo.set_attributes (auth_method_cell, "text", 0);
         auth_method_combo.set_active (0);
 
+        auth_method_combo.changed.connect (() => {
+            password_entry.set_sensitive (auth_methods.get (auth_method_combo.get_active ()) != Iridium.Models.AuthenticationMethod.NONE);
+        });
+
         var password_label = new Gtk.Label (_("Password:"));
         password_label.halign = Gtk.Align.END;
 
-        // TODO: Disable entry when the dropdown is set to None
         password_entry = new Gtk.Entry ();
         password_entry.hexpand = true;
         password_entry.visibility = false;
-		password_entry.set_icon_from_icon_name (Gtk.EntryIconPosition.SECONDARY, "changes-prevent-symbolic");
-		password_entry.icon_press.connect ((pos, event) => {
-			if (pos == Gtk.EntryIconPosition.SECONDARY) {
-				password_entry.visibility = !password_entry.visibility;
-			}
- 			if (password_entry.visibility) {
-				password_entry.set_icon_from_icon_name (Gtk.EntryIconPosition.SECONDARY, "changes-allow-symbolic");
-			} else {
-				password_entry.set_icon_from_icon_name (Gtk.EntryIconPosition.SECONDARY, "changes-prevent-symbolic");
-			}
-		});
+        password_entry.sensitive = false;
+        password_entry.set_icon_from_icon_name (Gtk.EntryIconPosition.SECONDARY, "changes-prevent-symbolic");
+        password_entry.icon_press.connect ((pos, event) => {
+            if (pos == Gtk.EntryIconPosition.SECONDARY) {
+                password_entry.visibility = !password_entry.visibility;
+            }
+            if (password_entry.visibility) {
+                password_entry.set_icon_from_icon_name (Gtk.EntryIconPosition.SECONDARY, "changes-allow-symbolic");
+            } else {
+                password_entry.set_icon_from_icon_name (Gtk.EntryIconPosition.SECONDARY, "changes-prevent-symbolic");
+            }
+        });
 
-        advanced_settings_view.attach (port_label, 0, 0, 1, 1);
-        advanced_settings_view.attach (port_entry, 1, 0, 1, 1);
-        advanced_settings_view.attach (auth_method_label, 0, 1, 1, 1);
-        advanced_settings_view.attach (auth_method_combo, 1, 1, 1, 1);
-        advanced_settings_view.attach (password_label, 0, 2, 1, 1);
-        advanced_settings_view.attach (password_entry, 1, 2, 1, 1);
+        basic_form_grid.attach (server_label, 0, 0, 1, 1);
+        basic_form_grid.attach (server_entry, 1, 0, 1, 1);
+        basic_form_grid.attach (nickname_label, 0, 1, 1, 1);
+        basic_form_grid.attach (nickname_entry, 1, 1, 1, 1);
+        basic_form_grid.attach (username_label, 0, 2, 1, 1);
+        basic_form_grid.attach (username_entry, 1, 2, 1, 1);
+        basic_form_grid.attach (realname_label, 0, 3, 1, 1);
+        basic_form_grid.attach (realname_entry, 1, 3, 1, 1);
+        basic_form_grid.attach (auth_method_label, 0, 4, 1, 1);
+        basic_form_grid.attach (auth_method_combo, 1, 4, 1, 1);
+        basic_form_grid.attach (password_label, 0, 5, 1, 1);
+        basic_form_grid.attach (password_entry, 1, 5, 1, 1);
 
-        return advanced_settings_view;
+        return basic_form_grid;
+    }
+
+    private Gtk.Grid create_advanced_form () {
+        var advanced_form_grid = new Gtk.Grid ();
+        advanced_form_grid.margin = 30;
+        advanced_form_grid.row_spacing = 12;
+        advanced_form_grid.column_spacing = 20;
+
+        var ssl_tls_label = new Gtk.Label (_("Use SSL/TLS:"));
+        ssl_tls_label.halign = Gtk.Align.END;
+
+        ssl_tls_switch = new Gtk.Switch ();
+        var ssl_tls_switch_container = new Gtk.Grid ();
+        ssl_tls_switch_container.add (ssl_tls_switch);
+        ssl_tls_switch.state = true;
+        ssl_tls_switch.active = true;
+
+        ssl_tls_switch.notify["active"].connect (() => {
+            cert_validation_policy_combo.set_sensitive (ssl_tls_switch.get_active ());
+            port_entry.placeholder_text = ssl_tls_switch.get_active ()
+                ? Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT.to_string ()
+                : Iridium.Services.ServerConnectionDetails.DEFAULT_INSECURE_PORT.to_string ();
+        });
+        ssl_tls_switch.notify["active"].connect (on_security_posture_changed);
+
+        var cert_validation_policy_label = new Gtk.Label (_("Invalid Certificates:"));
+        cert_validation_policy_label.halign = Gtk.Align.END;
+
+        var invalid_cert_policies_list_store = new Gtk.ListStore (1, typeof (string));
+        // TODO: This can be handled better
+        invalid_cert_policies = new Gee.HashMap<int, Iridium.Models.InvalidCertificatePolicy> ();
+        invalid_cert_policies_display_strings = new Gee.HashMap<int, string> ();
+        invalid_cert_policies.set(0, Iridium.Models.InvalidCertificatePolicy.REJECT);
+        invalid_cert_policies_display_strings.set (0, Iridium.Models.InvalidCertificatePolicy.REJECT.get_display_string ());
+        invalid_cert_policies.set(1, Iridium.Models.InvalidCertificatePolicy.WARN);
+        invalid_cert_policies_display_strings.set (1, Iridium.Models.InvalidCertificatePolicy.WARN.get_display_string ());
+        invalid_cert_policies.set(2, Iridium.Models.InvalidCertificatePolicy.ALLOW);
+        invalid_cert_policies_display_strings.set (2, Iridium.Models.InvalidCertificatePolicy.ALLOW.get_display_string ());
+        for (int i = 0; i < invalid_cert_policies_display_strings.size; i++) {
+            Gtk.TreeIter iter;
+            invalid_cert_policies_list_store.append (out iter);
+            invalid_cert_policies_list_store.set (iter, Column.AUTH_METHOD, invalid_cert_policies_display_strings[i]);
+        }
+        cert_validation_policy_combo = new Gtk.ComboBox.with_model (invalid_cert_policies_list_store);
+        var cert_validation_policy_cell = new Gtk.CellRendererText ();
+        cert_validation_policy_combo.pack_start (cert_validation_policy_cell, false);
+        cert_validation_policy_combo.set_attributes (cert_validation_policy_cell, "text", 0);
+        cert_validation_policy_combo.set_active (0);
+
+        cert_validation_policy_combo.changed.connect (on_security_posture_changed);
+
+        var port_label = new Gtk.Label (_("Port:"));
+        port_label.halign = Gtk.Align.END;
+
+        // TODO: Force numeric input
+        port_entry = new Gtk.Entry ();
+        port_entry.hexpand = true;
+        port_entry.placeholder_text = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT.to_string ();
+
+        advanced_form_grid.attach (ssl_tls_label, 0, 0, 1, 1);
+        advanced_form_grid.attach (ssl_tls_switch_container, 1, 0, 1, 1);
+        advanced_form_grid.attach (cert_validation_policy_label, 0, 1, 1, 1);
+        advanced_form_grid.attach (cert_validation_policy_combo, 1, 1, 1, 1);
+        advanced_form_grid.attach (port_label, 0, 2, 1, 1);
+        advanced_form_grid.attach (port_entry, 1, 2, 1, 1);
+
+        return advanced_form_grid;
+    }
+
+    private void on_security_posture_changed () {
+        // TODO: Display text with a recommendation
+        if (ssl_tls_switch.get_active ()) {
+            switch (invalid_cert_policies.get (cert_validation_policy_combo.get_active ())) {
+                case REJECT:
+                    security_image.icon_name = "security-high";
+                    break;
+                case WARN:
+                    security_image.icon_name = "security-medium";
+                    break;
+                case ALLOW:
+                    security_image.icon_name = "security-low";
+                    break;
+                default:
+                    assert_not_reached ();
+            }
+        } else {
+            security_image.icon_name = "security-low";
+        }
     }
 
     public void dismiss () {
@@ -246,6 +341,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
     }
 
     public signal void connect_button_clicked (string server, string nickname, string username, string realname, 
-        uint16 port, Iridium.Models.AuthenticationMethod auth_method, string auth_token);
+        uint16 port, Iridium.Models.AuthenticationMethod auth_method, bool tls, 
+        Iridium.Models.InvalidCertificatePolicy invalid_cert_policy, string auth_token);
 
 }

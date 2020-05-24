@@ -65,6 +65,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                     line = input_stream.read_line (null);
                     handle_line (line);
                 } catch (GLib.IOError e) {
+                    // TODO: Handle this differently on initialization (currently fails silently in the background)
                     stderr.printf ("IOError while reading: %s\n", e.message);
                 }
             } while (line != null && !should_exit);

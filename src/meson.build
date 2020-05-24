@@ -18,6 +18,7 @@ executable(
     join_paths('Models', 'AuthenticationMethod.vala'),
     join_paths('Models', 'RichText.vala'),
     join_paths('Models', 'ChannelErrorMessageText.vala'),
+    join_paths('Models', 'InvalidCertificatePolicy.vala'),
     join_paths('Models', 'PrivateMessageText.vala'),
     join_paths('Models', 'SelfPrivateMessageText.vala'),
     join_paths('Models', 'OthersPrivateMessageText.vala'),
