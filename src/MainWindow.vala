@@ -687,6 +687,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             return false;
         });
         side_panel.disable_server_row (server_name);
+        // TODO: Improve messaging when this fails in the background on app initialization
     }
 
     private void on_server_connection_closed (string server_name) {

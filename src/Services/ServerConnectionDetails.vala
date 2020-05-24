@@ -31,5 +31,6 @@ public class Iridium.Services.ServerConnectionDetails : GLib.Object {
     public string realname;
     public Iridium.Models.AuthenticationMethod auth_method;
     public string auth_token;
+    public bool tls = true; // TODO: Make this configurable
 
 }

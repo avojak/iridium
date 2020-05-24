@@ -48,9 +48,11 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
     private int do_connect () {
         try {
-            InetAddress address = resolve_server_hostname (connection_details.server);
+            //  InetAddress address = resolve_server_hostname (connection_details.server);
+            var host = connection_details.server;
             var port = connection_details.port;
-            SocketConnection connection = connect_to_server (address, port);
+            var tls = connection_details.tls;
+            IOStream connection = connect_to_server (host, port, tls);
 
             input_stream = new DataInputStream (connection.input_stream);
             output_stream = new DataOutputStream (connection.output_stream);
@@ -81,18 +83,17 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         return address;
     }
 
-    private SocketConnection connect_to_server (InetAddress address, uint16 port) throws GLib.Error {
+    private IOStream connect_to_server (string host, uint16 port, bool tls) throws GLib.Error {
+        InetAddress address = resolve_server_hostname (connection_details.server);
         SocketClient client = new SocketClient ();
-        client.set_tls (true);
-        //  client.set_tls_validation_flags (TlsCertificateFlags.VALIDATE_ALL);
-        client.set_tls_validation_flags (TlsCertificateFlags.UNKNOWN_CA);
         client.event.connect (on_socket_client_event);
+        client.set_tls (tls);
+        client.set_tls_validation_flags (TlsCertificateFlags.VALIDATE_ALL); // TODO: Allow ignoring
+        return client.connect (new NetworkAddress (host, port));
 
         // TODO: Set a timeout on the client (Might already have a default?)
 
         // TODO: Could use the NetworkMonitor to check the InetSocketAddress prior to attempting a connection
-        SocketConnection connection = client.connect (new InetSocketAddress (address, port));
-        return connection;
     }
 
     private void on_socket_client_event (SocketClientEvent event, SocketConnectable connectable, IOStream? connection) {
@@ -135,7 +136,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
     private bool on_invalid_certificate (TlsCertificate peer_cert, TlsCertificateFlags errors) {
         // TODO: Also see https://github.com/jangernert/FeedReader/blob/master/src/Utils.vala#L212
-
         TlsCertificateFlags[] flags = new TlsCertificateFlags[] {
             TlsCertificateFlags.BAD_IDENTITY,
             TlsCertificateFlags.EXPIRED,
@@ -152,7 +152,10 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             }
         }
         print (@"TLS certificate errors: $(error_string)\n");
-        print (peer_cert.certificate_pem);
+        //  print (peer_cert.certificate_pem);
+        // TODO: Improve messaging here - this is ugly for a user to read!
+        // TODO: Maybe give users the option to ignore and continue connecting anyway?
+        open_failed (@"TLS certificate errors: $(error_string)\n");
         return false;
     }
 
