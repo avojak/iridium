@@ -310,6 +310,9 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
 
     private void on_security_posture_changed () {
         // TODO: Display text with a recommendation
+        // TODO: Maybe create new icons which overlay the shield icon on the server icon, rather than having two
+        //       icons in the header of the dialog? Or display a small text status that uses the channel-secure
+        //       and channel-insecure icons instead.
         if (ssl_tls_switch.get_active ()) {
             switch (invalid_cert_policies.get (cert_validation_policy_combo.get_active ())) {
                 case REJECT:
