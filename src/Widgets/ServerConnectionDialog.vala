@@ -37,7 +37,8 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
     private Gtk.ComboBox cert_validation_policy_combo;
     private Gtk.Entry port_entry;
 
-    private Gtk.Image security_image;
+    private Gtk.Stack header_image_stack;
+    private Gtk.Stack status_stack;
     private Gtk.Spinner spinner;
     private Gtk.Label status_label;
 
@@ -66,20 +67,30 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
 		header_grid.margin_bottom = 10;
         header_grid.column_spacing = 10;
 
-        var header_image = new Gtk.Image.from_icon_name ("network-server", Gtk.IconSize.DIALOG);
+        header_image_stack = new Gtk.Stack ();
+        var tls_reject_header_image = new Gtk.Image.from_icon_name (Constants.APP_ID + ".network-server-security-high", Gtk.IconSize.DIALOG);
+        tls_reject_header_image.tooltip_text = _("Connection secure");
+        var tls_warn_header_image = new Gtk.Image.from_icon_name (Constants.APP_ID + ".network-server-security-medium", Gtk.IconSize.DIALOG);
+        tls_warn_header_image.tooltip_text = _("Connection secure, provided only trusted certificates are accepted when prompted");
+        var tls_allow_header_image = new Gtk.Image.from_icon_name (Constants.APP_ID + ".network-server-security-low", Gtk.IconSize.DIALOG);
+        tls_allow_header_image.tooltip_text = _("Connection may be insecure. Consider rejecting invalid certificates from the Advanced tab.");
+        var no_tls_header_image = new Gtk.Image.from_icon_name (Constants.APP_ID + ".network-server-security-low", Gtk.IconSize.DIALOG);
+        no_tls_header_image.tooltip_text = _("Connection insecure. Consider enabling SSL/TLS from the Advanced tab.");
+        header_image_stack.add_named (tls_reject_header_image, "tls-reject");
+        header_image_stack.add_named (tls_warn_header_image, "tls-warn");
+        header_image_stack.add_named (tls_allow_header_image, "tls-allow");
+        header_image_stack.add_named (no_tls_header_image, "no-tls");
+        header_image_stack.set_visible_child_name ("tls-reject");
 
         var header_title = new Gtk.Label (_("New Connection"));
         header_title.get_style_context ().add_class (Granite.STYLE_CLASS_H2_LABEL);
         header_title.halign = Gtk.Align.START;
         header_title.hexpand = true;
-        header_title.margin_end = 10;
+        //  header_title.margin_end = 10;
         header_title.set_line_wrap (true);
 
-        security_image = new Gtk.Image.from_icon_name ("security-high", Gtk.IconSize.DIALOG);
-
-        header_grid.attach (header_image, 0, 0, 1, 1);
+        header_grid.attach (header_image_stack, 0, 0, 1, 1);
         header_grid.attach (header_title, 1, 0, 1, 1);
-        header_grid.attach (security_image, 2, 0, 1, 1);
 
         body.add (header_grid);
 
@@ -102,7 +113,6 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         body.add (stack_grid);
 
         spinner = new Gtk.Spinner ();
-        body.add (spinner);
 
         status_label = new Gtk.Label ("");
         status_label.get_style_context ().add_class ("h4");
@@ -111,7 +121,21 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         status_label.justify = Gtk.Justification.CENTER;
         status_label.set_line_wrap (true);
         status_label.margin_bottom = 10;
-        body.add (status_label);
+
+        var status_stack_grid = new Gtk.Grid ();
+        status_stack_grid.expand = true;
+        status_stack_grid.margin_start = 30;
+        status_stack_grid.margin_end = 30;
+        status_stack_grid.margin_bottom = 10;
+
+        status_stack = new Gtk.Stack ();
+        status_stack.expand = true;
+        status_stack.add_named (spinner, "spinner");
+        status_stack.add_named (status_label, "status-label");
+        status_stack.set_visible_child_name ("status-label");
+
+        status_stack_grid.attach (status_stack, 0, 1, 1, 1);
+        body.add (status_stack_grid);
 
         // Add action buttons
         var cancel_button = new Gtk.Button.with_label (_("Cancel"));
@@ -124,6 +148,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         connect_button.clicked.connect (() => {
             // TODO: Validate entries first!
             spinner.start ();
+            status_stack.set_visible_child_name ("spinner");
             status_label.label = "";
             var server_name = server_entry.get_text ().chomp ().chug ();
             var nickname = nickname_entry.get_text ().chomp ().chug ();
@@ -309,26 +334,22 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
     }
 
     private void on_security_posture_changed () {
-        // TODO: Display text with a recommendation
-        // TODO: Maybe create new icons which overlay the shield icon on the server icon, rather than having two
-        //       icons in the header of the dialog? Or display a small text status that uses the channel-secure
-        //       and channel-insecure icons instead.
         if (ssl_tls_switch.get_active ()) {
             switch (invalid_cert_policies.get (cert_validation_policy_combo.get_active ())) {
                 case REJECT:
-                    security_image.icon_name = "security-high";
+                    header_image_stack.set_visible_child_name ("tls-reject");
                     break;
                 case WARN:
-                    security_image.icon_name = "security-medium";
+                    header_image_stack.set_visible_child_name ("tls-warn");
                     break;
                 case ALLOW:
-                    security_image.icon_name = "security-low";
+                    header_image_stack.set_visible_child_name ("tls-allow");
                     break;
                 default:
                     assert_not_reached ();
             }
         } else {
-            security_image.icon_name = "security-low";
+            header_image_stack.set_visible_child_name ("no-tls");
         }
     }
 
@@ -341,6 +362,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         // TODO: We can make the error messaging better (wrap text!)
         spinner.stop ();
         status_label.label = message;
+        status_stack.set_visible_child_name ("status-label");
     }
 
     public signal void connect_button_clicked (string server, string nickname, string username, string realname, 
