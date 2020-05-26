@@ -123,6 +123,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 break;
             case SocketClientEvent.TLS_HANDSHAKED:
                 print ("SocketClientEvent.TLS_HANDSHAKED\n");
+                //  print (((TlsClientConnection) connection).get_negotiated_protocol ()+ "\n");
                 break;
             case SocketClientEvent.TLS_HANDSHAKING:
                 print ("SocketClientEvent.TLS_HANDSHAKING\n");
@@ -147,17 +148,40 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             TlsCertificateFlags.UNKNOWN_CA
         };
         string error_string = "";
+        Gee.List<TlsCertificateFlags> encountered_errors = new Gee.ArrayList<TlsCertificateFlags> ();
         foreach (var flag in flags) {
             if (flag in errors) {
+                encountered_errors.add (flag);
                 error_string += @"$(flag), ";
             }
         }
         print (@"TLS certificate errors: $(error_string)\n");
+        
         //  print (peer_cert.certificate_pem);
         // TODO: Improve messaging here - this is ugly for a user to read!
         // TODO: Maybe give users the option to ignore and continue connecting anyway?
-        open_failed (@"TLS certificate errors: $(error_string)\n");
-        return false;
+
+        switch (connection_details.invalid_cert_policy) {
+            case REJECT:
+                print ("Rejecting certificate per policy\n");
+                open_failed (@"TLS certificate errors: $(error_string)\n");
+                return false;
+            case WARN:
+                print ("Warning about certificate per policy\n");
+                print (errors.to_string () + "\n");
+                if (unacceptable_certificate (peer_cert, encountered_errors)) {
+                    return true;
+                } else {
+                    open_failed (@"TLS certificate errors: $(error_string)\n");
+                    return false;
+                }
+            case ALLOW:
+                print ("Allowing certificate per policy\n");
+                return true;
+            default:
+                assert_not_reached ();
+        }
+        
     }
 
     private void register (Iridium.Services.ServerConnectionDetails connection_details) {
@@ -505,6 +529,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         send_output (Iridium.Services.MessageCommands.TOPIC + " " + channel_name + " :" + topic);
     }
 
+    public signal bool unacceptable_certificate (TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors);
     public signal void open_successful (Iridium.Services.Message message);
     public signal void open_failed (string error_message);
     public signal void connection_closed ();

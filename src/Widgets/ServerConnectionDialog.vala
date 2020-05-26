@@ -32,8 +32,8 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
     private Gtk.ComboBox auth_method_combo;
     private Gtk.Entry password_entry;
     private Gtk.Switch ssl_tls_switch;
-    private Gee.Map<int, Iridium.Models.InvalidCertificatePolicy> invalid_cert_policies;
-    private Gee.Map<int, string> invalid_cert_policies_display_strings;
+    private Gee.Map<int, Iridium.Models.InvalidCertificatePolicy> cert_policies;
+    private Gee.Map<int, string> cert_policies_display_strings;
     private Gtk.ComboBox cert_validation_policy_combo;
     private Gtk.Entry port_entry;
 
@@ -42,8 +42,12 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
     private Gtk.Spinner spinner;
     private Gtk.Label status_label;
 
-    enum Column {
+    enum AuthColumn {
         AUTH_METHOD
+    }
+
+    enum CertColumn {
+        CERT_POLICY
     }
 
     public ServerConnectionDialog (Iridium.MainWindow main_window) {
@@ -143,6 +147,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
             close ();
         });
 
+        // TODO: Disable the connect button until sufficient information is filled out
         var connect_button = new Gtk.Button.with_label (_("Connect"));
         connect_button.get_style_context ().add_class ("suggested-action");
         connect_button.clicked.connect (() => {
@@ -161,8 +166,8 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
             var auth_method = auth_methods.get (auth_method_combo.get_active ());
             var auth_token = password_entry.get_text ();
             var tls = ssl_tls_switch.get_active ();
-            var invalid_cert_policy = invalid_cert_policies.get (cert_validation_policy_combo.get_active ());
-            connect_button_clicked (server_name, nickname, username, realname, port, auth_method, tls, invalid_cert_policy, auth_token);
+            var cert_policy = cert_policies.get (cert_validation_policy_combo.get_active ());
+            connect_button_clicked (server_name, nickname, username, realname, port, auth_method, tls, cert_policy, auth_token);
         });
 
         add_action_widget (cancel_button, 0);
@@ -219,7 +224,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         for (int i = 0; i < auth_method_display_strings.size; i++) {
             Gtk.TreeIter iter;
             list_store.append (out iter);
-            list_store.set (iter, Column.AUTH_METHOD, auth_method_display_strings[i]);
+            list_store.set (iter, AuthColumn.AUTH_METHOD, auth_method_display_strings[i]);
         }
         auth_method_combo = new Gtk.ComboBox.with_model (list_store);
         var auth_method_cell = new Gtk.CellRendererText ();
@@ -289,25 +294,25 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         });
         ssl_tls_switch.notify["active"].connect (on_security_posture_changed);
 
-        var cert_validation_policy_label = new Gtk.Label (_("Invalid Certificates:"));
+        var cert_validation_policy_label = new Gtk.Label (_("Unacceptable Certificates:"));
         cert_validation_policy_label.halign = Gtk.Align.END;
 
-        var invalid_cert_policies_list_store = new Gtk.ListStore (1, typeof (string));
+        var cert_policies_list_store = new Gtk.ListStore (1, typeof (string));
         // TODO: This can be handled better
-        invalid_cert_policies = new Gee.HashMap<int, Iridium.Models.InvalidCertificatePolicy> ();
-        invalid_cert_policies_display_strings = new Gee.HashMap<int, string> ();
-        invalid_cert_policies.set(0, Iridium.Models.InvalidCertificatePolicy.REJECT);
-        invalid_cert_policies_display_strings.set (0, Iridium.Models.InvalidCertificatePolicy.REJECT.get_display_string ());
-        invalid_cert_policies.set(1, Iridium.Models.InvalidCertificatePolicy.WARN);
-        invalid_cert_policies_display_strings.set (1, Iridium.Models.InvalidCertificatePolicy.WARN.get_display_string ());
-        invalid_cert_policies.set(2, Iridium.Models.InvalidCertificatePolicy.ALLOW);
-        invalid_cert_policies_display_strings.set (2, Iridium.Models.InvalidCertificatePolicy.ALLOW.get_display_string ());
-        for (int i = 0; i < invalid_cert_policies_display_strings.size; i++) {
+        cert_policies = new Gee.HashMap<int, Iridium.Models.InvalidCertificatePolicy> ();
+        cert_policies_display_strings = new Gee.HashMap<int, string> ();
+        cert_policies.set(0, Iridium.Models.InvalidCertificatePolicy.REJECT);
+        cert_policies_display_strings.set (0, Iridium.Models.InvalidCertificatePolicy.REJECT.get_display_string ());
+        cert_policies.set(1, Iridium.Models.InvalidCertificatePolicy.WARN);
+        cert_policies_display_strings.set (1, Iridium.Models.InvalidCertificatePolicy.WARN.get_display_string ());
+        cert_policies.set(2, Iridium.Models.InvalidCertificatePolicy.ALLOW);
+        cert_policies_display_strings.set (2, Iridium.Models.InvalidCertificatePolicy.ALLOW.get_display_string ());
+        for (int i = 0; i < cert_policies_display_strings.size; i++) {
             Gtk.TreeIter iter;
-            invalid_cert_policies_list_store.append (out iter);
-            invalid_cert_policies_list_store.set (iter, Column.AUTH_METHOD, invalid_cert_policies_display_strings[i]);
+            cert_policies_list_store.append (out iter);
+            cert_policies_list_store.set (iter, CertColumn.CERT_POLICY, cert_policies_display_strings[i]);
         }
-        cert_validation_policy_combo = new Gtk.ComboBox.with_model (invalid_cert_policies_list_store);
+        cert_validation_policy_combo = new Gtk.ComboBox.with_model (cert_policies_list_store);
         var cert_validation_policy_cell = new Gtk.CellRendererText ();
         cert_validation_policy_combo.pack_start (cert_validation_policy_cell, false);
         cert_validation_policy_combo.set_attributes (cert_validation_policy_cell, "text", 0);
@@ -335,7 +340,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
 
     private void on_security_posture_changed () {
         if (ssl_tls_switch.get_active ()) {
-            switch (invalid_cert_policies.get (cert_validation_policy_combo.get_active ())) {
+            switch (cert_policies.get (cert_validation_policy_combo.get_active ())) {
                 case REJECT:
                     header_image_stack.set_visible_child_name ("tls-reject");
                     break;
@@ -367,6 +372,6 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
 
     public signal void connect_button_clicked (string server, string nickname, string username, string realname, 
         uint16 port, Iridium.Models.AuthenticationMethod auth_method, bool tls, 
-        Iridium.Models.InvalidCertificatePolicy invalid_cert_policy, string auth_token);
+        Iridium.Models.InvalidCertificatePolicy cert_policy, string auth_token);
 
 }

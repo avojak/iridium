@@ -27,6 +27,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     public Iridium.Widgets.ChannelJoinDialog? channel_join_dialog = null;
     public Iridium.Widgets.ManageConnectionsDialog? manage_connections_dialog = null;
     //  public Iridium.Widgets.PreferencesDialog? preferences_dialog = null;
+    public Iridium.Widgets.CertificateWarningDialog? certificate_warning_dialog = null;
 
     private Iridium.Views.Welcome welcome_view;
     private Iridium.Widgets.HeaderBar header_bar;
@@ -198,6 +199,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         });
 
         // Connect to all of the connection handler signals
+        connection_handler.unacceptable_certificate.connect (on_unacceptable_certificate);
         connection_handler.server_connection_successful.connect (on_server_connection_successful);
         connection_handler.server_connection_failed.connect (on_server_connection_failed);
         connection_handler.server_connection_closed.connect (on_server_connection_closed);
@@ -511,6 +513,17 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     //      preferences_dialog.present ();
     //  }
 
+    //  private void show_certificate_warning_dialog () {
+    //      if (certificate_warning_dialog == null) {
+    //          certificate_warning_dialog = new Iridium.Widgets.CertificateWarningDialog (this);
+    //          certificate_warning_dialog.show_all ();
+    //          certificate_warning_dialog.destroy.connect (() => {
+    //              certificate_warning_dialog = null;
+    //          });
+    //      }
+    //      certificate_warning_dialog.present ();
+    //  }
+
     private void join_channel (string server_name, string channel_name) {
         // Check if we're already in this channel
         if (connection_handler.get_channels (server_name).index_of (channel_name) != -1) {
@@ -650,6 +663,21 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     //
     // ServerConnectionHandler Callbacks
     //
+
+    private bool on_unacceptable_certificate (TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors) {
+        int result = -1;
+        Idle.add (() => {
+            //  show_certificate_warning_dialog ();
+            var dialog = new Iridium.Widgets.CertificateWarningDialog (this, peer_cert, errors);
+            result = dialog.run ();
+            dialog.dismiss ();
+            return false;
+        });
+        while (result == -1) {
+            // Block until a selection is made
+        }
+        return result == Gtk.ResponseType.OK;
+    }
 
     private void on_server_connection_successful (string server_name, Iridium.Services.Message message) {
         Idle.add (() => {

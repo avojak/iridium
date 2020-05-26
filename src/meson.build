@@ -40,6 +40,7 @@ executable(
     join_paths('Views', 'PrivateMessageChatView.vala'),
     join_paths('Views', 'ServerChatView.vala'),
     join_paths('Views', 'Welcome.vala'),
+    join_paths('Widgets', 'CertificateWarningDialog.vala'),
     join_paths('Widgets', 'ChannelJoinDialog.vala'),
     join_paths('Widgets', 'ChannelTopicEditDialog.vala'),
     join_paths('Widgets', 'HeaderBar.vala'),
