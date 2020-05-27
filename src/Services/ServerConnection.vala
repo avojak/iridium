@@ -123,11 +123,12 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 break;
             case SocketClientEvent.TLS_HANDSHAKED:
                 print ("SocketClientEvent.TLS_HANDSHAKED\n");
-                //  print (((TlsClientConnection) connection).get_negotiated_protocol ()+ "\n");
                 break;
             case SocketClientEvent.TLS_HANDSHAKING:
                 print ("SocketClientEvent.TLS_HANDSHAKING\n");
-                ((TlsClientConnection) connection).accept_certificate.connect (on_invalid_certificate);
+                ((TlsClientConnection) connection).accept_certificate.connect ((peer_cert, errors) => {
+                    return on_invalid_certificate (peer_cert, errors, connectable);
+                });
                 break;
             default:
                 // Do nothing - per documentation, unrecognized events should be ignored as there may be
@@ -136,7 +137,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         }
     }
 
-    private bool on_invalid_certificate (TlsCertificate peer_cert, TlsCertificateFlags errors) {
+    private bool on_invalid_certificate (TlsCertificate peer_cert, TlsCertificateFlags errors, SocketConnectable connectable) {
         // TODO: Also see https://github.com/jangernert/FeedReader/blob/master/src/Utils.vala#L212
         TlsCertificateFlags[] flags = new TlsCertificateFlags[] {
             TlsCertificateFlags.BAD_IDENTITY,
@@ -169,7 +170,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             case WARN:
                 print ("Warning about certificate per policy\n");
                 print (errors.to_string () + "\n");
-                if (unacceptable_certificate (peer_cert, encountered_errors)) {
+                if (unacceptable_certificate (peer_cert, encountered_errors, connectable)) {
                     return true;
                 } else {
                     open_failed (@"TLS certificate errors: $(error_string)\n");
@@ -529,7 +530,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         send_output (Iridium.Services.MessageCommands.TOPIC + " " + channel_name + " :" + topic);
     }
 
-    public signal bool unacceptable_certificate (TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors);
+    public signal bool unacceptable_certificate (TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors, SocketConnectable connectable);
     public signal void open_successful (Iridium.Services.Message message);
     public signal void open_failed (string error_message);
     public signal void connection_closed ();

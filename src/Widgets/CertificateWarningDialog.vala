@@ -24,8 +24,9 @@ public class Iridium.Widgets.CertificateWarningDialog : Granite.MessageDialog {
     public unowned Iridium.MainWindow main_window { get; construct; }
     public unowned TlsCertificate peer_cert { get; construct; }
     public unowned Gee.List<TlsCertificateFlags> errors { get; construct; }
+    public unowned SocketConnectable connectable { get; construct; }
 
-    public CertificateWarningDialog (Iridium.MainWindow main_window, TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors) {
+    public CertificateWarningDialog (Iridium.MainWindow main_window, TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors, SocketConnectable connectable) {
         Object (
             deletable: false,
             resizable: false,
@@ -33,14 +34,16 @@ public class Iridium.Widgets.CertificateWarningDialog : Granite.MessageDialog {
             modal: true,
             main_window: main_window,
             peer_cert: peer_cert,
-            errors: errors
+            errors: errors,
+            connectable: connectable
         );
     }
 
     construct {
         image_icon = new ThemedIcon ("security-low");
         primary_text = _("Untrusted Connection");
-        secondary_text = _("The identity of the server could not be verified. Connecting to the server may cause your username, password, and all messages to be transmitted insecurely.");
+        string server = connectable.to_string ().split (":")[0];
+        secondary_text = _(@"The identity of the server \"$server\" could not be verified. Connecting to the server may cause your username, password, and all messages to be transmitted insecurely.");
 
         add_button (_("Don't Connect"), Gtk.ResponseType.CANCEL);
         add_button (_("Connect Anyway"), Gtk.ResponseType.OK);
@@ -55,56 +58,88 @@ public class Iridium.Widgets.CertificateWarningDialog : Granite.MessageDialog {
         grid.column_spacing = 6;
         grid.row_spacing = 12;
 
+        var error_grid = new Gtk.Grid ();
+        error_grid.orientation = Gtk.Orientation.VERTICAL;
+        error_grid.column_spacing = 6;
+        error_grid.row_spacing = 12;
+
         int row_index = 0;
         if (TlsCertificateFlags.GENERIC_ERROR in errors) {
-            grid.attach (new Gtk.Image.from_icon_name ("security-low-symbolic", Gtk.IconSize.BUTTON), 0, row_index);
+            error_grid.attach (new Gtk.Image.from_icon_name ("security-low-symbolic", Gtk.IconSize.BUTTON), 0, row_index);
             var label = new Gtk.Label(_("An error has occurred processing the server's certificate"));
             label.halign = Gtk.Align.START;
-            grid.attach (label, 1, row_index);
+            error_grid.attach (label, 1, row_index);
             row_index++;
         }
         if (TlsCertificateFlags.INSECURE in errors) {
-            grid.attach (new Gtk.Image.from_icon_name ("security-low-symbolic", Gtk.IconSize.BUTTON), 0, row_index);
+            error_grid.attach (new Gtk.Image.from_icon_name ("security-low-symbolic", Gtk.IconSize.BUTTON), 0, row_index);
             var label = new Gtk.Label(_("The server's certificate is considered insecure"));
             label.halign = Gtk.Align.START;
-            grid.attach (label, 1, row_index);
+            error_grid.attach (label, 1, row_index);
             row_index++;
         }
         if (TlsCertificateFlags.REVOKED in errors) {
-            grid.attach (new Gtk.Image.from_icon_name ("security-low-symbolic", Gtk.IconSize.BUTTON), 0, row_index);
+            error_grid.attach (new Gtk.Image.from_icon_name ("security-low-symbolic", Gtk.IconSize.BUTTON), 0, row_index);
             var label = new Gtk.Label(_("The server's certificate has been revoked and is now invalid"));
             label.halign = Gtk.Align.START;
-            grid.attach (label, 1, row_index);
+            error_grid.attach (label, 1, row_index);
             row_index++;
         }
         if (TlsCertificateFlags.EXPIRED in errors) {
-            grid.attach (new Gtk.Image.from_icon_name ("security-low-symbolic", Gtk.IconSize.BUTTON), 0, row_index);
+            error_grid.attach (new Gtk.Image.from_icon_name ("security-low-symbolic", Gtk.IconSize.BUTTON), 0, row_index);
             var label = new Gtk.Label(_("The server's certificate has expired"));
             label.halign = Gtk.Align.START;
-            grid.attach (label, 1, row_index);
+            error_grid.attach (label, 1, row_index);
             row_index++;
         }
         if (TlsCertificateFlags.NOT_ACTIVATED in errors) {
-            grid.attach (new Gtk.Image.from_icon_name ("security-low-symbolic", Gtk.IconSize.BUTTON), 0, row_index);
+            error_grid.attach (new Gtk.Image.from_icon_name ("security-low-symbolic", Gtk.IconSize.BUTTON), 0, row_index);
             var label = new Gtk.Label(_("The server's certificate has not been activated"));
             label.halign = Gtk.Align.START;
-            grid.attach (label, 1, row_index);
+            error_grid.attach (label, 1, row_index);
             row_index++;
         }
         if (TlsCertificateFlags.BAD_IDENTITY in errors) {
-            grid.attach (new Gtk.Image.from_icon_name ("security-low-symbolic", Gtk.IconSize.BUTTON), 0, row_index);
+            error_grid.attach (new Gtk.Image.from_icon_name ("security-low-symbolic", Gtk.IconSize.BUTTON), 0, row_index);
             var label = new Gtk.Label(_("The server's identity does not match the identity in the certificate"));
             label.halign = Gtk.Align.START;
-            grid.attach (label, 1, row_index);
+            error_grid.attach (label, 1, row_index);
             row_index++;
         }
         if (TlsCertificateFlags.UNKNOWN_CA in errors) {
-            grid.attach (new Gtk.Image.from_icon_name ("security-low-symbolic", Gtk.IconSize.BUTTON), 0, row_index);
+            error_grid.attach (new Gtk.Image.from_icon_name ("security-low-symbolic", Gtk.IconSize.BUTTON), 0, row_index);
             var label = new Gtk.Label(_("The server's certificate is not signed by a known authority"));
             label.halign = Gtk.Align.START;
-            grid.attach (label, 1, row_index);
+            error_grid.attach (label, 1, row_index);
             row_index++;
         }
+
+        var text_view = new Gtk.TextView ();
+        text_view.set_pixels_below_lines (3);
+        text_view.set_border_width (6);
+        text_view.set_wrap_mode (Gtk.WrapMode.NONE);
+        text_view.set_monospace (true);
+        text_view.set_editable (false);
+        text_view.set_cursor_visible (false);
+        text_view.set_vexpand (false);
+        text_view.set_hexpand (true);
+
+        var scroll_box = new Gtk.ScrolledWindow (null, null);
+        scroll_box.margin_top = 12;
+        scroll_box.min_content_height = 140;
+        scroll_box.add (text_view);
+
+        text_view.buffer.text = peer_cert.certificate_pem;
+
+        var expander = new Gtk.Expander (_("View certificate"));
+        expander.add (scroll_box);
+
+        var check_box = new Gtk.CheckButton.with_label (_("Remember my decision"));
+
+        grid.attach (error_grid, 0, 0);
+        grid.attach (expander, 0, 1);
+        grid.attach (check_box, 0, 2);
+
         return grid;
     }
 

@@ -167,8 +167,8 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
     // ServerConnection Callbacks
     //
 
-    private bool on_unacceptable_certificate (TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors) {
-        return unacceptable_certificate (peer_cert, errors);
+    private bool on_unacceptable_certificate (TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors, SocketConnectable connectable) {
+        return unacceptable_certificate (peer_cert, errors, connectable);
     }
 
     private void on_server_connection_successful (Iridium.Services.ServerConnection source, Iridium.Services.Message message) {
@@ -243,7 +243,7 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
     // Signals
     //
 
-    public signal bool unacceptable_certificate (TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors);
+    public signal bool unacceptable_certificate (TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors, SocketConnectable connectable);
     public signal void server_connection_successful (string server_name, Iridium.Services.Message message);
     public signal void server_connection_failed (string server_name, string error_message);
     public signal void server_connection_closed (string server_name);

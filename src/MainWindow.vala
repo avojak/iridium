@@ -664,11 +664,11 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     // ServerConnectionHandler Callbacks
     //
 
-    private bool on_unacceptable_certificate (TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors) {
+    private bool on_unacceptable_certificate (TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors, SocketConnectable connectable) {
         int result = -1;
         Idle.add (() => {
             //  show_certificate_warning_dialog ();
-            var dialog = new Iridium.Widgets.CertificateWarningDialog (this, peer_cert, errors);
+            var dialog = new Iridium.Widgets.CertificateWarningDialog (this, peer_cert, errors, connectable);
             result = dialog.run ();
             dialog.dismiss ();
             return false;
