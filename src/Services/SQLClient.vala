@@ -443,7 +443,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
     }
 
     public Gee.List<Iridium.Models.ServerIdentity> get_server_identities (string host) {
-        var identities = new Gee.ArrayList<Iridium.Services.Server> ();
+        var identities = new Gee.ArrayList<Iridium.Models.ServerIdentity> ();
 
         var sql = "SELECT * FROM server_identities WHERE host = $HOST;";
         Sqlite.Statement statement;
@@ -465,20 +465,20 @@ public class Iridium.Services.SQLClient : GLib.Object {
 
     private Iridium.Models.ServerIdentity parse_identity_row (Sqlite.Statement statement) {
         var num_columns = statement.column_count ();
-        var identity = new Iridium.Services.ServerIdentity ();
+        var identity = new Iridium.Models.ServerIdentity ();
         for (int i = 0; i < num_columns; i++) {
             switch (statement.column_name (i)) {
                 case "id":
                     identity.id = statement.column_int (i);
                     break;
                 case "host":
-                    channel.host = statement.column_text (i);
+                    identity.host = statement.column_text (i);
                     break;
                 case "certificate_pem":
-                    channel.certificate_pem = statement.column_text (i);
+                    identity.certificate_pem = statement.column_text (i);
                     break;
                 case "is_accepted":
-                    channel.is_accepted = int_to_bool (statement.column_int (i));
+                    identity.is_accepted = int_to_bool (statement.column_int (i));
                     break;
                 default:
                     break;

@@ -6,5 +6,20 @@
       <summary>If the dark Gtk stylesheet should be used</summary>
       <description>If the dark Gtk stylesheet should be used</description>
     </key>
+    <key name="certificate-validation-policy" type="s">
+      <default>"REJECT"</default>
+      <summary>How to handle unacceptable SSL/TLS certificates</summary>
+      <description>How to handle unacceptable SSL/TLS certificates</description>
+    </key>
+    <key name="default-nickname" type="s">
+      <default>""</default>
+      <summary>The default nickname when connecting to a server</summary>
+      <description>The default nickname when connecting to a server</description>
+    </key>
+    <key name="default-realname" type="s">
+      <default>""</default>
+      <summary>The default real name when connecting to a server</summary>
+      <description>The default real name when connecting to a server</description>
+    </key>
   </schema>
 </schemalist>

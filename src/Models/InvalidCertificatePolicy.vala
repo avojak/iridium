@@ -38,6 +38,19 @@ public enum Iridium.Models.InvalidCertificatePolicy {
         }
     }
 
+    public string get_short_name () {
+        switch (this) {
+            case REJECT:
+                return _("REJECT");
+            case WARN:
+                return _("WARN");
+            case ALLOW:
+                return _("ALLOW");
+            default:
+                assert_not_reached ();
+        }
+    }
+
     public static InvalidCertificatePolicy get_value_by_name (string name) {
         EnumClass enumc = (EnumClass) typeof (InvalidCertificatePolicy).class_ref ();
         unowned EnumValue? eval = enumc.get_value_by_name (name);
@@ -45,6 +58,19 @@ public enum Iridium.Models.InvalidCertificatePolicy {
 			assert_not_reached ();
 		}
 		return (InvalidCertificatePolicy) eval.value;
+    }
+
+    public static InvalidCertificatePolicy get_value_by_short_name (string short_name) {
+        switch (short_name) {
+            case "REJECT":
+                return REJECT;
+            case "WARN":
+                return WARN;
+            case "ALLOW":
+                return ALLOW;
+            default:
+                assert_not_reached ();
+        }
     }
 
 }

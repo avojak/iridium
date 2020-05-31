@@ -26,7 +26,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     public Iridium.Widgets.ServerConnectionDialog? connection_dialog = null;
     public Iridium.Widgets.ChannelJoinDialog? channel_join_dialog = null;
     public Iridium.Widgets.ManageConnectionsDialog? manage_connections_dialog = null;
-    //  public Iridium.Widgets.PreferencesDialog? preferences_dialog = null;
+    public Iridium.Widgets.PreferencesDialog? preferences_dialog = null;
     public Iridium.Widgets.CertificateWarningDialog? certificate_warning_dialog = null;
 
     private Iridium.Views.Welcome welcome_view;
@@ -83,9 +83,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         //  header_bar.channel_join_button_clicked.connect (() => {
         //      show_channel_join_dialog ();
         //  });
-        //  header_bar.preferences_button_clicked.connect (() => {
-        //      show_preferences_dialog ();
-        //  });
+        header_bar.preferences_button_clicked.connect (() => {
+            show_preferences_dialog ();
+        });
         header_bar.username_selected.connect (on_username_selected);
         //  header_bar.channel_topic_toggled.connect (on_channel_topic_toggled);
         side_panel.item_selected.connect ((item) => {
@@ -502,16 +502,16 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         manage_connections_dialog.present ();
     }
 
-    //  private void show_preferences_dialog () {
-    //      if (preferences_dialog == null) {
-    //          preferences_dialog = new Iridium.Widgets.PreferencesDialog (this);
-    //          preferences_dialog.show_all ();
-    //          preferences_dialog.destroy.connect (() => {
-    //              preferences_dialog = null;
-    //          });
-    //      }
-    //      preferences_dialog.present ();
-    //  }
+    private void show_preferences_dialog () {
+        if (preferences_dialog == null) {
+            preferences_dialog = new Iridium.Widgets.PreferencesDialog (this);
+            preferences_dialog.show_all ();
+            preferences_dialog.destroy.connect (() => {
+                preferences_dialog = null;
+            });
+        }
+        preferences_dialog.present ();
+    }
 
     //  private void show_certificate_warning_dialog () {
     //      if (certificate_warning_dialog == null) {

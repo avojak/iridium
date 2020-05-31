@@ -84,30 +84,67 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         channel_users_popover.username_selected.connect (on_username_selected);
         channel_users_button.popover = channel_users_popover;
 
-        //  var preferences_button = new Gtk.Button.from_icon_name ("preferences-system-symbolic", Gtk.IconSize.BUTTON);
-        //  preferences_button.tooltip_text = _("Preferences");
-        //  preferences_button.relief = Gtk.ReliefStyle.NONE;
-        //  preferences_button.valign = Gtk.Align.CENTER;
-        //  preferences_button.clicked.connect (() => {
-        //      preferences_button_clicked ();
-        //  });
+        var settings_button = new Gtk.MenuButton ();
+        settings_button.image = new Gtk.Image.from_icon_name ("preferences-system-symbolic", Gtk.IconSize.BUTTON);
+        settings_button.tooltip_text = _("Menu");
+        settings_button.relief = Gtk.ReliefStyle.NONE;
+        settings_button.valign = Gtk.Align.CENTER;
 
-        // TODO: Move this to a settings menu
         var mode_switch = new Granite.ModeSwitch.from_icon_name ("display-brightness-symbolic", "weather-clear-night-symbolic");
         mode_switch.primary_icon_tooltip_text = _("Light background");
         mode_switch.secondary_icon_tooltip_text = _("Dark background");
         mode_switch.valign = Gtk.Align.CENTER;
+        mode_switch.halign = Gtk.Align.CENTER;
+        mode_switch.margin = 12;
+        mode_switch.margin_bottom = 6;
         mode_switch.bind_property ("active", Gtk.Settings.get_default (), "gtk_application_prefer_dark_theme");
         Iridium.Application.settings.bind ("prefer-dark-style", mode_switch, "active", GLib.SettingsBindFlags.DEFAULT);
+
+        var menu_separator = new Gtk.Separator (Gtk.Orientation.HORIZONTAL);
+        menu_separator.margin_top = 12;
+
+        var preferences_label = new Gtk.Label (_("Preferences…"));
+        preferences_label.halign = Gtk.Align.START;
+        preferences_label.hexpand = true;
+        preferences_label.margin_start = 6;
+        preferences_label.margin_end = 6;
+
+        var preferences_button = new Gtk.Button ();
+        preferences_button.add (preferences_label);
+        preferences_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
+        preferences_button.get_style_context ().add_class (Gtk.STYLE_CLASS_MENUITEM);
+
+        var settings_popover_grid = new Gtk.Grid ();
+        settings_popover_grid.margin_bottom = 3;
+        settings_popover_grid.orientation = Gtk.Orientation.VERTICAL;
+        settings_popover_grid.width_request = 200;
+        settings_popover_grid.attach (mode_switch, 0, 0, 1, 1);
+        settings_popover_grid.attach (menu_separator, 0, 1, 1, 1);
+        settings_popover_grid.attach (preferences_button, 0, 2, 1, 1);
+        settings_popover_grid.show_all ();
+
+        var settings_popover = new Gtk.Popover (null);
+        settings_popover.add (settings_popover_grid);
+
+        settings_button.popover = settings_popover;
+
+        //  menu_button.clicked.connect (() => {
+        //      menu_button_clicked ();
+        //  });
 
         //  pack_start (server_connect_button);
         //  pack_start (channel_join_button);
 
-        pack_end (mode_switch);
-        //  pack_end (preferences_button);
+        //  pack_end (mode_switch);
+        pack_end (settings_button);
         pack_end (channel_users_button);
         //  pack_end (channel_topic_button);
         pack_end (new Gtk.Separator (Gtk.Orientation.VERTICAL));
+
+        preferences_button.clicked.connect (() => {
+            settings_popover.popdown ();
+            preferences_button_clicked ();
+        });
     }
 
     public void update_title (string title, string? subtitle) {
@@ -151,7 +188,7 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
 
     //  public signal void server_connect_button_clicked ();
     //  public signal void channel_join_button_clicked ();
-    //  public signal void preferences_button_clicked ();
+    public signal void preferences_button_clicked ();
     //  public signal void channel_topic_toggled (bool visible);
     public signal void username_selected (string username);
 
