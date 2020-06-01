@@ -21,6 +21,8 @@
 
 public class Iridium.Widgets.CertificateWarningDialog : Granite.MessageDialog {
 
+    private static Gtk.CssProvider provider;
+
     public unowned Iridium.MainWindow main_window { get; construct; }
     public unowned TlsCertificate peer_cert { get; construct; }
     public unowned Gee.List<TlsCertificateFlags> errors { get; construct; }
@@ -37,6 +39,11 @@ public class Iridium.Widgets.CertificateWarningDialog : Granite.MessageDialog {
             errors: errors,
             connectable: connectable
         );
+    }
+
+    static construct {
+        provider = new Gtk.CssProvider ();
+        provider.load_from_resource ("com/github/avojak/iridium/CertificateWarningDialog.css");
     }
 
     construct {
@@ -65,49 +72,49 @@ public class Iridium.Widgets.CertificateWarningDialog : Granite.MessageDialog {
 
         int row_index = 0;
         if (TlsCertificateFlags.GENERIC_ERROR in errors) {
-            error_grid.attach (new Gtk.Image.from_icon_name ("security-low-symbolic", Gtk.IconSize.BUTTON), 0, row_index);
+            error_grid.attach (create_error_icon (), 0, row_index);
             var label = new Gtk.Label(_("An error has occurred processing the server's certificate"));
             label.halign = Gtk.Align.START;
             error_grid.attach (label, 1, row_index);
             row_index++;
         }
         if (TlsCertificateFlags.INSECURE in errors) {
-            error_grid.attach (new Gtk.Image.from_icon_name ("security-low-symbolic", Gtk.IconSize.BUTTON), 0, row_index);
+            error_grid.attach (create_error_icon (), 0, row_index);
             var label = new Gtk.Label(_("The server's certificate is considered insecure"));
             label.halign = Gtk.Align.START;
             error_grid.attach (label, 1, row_index);
             row_index++;
         }
         if (TlsCertificateFlags.REVOKED in errors) {
-            error_grid.attach (new Gtk.Image.from_icon_name ("security-low-symbolic", Gtk.IconSize.BUTTON), 0, row_index);
+            error_grid.attach (create_error_icon (), 0, row_index);
             var label = new Gtk.Label(_("The server's certificate has been revoked and is now invalid"));
             label.halign = Gtk.Align.START;
             error_grid.attach (label, 1, row_index);
             row_index++;
         }
         if (TlsCertificateFlags.EXPIRED in errors) {
-            error_grid.attach (new Gtk.Image.from_icon_name ("security-low-symbolic", Gtk.IconSize.BUTTON), 0, row_index);
+            error_grid.attach (create_error_icon (), 0, row_index);
             var label = new Gtk.Label(_("The server's certificate has expired"));
             label.halign = Gtk.Align.START;
             error_grid.attach (label, 1, row_index);
             row_index++;
         }
         if (TlsCertificateFlags.NOT_ACTIVATED in errors) {
-            error_grid.attach (new Gtk.Image.from_icon_name ("security-low-symbolic", Gtk.IconSize.BUTTON), 0, row_index);
+            error_grid.attach (create_error_icon (), 0, row_index);
             var label = new Gtk.Label(_("The server's certificate has not been activated"));
             label.halign = Gtk.Align.START;
             error_grid.attach (label, 1, row_index);
             row_index++;
         }
         if (TlsCertificateFlags.BAD_IDENTITY in errors) {
-            error_grid.attach (new Gtk.Image.from_icon_name ("security-low-symbolic", Gtk.IconSize.BUTTON), 0, row_index);
+            error_grid.attach (create_error_icon (), 0, row_index);
             var label = new Gtk.Label(_("The server's identity does not match the identity in the certificate"));
             label.halign = Gtk.Align.START;
             error_grid.attach (label, 1, row_index);
             row_index++;
         }
         if (TlsCertificateFlags.UNKNOWN_CA in errors) {
-            error_grid.attach (new Gtk.Image.from_icon_name ("security-low-symbolic", Gtk.IconSize.BUTTON), 0, row_index);
+            error_grid.attach (create_error_icon (), 0, row_index);
             var label = new Gtk.Label(_("The server's certificate is not signed by a known authority"));
             label.halign = Gtk.Align.START;
             error_grid.attach (label, 1, row_index);
@@ -141,6 +148,14 @@ public class Iridium.Widgets.CertificateWarningDialog : Granite.MessageDialog {
         grid.attach (check_box, 0, 2);
 
         return grid;
+    }
+
+    private Gtk.Image create_error_icon () {
+        var icon = new Gtk.Image.from_icon_name ("security-low-symbolic", Gtk.IconSize.BUTTON);
+        unowned Gtk.StyleContext style_context = icon.get_style_context ();
+        style_context.add_class ("error");
+        style_context.add_provider (provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+        return icon;
     }
 
     public void dismiss () {

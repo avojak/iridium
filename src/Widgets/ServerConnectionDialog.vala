@@ -32,9 +32,6 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
     private Gtk.ComboBox auth_method_combo;
     private Gtk.Entry password_entry;
     private Gtk.Switch ssl_tls_switch;
-    private Gee.Map<int, Iridium.Models.InvalidCertificatePolicy> cert_policies;
-    private Gee.Map<int, string> cert_policies_display_strings;
-    private Gtk.ComboBox cert_validation_policy_combo;
     private Gtk.Entry port_entry;
 
     private Gtk.Stack header_image_stack;
@@ -45,10 +42,6 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
     enum AuthColumn {
         AUTH_METHOD
     }
-
-    //  enum CertColumn {
-    //      CERT_POLICY
-    //  }
 
     public ServerConnectionDialog (Iridium.MainWindow main_window) {
         Object (
@@ -84,7 +77,6 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         header_image_stack.add_named (tls_warn_header_image, "tls-warn");
         header_image_stack.add_named (tls_allow_header_image, "tls-allow");
         header_image_stack.add_named (no_tls_header_image, "no-tls");
-        //  header_image_stack.set_visible_child_name ("tls-reject");
         header_image_stack.show_all (); // Required in order to set the visible child from preferences
 
 
@@ -168,8 +160,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
             var auth_method = auth_methods.get (auth_method_combo.get_active ());
             var auth_token = password_entry.get_text ();
             var tls = ssl_tls_switch.get_active ();
-            var cert_policy = cert_policies.get (cert_validation_policy_combo.get_active ());
-            connect_button_clicked (server_name, nickname, username, realname, port, auth_method, tls, cert_policy, auth_token);
+            connect_button_clicked (server_name, nickname, username, realname, port, auth_method, tls, auth_token);
         });
 
         add_action_widget (cancel_button, 0);
@@ -291,38 +282,11 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         ssl_tls_switch.active = true;
 
         ssl_tls_switch.notify["active"].connect (() => {
-            //  cert_validation_policy_combo.set_sensitive (ssl_tls_switch.get_active ());
-            port_entry.placeholder_text = ssl_tls_switch.get_active ()
+            port_entry.text = ssl_tls_switch.get_active ()
                 ? Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT.to_string ()
                 : Iridium.Services.ServerConnectionDetails.DEFAULT_INSECURE_PORT.to_string ();
         });
         ssl_tls_switch.notify["active"].connect (on_security_posture_changed);
-
-        //  var cert_validation_policy_label = new Gtk.Label (_("Unacceptable Certificates:"));
-        //  cert_validation_policy_label.halign = Gtk.Align.END;
-
-        //  var cert_policies_list_store = new Gtk.ListStore (1, typeof (string));
-        //  // TODO: This can be handled better
-        //  cert_policies = new Gee.HashMap<int, Iridium.Models.InvalidCertificatePolicy> ();
-        //  cert_policies_display_strings = new Gee.HashMap<int, string> ();
-        //  cert_policies.set(0, Iridium.Models.InvalidCertificatePolicy.REJECT);
-        //  cert_policies_display_strings.set (0, Iridium.Models.InvalidCertificatePolicy.REJECT.get_display_string ());
-        //  cert_policies.set(1, Iridium.Models.InvalidCertificatePolicy.WARN);
-        //  cert_policies_display_strings.set (1, Iridium.Models.InvalidCertificatePolicy.WARN.get_display_string ());
-        //  cert_policies.set(2, Iridium.Models.InvalidCertificatePolicy.ALLOW);
-        //  cert_policies_display_strings.set (2, Iridium.Models.InvalidCertificatePolicy.ALLOW.get_display_string ());
-        //  for (int i = 0; i < cert_policies_display_strings.size; i++) {
-        //      Gtk.TreeIter iter;
-        //      cert_policies_list_store.append (out iter);
-        //      cert_policies_list_store.set (iter, CertColumn.CERT_POLICY, cert_policies_display_strings[i]);
-        //  }
-        //  cert_validation_policy_combo = new Gtk.ComboBox.with_model (cert_policies_list_store);
-        //  var cert_validation_policy_cell = new Gtk.CellRendererText ();
-        //  cert_validation_policy_combo.pack_start (cert_validation_policy_cell, false);
-        //  cert_validation_policy_combo.set_attributes (cert_validation_policy_cell, "text", 0);
-        //  cert_validation_policy_combo.set_active (0);
-
-        //  cert_validation_policy_combo.changed.connect (on_security_posture_changed);
 
         var port_label = new Gtk.Label (_("Port:"));
         port_label.halign = Gtk.Align.END;
@@ -330,12 +294,10 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         // TODO: Force numeric input
         port_entry = new Gtk.Entry ();
         port_entry.hexpand = true;
-        port_entry.placeholder_text = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT.to_string ();
+        port_entry.text = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT.to_string ();
 
         advanced_form_grid.attach (ssl_tls_label, 0, 0, 1, 1);
         advanced_form_grid.attach (ssl_tls_switch_container, 1, 0, 1, 1);
-        //  advanced_form_grid.attach (cert_validation_policy_label, 0, 1, 1, 1);
-        //  advanced_form_grid.attach (cert_validation_policy_combo, 1, 1, 1, 1);
         advanced_form_grid.attach (port_label, 0, 1, 1, 1);
         advanced_form_grid.attach (port_entry, 1, 1, 1, 1);
 
@@ -383,7 +345,6 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
     }
 
     public signal void connect_button_clicked (string server, string nickname, string username, string realname, 
-        uint16 port, Iridium.Models.AuthenticationMethod auth_method, bool tls, 
-        Iridium.Models.InvalidCertificatePolicy cert_policy, string auth_token);
+        uint16 port, Iridium.Models.AuthenticationMethod auth_method, bool tls, string auth_token);
 
 }

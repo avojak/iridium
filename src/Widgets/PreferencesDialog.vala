@@ -21,6 +21,8 @@
 
 public class Iridium.Widgets.PreferencesDialog : Gtk.Dialog {
 
+    private static Gtk.CssProvider provider;
+
     public unowned Iridium.MainWindow main_window { get; construct; }
 
     private Gtk.Entry default_nickname_entry;
@@ -42,6 +44,11 @@ public class Iridium.Widgets.PreferencesDialog : Gtk.Dialog {
             modal: true,
             main_window: main_window
         );
+    }
+
+    static construct {
+        provider = new Gtk.CssProvider ();
+        provider.load_from_resource ("com/github/avojak/iridium/PreferencesDialog.css");
     }
 
     construct {
@@ -132,8 +139,11 @@ public class Iridium.Widgets.PreferencesDialog : Gtk.Dialog {
 
         var tls_cert_reject_grid = new Gtk.Grid ();
         tls_cert_reject_grid.column_spacing = 10;
-        var tls_cert_reject_image = new Gtk.Image.from_icon_name ("security-high", Gtk.IconSize.BUTTON);
+        var tls_cert_reject_image = new Gtk.Image.from_icon_name ("security-high-symbolic", Gtk.IconSize.BUTTON);
         tls_cert_reject_image.yalign = 0;
+        unowned Gtk.StyleContext tls_cert_reject_image_style_context = tls_cert_reject_image.get_style_context ();
+        tls_cert_reject_image_style_context.add_class ("security-high");
+        tls_cert_reject_image_style_context.add_provider (provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
         var tls_cert_reject_label = new Gtk.Label (null);
         tls_cert_reject_label.set_markup (_("<i>If a server presents an unacceptable SSL/TLS certificate, no connection will be made.</i> <b>(Recommended)</b>"));
         tls_cert_reject_label.use_markup = true;
@@ -146,8 +156,11 @@ public class Iridium.Widgets.PreferencesDialog : Gtk.Dialog {
 
         var tls_cert_warn_grid = new Gtk.Grid ();
         tls_cert_warn_grid.column_spacing = 10;
-        var tls_cert_warn_image = new Gtk.Image.from_icon_name ("security-medium", Gtk.IconSize.BUTTON);
+        var tls_cert_warn_image = new Gtk.Image.from_icon_name ("security-medium-symbolic", Gtk.IconSize.BUTTON);
         tls_cert_warn_image.yalign = 0;
+        unowned Gtk.StyleContext tls_cert_warn_image_style_context = tls_cert_warn_image.get_style_context ();
+        tls_cert_warn_image_style_context.add_class ("security-medium");
+        tls_cert_warn_image_style_context.add_provider (provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
         var tls_cert_warn_label = new Gtk.Label (null);
         tls_cert_warn_label.set_markup (_("<i>If a server presents an unacceptable SSL/TLS certificate, the user will be warned and can choose whether or not to proceed.</i>"));
         tls_cert_warn_label.use_markup = true;
@@ -160,8 +173,11 @@ public class Iridium.Widgets.PreferencesDialog : Gtk.Dialog {
 
         var tls_cert_allow_grid = new Gtk.Grid ();
         tls_cert_allow_grid.column_spacing = 10;
-        var tls_cert_allow_image = new Gtk.Image.from_icon_name ("security-low", Gtk.IconSize.BUTTON);
+        var tls_cert_allow_image = new Gtk.Image.from_icon_name ("security-low-symbolic", Gtk.IconSize.BUTTON);
         tls_cert_allow_image.yalign = 0;
+        unowned Gtk.StyleContext tls_cert_allow_image_style_context = tls_cert_allow_image.get_style_context ();
+        tls_cert_allow_image_style_context.add_class ("security-low");
+        tls_cert_allow_image_style_context.add_provider (provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
         var tls_cert_allow_label = new Gtk.Label (null);
         tls_cert_allow_label.set_markup (_("<i>If a server presents an unacceptable SSL/TLS certificate, the connection will still be made.</i> <b>(Not recommended)</b>"));
         tls_cert_allow_label.use_markup = true;

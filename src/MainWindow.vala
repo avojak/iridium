@@ -445,7 +445,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         if (connection_dialog == null) {
             connection_dialog = new Iridium.Widgets.ServerConnectionDialog (this);
             connection_dialog.show_all ();
-            connection_dialog.connect_button_clicked.connect ((server, nickname, username, realname, port, auth_method, tls, invalid_cert_policy, auth_token) => {
+            connection_dialog.connect_button_clicked.connect ((server, nickname, username, realname, port, auth_method, tls, auth_token) => {
                 // Prevent duplicate connections
                 if (connection_handler.has_connection (server)) {
                     connection_dialog.display_error (_("Already connected to this server!"));
@@ -462,7 +462,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 connection_details.auth_method = auth_method;
                 connection_details.auth_token = auth_token;
                 connection_details.tls = tls;
-                connection_details.invalid_cert_policy = invalid_cert_policy;
 
                 // Attempt the server connection
                 connection_handler.connect_to_server (connection_details);

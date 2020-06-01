@@ -21,9 +21,7 @@
 
 public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
 
-    //  private Gtk.Button channel_join_button;
     private Gtk.MenuButton channel_users_button;
-    //  private Gtk.ToggleButton channel_topic_button;
 
     private Iridium.Widgets.UsersPopover.ChannelUsersPopover channel_users_popover;
 
@@ -35,45 +33,6 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
     }
 
     construct {
-        //  var server_connect_button = new Gtk.Button.from_icon_name (Constants.APP_ID + ".network-server-new", Gtk.IconSize.LARGE_TOOLBAR);
-        //  /* var server_connect_button = new Gtk.Button.from_icon_name ("network-server", Gtk.IconSize.BUTTON); */
-        //  server_connect_button.tooltip_text = _("Connect to a Server");
-        //  server_connect_button.relief = Gtk.ReliefStyle.NONE;
-		//  server_connect_button.valign = Gtk.Align.CENTER;
-        //  // TODO: Support keyboard accelerator
-        //  server_connect_button.clicked.connect (() => {
-        //      server_connect_button_clicked ();
-        //  });
-
-        //  channel_join_button = new Gtk.Button.from_icon_name (Constants.APP_ID + ".internet-chat-new", Gtk.IconSize.LARGE_TOOLBAR);
-        //  /* var channel_join_button = new Gtk.Button.from_icon_name ("internet-chat", Gtk.IconSize.BUTTON); */
-        //  channel_join_button.tooltip_text = _("Join a Channel");
-        //  channel_join_button.relief = Gtk.ReliefStyle.NONE;
-		//  channel_join_button.valign = Gtk.Align.CENTER;
-        //  // TODO: Support keyboard accelerator
-        //  channel_join_button.sensitive = false;
-        //  channel_join_button.clicked.connect (() => {
-        //      channel_join_button_clicked ();
-        //  });
-
-
-        // TODO: Make this display a menu rather than be a toggle. The menu can have a toggle item
-        //       and an edit item.
-        //  channel_topic_button = new Gtk.ToggleButton ();
-        //  channel_topic_button.set_image (new Gtk.Image.from_icon_name ("help-faq-symbolic", Gtk.IconSize.BUTTON));
-        //  channel_topic_button.tooltip_text = _("Show channel topic"); // TODO: Enable accelerator
-        //  channel_topic_button.relief = Gtk.ReliefStyle.NONE;
-        //  channel_topic_button.valign = Gtk.Align.CENTER;
-        //  channel_topic_button.toggled.connect (() => {
-        //      var active = channel_topic_button.get_active ();
-        //      if (active) {
-        //          channel_topic_button.tooltip_text = _("Hide channel topic");
-        //      } else {
-        //          channel_topic_button.tooltip_text = _("Show channel topic");
-        //      }
-        //      channel_topic_toggled (active);
-        //  });
-
         channel_users_button = new Gtk.MenuButton ();
         channel_users_button.set_image (new Gtk.Image.from_icon_name ("system-users-symbolic", Gtk.IconSize.BUTTON));
         channel_users_button.tooltip_text = _("Channel users"); // TODO: Enable accelerator
@@ -128,17 +87,8 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
 
         settings_button.popover = settings_popover;
 
-        //  menu_button.clicked.connect (() => {
-        //      menu_button_clicked ();
-        //  });
-
-        //  pack_start (server_connect_button);
-        //  pack_start (channel_join_button);
-
-        //  pack_end (mode_switch);
         pack_end (settings_button);
         pack_end (channel_users_button);
-        //  pack_end (channel_topic_button);
         pack_end (new Gtk.Separator (Gtk.Orientation.VERTICAL));
 
         preferences_button.clicked.connect (() => {
@@ -151,23 +101,6 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         this.title = title;
         this.subtitle = subtitle;
     }
-
-    //  public void set_channel_join_button_enabled (bool enabled) {
-    //      channel_join_button.sensitive = enabled;
-    //  }
-
-    //  public void set_channel_topic_button_visible (bool visible) {
-        //  channel_topic_button.visible = visible;
-        //  channel_topic_button.no_show_all = !visible;
-    //  }
-
-    //  public void set_channel_topic_button_enabled (bool enabled) {
-        //  channel_topic_button.sensitive = enabled;
-    //  }
-
-    //  public bool get_channel_topic_button_active () {
-        //  return channel_topic_button.get_active ();
-    //  }
 
     public void set_channel_users_button_visible (bool visible) {
         channel_users_button.visible = visible;
@@ -186,10 +119,7 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         username_selected (username);
     }
 
-    //  public signal void server_connect_button_clicked ();
-    //  public signal void channel_join_button_clicked ();
     public signal void preferences_button_clicked ();
-    //  public signal void channel_topic_toggled (bool visible);
     public signal void username_selected (string username);
 
 }

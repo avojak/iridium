@@ -9,9 +9,7 @@ config_header = configure_file(
     configuration: conf_data
 )
 
-# Create a new executable, list the files we want to compile, list the dependencies we need, and install
-executable(
-    application_id,
+iridium_files = files(
     join_paths('Application.vala'),
     join_paths('MainWindow.vala'),
     join_paths('Layouts', 'MainLayout.vala'),
@@ -57,8 +55,15 @@ executable(
     join_paths('Widgets', 'SidePanel', 'ChannelRow.vala'),
     join_paths('Widgets', 'SidePanel', 'PrivateMessageRow.vala'),
     join_paths('Widgets', 'UsersPopover', 'ChannelUsersPopover.vala'),
-    join_paths('Widgets', 'UsersPopover', 'UserListBoxRow.vala'),
+    join_paths('Widgets', 'UsersPopover', 'UserListBoxRow.vala')
+)
+
+# Create a new executable, list the files we want to compile, list the dependencies we need, and install
+executable(
+    application_id,
+    iridium_files,
     config_header,
+    css_gresource,
     dependencies: [
         dependency('gtk+-3.0', version: '>= 3.6.4'),
         dependency('gee-0.8', version: '>= 0.8.5'),
