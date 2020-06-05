@@ -53,9 +53,6 @@ public class Iridium.Application : Gtk.Application {
         connection_dao.sql_client = Iridium.Services.SQLClient.get_instance ();
         certificate_manager.sql_client = Iridium.Services.SQLClient.get_instance ();
 
-        // Set the parent on the certificate manager after the main window is created
-        certificate_manager.parent = main_window;
-
         // TODO: Connect to signals to save window size and position in settings
 
         var network_monitor = NetworkMonitor.get_default ();

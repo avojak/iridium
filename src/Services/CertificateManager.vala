@@ -22,7 +22,6 @@
 public class Iridium.Services.CertificateManager : GLib.Object {
 
     public Iridium.Services.SQLClient sql_client { get; set; }
-    public unowned Iridium.MainWindow parent { get; set; }
 
     public static string parse_host (SocketConnectable connectable) {
         return connectable.to_string ().split (":")[0]; // e.g.: chat.freenode.net:6697 -> chat.freenode.net
@@ -37,33 +36,6 @@ public class Iridium.Services.CertificateManager : GLib.Object {
             }
         }
         return null;
-
-        // No match, so prompt user for action
-        //  int result = -1;
-        //  Idle.add (() => {
-        //      //  show_certificate_warning_dialog ();
-        //      var dialog = new Iridium.Widgets.CertificateWarningDialog (this, peer_cert, errors, connectable);
-        //      result = dialog.run ();
-        //      dialog.dismiss ();
-        //      return false;
-        //  });
-        //  while (result == -1) {
-        //      // Block until a selection is made
-        //  }
-        //  return result == Gtk.ResponseType.OK;
-
-        //  var dialog = new Iridium.Widgets.CertificateWarningDialog (this, peer_cert, errors, connectable);
-        //  var result = (dialog.run () == Gtk.ResponseType.OK);
-        //  dialog.dismiss ();
-        //  var result = false;
-
-        //  var identity = new Iridium.Models.ServerIdentity ();
-        //  identity.host = host;
-        //  identity.certificate_pem = cert.certificate_pem;
-        //  identity.is_accepted = result;
-        //  sql_client.insert_server_identity (identity);
-
-        //  return result;
     }
 
     public void store_identity (Iridium.Models.ServerIdentity identity) {
