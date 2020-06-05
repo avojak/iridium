@@ -22,17 +22,21 @@
 public class Iridium.Services.CertificateManager : GLib.Object {
 
     public Iridium.Services.SQLClient sql_client { get; set; }
-    public unowned Iridium.MainWindow main_window { get; construct; }
+    public unowned Iridium.MainWindow parent { get; set; }
 
-    public bool verify_identity (TlsCertificate cert, string host) {
+    public static string parse_host (SocketConnectable connectable) {
+        return connectable.to_string ().split (":")[0]; // e.g.: chat.freenode.net:6697 -> chat.freenode.net
+    }
+
+    public Iridium.Models.ServerIdentity? lookup_identity (TlsCertificate cert, string host) {
         // Check database to see if we've previously accepted/rejected the identity
         Gee.List<Iridium.Models.ServerIdentity> identities = sql_client.get_server_identities (host);
         foreach (var identity in identities) {
-            if (identity.certificate_pem == cert.certificate_pem) {
-                print ("Found identity match for " + host + " (accepted: " + identity.is_accepted.to_string () + ")\n");
-                return identity.is_accepted;
+            if (identity.certificate_pem.chomp ().chug () == cert.certificate_pem. chomp().chug ()) {
+                return identity;
             }
         }
+        return null;
 
         // No match, so prompt user for action
         //  int result = -1;
@@ -51,15 +55,19 @@ public class Iridium.Services.CertificateManager : GLib.Object {
         //  var dialog = new Iridium.Widgets.CertificateWarningDialog (this, peer_cert, errors, connectable);
         //  var result = (dialog.run () == Gtk.ResponseType.OK);
         //  dialog.dismiss ();
-        var result = false;
+        //  var result = false;
 
-        var identity = new Iridium.Models.ServerIdentity ();
-        identity.host = host;
-        identity.certificate_pem = cert.certificate_pem;
-        identity.is_accepted = result;
+        //  var identity = new Iridium.Models.ServerIdentity ();
+        //  identity.host = host;
+        //  identity.certificate_pem = cert.certificate_pem;
+        //  identity.is_accepted = result;
+        //  sql_client.insert_server_identity (identity);
+
+        //  return result;
+    }
+
+    public void store_identity (Iridium.Models.ServerIdentity identity) {
         sql_client.insert_server_identity (identity);
-
-        return result;
     }
 
 }

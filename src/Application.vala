@@ -24,6 +24,7 @@ public class Iridium.Application : Gtk.Application {
     public static GLib.Settings settings;
     public static Iridium.Services.ServerConnectionDAO connection_dao;
     public static Iridium.Services.SecretManager secret_manager;
+    public static Iridium.Services.CertificateManager certificate_manager;
 
     private static Iridium.Services.ServerConnectionHandler connection_handler;
 
@@ -41,7 +42,7 @@ public class Iridium.Application : Gtk.Application {
         connection_handler = new Iridium.Services.ServerConnectionHandler ();
         connection_dao = new Iridium.Services.ServerConnectionDAO ();
         secret_manager = new Iridium.Services.SecretManager ();
-        connection_handler = new Iridium.Services.ServerConnectionHandler ();
+        certificate_manager = new Iridium.Services.CertificateManager ();
     }
 
     protected override void activate () {
@@ -50,6 +51,10 @@ public class Iridium.Application : Gtk.Application {
 
         // This must happen here because the main event loops will have started
         connection_dao.sql_client = Iridium.Services.SQLClient.get_instance ();
+        certificate_manager.sql_client = Iridium.Services.SQLClient.get_instance ();
+
+        // Set the parent on the certificate manager after the main window is created
+        certificate_manager.parent = main_window;
 
         // TODO: Connect to signals to save window size and position in settings
 

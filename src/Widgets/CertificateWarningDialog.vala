@@ -142,6 +142,9 @@ public class Iridium.Widgets.CertificateWarningDialog : Granite.MessageDialog {
         expander.add (scroll_box);
 
         var check_box = new Gtk.CheckButton.with_label (_("Remember my decision"));
+        check_box.toggled.connect (() => {
+            remember_decision_toggled (check_box.get_active ());
+        });
 
         grid.attach (error_grid, 0, 0);
         grid.attach (expander, 0, 1);
@@ -161,5 +164,7 @@ public class Iridium.Widgets.CertificateWarningDialog : Granite.MessageDialog {
     public void dismiss () {
         close ();
     }
+
+    public signal void remember_decision_toggled (bool remember_decision);
 
 }

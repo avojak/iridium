@@ -145,22 +145,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         var connect_button = new Gtk.Button.with_label (_("Connect"));
         connect_button.get_style_context ().add_class ("suggested-action");
         connect_button.clicked.connect (() => {
-            // TODO: Validate entries first!
-            spinner.start ();
-            status_stack.set_visible_child_name ("spinner");
-            status_label.label = "";
-            var server_name = server_entry.get_text ().chomp ().chug ();
-            var nickname = nickname_entry.get_text ().chomp ().chug ();
-            var username = username_entry.get_text ().chomp ().chug ();
-            var realname = realname_entry.get_text ().chomp ().chug ();
-            var port = (uint16) port_entry.get_text ().chomp ().chug ().to_int ();
-            if (port == 0) {
-                port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT;
-            }
-            var auth_method = auth_methods.get (auth_method_combo.get_active ());
-            var auth_token = password_entry.get_text ();
-            var tls = ssl_tls_switch.get_active ();
-            connect_button_clicked (server_name, nickname, username, realname, port, auth_method, tls, auth_token);
+            connect ();
         });
 
         add_action_widget (cancel_button, 0);
@@ -330,6 +315,25 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         nickname_entry.text = Iridium.Application.settings.get_string ("default-nickname");
         username_entry.text = Iridium.Application.settings.get_string ("default-nickname");
         realname_entry.text = Iridium.Application.settings.get_string ("default-realname");
+    }
+
+    public void connect () {
+        // TODO: Validate entries first!
+        spinner.start ();
+        status_stack.set_visible_child_name ("spinner");
+        status_label.label = "";
+        var server_name = server_entry.get_text ().chomp ().chug ();
+        var nickname = nickname_entry.get_text ().chomp ().chug ();
+        var username = username_entry.get_text ().chomp ().chug ();
+        var realname = realname_entry.get_text ().chomp ().chug ();
+        var port = (uint16) port_entry.get_text ().chomp ().chug ().to_int ();
+        if (port == 0) {
+            port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT;
+        }
+        var auth_method = auth_methods.get (auth_method_combo.get_active ());
+        var auth_token = password_entry.get_text ();
+        var tls = ssl_tls_switch.get_active ();
+        connect_button_clicked (server_name, nickname, username, realname, port, auth_method, tls, auth_token);
     }
 
     public void dismiss () {

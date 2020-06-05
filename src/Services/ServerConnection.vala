@@ -126,6 +126,8 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 break;
             case SocketClientEvent.TLS_HANDSHAKING:
                 print ("SocketClientEvent.TLS_HANDSHAKING\n");
+                print (connectable.to_string () + "\n");
+                prepare_tls_cx ((TlsClientConnection) connection);
                 ((TlsClientConnection) connection).accept_certificate.connect ((peer_cert, errors) => {
                     return on_invalid_certificate (peer_cert, errors, connectable);
                 });
@@ -135,6 +137,10 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 // additional event values in the future
                 break;
         }
+    }
+
+    private void prepare_tls_cx (GLib.TlsClientConnection tls_cx) {
+        // TODO: tls_cx.set_database (null);
     }
 
     private bool on_invalid_certificate (TlsCertificate peer_cert, TlsCertificateFlags errors, SocketConnectable connectable) {
@@ -158,7 +164,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         }
         print (@"TLS certificate errors: $(error_string)\n");
         
-        //  print (peer_cert.certificate_pem);
         // TODO: Improve messaging here - this is ugly for a user to read!
         // TODO: Maybe give users the option to ignore and continue connecting anyway?
 
@@ -171,12 +176,26 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             case WARN:
                 print ("Warning about certificate per policy\n");
                 print (errors.to_string () + "\n");
+
+                // First check if the user has already verified or rejected this certificate
+                var host = Iridium.Services.CertificateManager.parse_host (connectable);
+                var identity = Iridium.Application.certificate_manager.lookup_identity (peer_cert, host);
+                if (identity != null) {
+                    print ("Known server identity (accepted: " + identity.is_accepted.to_string () + ")\n");
+                    return identity.is_accepted;
+                }
+
+                // Identity is not known, so prompt the user
                 if (unacceptable_certificate (peer_cert, encountered_errors, connectable)) {
                     return true;
                 } else {
                     open_failed (@"TLS certificate errors: $(error_string)\n");
                     return false;
                 }
+
+                // TODO: Need a way to retro-actively accept a certificate?
+
+                // TODO: Add visual indication of the security of the connection?
             case ALLOW:
                 print ("Allowing certificate per policy\n");
                 return true;

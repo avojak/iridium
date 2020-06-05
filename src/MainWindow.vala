@@ -665,9 +665,13 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     private bool on_unacceptable_certificate (TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors, SocketConnectable connectable) {
         int result = -1;
+        bool remember_decision = false;
         Idle.add (() => {
             //  show_certificate_warning_dialog ();
             var dialog = new Iridium.Widgets.CertificateWarningDialog (this, peer_cert, errors, connectable);
+            dialog.remember_decision_toggled.connect ((remember) => {
+                remember_decision = remember;
+            });
             result = dialog.run ();
             dialog.dismiss ();
             return false;
@@ -675,7 +679,16 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         while (result == -1) {
             // Block until a selection is made
         }
-        return result == Gtk.ResponseType.OK;
+        var is_accepted = (result == Gtk.ResponseType.OK);
+        print (remember_decision.to_string () + "\n");
+        if (remember_decision) {
+            var server_identity = new Iridium.Models.ServerIdentity ();
+            server_identity.host = Iridium.Services.CertificateManager.parse_host (connectable);
+            server_identity.certificate_pem = peer_cert.certificate_pem;
+            server_identity.is_accepted = is_accepted;
+            Iridium.Application.certificate_manager.store_identity (server_identity);
+        }
+        return is_accepted;
     }
 
     private void on_server_connection_successful (string server_name, Iridium.Services.Message message) {
@@ -713,6 +726,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             if (connection_dialog != null) {
                 connection_dialog.display_error (error_message);
             }
+            // TODO: Add message to the side panel?
             return false;
         });
         side_panel.disable_server_row (server_name);
