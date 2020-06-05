@@ -89,7 +89,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         SocketClient client = new SocketClient ();
         client.event.connect (on_socket_client_event);
         client.set_tls (tls);
-        client.set_tls_validation_flags (TlsCertificateFlags.VALIDATE_ALL); // TODO: Allow ignoring
+        client.set_tls_validation_flags (TlsCertificateFlags.VALIDATE_ALL);
         return client.connect (new NetworkAddress (host, port));
 
         // TODO: Set a timeout on the client (Might already have a default?)
@@ -127,7 +127,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             case SocketClientEvent.TLS_HANDSHAKING:
                 print ("SocketClientEvent.TLS_HANDSHAKING\n");
                 print (connectable.to_string () + "\n");
-                prepare_tls_cx ((TlsClientConnection) connection);
                 ((TlsClientConnection) connection).accept_certificate.connect ((peer_cert, errors) => {
                     return on_invalid_certificate (peer_cert, errors, connectable);
                 });
@@ -137,10 +136,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 // additional event values in the future
                 break;
         }
-    }
-
-    private void prepare_tls_cx (GLib.TlsClientConnection tls_cx) {
-        // TODO: tls_cx.set_database (null);
     }
 
     private bool on_invalid_certificate (TlsCertificate peer_cert, TlsCertificateFlags errors, SocketConnectable connectable) {
