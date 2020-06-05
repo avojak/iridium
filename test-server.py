@@ -41,7 +41,7 @@ class TestServerDriver:
         args = parser.parse_args(sys.argv[2:])
         self.docker_client.containers.run(IMAGE,
                                           name='ircd', 
-                                          ports={'6667/tcp':6667},
+                                          ports={'6667/tcp':6667, '6697/tcp':'6697'},
                                           environment=args.e,
                                           detach=True)
 

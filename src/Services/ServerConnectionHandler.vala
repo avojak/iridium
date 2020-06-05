@@ -34,6 +34,7 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
             return open_connections.get (server);
         }
         Iridium.Services.ServerConnection server_connection = new Iridium.Services.ServerConnection (connection_details);
+        server_connection.unacceptable_certificate.connect (on_unacceptable_certificate);
         server_connection.open_successful.connect (on_server_connection_successful);
         server_connection.open_failed.connect (on_server_connection_failed);
         server_connection.connection_closed.connect (on_server_connection_closed);
@@ -166,6 +167,10 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
     // ServerConnection Callbacks
     //
 
+    private bool on_unacceptable_certificate (TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors, SocketConnectable connectable) {
+        return unacceptable_certificate (peer_cert, errors, connectable);
+    }
+
     private void on_server_connection_successful (Iridium.Services.ServerConnection source, Iridium.Services.Message message) {
         server_connection_successful (source.connection_details.server, message);
     }
@@ -238,6 +243,7 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
     // Signals
     //
 
+    public signal bool unacceptable_certificate (TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors, SocketConnectable connectable);
     public signal void server_connection_successful (string server_name, Iridium.Services.Message message);
     public signal void server_connection_failed (string server_name, string error_message);
     public signal void server_connection_closed (string server_name);

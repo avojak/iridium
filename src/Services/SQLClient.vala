@@ -70,6 +70,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
                 "username" TEXT,
                 "realname" TEXT,
                 "auth_method" TEXT,
+                "tls" BOOL,
                 "enabled" BOOL
             );
             CREATE TABLE IF NOT EXISTS "channels" (
@@ -79,14 +80,20 @@ public class Iridium.Services.SQLClient : GLib.Object {
                 "enabled" BOOL,
                 "favorite" BOOL
             );
+            CREATE TABLE IF NOT EXISTS "server_identities" (
+                "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+                "host" TEXT,
+                "certificate_pem" TEXT,
+                "is_accepted" BOOL
+            );
             """;
 		database.exec(sql);
     }
 
     public void insert_server (Iridium.Services.Server server) {
         var sql = """
-            INSERT INTO servers (hostname, port, nickname, username, realname, auth_method, enabled) 
-            VALUES ($HOSTNAME, $PORT, $NICKNAME, $USERNAME, $REALNAME, $AUTH_METHOD, $ENABLED);
+            INSERT INTO servers (hostname, port, nickname, username, realname, auth_method, tls, enabled) 
+            VALUES ($HOSTNAME, $PORT, $NICKNAME, $USERNAME, $REALNAME, $AUTH_METHOD, $TLS, $ENABLED);
             """;
 
         Sqlite.Statement statement;
@@ -102,7 +109,8 @@ public class Iridium.Services.SQLClient : GLib.Object {
         statement.bind_text (4, server.connection_details.username);
         statement.bind_text (5, server.connection_details.realname);
         statement.bind_text (6, server.connection_details.auth_method.to_string ());
-        statement.bind_int (7, bool_to_int (server.enabled));
+        statement.bind_int (7, bool_to_int (server.connection_details.tls));
+        statement.bind_int (8, bool_to_int (server.enabled));
 
         statement.step ();
         statement.reset ();
@@ -347,6 +355,9 @@ public class Iridium.Services.SQLClient : GLib.Object {
                     }
                     connection_details.auth_method = (Iridium.Models.AuthenticationMethod) eval.value;
                     break;
+                case "tls": 
+                    connection_details.tls = int_to_bool (statement.column_int (i));
+                    break;
                 case "enabled":
                     server.enabled = int_to_bool (statement.column_int (i));
                     break;
@@ -383,6 +394,86 @@ public class Iridium.Services.SQLClient : GLib.Object {
             }
         }
         return channel;
+    }
+
+    public void insert_server_identity (Iridium.Models.ServerIdentity identity) {
+        var sql = """
+        INSERT INTO server_identities (host, certificate_pem, is_accepted) 
+        VALUES ($HOST, $CERTIFICATE_PEM, $IS_ACCEPTED);
+        """;
+
+        Sqlite.Statement statement;
+        if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
+            // TODO: Log this
+            stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
+            return;
+        }
+
+        statement.bind_text (1, identity.host);
+        statement.bind_text (2, identity.certificate_pem);
+        statement.bind_int (3, bool_to_int (identity.is_accepted));
+
+        statement.step ();
+        statement.reset ();
+    }
+
+    public void remove_server_identities (string host) {
+        var sql = "DELETE FROM server_identities WHERE host = $HOST;";
+        Sqlite.Statement statement;
+        if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
+            // TODO: Log this
+            stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
+		    return;
+        }
+        statement.bind_text (1, host);
+        
+        statement.step ();
+        statement.reset ();
+    }
+
+    public Gee.List<Iridium.Models.ServerIdentity> get_server_identities (string host) {
+        var identities = new Gee.ArrayList<Iridium.Models.ServerIdentity> ();
+
+        var sql = "SELECT * FROM server_identities WHERE host = $HOST;";
+        Sqlite.Statement statement;
+        if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
+            // TODO: Log this
+            stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
+		    return identities;
+        }
+        statement.bind_text (1, host);
+
+        while (statement.step () == Sqlite.ROW) {
+            var identity = parse_identity_row (statement);
+            identities.add (identity);
+        }
+        statement.reset ();
+
+        return identities;
+    }
+
+    private Iridium.Models.ServerIdentity parse_identity_row (Sqlite.Statement statement) {
+        var num_columns = statement.column_count ();
+        var identity = new Iridium.Models.ServerIdentity ();
+        for (int i = 0; i < num_columns; i++) {
+            switch (statement.column_name (i)) {
+                case "id":
+                    identity.id = statement.column_int (i);
+                    break;
+                case "host":
+                    identity.host = statement.column_text (i);
+                    break;
+                case "certificate_pem":
+                    identity.certificate_pem = statement.column_text (i);
+                    break;
+                case "is_accepted":
+                    identity.is_accepted = int_to_bool (statement.column_int (i));
+                    break;
+                default:
+                    break;
+            }
+        }
+        return identity;
     }
 
     private static int bool_to_int (bool val) {

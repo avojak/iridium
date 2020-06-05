@@ -48,9 +48,11 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
     private int do_connect () {
         try {
-            InetAddress address = resolve_server_hostname (connection_details.server);
+            //  InetAddress address = resolve_server_hostname (connection_details.server);
+            var host = connection_details.server;
             var port = connection_details.port;
-            SocketConnection connection = connect_to_server (address, port);
+            var tls = connection_details.tls;
+            IOStream connection = connect_to_server (host, port, tls);
 
             input_stream = new DataInputStream (connection.input_stream);
             output_stream = new DataOutputStream (connection.output_stream);
@@ -63,6 +65,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                     line = input_stream.read_line (null);
                     handle_line (line);
                 } catch (GLib.IOError e) {
+                    // TODO: Handle this differently on initialization (currently fails silently in the background)
                     stderr.printf ("IOError while reading: %s\n", e.message);
                 }
             } while (line != null && !should_exit);
@@ -81,11 +84,117 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         return address;
     }
 
-    private SocketConnection connect_to_server (InetAddress address, uint16 port) throws GLib.Error {
+    private IOStream connect_to_server (string host, uint16 port, bool tls) throws GLib.Error {
+        InetAddress address = resolve_server_hostname (connection_details.server);
         SocketClient client = new SocketClient ();
+        client.event.connect (on_socket_client_event);
+        client.set_tls (tls);
+        client.set_tls_validation_flags (TlsCertificateFlags.VALIDATE_ALL);
+        return client.connect (new NetworkAddress (host, port));
+
+        // TODO: Set a timeout on the client (Might already have a default?)
+
         // TODO: Could use the NetworkMonitor to check the InetSocketAddress prior to attempting a connection
-        SocketConnection connection = client.connect (new InetSocketAddress (address, port));
-        return connection;
+    }
+
+    private void on_socket_client_event (SocketClientEvent event, SocketConnectable connectable, IOStream? connection) {
+        // See https://valadoc.org/gio-2.0/GLib.SocketClient.event.html for event definitions
+        switch (event) {
+            case SocketClientEvent.COMPLETE:
+                print ("SocketClientEvent.COMPLETE\n");
+                break;
+            case SocketClientEvent.CONNECTED:
+                print ("SocketClientEvent.CONNECTED\n");
+                break;
+            case SocketClientEvent.CONNECTING:
+                print ("SocketClientEvent.CONNECTING\n");
+                break;
+            case SocketClientEvent.PROXY_NEGOTIATED:
+                print ("SocketClientEvent.PROXY_NEGOTIATED\n");
+                break;
+            case SocketClientEvent.PROXY_NEGOTIATING:
+                print ("SocketClientEvent.PROXY_NEGOTIATING\n");
+                break;
+            case SocketClientEvent.RESOLVED:
+                print ("SocketClientEvent.RESOLVED\n");
+                break;
+            case SocketClientEvent.RESOLVING:
+                print ("SocketClientEvent.RESOLVING\n");
+                break;
+            case SocketClientEvent.TLS_HANDSHAKED:
+                print ("SocketClientEvent.TLS_HANDSHAKED\n");
+                break;
+            case SocketClientEvent.TLS_HANDSHAKING:
+                print ("SocketClientEvent.TLS_HANDSHAKING\n");
+                print (connectable.to_string () + "\n");
+                ((TlsClientConnection) connection).accept_certificate.connect ((peer_cert, errors) => {
+                    return on_invalid_certificate (peer_cert, errors, connectable);
+                });
+                break;
+            default:
+                // Do nothing - per documentation, unrecognized events should be ignored as there may be
+                // additional event values in the future
+                break;
+        }
+    }
+
+    private bool on_invalid_certificate (TlsCertificate peer_cert, TlsCertificateFlags errors, SocketConnectable connectable) {
+        // TODO: Also see https://github.com/jangernert/FeedReader/blob/master/src/Utils.vala#L212
+        TlsCertificateFlags[] flags = new TlsCertificateFlags[] {
+            TlsCertificateFlags.BAD_IDENTITY,
+            TlsCertificateFlags.EXPIRED,
+            TlsCertificateFlags.GENERIC_ERROR,
+            TlsCertificateFlags.INSECURE,
+            TlsCertificateFlags.NOT_ACTIVATED,
+            TlsCertificateFlags.REVOKED,
+            TlsCertificateFlags.UNKNOWN_CA
+        };
+        string error_string = "";
+        Gee.List<TlsCertificateFlags> encountered_errors = new Gee.ArrayList<TlsCertificateFlags> ();
+        foreach (var flag in flags) {
+            if (flag in errors) {
+                encountered_errors.add (flag);
+                error_string += @"$(flag), ";
+            }
+        }
+        print (@"TLS certificate errors: $(error_string)\n");
+        
+        var cert_policy = Iridium.Application.settings.get_string ("certificate-validation-policy");
+        switch (Iridium.Models.InvalidCertificatePolicy.get_value_by_short_name (cert_policy)) {
+            case REJECT:
+                print ("Rejecting certificate per policy\n");
+                open_failed (@"TLS certificate errors: $(error_string)\n");
+                return false;
+            case WARN:
+                print ("Warning about certificate per policy\n");
+                print (errors.to_string () + "\n");
+
+                // First check if the user has already verified or rejected this certificate
+                var host = Iridium.Services.CertificateManager.parse_host (connectable);
+                var identity = Iridium.Application.certificate_manager.lookup_identity (peer_cert, host);
+                if (identity != null) {
+                    print ("Known server identity (accepted: " + identity.is_accepted.to_string () + ")\n");
+                    return identity.is_accepted;
+                }
+
+                // Identity is not known, so prompt the user
+                if (unacceptable_certificate (peer_cert, encountered_errors, connectable)) {
+                    return true;
+                } else {
+                    open_failed (@"TLS certificate errors: $(error_string)\n");
+                    return false;
+                }
+
+                // TODO: Need a way to retro-actively accept a certificate?
+
+                // TODO: Add visual indication of the security of the connection?
+            case ALLOW:
+                print ("Allowing certificate per policy\n");
+                return true;
+            default:
+                assert_not_reached ();
+        }
+        
     }
 
     private void register (Iridium.Services.ServerConnectionDetails connection_details) {
@@ -98,6 +207,9 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         switch (connection_details.auth_method) {
             case Iridium.Models.AuthenticationMethod.NONE:
                 debug("AuthenticationMethod is NONE");
+                send_output (@"NICK $nickname");
+                send_output (@"USER $username 0 * :$realname");
+                send_output (@"MODE $username $mode");
                 break;
             case Iridium.Models.AuthenticationMethod.SERVER_PASSWORD:
                 debug("AuthenticationMethod is SERVER_PASSWORD");
@@ -430,6 +542,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         send_output (Iridium.Services.MessageCommands.TOPIC + " " + channel_name + " :" + topic);
     }
 
+    public signal bool unacceptable_certificate (TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors, SocketConnectable connectable);
     public signal void open_successful (Iridium.Services.Message message);
     public signal void open_failed (string error_message);
     public signal void connection_closed ();

@@ -9,20 +9,21 @@ config_header = configure_file(
     configuration: conf_data
 )
 
-# Create a new executable, list the files we want to compile, list the dependencies we need, and install
-executable(
-    application_id,
+iridium_files = files(
     join_paths('Application.vala'),
     join_paths('MainWindow.vala'),
     join_paths('Layouts', 'MainLayout.vala'),
     join_paths('Models', 'AuthenticationMethod.vala'),
     join_paths('Models', 'RichText.vala'),
     join_paths('Models', 'ChannelErrorMessageText.vala'),
+    join_paths('Models', 'InvalidCertificatePolicy.vala'),
     join_paths('Models', 'PrivateMessageText.vala'),
     join_paths('Models', 'SelfPrivateMessageText.vala'),
     join_paths('Models', 'OthersPrivateMessageText.vala'),
     join_paths('Models', 'ServerErrorMessageText.vala'),
+    join_paths('Models', 'ServerIdentity.vala'),
     join_paths('Models', 'ServerMessageText.vala'),
+    join_paths('Services', 'CertificateManager.vala'),
     join_paths('Services', 'Message.vala'),
     join_paths('Services', 'MessageCommands.vala'),
     join_paths('Services', 'NumericCodes.vala'),
@@ -39,11 +40,13 @@ executable(
     join_paths('Views', 'PrivateMessageChatView.vala'),
     join_paths('Views', 'ServerChatView.vala'),
     join_paths('Views', 'Welcome.vala'),
+    join_paths('Widgets', 'CertificateWarningDialog.vala'),
     join_paths('Widgets', 'ChannelJoinDialog.vala'),
     join_paths('Widgets', 'ChannelTopicEditDialog.vala'),
     join_paths('Widgets', 'HeaderBar.vala'),
     join_paths('Widgets', 'ManageConnectionsDialog.vala'),
     join_paths('Widgets', 'NetworkInfoBar.vala'),
+    join_paths('Widgets', 'PreferencesDialog.vala'),
     join_paths('Widgets', 'ServerConnectionDialog.vala'),
     join_paths('Widgets', 'StatusBar.vala'),
     join_paths('Widgets', 'SidePanel', 'Panel.vala'),
@@ -52,8 +55,15 @@ executable(
     join_paths('Widgets', 'SidePanel', 'ChannelRow.vala'),
     join_paths('Widgets', 'SidePanel', 'PrivateMessageRow.vala'),
     join_paths('Widgets', 'UsersPopover', 'ChannelUsersPopover.vala'),
-    join_paths('Widgets', 'UsersPopover', 'UserListBoxRow.vala'),
+    join_paths('Widgets', 'UsersPopover', 'UserListBoxRow.vala')
+)
+
+# Create a new executable, list the files we want to compile, list the dependencies we need, and install
+executable(
+    application_id,
+    iridium_files,
     config_header,
+    css_gresource,
     dependencies: [
         dependency('gtk+-3.0', version: '>= 3.6.4'),
         dependency('gee-0.8', version: '>= 0.8.5'),

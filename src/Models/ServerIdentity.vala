@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Andrew Vojak (https://avojak.com)
+ * Copyright (c) 2020 Andrew Vojak (https://avojak.com)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -19,19 +19,11 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Services.ServerConnectionDetails : GLib.Object {
+public class Iridium.Models.ServerIdentity : GLib.Object {
 
-    // TODO: Support non-default port numbers
-    public const uint16 DEFAULT_SECURE_PORT = 6697;
-    public const uint16 DEFAULT_INSECURE_PORT = 6667;
-
-    public string server;
-    public uint16 port;
-    public string nickname;
-    public string username;
-    public string realname;
-    public Iridium.Models.AuthenticationMethod auth_method;
-    public string auth_token;
-    public bool tls;
+    public int id { get; set; }
+    public string host { get; set; }
+    public string certificate_pem { get; set; }
+    public bool is_accepted { get; set; }
 
 }

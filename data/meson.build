@@ -35,6 +35,37 @@ foreach i : icon_sizes
 endforeach
 
 install_data(
+    join_paths('assets', 'icons', '64x64', meson.project_name() + '.network-server-security-high.svg'),
+    install_dir: join_paths(get_option('datadir'), 'icons', 'hicolor', '64x64', 'actions'),
+    rename: '@0@.network-server-security-high.svg'.format(application_id)
+)
+install_data(
+    join_paths('assets', 'icons', '64x64', meson.project_name() + '.network-server-security-high.svg'),
+    install_dir: join_paths(get_option('datadir'), 'icons', 'hicolor', '64x64' + '@2', 'actions'),
+    rename: '@0@.network-server-security-high.svg'.format(application_id)
+)
+install_data(
+    join_paths('assets', 'icons', '64x64', meson.project_name() + '.network-server-security-low.svg'),
+    install_dir: join_paths(get_option('datadir'), 'icons', 'hicolor', '64x64', 'actions'),
+    rename: '@0@.network-server-security-low.svg'.format(application_id)
+)
+install_data(
+    join_paths('assets', 'icons', '64x64', meson.project_name() + '.network-server-security-low.svg'),
+    install_dir: join_paths(get_option('datadir'), 'icons', 'hicolor', '64x64' + '@2', 'actions'),
+    rename: '@0@.network-server-security-low.svg'.format(application_id)
+)
+install_data(
+    join_paths('assets', 'icons', '64x64', meson.project_name() + '.network-server-security-medium.svg'),
+    install_dir: join_paths(get_option('datadir'), 'icons', 'hicolor', '64x64', 'actions'),
+    rename: '@0@.network-server-security-medium.svg'.format(application_id)
+)
+install_data(
+    join_paths('assets', 'icons', '64x64', meson.project_name() + '.network-server-security-medium.svg'),
+    install_dir: join_paths(get_option('datadir'), 'icons', 'hicolor', '64x64' + '@2', 'actions'),
+    rename: '@0@.network-server-security-medium.svg'.format(application_id)
+)
+
+install_data(
     join_paths('assets', 'icons', '16x16', meson.project_name() + '.image-loading-symbolic.svg'),
     install_dir: join_paths(get_option('datadir'), 'icons', 'hicolor', '16x16', 'status'),
     rename: '@0@.image-loading-symbolic.svg'.format(application_id)
@@ -92,4 +123,10 @@ i18n.merge_file(
     po_dir: join_paths(meson.source_root(), 'po'),
     install: true,
     install_dir: join_paths(get_option('datadir'), 'metainfo')
+)
+
+# Use GResource
+css_gresource = gnome.compile_resources(
+    'gresource_css',
+    meson.project_name() + '.gresource.xml'
 )

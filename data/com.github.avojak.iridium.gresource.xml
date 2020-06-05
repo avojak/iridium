@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+    <gresource prefix="/com/github/avojak/iridium">
+        <file alias="CertificateWarningDialog.css" compressed="true">styles/CertificateWarningDialog.css</file>
+        <file alias="PreferencesDialog.css" compressed="true">styles/PreferencesDialog.css</file>
+    </gresource>
+</gresources>

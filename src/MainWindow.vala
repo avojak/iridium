@@ -26,7 +26,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     public Iridium.Widgets.ServerConnectionDialog? connection_dialog = null;
     public Iridium.Widgets.ChannelJoinDialog? channel_join_dialog = null;
     public Iridium.Widgets.ManageConnectionsDialog? manage_connections_dialog = null;
-    //  public Iridium.Widgets.PreferencesDialog? preferences_dialog = null;
+    public Iridium.Widgets.PreferencesDialog? preferences_dialog = null;
+    public Iridium.Widgets.CertificateWarningDialog? certificate_warning_dialog = null;
 
     private Iridium.Views.Welcome welcome_view;
     private Iridium.Widgets.HeaderBar header_bar;
@@ -82,9 +83,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         //  header_bar.channel_join_button_clicked.connect (() => {
         //      show_channel_join_dialog ();
         //  });
-        //  header_bar.preferences_button_clicked.connect (() => {
-        //      show_preferences_dialog ();
-        //  });
+        header_bar.preferences_button_clicked.connect (() => {
+            show_preferences_dialog ();
+        });
         header_bar.username_selected.connect (on_username_selected);
         //  header_bar.channel_topic_toggled.connect (on_channel_topic_toggled);
         side_panel.item_selected.connect ((item) => {
@@ -198,6 +199,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         });
 
         // Connect to all of the connection handler signals
+        connection_handler.unacceptable_certificate.connect (on_unacceptable_certificate);
         connection_handler.server_connection_successful.connect (on_server_connection_successful);
         connection_handler.server_connection_failed.connect (on_server_connection_failed);
         connection_handler.server_connection_closed.connect (on_server_connection_closed);
@@ -443,7 +445,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         if (connection_dialog == null) {
             connection_dialog = new Iridium.Widgets.ServerConnectionDialog (this);
             connection_dialog.show_all ();
-            connection_dialog.connect_button_clicked.connect ((server, nickname, username, realname, port, auth_method, auth_token) => {
+            connection_dialog.connect_button_clicked.connect ((server, nickname, username, realname, port, auth_method, tls, auth_token) => {
                 // Prevent duplicate connections
                 if (connection_handler.has_connection (server)) {
                     connection_dialog.display_error (_("Already connected to this server!"));
@@ -459,6 +461,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 connection_details.realname = realname;
                 connection_details.auth_method = auth_method;
                 connection_details.auth_token = auth_token;
+                connection_details.tls = tls;
 
                 // Attempt the server connection
                 connection_handler.connect_to_server (connection_details);
@@ -498,15 +501,26 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         manage_connections_dialog.present ();
     }
 
-    //  private void show_preferences_dialog () {
-    //      if (preferences_dialog == null) {
-    //          preferences_dialog = new Iridium.Widgets.PreferencesDialog (this);
-    //          preferences_dialog.show_all ();
-    //          preferences_dialog.destroy.connect (() => {
-    //              preferences_dialog = null;
+    private void show_preferences_dialog () {
+        if (preferences_dialog == null) {
+            preferences_dialog = new Iridium.Widgets.PreferencesDialog (this);
+            preferences_dialog.show_all ();
+            preferences_dialog.destroy.connect (() => {
+                preferences_dialog = null;
+            });
+        }
+        preferences_dialog.present ();
+    }
+
+    //  private void show_certificate_warning_dialog () {
+    //      if (certificate_warning_dialog == null) {
+    //          certificate_warning_dialog = new Iridium.Widgets.CertificateWarningDialog (this);
+    //          certificate_warning_dialog.show_all ();
+    //          certificate_warning_dialog.destroy.connect (() => {
+    //              certificate_warning_dialog = null;
     //          });
     //      }
-    //      preferences_dialog.present ();
+    //      certificate_warning_dialog.present ();
     //  }
 
     private void join_channel (string server_name, string channel_name) {
@@ -649,6 +663,34 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     // ServerConnectionHandler Callbacks
     //
 
+    private bool on_unacceptable_certificate (TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors, SocketConnectable connectable) {
+        int result = -1;
+        bool remember_decision = false;
+        Idle.add (() => {
+            //  show_certificate_warning_dialog ();
+            var dialog = new Iridium.Widgets.CertificateWarningDialog (this, peer_cert, errors, connectable);
+            dialog.remember_decision_toggled.connect ((remember) => {
+                remember_decision = remember;
+            });
+            result = dialog.run ();
+            dialog.dismiss ();
+            return false;
+        });
+        while (result == -1) {
+            // Block until a selection is made
+        }
+        var is_accepted = (result == Gtk.ResponseType.OK);
+        print (remember_decision.to_string () + "\n");
+        if (remember_decision) {
+            var server_identity = new Iridium.Models.ServerIdentity ();
+            server_identity.host = Iridium.Services.CertificateManager.parse_host (connectable);
+            server_identity.certificate_pem = peer_cert.certificate_pem;
+            server_identity.is_accepted = is_accepted;
+            Iridium.Application.certificate_manager.store_identity (server_identity);
+        }
+        return is_accepted;
+    }
+
     private void on_server_connection_successful (string server_name, Iridium.Services.Message message) {
         Idle.add (() => {
             // Check if the chat view already exists before creating a new one
@@ -684,9 +726,11 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             if (connection_dialog != null) {
                 connection_dialog.display_error (error_message);
             }
+            // TODO: Add message to the side panel?
             return false;
         });
         side_panel.disable_server_row (server_name);
+        // TODO: Improve messaging when this fails in the background on app initialization
     }
 
     private void on_server_connection_closed (string server_name) {
