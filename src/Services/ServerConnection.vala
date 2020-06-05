@@ -159,9 +159,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         }
         print (@"TLS certificate errors: $(error_string)\n");
         
-        // TODO: Improve messaging here - this is ugly for a user to read!
-        // TODO: Maybe give users the option to ignore and continue connecting anyway?
-
         var cert_policy = Iridium.Application.settings.get_string ("certificate-validation-policy");
         switch (Iridium.Models.InvalidCertificatePolicy.get_value_by_short_name (cert_policy)) {
             case REJECT:
