@@ -90,6 +90,7 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         pack_end (settings_button);
         pack_end (channel_users_button);
         pack_end (new Gtk.Separator (Gtk.Orientation.VERTICAL));
+        pack_start (new Gtk.Separator (Gtk.Orientation.VERTICAL));
 
         preferences_button.clicked.connect (() => {
             settings_popover.popdown ();

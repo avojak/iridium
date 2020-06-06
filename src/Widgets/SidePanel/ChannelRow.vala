@@ -118,6 +118,11 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
     public override Gtk.Menu? get_context_menu () {
         var menu = new Gtk.Menu ();
 
+        var edit_topic_item = new Gtk.MenuItem.with_label (_("Edit topic…"));
+        edit_topic_item.activate.connect (() => {
+            edit_topic ();
+        });
+
         var favorite_item = new Gtk.MenuItem.with_label (_("Add to favorites"));
         favorite_item.activate.connect (() => {
             favorite_channel ();
@@ -146,6 +151,8 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
             remove_channel ();
         });
 
+        menu.append (edit_topic_item);
+        menu.append (new Gtk.SeparatorMenuItem ());
         if (is_favorite) {
             menu.append (remove_favorite_item);
         } else {
@@ -164,6 +171,7 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
         return menu;
     }
 
+    public signal void edit_topic ();
     public signal void favorite_channel ();
     public signal void remove_favorite_channel ();
     public signal void join_channel ();
