@@ -972,6 +972,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             var channel_chat_view = main_layout.get_channel_chat_view (server_name, channel_name);
             if (channel_chat_view != null) {
                 channel_chat_view.set_channel_topic (topic);
+                header_bar.update_title (channel_name, topic);
+                header_bar.tooltip_text = topic;
             }
             return false;
         });
