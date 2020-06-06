@@ -151,8 +151,10 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
             remove_channel ();
         });
 
-        menu.append (edit_topic_item);
-        menu.append (new Gtk.SeparatorMenuItem ());
+        if (is_enabled) {
+            menu.append (edit_topic_item);
+            menu.append (new Gtk.SeparatorMenuItem ());
+        }
         if (is_favorite) {
             menu.append (remove_favorite_item);
         } else {
