@@ -119,6 +119,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 update_channel_topic (server_name, channel_name);
             } else {
                 header_bar.set_channel_users_button_visible (false);
+                header_bar.set_tooltip_text (null);
             }
 
             // We have enough context to join a channel
@@ -254,6 +255,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             if (welcome_view.is_visible ()) {
                 header_bar.set_channel_users_button_visible (false);
                 header_bar.update_title (Constants.APP_NAME, null);
+                header_bar.set_tooltip_text (null);
             }
         });
 
