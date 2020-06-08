@@ -138,6 +138,9 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         }
 
         var channel_item = new Iridium.Widgets.SidePanel.ChannelRow (channel_name, server_name);
+        channel_item.edit_topic.connect (() => {
+            edit_channel_topic (server_name, channel_name);
+        });
         channel_item.favorite_channel.connect (() => {
             favorite_channel (server_name, channel_name);
         });
@@ -438,6 +441,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
     public signal void channel_favorite_removed (string server_name, string channel_name);
     public signal void connect_to_server (string server_name);
     public signal void disconnect_from_server (string server_name);
+    public signal void edit_channel_topic (string server_name, string channel_name);
 
     public signal void server_row_added (string server_name);
     public signal void server_row_removed (string server_name);

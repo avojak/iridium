@@ -25,9 +25,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     public Iridium.Widgets.ServerConnectionDialog? connection_dialog = null;
     public Iridium.Widgets.ChannelJoinDialog? channel_join_dialog = null;
+    public Iridium.Widgets.ChannelTopicEditDialog? channel_topic_edit_dialog = null;
     public Iridium.Widgets.ManageConnectionsDialog? manage_connections_dialog = null;
     public Iridium.Widgets.PreferencesDialog? preferences_dialog = null;
-    public Iridium.Widgets.CertificateWarningDialog? certificate_warning_dialog = null;
 
     private Iridium.Views.Welcome welcome_view;
     private Iridium.Widgets.HeaderBar header_bar;
@@ -117,11 +117,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 // Update the channel users list
                 update_channel_users_list (server_name, channel_name);
                 update_channel_topic (server_name, channel_name);
-                
-                var channel_chat_view = main_layout.get_channel_chat_view (server_name, channel_name);
-                channel_chat_view.set_topic_edit_button_enabled (row.get_enabled ());
             } else {
                 header_bar.set_channel_users_button_visible (false);
+                header_bar.set_tooltip_text (null);
             }
 
             // We have enough context to join a channel
@@ -150,6 +148,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         side_panel.disconnect_from_server.connect ((server_name) => {
             // TODO: Might need to disable the join channel header button!
             connection_handler.disconnect_from_server (server_name);
+        });
+        side_panel.edit_channel_topic.connect ((server_name, channel_name) => {
+            show_channel_topic_edit_dialog (server_name, channel_name);
         });
         side_panel.join_channel_for_server.connect ((server_name) => {
             show_channel_join_dialog (server_name);
@@ -253,6 +254,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         side_panel.server_row_removed.connect ((server_name) => {
             if (welcome_view.is_visible ()) {
                 header_bar.set_channel_users_button_visible (false);
+                header_bar.update_title (Constants.APP_NAME, null);
+                header_bar.set_tooltip_text (null);
             }
         });
 
@@ -426,9 +429,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         chat_view.message_to_send.connect ((user_message) => {
             send_channel_message (server_name, channel_name, user_message, chat_view);
         });
-        chat_view.set_topic.connect ((new_topic) => {
-            connection_handler.set_channel_topic (server_name, channel_name, new_topic);
-        });
         return chat_view;
     }
 
@@ -489,6 +489,22 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         channel_join_dialog.present ();
     }
 
+    private void show_channel_topic_edit_dialog (string server_name, string channel_name) {
+        if (channel_topic_edit_dialog == null) {
+            var current_topic = connection_handler.get_topic (server_name, channel_name);
+            channel_topic_edit_dialog = new Iridium.Widgets.ChannelTopicEditDialog (this, current_topic);
+            channel_topic_edit_dialog.show_all ();
+            channel_topic_edit_dialog.submit_button_clicked.connect ((new_topic) => {
+                var trimmed_topic = new_topic == null ? "" : new_topic.chomp ().chug ();
+                connection_handler.set_channel_topic (server_name, channel_name, trimmed_topic);
+            });
+            channel_topic_edit_dialog.destroy.connect (() => {
+                channel_topic_edit_dialog = null;
+            });
+        }
+        channel_topic_edit_dialog.present ();
+    }
+
     private void show_manage_connections_dialog () {
         if (manage_connections_dialog == null) {
             var servers = Iridium.Application.connection_dao.get_servers ();
@@ -511,17 +527,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         }
         preferences_dialog.present ();
     }
-
-    //  private void show_certificate_warning_dialog () {
-    //      if (certificate_warning_dialog == null) {
-    //          certificate_warning_dialog = new Iridium.Widgets.CertificateWarningDialog (this);
-    //          certificate_warning_dialog.show_all ();
-    //          certificate_warning_dialog.destroy.connect (() => {
-    //              certificate_warning_dialog = null;
-    //          });
-    //      }
-    //      certificate_warning_dialog.present ();
-    //  }
 
     private void join_channel (string server_name, string channel_name) {
         // Check if we're already in this channel
@@ -639,26 +644,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         return username;
     }
 
-    //  private void on_channel_topic_toggled (bool visible) {
-    //      // Check if the current view matches the server and channel
-    //      var selected_row = side_panel.get_selected_row ();
-    //      if (selected_row == null) {
-    //          return;
-    //      }
-    //      if (selected_row.get_channel_name () == null) {
-    //          return;
-    //      }
-    //      var channel_chat_view = main_layout.get_channel_chat_view (selected_row.get_server_name (), selected_row.get_channel_name ());
-    //      if (channel_chat_view == null) {
-    //          return;
-    //      }
-    //      if (visible) {
-    //          channel_chat_view.show_topic ();
-    //      } else {
-    //          channel_chat_view.hide_topic ();
-    //      }
-    //  }
-
     //
     // ServerConnectionHandler Callbacks
     //
@@ -667,7 +652,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         int result = -1;
         bool remember_decision = false;
         Idle.add (() => {
-            //  show_certificate_warning_dialog ();
             var dialog = new Iridium.Widgets.CertificateWarningDialog (this, peer_cert, errors, connectable);
             dialog.remember_decision_toggled.connect ((remember) => {
                 remember_decision = remember;
@@ -815,6 +799,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     private void on_channel_topic_received (string server_name, string channel_name) {
         update_channel_topic (server_name, channel_name);
+        if (channel_topic_edit_dialog != null) {
+            channel_topic_edit_dialog.dismiss ();
+        }
     }
 
     private void on_nickname_in_use (string server_name, Iridium.Services.Message message) {
@@ -838,7 +825,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 chat_view = create_and_add_channel_chat_view (server_name, channel_name);
             }
             chat_view.set_enabled (true);
-            chat_view.set_topic_edit_button_enabled (true);
 
             side_panel.add_channel (server_name, channel_name);
             side_panel.enable_channel_row (server_name, channel_name);
@@ -866,7 +852,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             var chat_view = main_layout.get_channel_chat_view (server_name, channel_name);
             if (chat_view != null) {
                 chat_view.set_enabled (false);
-                chat_view.set_topic_edit_button_enabled (false);
             }
             return false;
         });
@@ -967,14 +952,15 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     
     private void update_channel_topic (string server_name, string channel_name) {
         var topic = connection_handler.get_topic (server_name, channel_name);
-        // Ensures that this runs only after the channel chat view has been created and added to the main layout
-        Idle.add (() => {
-            var channel_chat_view = main_layout.get_channel_chat_view (server_name, channel_name);
-            if (channel_chat_view != null) {
-                channel_chat_view.set_channel_topic (topic);
-            }
-            return false;
-        });
+        // Check if the current view matches the server and channel
+        var selected_row = side_panel.get_selected_row ();
+        if (selected_row == null) {
+            return;
+        }
+        if (selected_row.get_server_name () == server_name && selected_row.get_channel_name () == channel_name) {
+            header_bar.update_title (channel_name, topic);
+            header_bar.set_tooltip_text ((topic == null || topic.length == 0) ? null : channel_name + ": " + topic);
+        }
     }
 
     private void on_insufficient_privs_received (string server_name, string channel_name, Iridium.Services.Message message) {
