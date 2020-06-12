@@ -25,18 +25,18 @@
  */
 public class Iridium.Services.Message : GLib.Object {
 
-    private static string REGEX_STR = """^(:(?<prefix>\S+) )?(?<command>\S+)( (?!:)(?<params>.+?))?( :(?<trail>.+))?$""";
-    private static string ESCAPE_EXCEPT_CHARS = "\b\f\n\r\t\'";
-    private static string NON_PRINT_REGEX_STR = """[\x01]""";
-    private static string[] USER_COMMANDS = {
+    private static string REGEX_STR = """^(:(?<prefix>\S+) )?(?<command>\S+)( (?!:)(?<params>.+?))?( :(?<trail>.+))?$"""; // vala-lint=naming-convention
+    private static string ESCAPE_EXCEPT_CHARS = "\b\f\n\r\t\'"; // vala-lint=naming-convention
+    private static string NON_PRINT_REGEX_STR = """[\x01]"""; // vala-lint=naming-convention
+    private static string[] USER_COMMANDS = { // vala-lint=naming-convention
         Iridium.Services.MessageCommands.PRIVMSG,
         Iridium.Services.MessageCommands.JOIN,
         Iridium.Services.MessageCommands.NICK,
         Iridium.Services.MessageCommands.QUIT,
         Iridium.Services.MessageCommands.PART
     };
-    private static GLib.Regex regex;
-    private static GLib.Regex non_print_regex;
+    private static GLib.Regex REGEX;
+    private static GLib.Regex NON_PRINT_REGEX;
 
     public string command { get; set; }
     public string message { get; set; }
@@ -46,8 +46,8 @@ public class Iridium.Services.Message : GLib.Object {
 
     static construct {
         try {
-            regex = new GLib.Regex (REGEX_STR, GLib.RegexCompileFlags.OPTIMIZE);
-            non_print_regex = new GLib.Regex (NON_PRINT_REGEX_STR, GLib.RegexCompileFlags.OPTIMIZE);
+            REGEX = new GLib.Regex (REGEX_STR, GLib.RegexCompileFlags.OPTIMIZE);
+            NON_PRINT_REGEX = new GLib.Regex (NON_PRINT_REGEX_STR, GLib.RegexCompileFlags.OPTIMIZE);
         } catch (GLib.RegexError e) {
             // TODO: Handle errors!
             // This should never ever happen
@@ -59,13 +59,13 @@ public class Iridium.Services.Message : GLib.Object {
             message = _message;
             return;
         }
-        message = _message.validate() ? _message : _message.escape (ESCAPE_EXCEPT_CHARS);
+        message = _message.validate () ? _message : _message.escape (ESCAPE_EXCEPT_CHARS);
         parse_message ();
     }
 
     private void parse_message () {
         try {
-            regex.replace_eval (message, -1, 0, 0, (match_info, result) => {
+            REGEX.replace_eval (message, -1, 0, 0, (match_info, result) => {
                 prefix = match_info.fetch_named ("prefix");
                 command = match_info.fetch_named ("command");
                 if (match_info.fetch_named ("params") != null) {
@@ -76,7 +76,7 @@ public class Iridium.Services.Message : GLib.Object {
                     message.replace ("\t", "");
                     strip_non_printable_chars ();
                 }
-                if ((prefix != null) && (command in USER_COMMANDS)) {
+                if ((prefix != null) && (command in USER_COMMANDS)) {  // vala-lint=naming-convention
                     username = prefix.split ("!")[0];
                 }
                 return false;
@@ -88,10 +88,10 @@ public class Iridium.Services.Message : GLib.Object {
 
     private void strip_non_printable_chars () {
         // TODO: Probably a better way to do this
-        if (non_print_regex.match (message[0].to_string ())) {
+        if (NON_PRINT_REGEX.match (message[0].to_string ())) {
             message = message.substring (1);
         }
-        if (non_print_regex.match (message[message.length - 1].to_string ())) {
+        if (NON_PRINT_REGEX.match (message[message.length - 1].to_string ())) {
             message = message.substring (0, message.length - 1);
         }
     }

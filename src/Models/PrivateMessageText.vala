@@ -21,7 +21,7 @@
 
 public abstract class Iridium.Models.PrivateMessageText : Iridium.Models.RichText {
 
-    private static uint16 USERNAME_SPACING = 20;
+    private static uint16 USERNAME_SPACING = 20; // vala-lint=naming-convention
 
     public bool suppress_sender_username { get; set; }
 

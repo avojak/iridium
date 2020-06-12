@@ -49,9 +49,9 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
 
         // Create the header
         var header_grid = new Gtk.Grid ();
-		header_grid.margin_start = 30;
-		header_grid.margin_end = 30;
-		header_grid.margin_bottom = 10;
+        header_grid.margin_start = 30;
+        header_grid.margin_end = 30;
+        header_grid.margin_bottom = 10;
         header_grid.column_spacing = 10;
 
         var header_image = new Gtk.Image.from_icon_name ("internet-chat", Gtk.IconSize.DIALOG);

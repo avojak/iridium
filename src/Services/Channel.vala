@@ -20,7 +20,7 @@
  */
 
 public class Iridium.Services.Channel : GLib.Object {
-    
+
     public int id { get; set; }
     public int server_id { get; set; }
     public string name { get; set; }

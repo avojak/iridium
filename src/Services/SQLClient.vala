@@ -21,8 +21,8 @@
 
 public class Iridium.Services.SQLClient : GLib.Object {
 
-    private static string DATABASE_FILE = "iridium01.db";
-    private static Iridium.Services.SQLClient INSTANCE;
+    private static string DATABASE_FILE = "iridium01.db"; // vala-lint=naming-convention
+    private static Iridium.Services.SQLClient INSTANCE; // vala-lint=naming-convention
 
     private Sqlite.Database database;
 
@@ -87,7 +87,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
                 "is_accepted" BOOL
             );
             """;
-		database.exec(sql);
+        database.exec (sql);
     }
 
     public void insert_server (Iridium.Services.Server server) {
@@ -100,7 +100,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
         if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
             // TODO: Log this
             stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
-		    return;
+            return;
         }
 
         statement.bind_text (1, server.connection_details.server);
@@ -122,7 +122,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
         if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
             // TODO: Log this
             stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
-		    return null;
+            return null;
         }
         statement.bind_text (1, server_name);
 
@@ -144,11 +144,11 @@ public class Iridium.Services.SQLClient : GLib.Object {
         if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
             // TODO: Log this
             stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
-		    return;
+            return;
         }
         statement.bind_int (1, bool_to_int (enabled));
         statement.bind_text (2, hostname);
-        
+
         statement.step ();
         statement.reset ();
     }
@@ -159,10 +159,10 @@ public class Iridium.Services.SQLClient : GLib.Object {
         if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
             // TODO: Log this
             stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
-		    return;
+            return;
         }
         statement.bind_text (1, hostname);
-        
+
         statement.step ();
         statement.reset ();
     }
@@ -173,7 +173,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
     //      if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
     //          // TODO: Log this
     //          stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
-	//  	    return;
+    //          return;
     //      }
     //      statement.step ();
     //      statement.reset ();
@@ -194,8 +194,8 @@ public class Iridium.Services.SQLClient : GLib.Object {
 
         statement.bind_int (1, server_id);
         statement.bind_text (2, channel.name);
-        statement.bind_int (3, bool_to_int(channel.enabled));
-        statement.bind_int (4, bool_to_int(channel.favorite));
+        statement.bind_int (3, bool_to_int (channel.enabled));
+        statement.bind_int (4, bool_to_int (channel.favorite));
 
         statement.step ();
         statement.reset ();
@@ -230,11 +230,11 @@ public class Iridium.Services.SQLClient : GLib.Object {
         if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
             // TODO: Log this
             stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
-		    return;
+            return;
         }
         statement.bind_int (1, bool_to_int (enabled));
         statement.bind_int (2, channel_id);
-        
+
         statement.step ();
         statement.reset ();
     }
@@ -245,10 +245,10 @@ public class Iridium.Services.SQLClient : GLib.Object {
         if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
             // TODO: Log this
             stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
-		    return;
+            return;
         }
         statement.bind_int (1, channel_id);
-        
+
         statement.step ();
         statement.reset ();
     }
@@ -259,10 +259,10 @@ public class Iridium.Services.SQLClient : GLib.Object {
         if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
             // TODO: Log this
             stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
-		    return;
+            return;
         }
         statement.bind_int (1, server_id);
-        
+
         statement.step ();
         statement.reset ();
     }
@@ -275,7 +275,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
         if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
             // TODO: Log this
             stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
-		    return servers;
+            return servers;
         }
 
         while (statement.step () == Sqlite.ROW) {
@@ -295,7 +295,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
         if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
             // TODO: Log this
             stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
-		    return channels;
+            return channels;
         }
 
         while (statement.step () == Sqlite.ROW) {
@@ -313,11 +313,11 @@ public class Iridium.Services.SQLClient : GLib.Object {
         if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
             // TODO: Log this
             stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
-		    return;
+            return;
         }
         statement.bind_int (1, bool_to_int (favorite));
         statement.bind_int (2, channel_id);
-        
+
         statement.step ();
         statement.reset ();
     }
@@ -355,7 +355,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
                     }
                     connection_details.auth_method = (Iridium.Models.AuthenticationMethod) eval.value;
                     break;
-                case "tls": 
+                case "tls":
                     connection_details.tls = int_to_bool (statement.column_int (i));
                     break;
                 case "enabled":
@@ -423,10 +423,10 @@ public class Iridium.Services.SQLClient : GLib.Object {
         if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
             // TODO: Log this
             stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
-		    return;
+            return;
         }
         statement.bind_text (1, host);
-        
+
         statement.step ();
         statement.reset ();
     }
@@ -439,7 +439,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
         if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
             // TODO: Log this
             stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
-		    return identities;
+            return identities;
         }
         statement.bind_text (1, host);
 

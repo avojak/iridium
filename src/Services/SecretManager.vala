@@ -21,7 +21,7 @@
 
 public class Iridium.Services.SecretManager : GLib.Object {
 
-    private static string SCHEMA_VERSION = "1";
+    private static string SCHEMA_VERSION = "1"; // vala-lint=naming-convention
 
     private static Secret.Schema schema = new Secret.Schema (
         Constants.APP_ID,

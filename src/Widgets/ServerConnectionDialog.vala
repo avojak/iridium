@@ -59,9 +59,9 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
 
         // Create the header
         var header_grid = new Gtk.Grid ();
-		header_grid.margin_start = 30;
-		header_grid.margin_end = 30;
-		header_grid.margin_bottom = 10;
+        header_grid.margin_start = 30;
+        header_grid.margin_end = 30;
+        header_grid.margin_bottom = 10;
         header_grid.column_spacing = 10;
 
         header_image_stack = new Gtk.Stack ();
@@ -195,11 +195,11 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         // TODO: This can be handled better
         auth_methods = new Gee.HashMap<int, Iridium.Models.AuthenticationMethod> ();
         auth_method_display_strings = new Gee.HashMap<int, string> ();
-        auth_methods.set(0, Iridium.Models.AuthenticationMethod.NONE);
+        auth_methods.set (0, Iridium.Models.AuthenticationMethod.NONE);
         auth_method_display_strings.set (0, Iridium.Models.AuthenticationMethod.NONE.get_display_string ());
-        auth_methods.set(1, Iridium.Models.AuthenticationMethod.SERVER_PASSWORD);
+        auth_methods.set (1, Iridium.Models.AuthenticationMethod.SERVER_PASSWORD);
         auth_method_display_strings.set (1, Iridium.Models.AuthenticationMethod.SERVER_PASSWORD.get_display_string ());
-        auth_methods.set(2, Iridium.Models.AuthenticationMethod.NICKSERV_MSG);
+        auth_methods.set (2, Iridium.Models.AuthenticationMethod.NICKSERV_MSG);
         auth_method_display_strings.set (2, Iridium.Models.AuthenticationMethod.NICKSERV_MSG.get_display_string ());
         for (int i = 0; i < auth_method_display_strings.size; i++) {
             Gtk.TreeIter iter;
@@ -348,7 +348,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         status_stack.set_visible_child_name ("status-label");
     }
 
-    public signal void connect_button_clicked (string server, string nickname, string username, string realname, 
+    public signal void connect_button_clicked (string server, string nickname, string username, string realname,
         uint16 port, Iridium.Models.AuthenticationMethod auth_method, bool tls, string auth_token);
 
 }

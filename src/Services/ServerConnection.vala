@@ -158,7 +158,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             }
         }
         print (@"TLS certificate errors: $(error_string)\n");
-        
+
         var cert_policy = Iridium.Application.settings.get_string ("certificate-validation-policy");
         switch (Iridium.Models.InvalidCertificatePolicy.get_value_by_short_name (cert_policy)) {
             case REJECT:
@@ -194,7 +194,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             default:
                 assert_not_reached ();
         }
-        
+
     }
 
     private void register (Iridium.Services.ServerConnectionDetails connection_details) {
@@ -206,20 +206,20 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         // Handle the various auth methods
         switch (connection_details.auth_method) {
             case Iridium.Models.AuthenticationMethod.NONE:
-                debug("AuthenticationMethod is NONE");
+                debug ("AuthenticationMethod is NONE");
                 send_output (@"NICK $nickname");
                 send_output (@"USER $username 0 * :$realname");
                 send_output (@"MODE $username $mode");
                 break;
             case Iridium.Models.AuthenticationMethod.SERVER_PASSWORD:
-                debug("AuthenticationMethod is SERVER_PASSWORD");
+                debug ("AuthenticationMethod is SERVER_PASSWORD");
                 string password = null;
                 // Check if we're passed an auth token
                 if (connection_details.auth_token != null) {
-                    debug("Server password passed with request to open connection");
+                    debug ("Server password passed with request to open connection");
                     password = connection_details.auth_token;
                 } else {
-                    debug("Retrieving server password from secret manager");
+                    debug ("Retrieving server password from secret manager");
                     var server = connection_details.server;
                     var port = connection_details.port;
                     password = Iridium.Application.secret_manager.retrieve_secret (server, port, username);
@@ -369,7 +369,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             case Iridium.Services.NumericCodes.RPL_NOTOPIC:
                 on_channel_topic_received (message.params[1], "");
                 break;
-            
+
             // Errors
             case Iridium.Services.NumericCodes.ERR_NICKNAMEINUSE:
                 nickname_in_use (message);
@@ -380,7 +380,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 server_error_received (message);
                 break;
             case Iridium.Services.NumericCodes.ERR_UNKNOWNCOMMAND:
-            case Iridium.Services.NumericCodes.ERR_NOSUCHNICK: 
+            case Iridium.Services.NumericCodes.ERR_NOSUCHNICK:
                 // TODO: Handle no such nick for sending a PM. Should display the server 
                 //       error in the channel view, not the server view.
             case Iridium.Services.NumericCodes.ERR_NOSUCHCHANNEL:

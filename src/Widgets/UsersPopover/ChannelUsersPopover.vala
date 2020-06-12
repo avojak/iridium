@@ -43,7 +43,7 @@ public class Iridium.Widgets.UsersPopover.ChannelUsersPopover : Gtk.Popover {
         scrolled_window = new Gtk.ScrolledWindow (null, null);
         scrolled_window.max_content_height = 250;
         scrolled_window.propagate_natural_height = true;
-        
+
         list_box = new Gtk.ListBox ();
         list_box.expand = true;
         list_box.activate_on_single_click = true;
@@ -62,7 +62,7 @@ public class Iridium.Widgets.UsersPopover.ChannelUsersPopover : Gtk.Popover {
         var users_box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
         users_box.pack_start (search_entry, true, false, 0);
         users_box.pack_start (scrolled_window, true, false, 0);
-        
+
         add (users_box);
 
         users_box.show_all ();

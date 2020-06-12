@@ -50,7 +50,7 @@ public class Iridium.Widgets.ManageConnectionsDialog : Gtk.Dialog {
         header_grid.column_spacing = 10;
 
         var header_image = new Gtk.Image.from_icon_name ("network-server", Gtk.IconSize.DIALOG);
-        
+
         var header_title = new Gtk.Label (_("Manage Connections"));
         header_title.get_style_context ().add_class (Granite.STYLE_CLASS_H2_LABEL);
         header_title.halign = Gtk.Align.START;

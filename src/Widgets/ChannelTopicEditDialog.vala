@@ -53,7 +53,7 @@ public class Iridium.Widgets.ChannelTopicEditDialog : Gtk.Dialog {
         header_grid.column_spacing = 10;
 
         var header_image = new Gtk.Image.from_icon_name ("edit", Gtk.IconSize.DIALOG);
-        
+
         var header_title = new Gtk.Label (_("Edit Channel Topic"));
         header_title.get_style_context ().add_class (Granite.STYLE_CLASS_H2_LABEL);
         header_title.halign = Gtk.Align.START;
@@ -144,7 +144,7 @@ public class Iridium.Widgets.ChannelTopicEditDialog : Gtk.Dialog {
         text_view.get_buffer ().get_start_iter (out start);
         Gtk.TextIter end;
         text_view.get_buffer ().get_end_iter (out end);
-        return text_view.get_buffer ().get_text (start, end, false).chomp ().chug ().replace("\n", " ");
+        return text_view.get_buffer ().get_text (start, end, false).chomp ().chug ().replace ("\n", " ");
     }
 
     public void dismiss () {

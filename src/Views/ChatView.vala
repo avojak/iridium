@@ -26,11 +26,11 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
 
     // TODO: Should toggle these colors slightly depending on whether user is in dark mode or not
     // Colors defined by the elementary OS Human Interface Guidelines
-    private static string COLOR_STRAWBERRY = "#ed5353"; // "#c6262e";
-    private static string COLOR_ORANGE = "#ffa154"; // "#f37329";
-    private static string COLOR_LIME = "#9bdb4d"; // "#68b723";
-    private static string COLOR_BLUEBERRY = "#64baff"; // "#3689e6";
-    //  private static string COLOR_GRAPE = "#a56de2";
+    private static string COLOR_STRAWBERRY = "#ed5353"; // "#c6262e"; // vala-lint=naming-convention
+    private static string COLOR_ORANGE = "#ffa154"; // "#f37329"; // vala-lint=naming-convention
+    private static string COLOR_LIME = "#9bdb4d"; // "#68b723"; // vala-lint=naming-convention
+    private static string COLOR_BLUEBERRY = "#64baff"; // "#3689e6"; // vala-lint=naming-convention
+    //  private static string COLOR_GRAPE = "#a56de2"; // vala-lint=naming-convention
 
     protected Gtk.TextView text_view;
 
@@ -149,7 +149,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
             } else {
                 clear_selectable_underlining ();
             }
-            
+
         });
 
         // Clear the underlining when the mouse leaves the event box around the text view
@@ -287,7 +287,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         if (!pos.has_tag (selectable_tag)) {
             return null;
         }
-            
+
         Gtk.TextIter tag_start = pos;
         tag_start.backward_to_tag_toggle (selectable_tag);
         Gtk.TextIter tag_end = pos;

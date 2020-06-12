@@ -20,7 +20,7 @@
  */
 
 public class Iridium.Services.ServerConnectionDAO : GLib.Object {
-    
+
     public Iridium.Services.SQLClient sql_client { get; set; }
 
     public void on_server_connection_successful (Iridium.Services.ServerConnectionDetails connection_details) {
@@ -29,7 +29,7 @@ public class Iridium.Services.ServerConnectionDAO : GLib.Object {
             if (sql_client.get_server (connection_details.server) != null) {
                 return;
             }
-            
+
             // Add the new entry
             var server = new Iridium.Services.Server ();
             server.connection_details = connection_details;

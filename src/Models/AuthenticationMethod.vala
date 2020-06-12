@@ -19,8 +19,8 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public enum Iridium.Models.AuthenticationMethod { 
-    
+public enum Iridium.Models.AuthenticationMethod {
+
     NONE,
     SERVER_PASSWORD,
     NICKSERV_MSG;
@@ -42,9 +42,9 @@ public enum Iridium.Models.AuthenticationMethod {
         EnumClass enumc = (EnumClass) typeof (AuthenticationMethod).class_ref ();
         unowned EnumValue? eval = enumc.get_value_by_name (name);
         if (eval == null) {
-			assert_not_reached ();
-		}
-		return (AuthenticationMethod) eval.value;
+            assert_not_reached ();
+        }
+        return (AuthenticationMethod) eval.value;
     }
 
 }

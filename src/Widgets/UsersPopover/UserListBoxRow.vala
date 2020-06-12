@@ -34,13 +34,13 @@ public class Iridium.Widgets.UsersPopover.UserListBoxRow : Gtk.ListBoxRow {
     construct {
         event_box = new Gtk.EventBox ();
         event_box.enter_notify_event.connect (() => {
-			event_box.set_state_flags (Gtk.StateFlags.PRELIGHT | Gtk.StateFlags.SELECTED, true);
-			return false;
-		});
-		event_box.leave_notify_event.connect (() => {
-			event_box.set_state_flags (Gtk.StateFlags.NORMAL, true);
-			return false;
-		});
+            event_box.set_state_flags (Gtk.StateFlags.PRELIGHT | Gtk.StateFlags.SELECTED, true);
+            return false;
+        });
+        event_box.leave_notify_event.connect (() => {
+            event_box.set_state_flags (Gtk.StateFlags.NORMAL, true);
+            return false;
+        });
 
         var label = new Gtk.Label (username);
         label.margin_top = 4;

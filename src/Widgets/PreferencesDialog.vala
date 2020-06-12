@@ -62,7 +62,7 @@ public class Iridium.Widgets.PreferencesDialog : Gtk.Dialog {
         header_grid.column_spacing = 10;
 
         var header_image = new Gtk.Image.from_icon_name ("preferences-system", Gtk.IconSize.DIALOG);
-        
+
         var header_title = new Gtk.Label (_("Preferences"));
         header_title.get_style_context ().add_class (Granite.STYLE_CLASS_H2_LABEL);
         header_title.halign = Gtk.Align.START;
@@ -108,11 +108,11 @@ public class Iridium.Widgets.PreferencesDialog : Gtk.Dialog {
         // TODO: This can be handled better
         cert_policies = new Gee.HashMap<int, Iridium.Models.InvalidCertificatePolicy> ();
         var cert_policies_display_strings = new Gee.HashMap<int, string> ();
-        cert_policies.set(0, Iridium.Models.InvalidCertificatePolicy.REJECT);
+        cert_policies.set (0, Iridium.Models.InvalidCertificatePolicy.REJECT);
         cert_policies_display_strings.set (0, Iridium.Models.InvalidCertificatePolicy.REJECT.get_display_string ());
-        cert_policies.set(1, Iridium.Models.InvalidCertificatePolicy.WARN);
+        cert_policies.set (1, Iridium.Models.InvalidCertificatePolicy.WARN);
         cert_policies_display_strings.set (1, Iridium.Models.InvalidCertificatePolicy.WARN.get_display_string ());
-        cert_policies.set(2, Iridium.Models.InvalidCertificatePolicy.ALLOW);
+        cert_policies.set (2, Iridium.Models.InvalidCertificatePolicy.ALLOW);
         cert_policies_display_strings.set (2, Iridium.Models.InvalidCertificatePolicy.ALLOW.get_display_string ());
         for (int i = 0; i < cert_policies_display_strings.size; i++) {
             Gtk.TreeIter iter;

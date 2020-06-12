@@ -26,7 +26,7 @@ public class Iridium.Widgets.StatusBar : Gtk.ActionBar {
     construct {
         var server_connect_menu_item = new Gtk.MenuItem.with_label (_("Connect to a Server…"));
         channel_join_menu_item = new Gtk.MenuItem.with_label (_("Join a Channel…"));
-        
+
         var menu = new Gtk.Menu ();
         menu.append (server_connect_menu_item);
         menu.append (channel_join_menu_item);
@@ -70,5 +70,5 @@ public class Iridium.Widgets.StatusBar : Gtk.ActionBar {
     public signal void server_connect_button_clicked ();
     public signal void channel_join_button_clicked ();
     public signal void manage_connections_button_clicked ();
-    
+
 }

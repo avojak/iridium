@@ -19,8 +19,8 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public enum Iridium.Models.InvalidCertificatePolicy { 
-    
+public enum Iridium.Models.InvalidCertificatePolicy {
+
     REJECT,
     WARN,
     ALLOW;
@@ -55,9 +55,9 @@ public enum Iridium.Models.InvalidCertificatePolicy {
         EnumClass enumc = (EnumClass) typeof (InvalidCertificatePolicy).class_ref ();
         unowned EnumValue? eval = enumc.get_value_by_name (name);
         if (eval == null) {
-			assert_not_reached ();
-		}
-		return (InvalidCertificatePolicy) eval.value;
+            assert_not_reached ();
+        }
+        return (InvalidCertificatePolicy) eval.value;
     }
 
     public static InvalidCertificatePolicy get_value_by_short_name (string short_name) {

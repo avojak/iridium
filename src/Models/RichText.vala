@@ -22,8 +22,8 @@
 public abstract class Iridium.Models.RichText : GLib.Object {
 
     // https://github.com/didrocks/geary/blob/master/src/client/util/util-webkit.vala
-    private static string URI_REGEX_STR = "(?i)\\b((?:[a-z][\\w-]+:(?:/{1,3}|[a-z0-9%])|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,4}/)(?:[^\\s()<>]+|\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\))+(?:\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’]))";
-    private static GLib.Regex URI_REGEX;
+    private static string URI_REGEX_STR = "(?i)\\b((?:[a-z][\\w-]+:(?:/{1,3}|[a-z0-9%])|www\\d{0,3}[.]|[a-z0-9.\\-]+[.][a-z]{2,4}/)(?:[^\\s()<>]+|\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\))+(?:\\(([^\\s()<>]+|(\\([^\\s()<>]+\\)))*\\)|[^\\s`!()\\[\\]{};:'\".,<>?«»“”‘’]))";  // vala-lint=naming-convention
+    private static GLib.Regex URI_REGEX; // vala-lint=naming-convention
 
     public Iridium.Services.Message message { get; construct; }
 
@@ -79,20 +79,20 @@ public abstract class Iridium.Models.RichText : GLib.Object {
     private void apply_uri_tags (Gtk.TextBuffer buffer) {
         // TODO: Need to update the regex because it matches certain punctuation around a URI
         //       For example, it matches "(www.example.com)." instead of just "www.example.com"
-        
+
         Gtk.TextIter search_start;
         Gtk.TextIter search_end;
         Gtk.TextIter match_start;
         Gtk.TextIter match_end;
         Gtk.TextIter iter;
-        
+
         buffer.get_end_iter (out search_start);
         search_start.backward_chars (message.message.length + 1); // +1 for newline char
         buffer.get_end_iter (out search_end);
         search_end.backward_chars (1); // 1 for newline char
 
         var text = buffer.get_text (search_start, search_end, false);
-        Gee.Set<string> tokens = new Gee.HashSet<string>();
+        Gee.Set<string> tokens = new Gee.HashSet<string> ();
         tokens.add_all_array (text.split (" "));
 
         var selectable_tag = buffer.get_tag_table ().lookup ("selectable");
@@ -129,7 +129,7 @@ public abstract class Iridium.Models.RichText : GLib.Object {
                     buffer.apply_tag_by_name ("inline-username", match_start, match_end);
                     buffer.apply_tag_by_name ("selectable", match_start, match_end);
                 }
-                search_start = match_end; 
+                search_start = match_end;
             }
         }
 
@@ -139,7 +139,7 @@ public abstract class Iridium.Models.RichText : GLib.Object {
         //  search_start.backward_chars (message.message.length + 1); // +1 for newline char
         //  buffer.get_end_iter (out search_end);
         //  search_end.backward_chars (1);
-        
+
         //  // The our username appears, color the whole message
         //  if (search_start.forward_search (self_username, Gtk.TextSearchFlags.CASE_INSENSITIVE, out match_start, out match_end, search_end)) {
         //      buffer.apply_tag_by_name ("inline-self-username", search_start, search_end);

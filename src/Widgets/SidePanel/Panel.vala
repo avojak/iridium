@@ -365,7 +365,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         if (server_item == null) {
             return;
         }
-        foreach (var channel_row in channel_items.get(server_name)) {
+        foreach (var channel_row in channel_items.get (server_name)) {
             if (channel_row.get_channel_name () == channel_name) {
                 selected = channel_row;
                 return;

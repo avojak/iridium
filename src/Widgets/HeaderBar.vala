@@ -37,7 +37,7 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         channel_users_button.set_image (new Gtk.Image.from_icon_name ("system-users-symbolic", Gtk.IconSize.BUTTON));
         channel_users_button.tooltip_text = _("Channel users"); // TODO: Enable accelerator
         channel_users_button.relief = Gtk.ReliefStyle.NONE;
-		channel_users_button.valign = Gtk.Align.CENTER;
+        channel_users_button.valign = Gtk.Align.CENTER;
 
         channel_users_popover = new Iridium.Widgets.UsersPopover.ChannelUsersPopover (channel_users_button);
         channel_users_popover.username_selected.connect (on_username_selected);
