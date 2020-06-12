@@ -638,7 +638,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         var prefixes = new string[] { "@", "&" };
         foreach (string prefix in prefixes) {
             if (username.has_prefix (prefix)) {
-                return username.substring(1, username.length - 1);
+                return username.substring (1, username.length - 1);
             }
         }
         return username;
@@ -949,7 +949,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             header_bar.set_channel_users_button_enabled (enabled);
         }
     }
-    
+
     private void update_channel_topic (string server_name, string channel_name) {
         var topic = connection_handler.get_topic (server_name, channel_name);
         // Check if the current view matches the server and channel

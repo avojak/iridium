@@ -35,8 +35,8 @@ public class Iridium.Services.Message : GLib.Object {
         Iridium.Services.MessageCommands.QUIT,
         Iridium.Services.MessageCommands.PART
     };
-    private static GLib.Regex REGEX;
-    private static GLib.Regex NON_PRINT_REGEX;
+    private static GLib.Regex REGEX; // vala-lint=naming-convention
+    private static GLib.Regex NON_PRINT_REGEX; // vala-lint=naming-convention
 
     public string command { get; set; }
     public string message { get; set; }
