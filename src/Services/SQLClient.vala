@@ -43,7 +43,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
         var config_dir_file = GLib.File.new_for_path (config_dir_path);
         try {
             if (!config_dir_file.query_exists ()) {
-                debug ("Config directory does not exist - creating it now...");
+                debug ("Config directory does not exist - creating it now");
                 config_dir_file.make_directory ();
             }
         } catch (GLib.Error e) {
