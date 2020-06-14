@@ -66,11 +66,11 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                     handle_line (line);
                 } catch (GLib.IOError e) {
                     // TODO: Handle this differently on initialization (currently fails silently in the background)
-                    stderr.printf ("IOError while reading: %s\n", e.message);
+                    critical ("IOError while reading: %s\n", e.message);
                 }
             } while (line != null && !should_exit);
         } catch (GLib.Error e) {
-            stderr.printf ("Error while connecting: %s\n", e.message);
+            critical ("Error while connecting: %s\n", e.message);
             open_failed (e.message);
             return 0;
         }
@@ -101,32 +101,31 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         // See https://valadoc.org/gio-2.0/GLib.SocketClient.event.html for event definitions
         switch (event) {
             case SocketClientEvent.COMPLETE:
-                print ("SocketClientEvent.COMPLETE\n");
+                debug ("[SocketClientEvent] %s COMPLETE", connectable.to_string ());
                 break;
             case SocketClientEvent.CONNECTED:
-                print ("SocketClientEvent.CONNECTED\n");
+                debug ("[SocketClientEvent] %s CONNECTED", connectable.to_string ());
                 break;
             case SocketClientEvent.CONNECTING:
-                print ("SocketClientEvent.CONNECTING\n");
+                debug ("[SocketClientEvent] %s CONNECTING", connectable.to_string ());
                 break;
             case SocketClientEvent.PROXY_NEGOTIATED:
-                print ("SocketClientEvent.PROXY_NEGOTIATED\n");
+                debug ("[SocketClientEvent] %s PROXY_NEGOTIATED", connectable.to_string ());
                 break;
             case SocketClientEvent.PROXY_NEGOTIATING:
-                print ("SocketClientEvent.PROXY_NEGOTIATING\n");
+                debug ("[SocketClientEvent] %s PROXY_NEGOTIATING", connectable.to_string ());
                 break;
             case SocketClientEvent.RESOLVED:
-                print ("SocketClientEvent.RESOLVED\n");
+                debug ("[SocketClientEvent] %s RESOLVED", connectable.to_string ());
                 break;
             case SocketClientEvent.RESOLVING:
-                print ("SocketClientEvent.RESOLVING\n");
+                debug ("[SocketClientEvent] %s RESOLVING", connectable.to_string ());
                 break;
             case SocketClientEvent.TLS_HANDSHAKED:
-                print ("SocketClientEvent.TLS_HANDSHAKED\n");
+                debug ("[SocketClientEvent] %s TLS_HANDSHAKED", connectable.to_string ());
                 break;
             case SocketClientEvent.TLS_HANDSHAKING:
-                print ("SocketClientEvent.TLS_HANDSHAKING\n");
-                print (connectable.to_string () + "\n");
+                debug ("[SocketClientEvent] %s TLS_HANDSHAKING", connectable.to_string ());
                 ((TlsClientConnection) connection).accept_certificate.connect ((peer_cert, errors) => {
                     return on_invalid_certificate (peer_cert, errors, connectable);
                 });
@@ -157,23 +156,22 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 error_string += @"$(flag), ";
             }
         }
-        print (@"TLS certificate errors: $(error_string)\n");
+        warning (@"TLS certificate errors: $(error_string)");
 
         var cert_policy = Iridium.Application.settings.get_string ("certificate-validation-policy");
         switch (Iridium.Models.InvalidCertificatePolicy.get_value_by_short_name (cert_policy)) {
             case REJECT:
-                print ("Rejecting certificate per policy\n");
+                debug ("Rejecting certificate per policy");
                 open_failed (@"TLS certificate errors: $(error_string)\n");
                 return false;
             case WARN:
-                print ("Warning about certificate per policy\n");
-                print (errors.to_string () + "\n");
+                debug (@"Warning about certificate per policy: $(error_string)");
 
                 // First check if the user has already verified or rejected this certificate
                 var host = Iridium.Services.CertificateManager.parse_host (connectable);
                 var identity = Iridium.Application.certificate_manager.lookup_identity (peer_cert, host);
                 if (identity != null) {
-                    print ("Known server identity (accepted: " + identity.is_accepted.to_string () + ")\n");
+                    debug ("Known server identity (is accepted: %s)", identity.is_accepted.to_string ());
                     return identity.is_accepted;
                 }
 
@@ -189,7 +187,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
                 // TODO: Add visual indication of the security of the connection?
             case ALLOW:
-                print ("Allowing certificate per policy\n");
+                debug ("Allowing certificate per policy");
                 return true;
             default:
                 assert_not_reached ();
@@ -225,7 +223,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                     password = Iridium.Application.secret_manager.retrieve_secret (server, port, username);
                     if (password == null) {
                         // TODO: Handle this better!
-                        debug ("No password found for server: " + server);
+                        error ("No password found for server: " + server);
                     }
                 }
                 send_output (@"PASS $password");
@@ -235,20 +233,20 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
                 break;
             case Iridium.Models.AuthenticationMethod.NICKSERV_MSG:
-                print ("AuthenticationMethod is NICKSERV_MSG\n");
+                debug ("AuthenticationMethod is NICKSERV_MSG");
                 string password = null;
                 // Check if we're passed an auth token
                 if (connection_details.auth_token != null) {
-                    print ("NickServ password passed with request to open connection\n");
+                    debug ("NickServ password passed with request to open connection");
                     password = connection_details.auth_token;
                 } else {
-                    print ("Retrieving NickServ password from secret manager\n");
+                    debug ("Retrieving NickServ password from secret manager");
                     var server = connection_details.server;
                     var port = connection_details.port;
                     password = Iridium.Application.secret_manager.retrieve_secret (server, port, username);
                     if (password == null) {
                         // TODO: Handle this better!
-                        print ("No password found for server: " + server + ", port: " + port.to_string () + ", username: " + username + "\n");
+                        error ("No password found for server: " + server + ", port: " + port.to_string () + ", username: " + username + "\n");
                     }
                 }
                 send_output (@"NICK $nickname");
@@ -422,6 +420,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             }
         } catch (GLib.IOError e) {
             // TODO: Handle errors!
+            error ("Error while closing connection input stream: %s", e.message);
         }
 
         try {
@@ -435,6 +434,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             }
         } catch (GLib.Error e) {
             // TODO: Handle errors!
+            error ("Error while closing connection output stream: %s", e.message);
         }
 
         connection_closed ();
@@ -468,6 +468,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         try {
             output_stream.put_string (@"$output\r\n");
         } catch (GLib.IOError e) {
+            critical ("Error while sending output for server connection: %s", e.message);
             // TODO: Handle errors!!
         }
     }
