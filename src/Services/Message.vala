@@ -51,6 +51,7 @@ public class Iridium.Services.Message : GLib.Object {
         } catch (GLib.RegexError e) {
             // TODO: Handle errors!
             // This should never ever happen
+            error ("Error while constructing regex");
         }
     }
 
@@ -83,6 +84,7 @@ public class Iridium.Services.Message : GLib.Object {
             });
         } catch (GLib.RegexError e) {
             // TODO: Handle errors!
+            error ("Error while parsing message with regex");
         }
     }
 

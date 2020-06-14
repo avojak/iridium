@@ -156,7 +156,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 error_string += @"$(flag), ";
             }
         }
-        error (@"TLS certificate errors: $(error_string)");
+        warning (@"TLS certificate errors: $(error_string)");
 
         var cert_policy = Iridium.Application.settings.get_string ("certificate-validation-policy");
         switch (Iridium.Models.InvalidCertificatePolicy.get_value_by_short_name (cert_policy)) {
@@ -223,7 +223,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                     password = Iridium.Application.secret_manager.retrieve_secret (server, port, username);
                     if (password == null) {
                         // TODO: Handle this better!
-                        debug ("No password found for server: " + server);
+                        error ("No password found for server: " + server);
                     }
                 }
                 send_output (@"PASS $password");
@@ -233,20 +233,20 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
                 break;
             case Iridium.Models.AuthenticationMethod.NICKSERV_MSG:
-                print ("AuthenticationMethod is NICKSERV_MSG\n");
+                debug ("AuthenticationMethod is NICKSERV_MSG");
                 string password = null;
                 // Check if we're passed an auth token
                 if (connection_details.auth_token != null) {
-                    print ("NickServ password passed with request to open connection\n");
+                    debug ("NickServ password passed with request to open connection");
                     password = connection_details.auth_token;
                 } else {
-                    print ("Retrieving NickServ password from secret manager\n");
+                    debug ("Retrieving NickServ password from secret manager");
                     var server = connection_details.server;
                     var port = connection_details.port;
                     password = Iridium.Application.secret_manager.retrieve_secret (server, port, username);
                     if (password == null) {
                         // TODO: Handle this better!
-                        print ("No password found for server: " + server + ", port: " + port.to_string () + ", username: " + username + "\n");
+                        error ("No password found for server: " + server + ", port: " + port.to_string () + ", username: " + username + "\n");
                     }
                 }
                 send_output (@"NICK $nickname");
@@ -420,6 +420,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             }
         } catch (GLib.IOError e) {
             // TODO: Handle errors!
+            error ("Error while closing connection input stream: %s", e.message);
         }
 
         try {
@@ -433,6 +434,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             }
         } catch (GLib.Error e) {
             // TODO: Handle errors!
+            error ("Error while closing connection output stream: %s", e.message);
         }
 
         connection_closed ();
@@ -466,6 +468,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         try {
             output_stream.put_string (@"$output\r\n");
         } catch (GLib.IOError e) {
+            critical ("Error while sending output for server connection: %s", e.message);
             // TODO: Handle errors!!
         }
     }

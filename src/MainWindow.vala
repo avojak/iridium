@@ -247,7 +247,11 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             if (connection_details.auth_method == Iridium.Models.AuthenticationMethod.NONE) {
                 return;
             }
-            Iridium.Application.secret_manager.store_secret (connection_details.server, connection_details.port, connection_details.username, connection_details.auth_token);
+            try {
+                Iridium.Application.secret_manager.store_secret (connection_details.server, connection_details.port, connection_details.username, connection_details.auth_token);
+            } catch (GLib.Error e) {
+                error ("Error while storing secret: %s", e.message);
+            }
         });
 
         // When a server row is removed and the user is presented with the welcome view again, be sure the channel users button is hidden
@@ -664,7 +668,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             // Block until a selection is made
         }
         var is_accepted = (result == Gtk.ResponseType.OK);
-        print (remember_decision.to_string () + "\n");
         if (remember_decision) {
             var server_identity = new Iridium.Models.ServerIdentity ();
             server_identity.host = Iridium.Services.CertificateManager.parse_host (connectable);

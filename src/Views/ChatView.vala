@@ -251,7 +251,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         if (event.type == Gdk.EventType.BUTTON_RELEASE) {
             var username = get_selectable_text (iter);
             if (username == null) {
-                // TODO: Log this - it shouldn't happen
+                warning ("Encountered click of null username");
                 return false;
             }
             if (entry.text.length == 0) {
@@ -269,13 +269,13 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         if (event.type == Gdk.EventType.BUTTON_RELEASE) {
             var hyperlink = get_selectable_text (iter);
             if (hyperlink == null) {
-                // TODO: Log this - it shouldn't happen
+                warning ("Encountered click of null hyperlink");
                 return false;
             }
             try {
                 AppInfo.launch_default_for_uri (hyperlink, null);
             } catch (Error e) {
-                warning ("%s\n", e.message);
+                error ("Failed to launch default application for URI: %s", e.message);
             }
         }
         return false;

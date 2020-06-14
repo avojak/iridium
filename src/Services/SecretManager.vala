@@ -66,7 +66,11 @@ public class Iridium.Services.SecretManager : GLib.Object {
         dummy_attributes.insert ("server", "example.com");
         dummy_attributes.insert ("port", "6667");
         dummy_attributes.insert ("user", "dummy");
-        Secret.password_storev_sync (schema, dummy_attributes, null, dummy_label, "fake_not_real", null);
+        try {
+            Secret.password_storev_sync (schema, dummy_attributes, null, dummy_label, "fake_not_real", null);
+        } catch (GLib.Error e) {
+            error ("Error while storing dummy password: %s", e.message);
+        }
 
         var label = Constants.APP_ID + ":" + user + "@" + server + ":" + port.to_string ();
         var attributes = new GLib.HashTable<string, string> (str_hash, str_equal);
@@ -75,7 +79,12 @@ public class Iridium.Services.SecretManager : GLib.Object {
         attributes.insert ("port", port.to_string ());
         attributes.insert ("user", user);
         // We can do this synchronously because each connection is already handled in its own thread
-        string? secret = Secret.password_lookupv_sync (schema, attributes);
+        string? secret = null;
+        try {
+            secret = Secret.password_lookupv_sync (schema, attributes);
+        } catch (GLib.Error e) {
+            error ("Error while looking up password: %s", e.message);
+        }
         if (secret == null) {
             error ("Failed to load secret: %s", label);
         } else {
