@@ -33,18 +33,9 @@ An `install-dev-dependencies.sh` script is available to help developers get up a
 
 ## Building and Running
 
-To build:
-
 ```
 $ meson build --prefix=/usr
-$ cd build
-$ ninja
-```
-
-To run:
-
-```
-$ sudo ninja install
+$ sudo ninja -C build install
 $ com.github.avojak.iridium
 ```
 
@@ -54,9 +45,7 @@ You can also install a development build alongside a stable version by specifyin
 
 ```
 $ meson build --prefix=/usr -Dprofile=dev
-$ cd build
-$ ninja
-$ sudo ninja install
+$ sudo ninja -C build install
 $ com.github.avojak.iridium-dev
 ```
 
