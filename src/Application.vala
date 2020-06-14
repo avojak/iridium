@@ -38,6 +38,15 @@ public class Iridium.Application : Gtk.Application {
     }
 
     static construct {
+        Granite.Services.Logger.initialize (Constants.APP_ID);
+        if (Constants.APP_ID.has_suffix ("-dev")) {
+            Granite.Services.Logger.DisplayLevel = Granite.Services.LogLevel.DEBUG;
+        } else {
+            Granite.Services.Logger.DisplayLevel = Granite.Services.LogLevel.WARN;
+        }
+        info ("%s version: %s", Constants.APP_ID, Constants.VERSION);
+        info ("Kernel version: %s", Posix.utsname ().release);
+
         settings = new GLib.Settings (Constants.APP_ID);
         connection_handler = new Iridium.Services.ServerConnectionHandler ();
         connection_dao = new Iridium.Services.ServerConnectionDAO ();

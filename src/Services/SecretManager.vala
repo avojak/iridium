@@ -32,8 +32,12 @@ public class Iridium.Services.SecretManager : GLib.Object {
         "user", Secret.SchemaAttributeType.STRING
     );
 
+    static construct {
+        info ("Secret schema version: %s", SCHEMA_VERSION);
+    }
+
     public void store_secret (string server, int port, string user, string secret) throws GLib.Error {
-        print ("Storing secret for server: %s, port: %s, user: %s\n", server, port.to_string (), user);
+        debug ("Storing secret for server: %s, port: %s, user: %s", server, port.to_string (), user);
 
         var attributes = new GLib.HashTable<string, string> (str_hash, str_equal);
         attributes.insert ("version", SCHEMA_VERSION);
@@ -43,16 +47,16 @@ public class Iridium.Services.SecretManager : GLib.Object {
         var label = Constants.APP_ID + ":" + user + "@" + server + ":" + port.to_string ();
         Secret.password_storev.begin (schema, attributes, null, label, secret, null, (obj, async_res) => {
             if (Secret.password_store.end (async_res)) {
-                print ("Stored secret \"%s\"\n", label);
+                debug ("Stored secret: %s", label);
             } else {
                 // TODO: Handle this better
-                print ("Failed to store secret \"%s\"\n", label);
+                error ("Failed to store secret: %s", label);
             }
         });
     }
 
     public string? retrieve_secret (string server, int port, string user) {
-        print ("Retrieving password for server: %s, port: %s, user: %s\n", server, port.to_string (), user);
+        debug ("Retrieving password for server: %s, port: %s, user: %s", server, port.to_string (), user);
 
         // This is a dirty, dirty hack. Force authentication check by storing a dummy secret. Otherwise,
         // we get a null secret back and no prompt for authentication if needed.
@@ -73,7 +77,9 @@ public class Iridium.Services.SecretManager : GLib.Object {
         // We can do this synchronously because each connection is already handled in its own thread
         string? secret = Secret.password_lookupv_sync (schema, attributes);
         if (secret == null) {
-            print ("Failed to load secret: \"%s\"\n", label);
+            error ("Failed to load secret: %s", label);
+        } else {
+            debug ("Loaded secret for %s", label);
         }
         return secret;
     }

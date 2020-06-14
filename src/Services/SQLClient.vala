@@ -34,6 +34,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
     }
 
     private SQLClient () {
+        info ("Database file: %s", DATABASE_FILE);
         initialize_database ();
     }
 
@@ -45,15 +46,14 @@ public class Iridium.Services.SQLClient : GLib.Object {
                 config_dir_file.make_directory ();
             }
         } catch (GLib.Error e) {
-            // TODO: Log this, probably show an error message that we cannot proceed
-            print ("error creating config directory\n");
+            // TODO: Show an error message that we cannot proceed
+            critical ("error creating config directory\n");
             return;
         }
         var db_file = config_dir_path + "/" + DATABASE_FILE;
         if (Sqlite.Database.open_v2 (db_file, out database) != Sqlite.OK) {
-            // TODO: Log this and be consistent with other logging, also probably show error message
-            //       that we cannot proceed
-            stderr.printf ("Can't open database: %d: %s\n", database.errcode (), database.errmsg ());
+            // TODO: Show error message that we cannot proceed
+            critical ("Can't open database: %d: %s\n", database.errcode (), database.errmsg ());
             return;
         }
 
@@ -98,8 +98,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
 
         Sqlite.Statement statement;
         if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
-            // TODO: Log this
-            stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
+            log_database_error (database.errcode (), database.errmsg ());
             return;
         }
 
@@ -120,8 +119,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
         var sql = "SELECT * FROM servers WHERE hostname = $HOSTNAME;";
         Sqlite.Statement statement;
         if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
-            // TODO: Log this
-            stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
+            log_database_error (database.errcode (), database.errmsg ());
             return null;
         }
         statement.bind_text (1, server_name);
@@ -142,8 +140,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
         var sql = "UPDATE servers SET enabled = $ENABLED WHERE hostname = $HOSTNAME;";
         Sqlite.Statement statement;
         if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
-            // TODO: Log this
-            stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
+            log_database_error (database.errcode (), database.errmsg ());
             return;
         }
         statement.bind_int (1, bool_to_int (enabled));
@@ -157,8 +154,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
         var sql = "DELETE FROM servers WHERE hostname = $HOSTNAME;";
         Sqlite.Statement statement;
         if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
-            // TODO: Log this
-            stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
+            log_database_error (database.errcode (), database.errmsg ());
             return;
         }
         statement.bind_text (1, hostname);
@@ -171,8 +167,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
     //      var sql = "DELETE * FROM servers;";
     //      Sqlite.Statement statement;
     //      if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
-    //          // TODO: Log this
-    //          stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
+    //          log_database_error (database.errcode (), database.errmsg ());
     //          return;
     //      }
     //      statement.step ();
@@ -187,8 +182,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
 
         Sqlite.Statement statement;
         if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
-            // TODO: Log this
-            stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
+            log_database_error (database.errcode (), database.errmsg ());
             return;
         }
 
@@ -205,8 +199,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
         var sql = "SELECT * FROM channels WHERE server_id = $SERVER_ID AND channel = $CHANNEL;";
         Sqlite.Statement statement;
         if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
-            // TODO: Log this
-            stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
+            log_database_error (database.errcode (), database.errmsg ());
             return null;
         }
         statement.bind_int (1, server_id);
@@ -228,8 +221,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
         var sql = "UPDATE channels SET enabled = $ENABLED WHERE id = $ID;";
         Sqlite.Statement statement;
         if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
-            // TODO: Log this
-            stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
+            log_database_error (database.errcode (), database.errmsg ());
             return;
         }
         statement.bind_int (1, bool_to_int (enabled));
@@ -243,8 +235,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
         var sql = "DELETE FROM channels WHERE id = $ID;";
         Sqlite.Statement statement;
         if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
-            // TODO: Log this
-            stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
+            log_database_error (database.errcode (), database.errmsg ());
             return;
         }
         statement.bind_int (1, channel_id);
@@ -257,8 +248,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
         var sql = "DELETE FROM channels WHERE server_id = $SERVER_ID;";
         Sqlite.Statement statement;
         if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
-            // TODO: Log this
-            stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
+            log_database_error (database.errcode (), database.errmsg ());
             return;
         }
         statement.bind_int (1, server_id);
@@ -273,8 +263,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
         var sql = "SELECT * FROM servers;";
         Sqlite.Statement statement;
         if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
-            // TODO: Log this
-            stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
+            log_database_error (database.errcode (), database.errmsg ());
             return servers;
         }
 
@@ -293,8 +282,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
         var sql = "SELECT * FROM channels;";
         Sqlite.Statement statement;
         if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
-            // TODO: Log this
-            stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
+            log_database_error (database.errcode (), database.errmsg ());
             return channels;
         }
 
@@ -311,8 +299,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
         var sql = "UPDATE channels SET favorite = $FAVORITE WHERE id = $ID;";
         Sqlite.Statement statement;
         if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
-            // TODO: Log this
-            stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
+            log_database_error (database.errcode (), database.errmsg ());
             return;
         }
         statement.bind_int (1, bool_to_int (favorite));
@@ -404,8 +391,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
 
         Sqlite.Statement statement;
         if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
-            // TODO: Log this
-            stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
+            log_database_error (database.errcode (), database.errmsg ());
             return;
         }
 
@@ -421,8 +407,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
         var sql = "DELETE FROM server_identities WHERE host = $HOST;";
         Sqlite.Statement statement;
         if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
-            // TODO: Log this
-            stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
+            log_database_error (database.errcode (), database.errmsg ());
             return;
         }
         statement.bind_text (1, host);
@@ -437,8 +422,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
         var sql = "SELECT * FROM server_identities WHERE host = $HOST;";
         Sqlite.Statement statement;
         if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
-            // TODO: Log this
-            stderr.printf ("Error: %d: %s\n", database.errcode (), database.errmsg ());
+            log_database_error (database.errcode (), database.errmsg ());
             return identities;
         }
         statement.bind_text (1, host);
@@ -482,6 +466,10 @@ public class Iridium.Services.SQLClient : GLib.Object {
 
     private static bool int_to_bool (int val) {
         return val == 1;
+    }
+
+    private static void log_database_error (int errcode, string errmsg) {
+        error ("Database error: %d: %s", errcode, errmsg);
     }
 
 }

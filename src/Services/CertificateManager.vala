@@ -32,6 +32,7 @@ public class Iridium.Services.CertificateManager : GLib.Object {
         Gee.List<Iridium.Models.ServerIdentity> identities = sql_client.get_server_identities (host);
         foreach (var identity in identities) {
             if (identity.certificate_pem.chomp ().chug () == cert.certificate_pem.chomp ().chug ()) {
+                debug ("Identity of host %s is already known", host);
                 return identity;
             }
         }
