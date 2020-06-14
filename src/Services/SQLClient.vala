@@ -43,17 +43,18 @@ public class Iridium.Services.SQLClient : GLib.Object {
         var config_dir_file = GLib.File.new_for_path (config_dir_path);
         try {
             if (!config_dir_file.query_exists ()) {
+                debug ("Config directory does not exist - creating it now...");
                 config_dir_file.make_directory ();
             }
         } catch (GLib.Error e) {
             // TODO: Show an error message that we cannot proceed
-            critical ("error creating config directory\n");
+            critical ("error creating config directory");
             return;
         }
         var db_file = config_dir_path + "/" + DATABASE_FILE;
         if (Sqlite.Database.open_v2 (db_file, out database) != Sqlite.OK) {
             // TODO: Show error message that we cannot proceed
-            critical ("Can't open database: %d: %s\n", database.errcode (), database.errmsg ());
+            critical ("Can't open database: %d: %s", database.errcode (), database.errmsg ());
             return;
         }
 

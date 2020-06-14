@@ -42,7 +42,7 @@ public abstract class Iridium.Models.RichText : GLib.Object {
         } catch (GLib.RegexError e) {
             // TODO: Handle errors!
             // This should never ever happen
-            error ("Error while constructing URI regex");
+            error ("Error while constructing URI regex: %s", e.message);
         }
     }
 
