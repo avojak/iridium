@@ -35,6 +35,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     protected Gtk.TextView text_view;
 
     private Gtk.ScrolledWindow scrolled_window;
+    private Gtk.Button nickname_button;
     private Gtk.Entry entry;
 
     private Gdk.Cursor cursor_pointer;
@@ -73,13 +74,24 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         event_box.set_events (Gdk.EventMask.ENTER_NOTIFY_MASK);
         event_box.set_events (Gdk.EventMask.LEAVE_NOTIFY_MASK);
 
+        var entry_grid = new Gtk.Grid ();
+
+        nickname_button = new Gtk.Button.with_label ("nickname");
+        nickname_button.relief = Gtk.ReliefStyle.NONE;
+        nickname_button.clicked.connect (() => {
+            nickname_button_clicked ();
+        });
+
         entry = new Gtk.Entry ();
         entry.hexpand = true;
         entry.margin = 6;
         entry.secondary_icon_tooltip_text = _("Clear");
 
+        entry_grid.attach (nickname_button, 0, 0, 1, 1);
+        entry_grid.attach (entry, 1, 0, 1, 1);
+
         attach (event_box, 0, 0, 1, 1);
-        attach (entry, 0, 1, 1, 1);
+        attach (entry_grid, 0, 1, 1, 1);
 
         create_text_tags ();
 
@@ -233,6 +245,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     }
 
     public void set_enabled (bool enabled) {
+        nickname_button.sensitive = enabled;
         entry.set_can_focus (enabled);
         entry.set_editable (enabled);
         entry.set_text ("");
@@ -275,7 +288,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
             try {
                 AppInfo.launch_default_for_uri (hyperlink, null);
             } catch (Error e) {
-                error ("Failed to launch default application for URI: %s", e.message);
+                warning ("Failed to launch default application for URI: %s", e.message);
             }
         }
         return false;
@@ -300,9 +313,9 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     public abstract void display_server_msg (Iridium.Services.Message message);
 
     protected abstract int get_indent ();
-
     protected abstract string get_disabled_message ();
 
     public signal void message_to_send (string message);
+    public signal void nickname_button_clicked ();
 
 }

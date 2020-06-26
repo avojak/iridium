@@ -45,6 +45,7 @@ iridium_files = files(
     join_paths('Widgets', 'ChannelTopicEditDialog.vala'),
     join_paths('Widgets', 'HeaderBar.vala'),
     join_paths('Widgets', 'ManageConnectionsDialog.vala'),
+    join_paths('Widgets', 'NicknameEditDialog.vala'),
     join_paths('Widgets', 'NetworkInfoBar.vala'),
     join_paths('Widgets', 'PreferencesDialog.vala'),
     join_paths('Widgets', 'ServerConnectionDialog.vala'),

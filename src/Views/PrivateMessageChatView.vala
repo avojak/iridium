@@ -21,7 +21,15 @@
 
 public class Iridium.Views.PrivateMessageChatView : Iridium.Views.ChatView {
 
+    public string username { get; set; }
+
     private string last_sender = null;
+
+    public PrivateMessageChatView (string username) {
+        Object (
+            username: username
+        );
+    }
 
     protected override int get_indent () {
         return -140; // TODO: Figure out how to compute this

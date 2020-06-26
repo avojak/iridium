@@ -233,7 +233,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
 
         var private_message_item = new Iridium.Widgets.SidePanel.PrivateMessageRow (username, server_name);
         private_message_item.close_private_message.connect (() => {
-            remove_private_message (server_name, username);
+            remove_private_message (server_name, private_message_item.get_channel_name ());
         });
 
         server_item.add (private_message_item);
@@ -430,6 +430,18 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
                 var current_count = int.parse (channel_row.badge);
                 channel_row.badge = (current_count + 1).to_string ();
                 break;
+            }
+        }
+    }
+
+    public void update_nickname (string server_name, string old_nickname, string new_nickname) {
+        var server_item = server_items.get (server_name);
+        foreach (var child in server_item.children) {
+            if (child is Iridium.Widgets.SidePanel.PrivateMessageRow) {
+                unowned Iridium.Widgets.SidePanel.PrivateMessageRow private_message_item = (Iridium.Widgets.SidePanel.PrivateMessageRow) child;
+                if (private_message_item.username == old_nickname) {
+                    private_message_item.set_nickname (new_nickname);
+                }
             }
         }
     }

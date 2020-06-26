@@ -50,7 +50,7 @@ public class Iridium.Services.SecretManager : GLib.Object {
                 debug ("Stored secret: %s", label);
             } else {
                 // TODO: Handle this better
-                error ("Failed to store secret: %s", label);
+                warning ("Failed to store secret: %s", label);
             }
         });
     }
@@ -69,7 +69,7 @@ public class Iridium.Services.SecretManager : GLib.Object {
         try {
             Secret.password_storev_sync (schema, dummy_attributes, null, dummy_label, "fake_not_real", null);
         } catch (GLib.Error e) {
-            error ("Error while storing dummy password: %s", e.message);
+            warning ("Error while storing dummy password: %s", e.message);
         }
 
         var label = Constants.APP_ID + ":" + user + "@" + server + ":" + port.to_string ();
@@ -83,10 +83,10 @@ public class Iridium.Services.SecretManager : GLib.Object {
         try {
             secret = Secret.password_lookupv_sync (schema, attributes);
         } catch (GLib.Error e) {
-            error ("Error while looking up password: %s", e.message);
+            warning ("Error while looking up password: %s", e.message);
         }
         if (secret == null) {
-            error ("Failed to load secret: %s", label);
+            warning ("Failed to load secret: %s", label);
         } else {
             debug ("Loaded secret for %s", label);
         }

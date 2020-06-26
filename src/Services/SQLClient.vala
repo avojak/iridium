@@ -470,7 +470,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
     }
 
     private static void log_database_error (int errcode, string errmsg) {
-        error ("Database error: %d: %s", errcode, errmsg);
+        warning ("Database error: %d: %s", errcode, errmsg);
     }
 
 }

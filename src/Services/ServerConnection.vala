@@ -223,7 +223,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                     password = Iridium.Application.secret_manager.retrieve_secret (server, port, username);
                     if (password == null) {
                         // TODO: Handle this better!
-                        error ("No password found for server: " + server);
+                        warning ("No password found for server: " + server);
                     }
                 }
                 send_output (@"PASS $password");
@@ -246,7 +246,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                     password = Iridium.Application.secret_manager.retrieve_secret (server, port, username);
                     if (password == null) {
                         // TODO: Handle this better!
-                        error ("No password found for server: " + server + ", port: " + port.to_string () + ", username: " + username + "\n");
+                        warning ("No password found for server: " + server + ", port: " + port.to_string () + ", username: " + username + "\n");
                     }
                 }
                 send_output (@"NICK $nickname");
@@ -349,6 +349,15 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                     channel_message_received (message.params[0], message);
                 }
                 break;
+            case Iridium.Services.MessageCommands.NICK:
+                // If the username is our nickname, we've changed our nickname. Otherwise,
+                // another use has changed their nickname.
+                if (message.username == connection_details.nickname) {
+                    on_nickname_changed (message.message);
+                } else {
+                    on_user_changed_nickname (message.username, message.message);
+                }
+                break;
             case Iridium.Services.NumericCodes.RPL_NAMREPLY:
                 usernames_received (message.params[2], message.message.split (" "));
                 break;
@@ -420,7 +429,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             }
         } catch (GLib.IOError e) {
             // TODO: Handle errors!
-            error ("Error while closing connection input stream: %s", e.message);
+            warning ("Error while closing connection input stream: %s", e.message);
         }
 
         try {
@@ -434,7 +443,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             }
         } catch (GLib.Error e) {
             // TODO: Handle errors!
-            error ("Error while closing connection output stream: %s", e.message);
+            warning ("Error while closing connection output stream: %s", e.message);
         }
 
         connection_closed ();
@@ -471,6 +480,40 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             critical ("Error while sending output for server connection: %s", e.message);
             // TODO: Handle errors!!
         }
+    }
+
+    private void on_nickname_changed (string new_nickname) {
+        debug ("We've changed our nickname to %s", new_nickname);
+        // TODO: Implement
+
+        // Update connection details
+        string old_nickname = connection_details.nickname;
+        connection_details.nickname = new_nickname;
+
+        // Request new usernames for channels?
+
+        // Send signal
+        nickname_changed (old_nickname, new_nickname);
+    }
+
+    private void on_user_changed_nickname (string old_nickname, string new_nickname) {
+        debug ("User changed their nickname from %s to %s", old_nickname, new_nickname);
+        // TODO: Implement
+
+        // Update the data model for channel users
+        foreach (var entry in channel_users.entries) {
+            if (entry.value.index_of (old_nickname) != -1) {
+                channel_users.get (entry.key).remove (old_nickname);
+                channel_users.get (entry.key).add (new_nickname);
+            }
+        }
+
+        // Send signal
+        user_changed_nickname (old_nickname, new_nickname);
+    }
+
+    private void change_nickname (string new_nickname) {
+        send_output (Iridium.Services.MessageCommands.NICK + " " + new_nickname);
     }
 
     private void usernames_received (string channel_name, string[] usernames) {
@@ -562,5 +605,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     public signal void user_left_channel (string channel_name, string username);
     public signal void private_message_received (string username, Iridium.Services.Message message);
     public signal void insufficient_privs (string channel_name, Iridium.Services.Message message);
+    public signal void nickname_changed (string old_nickname, string new_nickname);
+    public signal void user_changed_nickname (string old_nickname, string new_nickname);
 
 }

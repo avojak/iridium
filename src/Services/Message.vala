@@ -84,7 +84,7 @@ public class Iridium.Services.Message : GLib.Object {
             });
         } catch (GLib.RegexError e) {
             // TODO: Handle errors!
-            error ("Error while parsing message with regex: %s", e.message);
+            warning ("Error while parsing message with regex: %s", e.message);
         }
     }
 

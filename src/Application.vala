@@ -85,7 +85,7 @@ public class Iridium.Application : Gtk.Application {
             }
         });
         network_monitor.network_changed.connect ((available) => {
-            warning ("Network availability changed: %b", available);
+            warning ("Network availability changed: %s", available.to_string ());
         });
 
         restore_state (main_window);

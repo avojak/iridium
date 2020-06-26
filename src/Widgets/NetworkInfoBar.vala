@@ -42,7 +42,7 @@ public class Iridium.Widgets.NetworkInfoBar : Gtk.InfoBar {
                 try {
                     AppInfo.launch_default_for_uri (SETTINGS_URI, null);
                 } catch (Error e) {
-                    error ("Failed to launch default application for URI: %s", e.message);
+                    warning ("Failed to launch default application for URI: %s", e.message);
                 }
             }
         });
