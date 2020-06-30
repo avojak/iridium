@@ -497,9 +497,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     }
 
     private void on_user_changed_nickname (string old_nickname, string new_nickname) {
-        debug ("User changed their nickname from %s to %s", old_nickname, new_nickname);
-        // TODO: Implement
-
         // Update the data model for channel users
         foreach (var entry in channel_users.entries) {
             if (entry.value.index_of (old_nickname) != -1) {
@@ -507,12 +504,10 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 channel_users.get (entry.key).add (new_nickname);
             }
         }
-
-        // Send signal
         user_changed_nickname (old_nickname, new_nickname);
     }
 
-    private void change_nickname (string new_nickname) {
+    public void set_nickname (string new_nickname) {
         send_output (Iridium.Services.MessageCommands.NICK + " " + new_nickname);
     }
 

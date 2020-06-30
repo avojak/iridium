@@ -21,6 +21,12 @@
 
 public class Iridium.Views.ServerChatView : Iridium.Views.ChatView {
 
+    public ServerChatView (string nickname) {
+        Object (
+            nickname: nickname
+        );
+    }
+
     protected override int get_indent () {
         return 0;
     }

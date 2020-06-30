@@ -24,6 +24,12 @@ public class Iridium.Views.ChannelChatView : Iridium.Views.ChatView {
     private Gee.List<string> usernames = new Gee.ArrayList<string> ();
     private string? last_sender = null;
 
+    public ChannelChatView (string nickname) {
+        Object (
+            nickname: nickname
+        );
+    }
+
     protected override int get_indent () {
         return -140; // TODO: Figure out how to compute this
     }

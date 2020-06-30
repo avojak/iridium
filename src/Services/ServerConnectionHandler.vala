@@ -166,6 +166,14 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         connection.set_channel_topic (channel_name, topic);
     }
 
+    public void set_nickname (string server_name, string new_nickname) {
+        var connection = open_connections.get (server_name);
+        if (connection == null) {
+            return;
+        }
+        connection.set_nickname (new_nickname);
+    }
+
     //
     // ServerConnection Callbacks
     //

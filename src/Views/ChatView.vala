@@ -32,6 +32,8 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     private static string COLOR_BLUEBERRY = "#64baff"; // "#3689e6"; // vala-lint=naming-convention
     //  private static string COLOR_GRAPE = "#a56de2"; // vala-lint=naming-convention
 
+    public string nickname { get; construct; }
+
     protected Gtk.TextView text_view;
 
     private Gtk.ScrolledWindow scrolled_window;
@@ -41,9 +43,10 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     private Gdk.Cursor cursor_pointer;
     private Gdk.Cursor cursor_text;
 
-    protected ChatView () {
+    protected ChatView (string nickname) {
         Object (
-            orientation: Gtk.Orientation.VERTICAL
+            orientation: Gtk.Orientation.VERTICAL,
+            nickname: nickname
         );
     }
 
@@ -76,7 +79,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
 
         var entry_grid = new Gtk.Grid ();
 
-        nickname_button = new Gtk.Button.with_label ("nickname");
+        nickname_button = new Gtk.Button.with_label (nickname);
         nickname_button.relief = Gtk.ReliefStyle.NONE;
         nickname_button.clicked.connect (() => {
             nickname_button_clicked ();

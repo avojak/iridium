@@ -422,7 +422,11 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     private Iridium.Views.ServerChatView create_and_add_server_chat_view (string server_name) {
-        var chat_view = new Iridium.Views.ServerChatView ();
+        var nickname = connection_handler.get_nickname (server_name);
+        if (nickname == null) {
+            warning ("No connection details found for server: %s", server_name);
+        }
+        var chat_view = new Iridium.Views.ServerChatView (nickname);
         main_layout.add_server_chat_view (chat_view, server_name);
         chat_view.message_to_send.connect ((message_to_send) => {
             send_server_message (server_name, message_to_send, chat_view);
@@ -434,7 +438,11 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     private Iridium.Views.ChannelChatView create_and_add_channel_chat_view (string server_name, string channel_name) {
-        var chat_view = new Iridium.Views.ChannelChatView ();
+        var nickname = connection_handler.get_nickname (server_name);
+        if (nickname == null) {
+            warning ("No connection details found for server: %s", server_name);
+        }
+        var chat_view = new Iridium.Views.ChannelChatView (nickname);
         main_layout.add_channel_chat_view (chat_view, server_name, channel_name);
         chat_view.message_to_send.connect ((user_message) => {
             send_channel_message (server_name, channel_name, user_message, chat_view);
@@ -443,7 +451,11 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     private Iridium.Views.PrivateMessageChatView create_and_add_private_message_chat_view (string server_name, string username) {
-        var chat_view = new Iridium.Views.PrivateMessageChatView (username);
+        var nickname = connection_handler.get_nickname (server_name);
+        if (nickname == null) {
+            warning ("No connection details found for server: %s", server_name);
+        }
+        var chat_view = new Iridium.Views.PrivateMessageChatView (nickname, username);
         main_layout.add_private_message_chat_view (chat_view, server_name, username);
         chat_view.message_to_send.connect ((user_message) => {
             send_channel_message (server_name, chat_view.username, user_message, chat_view);
@@ -538,10 +550,13 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         preferences_dialog.present ();
     }
 
-    private void show_nickname_edit_dialog (string current_nickname) {
+    private void show_nickname_edit_dialog (string server_name, string current_nickname) {
         if (nickname_edit_dialog == null) {
             nickname_edit_dialog = new Iridium.Widgets.NicknameEditDialog (this, current_nickname);
             nickname_edit_dialog.show_all ();
+            nickname_edit_dialog.submit_button_clicked.connect ((new_nickname) => {
+                connection_handler.set_nickname (server_name, new_nickname);
+            });
             nickname_edit_dialog.destroy.connect (() => {
                 nickname_edit_dialog = null;
             });
@@ -997,39 +1012,34 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     private void on_nickname_changed (string server_name, string old_nickname, string new_nickname) {
+        // TODO: Close dialog
+
         // TODO: Update database
 
         // TODO: Update chat views
     }
 
     private void on_user_changed_nickname (string server_name, string old_nickname, string new_nickname) {
-        // TODO: Update private message view
+        // Update private message view
         main_layout.rename_private_message_chat_view (server_name, old_nickname, new_nickname);
         var chat_view = main_layout.get_private_message_chat_view (server_name, new_nickname);
         if (chat_view != null) {
             chat_view.username = new_nickname;
         }
 
-        // TODO: Update private message side panel row
+        // Update private message side panel row
         side_panel.update_nickname (server_name, old_nickname, new_nickname);
 
-        // TODO: Update header for private message views
+        // Update header for private message views
         var selected_row = side_panel.get_selected_row ();
         if (selected_row != null && selected_row.get_server_name () == server_name && selected_row.get_channel_name () == new_nickname) {
             header_bar.update_title (new_nickname, server_name);
         }
 
-        // TODO: Update channel user lists
-        // Get channels on this server
-        // For each channel, check if the user was on that channel
-        // If so, update user list
+        // Update channel user lists
         Idle.add (() => {
             foreach (var channel_name in connection_handler.get_channels (server_name)) {
                 update_channel_users_list (server_name, channel_name);
-                //  if (connection_handler.get_users (server_name, channel_name).index_of (old_nickname) != -1) {
-                //      // TODO: This isn't working
-                //      update_channel_users_list (server_name, channel_name);
-                //  }
             }
             return false;
         });
@@ -1041,7 +1051,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     private void on_nickname_button_clicked (string server_name) {
         var connection_details = connection_handler.get_connection_details (server_name);
-        show_nickname_edit_dialog (connection_details.nickname);
+        show_nickname_edit_dialog (server_name, connection_details.nickname);
     }
 
 }

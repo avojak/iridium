@@ -112,7 +112,6 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
             return;
         }
         chat_view.show_all ();
-        //  var name = server_name + (channel_name == null ? "" : (";" + channel_name));
         main_stack.set_visible_child_full (get_child_name (server_name, channel_name), Gtk.StackTransitionType.SLIDE_RIGHT);
         // Set focus on the text entry
         Idle.add (() => {
@@ -137,10 +136,6 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
     }
 
     public void rename_private_message_chat_view (string server_name, string old_nickname, string new_nickname) {
-        //  var name = server_name + ";" + old_nickname;
-        //  unowned Iridium.Views.PrivateMessageChatView view = main_stack.get_child_by_name (name) as Iridium.Views.PrivateMessageChatView;
-        //  add_private_message_chat_view (view, server_name, new_nickname);
-        //  // TODO: How to remove named?
         if (!nickname_mapping.has_key (server_name)) {
             return;
         }
