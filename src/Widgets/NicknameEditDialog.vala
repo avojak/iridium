@@ -67,7 +67,7 @@ public class Iridium.Widgets.NicknameEditDialog : Gtk.Dialog {
         entry = new Gtk.Entry ();
         entry.hexpand = true;
         entry.text = current_nickname;
-        
+
         var form_grid = new Gtk.Grid ();
         form_grid.margin = 30;
         form_grid.row_spacing = 12;

@@ -120,7 +120,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
         });
     }
 
-    private Iridium.Views.ChatView? get_chat_view (string server_name, string? channel_name) {        
+    private Iridium.Views.ChatView? get_chat_view (string server_name, string? channel_name) {
         var child_name = get_child_name (server_name, channel_name);
         return (Iridium.Views.ChatView) main_stack.get_child_by_name (child_name);
     }
