@@ -32,7 +32,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     private static string COLOR_BLUEBERRY = "#64baff"; // "#3689e6"; // vala-lint=naming-convention
     //  private static string COLOR_GRAPE = "#a56de2"; // vala-lint=naming-convention
 
-    public string nickname { get; set; }
+    public string nickname { get; construct; }
 
     protected Gtk.TextView text_view;
 
