@@ -102,18 +102,11 @@ public class Iridium.Widgets.NicknameEditDialog : Gtk.Dialog {
             submit_button_clicked (get_new_nickname ());
         });
 
-        //  submit_button.sensitive = get_new_topic () != current_topic;
-        //  text_view.get_buffer ().changed.connect (() => {
-        //      var new_topic = get_new_topic ();
-        //      submit_button.sensitive = new_topic != current_topic;
-        //      if (new_topic.length == 0 && current_topic.length != 0) {
-        //          // Make sure current topic isn't empty - doesn't make sense to clear
-        //          // something that's already empty
-        //          submit_button.set_label (_("Clear topic"));
-        //      } else {
-        //          submit_button.set_label (_("Submit"));
-        //      }
-        //  });
+        submit_button.sensitive = get_new_nickname () != current_nickname;
+        entry.changed.connect (() => {
+            var new_nickname = get_new_nickname ();
+            submit_button.sensitive = (new_nickname != current_nickname) && new_nickname.length > 0;
+        });
 
         add_action_widget (cancel_button, 0);
         add_action_widget (submit_button, 1);

@@ -32,7 +32,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     private static string COLOR_BLUEBERRY = "#64baff"; // "#3689e6"; // vala-lint=naming-convention
     //  private static string COLOR_GRAPE = "#a56de2"; // vala-lint=naming-convention
 
-    public string nickname { get; set; }
+    public string nickname { get; construct; }
 
     protected Gtk.TextView text_view;
 
@@ -48,7 +48,6 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
             orientation: Gtk.Orientation.VERTICAL,
             nickname: nickname
         );
-        update_nickname (nickname);
     }
 
     construct {
@@ -314,7 +313,6 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     }
 
     public void update_nickname (string new_nickname) {
-        this.nickname = new_nickname;
         nickname_button.set_label (new_nickname);
     }
 

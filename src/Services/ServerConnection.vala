@@ -484,13 +484,12 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
     private void on_nickname_changed (string new_nickname) {
         debug ("We've changed our nickname to %s", new_nickname);
-        // TODO: Implement
+
+        // TODO: This has to account for prefix characters (e.g. @)
 
         // Update connection details
         string old_nickname = connection_details.nickname;
         connection_details.nickname = new_nickname;
-
-        // Request new usernames for channels?
 
         // Send signal
         nickname_changed (old_nickname, new_nickname);
