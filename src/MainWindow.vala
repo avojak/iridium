@@ -1012,11 +1012,31 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     private void on_nickname_changed (string server_name, string old_nickname, string new_nickname) {
-        // TODO: Close dialog
+        // Close dialog
+        Idle.add (() => {
+            if (nickname_edit_dialog != null) {
+                nickname_edit_dialog.dismiss ();
+            }
+            return false;
+        });
 
         // TODO: Update database
 
         // TODO: Update chat views
+        Idle.add (() => {
+            foreach (var chat_view in main_layout.get_chat_views ()) {
+                chat_view.update_nickname (new_nickname);
+            }
+            return false;
+        });
+
+        // Update channel user lists
+        Idle.add (() => {
+            foreach (var channel_name in connection_handler.get_channels (server_name)) {
+                update_channel_users_list (server_name, channel_name);
+            }
+            return false;
+        });
     }
 
     private void on_user_changed_nickname (string server_name, string old_nickname, string new_nickname) {

@@ -26,6 +26,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
     public unowned Iridium.Widgets.StatusBar status_bar { get; construct; }
 
     private Gee.Map<string, Gee.Map<string, string>> nickname_mapping;
+    private Gee.List<Iridium.Views.ChatView> chat_views;
 
     private Gtk.Stack main_stack;
 
@@ -53,6 +54,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
         pack2 (main_stack, true, false);
 
         nickname_mapping = new Gee.HashMap<string, Gee.Map<string, string>> ();
+        chat_views = new Gee.ArrayList<Iridium.Views.ChatView> ();
     }
 
     public void add_server_chat_view (Iridium.Views.ServerChatView view, string server_name) {
@@ -60,6 +62,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
             return;
         }
         main_stack.add_named (view, server_name);
+        chat_views.add (view);
     }
 
     public void add_channel_chat_view (Iridium.Views.ChatView view, string server_name, string channel_name) {
@@ -67,6 +70,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
             return;
         }
         main_stack.add_named (view, server_name + ";" + channel_name);
+        chat_views.add (view);
     }
 
     public void add_private_message_chat_view (Iridium.Views.PrivateMessageChatView view, string server_name, string username) {
@@ -79,6 +83,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
         var uuid = GLib.Uuid.string_random ();
         nickname_mapping.get (server_name).set (username, uuid);
         main_stack.add_named (view, uuid);
+        chat_views.add (view);
     }
 
     public void show_welcome_view () {
@@ -146,6 +151,10 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
         debug ("rename: found uuid %s for old nickname %s", uuid, old_nickname);
         nickname_mapping.get (server_name).set (new_nickname, uuid);
         nickname_mapping.get (server_name).unset (old_nickname);
+    }
+
+    public Gee.List<Iridium.Views.ChatView> get_chat_views () {
+        return chat_views;
     }
 
 }
