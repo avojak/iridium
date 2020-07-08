@@ -123,7 +123,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         }); */
 
         // This approach for detecting the mouse motion over a TextTag and changing the cursor
-        // was adapted from: 
+        // was adapted from:
         // https://www.kksou.com/php-gtk2/sample-codes/insert-links-in-GtkTextView-Part-4-Change-Cursor-over-Link.php
         text_view.motion_notify_event.connect ((event) => {
             int buffer_x;

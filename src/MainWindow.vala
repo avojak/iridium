@@ -447,6 +447,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         chat_view.message_to_send.connect ((user_message) => {
             send_channel_message (server_name, channel_name, user_message, chat_view);
         });
+        chat_view.nickname_button_clicked.connect (() => {
+            on_nickname_button_clicked (server_name);
+        });
         return chat_view;
     }
 
@@ -459,6 +462,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         main_layout.add_private_message_chat_view (chat_view, server_name, username);
         chat_view.message_to_send.connect ((user_message) => {
             send_channel_message (server_name, chat_view.username, user_message, chat_view);
+        });
+        chat_view.nickname_button_clicked.connect (() => {
+            on_nickname_button_clicked (server_name);
         });
         return chat_view;
     }
@@ -640,9 +646,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         //      network available: G_NETWORK_CONNECTIVITY_LOCAL
         //      network not available: G_NETWORK_CONNECTIVITY_LOCAL
         //      network available: G_NETWORK_CONNECTIVITY_FULL
-        // 
-        // This makes it rather difficult to reliably restore server connections. 
-        // Furthermore, if you lose a network connection then quickly regain it, you 
+        //
+        // This makes it rather difficult to reliably restore server connections.
+        // Furthermore, if you lose a network connection then quickly regain it, you
         // may not even need to reconnect to the IRC server.
         network_info_bar.revealed = false;
         // TODO: Enable server and channel buttons in header bar
@@ -958,7 +964,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     private void update_channel_users_list (string server_name, string channel_name) {
         var usernames = connection_handler.get_users (server_name, channel_name);
 
-        // Update the users for the channel chat view so it knows which usernames 
+        // Update the users for the channel chat view so it knows which usernames
         // to display in a different style. Do this regardless of whether the view
         // is currently selected and displayed.
         var channel_chat_view = main_layout.get_channel_chat_view (server_name, channel_name);
@@ -1022,7 +1028,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
         // TODO: Update database
 
-        // TODO: Update chat views
+        // Update chat views
         Idle.add (() => {
             foreach (var chat_view in main_layout.get_chat_views ()) {
                 chat_view.update_nickname (new_nickname);
