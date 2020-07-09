@@ -212,6 +212,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         connection_handler.channel_users_received.connect (on_channel_users_received);
         connection_handler.channel_topic_received.connect (on_channel_topic_received);
         connection_handler.nickname_in_use.connect (on_nickname_in_use);
+        connection_handler.erroneous_nickname.connect (on_erroneous_nickname);
         connection_handler.channel_joined.connect (on_channel_joined);
         connection_handler.channel_left.connect (on_channel_left);
         connection_handler.channel_message_received.connect (on_channel_message_received);
@@ -856,6 +857,22 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             chat_view.display_server_error_msg (message);
             // TODO: Prompt for new nickname?
         }
+    }
+
+    private void on_erroneous_nickname (string server_name, string current_nickname, string requested_nickname) {
+        // TODO: Implement
+        var error_message = requested_nickname + _(" is not a valid nickname.");
+        Idle.add (() => {
+            if (connection_dialog != null) {
+                connection_dialog.display_error (error_message);
+                return false;
+            }
+            if (nickname_edit_dialog != null) {
+                nickname_edit_dialog.display_error (error_message);
+                return false;
+            }
+            return false;
+        });
     }
 
     private void on_channel_joined (string server_name, string channel_name) {

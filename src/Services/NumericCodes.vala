@@ -98,7 +98,7 @@ public class Iridium.Services.NumericCodes {
     public const string ERR_TOOMANYCHANNELS = "405";
     public const string ERR_UNKNOWNCOMMAND = "421";
     public const string ERR_NOMOTD = "422";
-    public const string ERR_ERRONEUSNICKNAME = "432";
+    public const string ERR_ERRONEOUSNICKNAME = "432";
     public const string ERR_NICKNAMEINUSE = "433";
     public const string ERR_USERNOTINCHANNEL = "441";
     public const string ERR_NOTONCHANNEL = "442";
