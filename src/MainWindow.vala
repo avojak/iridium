@@ -221,6 +221,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         connection_handler.private_message_received.connect (on_private_message_received);
         connection_handler.insufficient_privs_received.connect (on_insufficient_privs_received);
         connection_handler.nickname_changed.connect (on_nickname_changed);
+        connection_handler.nickname_changed.connect (Iridium.Application.connection_dao.on_nickname_changed);
         connection_handler.user_changed_nickname.connect (on_user_changed_nickname);
 
         // Connect to all of the side panel signals to make settings changes
@@ -1042,8 +1043,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             }
             return false;
         });
-
-        // TODO: Update database
 
         // Update chat views
         Idle.add (() => {

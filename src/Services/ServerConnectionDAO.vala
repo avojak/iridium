@@ -109,11 +109,11 @@ public class Iridium.Services.ServerConnectionDAO : GLib.Object {
     }
 
     public void on_channel_row_enabled (string server_name, string channel_name) {
-            set_channel_row_enabled (server_name, channel_name, true);
+        set_channel_row_enabled (server_name, channel_name, true);
     }
 
     public void on_channel_row_disabled (string server_name, string channel_name) {
-            set_channel_row_enabled (server_name, channel_name, false);
+        set_channel_row_enabled (server_name, channel_name, false);
     }
 
     private void set_channel_row_enabled (string server_name, string channel_name, bool enabled) {
@@ -131,11 +131,11 @@ public class Iridium.Services.ServerConnectionDAO : GLib.Object {
     }
 
     public void on_channel_favorite_added (string server_name, string channel_name) {
-            set_channel_favorite (server_name, channel_name, true);
+        set_channel_favorite (server_name, channel_name, true);
     }
 
     public void on_channel_favorite_removed (string server_name, string channel_name) {
-            set_channel_favorite (server_name, channel_name, false);
+        set_channel_favorite (server_name, channel_name, false);
     }
 
     private void set_channel_favorite (string server_name, string channel_name, bool favorite) {
@@ -177,6 +177,17 @@ public class Iridium.Services.ServerConnectionDAO : GLib.Object {
     public Gee.List<Iridium.Services.Channel> get_channels () {
         lock (sql_client) {
             return sql_client.get_channels ();
+        }
+    }
+
+    public void on_nickname_changed (string server_name, string old_nickname, string new_nickname) {
+        lock (sql_client) {
+            Iridium.Services.Server? server = sql_client.get_server (server_name);
+            if (server == null) {
+                return;
+            }
+            server.connection_details.nickname = new_nickname;
+            sql_client.update_server (server);
         }
     }
 

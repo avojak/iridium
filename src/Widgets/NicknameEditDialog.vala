@@ -50,7 +50,7 @@ public class Iridium.Widgets.NicknameEditDialog : Gtk.Dialog {
         header_grid.margin_bottom = 10;
         header_grid.column_spacing = 10;
 
-        var header_image = new Gtk.Image.from_icon_name ("avatar-default", Gtk.IconSize.DIALOG);
+        var header_image = new Gtk.Image.from_icon_name ("edit", Gtk.IconSize.DIALOG);
 
         var header_title = new Gtk.Label (_("Edit Nickname"));
         header_title.get_style_context ().add_class (Granite.STYLE_CLASS_H2_LABEL);

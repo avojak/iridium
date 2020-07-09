@@ -134,7 +134,30 @@ public class Iridium.Services.SQLClient : GLib.Object {
     }
 
     public void update_server (Iridium.Services.Server server) {
-        // TODO: Implement
+        var sql = """
+            UPDATE servers
+            SET hostname = $HOSTNAME, port = $PORT, nickname = $NICKNAME, username = $USERNAME, realname = $REALNAME,
+                auth_method = $AUTH_METHOD, tls = $TLS, enabled = $ENABLED
+            WHERE id = $ID;
+            """;
+
+        Sqlite.Statement statement;
+        if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
+            log_database_error (database.errcode (), database.errmsg ());
+            return;
+        }
+        statement.bind_text (1, server.connection_details.server);
+        statement.bind_int (2, server.connection_details.port);
+        statement.bind_text (3, server.connection_details.nickname);
+        statement.bind_text (4, server.connection_details.username);
+        statement.bind_text (5, server.connection_details.realname);
+        statement.bind_text (6, server.connection_details.auth_method.to_string ());
+        statement.bind_int (7, bool_to_int (server.connection_details.tls));
+        statement.bind_int (8, bool_to_int (server.enabled));
+        statement.bind_int (9, server.id);
+
+        statement.step ();
+        statement.reset ();
     }
 
     public void set_server_enabled (string hostname, bool enabled) {
