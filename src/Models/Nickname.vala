@@ -21,7 +21,7 @@
 
 public class Iridium.Models.Nickname : GLib.Object {
 
-    private static string[] NICKNAME_PREFIXES = {
+    private const string[] NICKNAME_PREFIXES = {
         "@", // Full operator
         "%", // Half operator
         "~", // Owners

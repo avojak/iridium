@@ -378,12 +378,14 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 break;
             case Iridium.Services.MessageCommands.MODE:
                 // TODO: Implement
-                print ("prefix: " + message.prefix + "\n");
-                print ("username: " + message.username + "\n");
-                print ("message: " + message.message + "\n");
-                print ("params[0]: " + message.params[0] + "\n");
-                print ("params[1]: " + message.params[1] + "\n");
-                print ("params[2]: " + message.params[2] + "\n");
+                //  print ("prefix: " + message.prefix + "\n");
+                //  print ("username: " + message.username + "\n");
+                //  print ("message: " + message.message + "\n");
+                //  print ("params[0]: " + message.params[0] + "\n");
+                //  print ("params[1]: " + message.params[1] + "\n");
+                //  print ("params[2]: " + message.params[2] + "\n");
+                // TODO: This may affect the username displayed in the channel
+                // user list
                 break;
 
             // Errors
