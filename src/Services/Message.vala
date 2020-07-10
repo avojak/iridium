@@ -25,10 +25,10 @@
  */
 public class Iridium.Services.Message : GLib.Object {
 
-    private static string REGEX_STR = """^(:(?<prefix>\S+) )?(?<command>\S+)( (?!:)(?<params>.+?))?( :(?<trail>.+))?$"""; // vala-lint=naming-convention
-    private static string ESCAPE_EXCEPT_CHARS = "\b\f\n\r\t\'"; // vala-lint=naming-convention
-    private static string NON_PRINT_REGEX_STR = """[\x01]"""; // vala-lint=naming-convention
-    private static string[] USER_COMMANDS = { // vala-lint=naming-convention
+    private const string REGEX_STR = """^(:(?<prefix>\S+) )?(?<command>\S+)( (?!:)(?<params>.+?))?( :(?<trail>.+))?$""";
+    private const string ESCAPE_EXCEPT_CHARS = "\b\f\n\r\t\'";
+    private const string NON_PRINT_REGEX_STR = """[\x01]""";
+    private const string[] USER_COMMANDS = {
         Iridium.Services.MessageCommands.PRIVMSG,
         Iridium.Services.MessageCommands.JOIN,
         Iridium.Services.MessageCommands.NICK,
@@ -84,7 +84,7 @@ public class Iridium.Services.Message : GLib.Object {
             });
         } catch (GLib.RegexError e) {
             // TODO: Handle errors!
-            error ("Error while parsing message with regex: %s", e.message);
+            warning ("Error while parsing message with regex: %s", e.message);
         }
     }
 

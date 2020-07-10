@@ -25,6 +25,9 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
     public unowned Iridium.Widgets.SidePanel.Panel side_panel { get; construct; }
     public unowned Iridium.Widgets.StatusBar status_bar { get; construct; }
 
+    private Gee.Map<string, Gee.Map<string, string>> nickname_mapping;
+    private Gee.List<Iridium.Views.ChatView> chat_views;
+
     private Gtk.Stack main_stack;
 
     public MainLayout (Iridium.Views.Welcome welcome_view, Iridium.Widgets.SidePanel.Panel side_panel, Iridium.Widgets.StatusBar status_bar) {
@@ -49,6 +52,9 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
 
         pack1 (side_grid, false, false);
         pack2 (main_stack, true, false);
+
+        nickname_mapping = new Gee.HashMap<string, Gee.Map<string, string>> ();
+        chat_views = new Gee.ArrayList<Iridium.Views.ChatView> ();
     }
 
     public void add_server_chat_view (Iridium.Views.ServerChatView view, string server_name) {
@@ -56,6 +62,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
             return;
         }
         main_stack.add_named (view, server_name);
+        chat_views.add (view);
     }
 
     public void add_channel_chat_view (Iridium.Views.ChatView view, string server_name, string channel_name) {
@@ -63,13 +70,20 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
             return;
         }
         main_stack.add_named (view, server_name + ";" + channel_name);
+        chat_views.add (view);
     }
 
     public void add_private_message_chat_view (Iridium.Views.PrivateMessageChatView view, string server_name, string username) {
         if (get_private_message_chat_view (server_name, username) != null) {
             return;
         }
-        main_stack.add_named (view, server_name + ";" + username);
+        if (!nickname_mapping.has_key (server_name)) {
+            nickname_mapping.set (server_name, new Gee.HashMap<string, string> ());
+        }
+        var uuid = GLib.Uuid.string_random ();
+        nickname_mapping.get (server_name).set (username, uuid);
+        main_stack.add_named (view, uuid);
+        chat_views.add (view);
     }
 
     public void show_welcome_view () {
@@ -87,8 +101,14 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
     }
 
     public Iridium.Views.PrivateMessageChatView? get_private_message_chat_view (string server_name, string username) {
-        var name = server_name + ";" + username;
-        return main_stack.get_child_by_name (name) as Iridium.Views.PrivateMessageChatView;
+        if (!nickname_mapping.has_key (server_name)) {
+            return null;
+        }
+        if (!nickname_mapping.get (server_name).has_key (username)) {
+            return null;
+        }
+        var uuid = nickname_mapping.get (server_name).get (username);
+        return main_stack.get_child_by_name (uuid) as Iridium.Views.PrivateMessageChatView;
     }
 
     public void show_chat_view (string server_name, string? channel_name) {
@@ -97,8 +117,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
             return;
         }
         chat_view.show_all ();
-        var name = server_name + (channel_name == null ? "" : (";" + channel_name));
-        main_stack.set_visible_child_full (name, Gtk.StackTransitionType.SLIDE_RIGHT);
+        main_stack.set_visible_child_full (get_child_name (server_name, channel_name), Gtk.StackTransitionType.SLIDE_RIGHT);
         // Set focus on the text entry
         Idle.add (() => {
             chat_view.set_entry_focus ();
@@ -107,9 +126,35 @@ public class Iridium.Layouts.MainLayout : Gtk.Paned {
     }
 
     private Iridium.Views.ChatView? get_chat_view (string server_name, string? channel_name) {
-        var name = server_name + (channel_name == null ? "" : (";" + channel_name));
-        var view = main_stack.get_child_by_name (name);
-        return (Iridium.Views.ChatView) view;
+        var child_name = get_child_name (server_name, channel_name);
+        return (Iridium.Views.ChatView) main_stack.get_child_by_name (child_name);
+    }
+
+    private string get_child_name (string server_name, string? channel_name) {
+        if (channel_name == null) {
+            return server_name;
+        } else if (channel_name.has_prefix ("#")) {
+            return server_name + ";" + channel_name;
+        } else {
+            return nickname_mapping.get (server_name).get (channel_name);
+        }
+    }
+
+    public void rename_private_message_chat_view (string server_name, string old_nickname, string new_nickname) {
+        if (!nickname_mapping.has_key (server_name)) {
+            return;
+        }
+        if (!nickname_mapping.get (server_name).has_key (old_nickname)) {
+            return;
+        }
+        var uuid = nickname_mapping.get (server_name).get (old_nickname);
+        debug ("rename: found uuid %s for old nickname %s", uuid, old_nickname);
+        nickname_mapping.get (server_name).set (new_nickname, uuid);
+        nickname_mapping.get (server_name).unset (old_nickname);
+    }
+
+    public Gee.List<Iridium.Views.ChatView> get_chat_views () {
+        return chat_views;
     }
 
 }

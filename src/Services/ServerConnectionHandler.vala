@@ -45,6 +45,7 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         server_connection.channel_users_received.connect (on_channel_users_received);
         server_connection.channel_topic_received.connect (on_channel_topic_received);
         server_connection.nickname_in_use.connect (on_nickname_in_use);
+        server_connection.erroneous_nickname.connect (on_erroneous_nickname);
         server_connection.channel_joined.connect (on_channel_joined);
         server_connection.channel_left.connect (on_channel_left);
         server_connection.channel_message_received.connect (on_channel_message_received);
@@ -52,6 +53,8 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         server_connection.user_left_channel.connect (on_user_left_channel);
         server_connection.private_message_received.connect (on_private_message_received);
         server_connection.insufficient_privs.connect (on_insufficient_privs_received);
+        server_connection.nickname_changed.connect (on_nickname_changed);
+        server_connection.user_changed_nickname.connect (on_user_changed_nickname);
 
         //  server_connection.open_successful.connect (() => {
             open_connections.set (server, server_connection);
@@ -164,6 +167,14 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         connection.set_channel_topic (channel_name, topic);
     }
 
+    public void set_nickname (string server_name, string new_nickname) {
+        var connection = open_connections.get (server_name);
+        if (connection == null) {
+            return;
+        }
+        connection.set_nickname (new_nickname);
+    }
+
     //
     // ServerConnection Callbacks
     //
@@ -212,6 +223,10 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         nickname_in_use (source.connection_details.server, message);
     }
 
+    private void on_erroneous_nickname (Iridium.Services.ServerConnection source, string current_nickname, string requested_nickname) {
+        erroneous_nickname (source.connection_details.server, current_nickname, requested_nickname);
+    }
+
     private void on_channel_joined (Iridium.Services.ServerConnection source, string channel_name) {
         channel_joined (source.connection_details.server, channel_name);
     }
@@ -240,6 +255,14 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         insufficient_privs_received (source.connection_details.server, channel_name, message);
     }
 
+    private void on_nickname_changed (Iridium.Services.ServerConnection source, string old_nickname, string new_nickname) {
+        nickname_changed (source.connection_details.server, old_nickname, new_nickname);
+    }
+
+    private void on_user_changed_nickname (Iridium.Services.ServerConnection source, string old_nickname, string new_nickname) {
+        user_changed_nickname (source.connection_details.server, old_nickname, new_nickname);
+    }
+
     //
     // Signals
     //
@@ -255,6 +278,7 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
     public signal void channel_users_received (string server_name, string channel_name);
     public signal void channel_topic_received (string server_name, string channel_name);
     public signal void nickname_in_use (string server_name, Iridium.Services.Message message);
+    public signal void erroneous_nickname (string server_name, string current_nickname, string requested_nickname);
     public signal void channel_joined (string server_name, string channel_name);
     public signal void channel_left (string server_name, string channel_name);
     public signal void channel_message_received (string server_name, string channel_name, Iridium.Services.Message message);
@@ -262,5 +286,7 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
     public signal void user_left_channel (string server_name, string channel_name, string username);
     public signal void private_message_received (string server_name, string username, Iridium.Services.Message message);
     public signal void insufficient_privs_received (string server_name, string channel_name, Iridium.Services.Message message);
+    public signal void nickname_changed (string server_name, string old_nickname, string new_nickname);
+    public signal void user_changed_nickname (string server_name, string old_nickname, string new_nickname);
 
 }

@@ -21,7 +21,7 @@
 
 public class Iridium.Widgets.SidePanel.PrivateMessageRow : Granite.Widgets.SourceList.ExpandableItem, Iridium.Widgets.SidePanel.Row {
 
-    public string username { get; construct; }
+    public string username { get; set; }
     public string server_name { get; construct; }
 
     private bool is_enabled = true;
@@ -92,6 +92,11 @@ public class Iridium.Widgets.SidePanel.PrivateMessageRow : Granite.Widgets.Sourc
         menu.show_all ();
 
         return menu;
+    }
+
+    public void set_nickname (string nickname) {
+        this.name = nickname;
+        this.username = nickname;
     }
 
     public signal void close_private_message ();
