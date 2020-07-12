@@ -35,6 +35,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
 
     // TODO: May need to use this list as the source of truth once items start moving around for favorites
     private Gee.Map<string, Gee.List<Iridium.Widgets.SidePanel.ChannelRow>> channel_items;
+    private Gee.Map<string, Gee.List<Iridium.Widgets.SidePanel.PrivateMessageRow>> private_message_items;
 
     public Panel () {
         // TODO: Refactor these ExpandableItems to be a subclass that implements the sortable interface
@@ -74,6 +75,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
 
         server_items = new Gee.HashMap<string, Granite.Widgets.SourceList.ExpandableItem> ();
         channel_items = new Gee.HashMap<string, Gee.List<Iridium.Widgets.SidePanel.ChannelRow>> ();
+        private_message_items = new Gee.HashMap<string, Gee.List<Iridium.Widgets.SidePanel.PrivateMessageRow>> ();
 
         // Reset the badge when an item is selected
         item_selected.connect ((item) => {
@@ -102,6 +104,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         });
         server_items.set (server_name, server_item);
         channel_items.set (server_name, new Gee.ArrayList<Iridium.Widgets.SidePanel.ChannelRow> ());
+        private_message_items.set (server_name, new Gee.ArrayList<Iridium.Widgets.SidePanel.PrivateMessageRow> ());
         servers_category.add (server_item);
 
         /* selected = server_item; */
@@ -238,11 +241,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
 
         server_item.add (private_message_item);
         server_item.expanded = true;
-
-        // TODO: Automatically showing a PM when it's received was kinda annoying, 
-        //       but maybe not to everyone will feel that way. Maybe instead show
-        //       some indication/styling in the side panel to show that the PM is new?
-        //  selected = private_message_item;
+        private_message_items.get (server_name).add (private_message_item);
     }
 
     private void remove_private_message (string server_name, string username) {
@@ -429,9 +428,21 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
                 }
                 var current_count = int.parse (channel_row.badge);
                 channel_row.badge = (current_count + 1).to_string ();
-                break;
+                return;
             }
         }
+        foreach (var private_message_row in private_message_items.get (server_name)) {
+            if (private_message_row.get_channel_name () == channel_name) {
+                // Don't increment if the item is currently selected
+                if (selected == private_message_row) {
+                    return;
+                }
+                var current_count = int.parse (private_message_row.badge);
+                private_message_row.badge = (current_count + 1).to_string ();
+                return;
+            }
+        }
+        warning ("No row found for server %s and channel/user %s", server_name, channel_name);
     }
 
     public void update_nickname (string server_name, string old_nickname, string new_nickname) {
