@@ -457,6 +457,13 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         }
     }
 
+    public void update_network_name (string server_name, string network_name) {
+        // Update the server item
+        ((Iridium.Widgets.SidePanel.ServerRow) server_items.get (server_name)).update_network_name (network_name);
+
+        // Update the channel items
+    }
+
     public signal void join_channel_for_server (string server_name);
     public signal void join_channel (string server_name, string channel_name);
     public signal void leave_channel (string server_name, string channel_name);
