@@ -23,6 +23,7 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
 
     public string channel_name { get; construct; }
     public string server_name { get; construct; }
+    public string? network_name { get; set; }
 
     private bool is_enabled = true;
     private bool is_favorite = false;
@@ -55,12 +56,8 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
         //  icon = new GLib.ThemedIcon ("user-available");
         icon = new GLib.ThemedIcon ("internet-chat");
         //  icon = null;
-        if (is_favorite) {
-            markup = channel_name + " <small>" + server_name + "</small>";
-        } else {
-            markup = null;
-        }
-        is_enabled = true;
+        this.is_enabled = true;
+        update_markup ();
     }
 
     public new void disable () {
@@ -86,12 +83,8 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
         // Maybe add the symbolic chat and user icons so we can specifically use them when not loading?
         // Could also create "disabled" versions of each that are greyed out slightly
         icon = new GLib.ThemedIcon (Constants.APP_ID + ".image-loading-symbolic");
-        if (is_favorite) {
-            markup = "<i>" + channel_name + " <small>" + server_name + "</small></i>";
-        } else {
-            markup = "<i>" + channel_name + "</i>";
-        }
-        is_enabled = false;
+        this.is_enabled = false;
+        update_markup ();
     }
 
     public new bool get_enabled () {
@@ -100,19 +93,7 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
 
     public void set_favorite (bool favorite) {
         is_favorite = favorite;
-        if (favorite) {
-            if (is_enabled) {
-                markup = channel_name + " <small>" + server_name + "</small>";
-            } else {
-                markup = "<i>" + channel_name + " <small>" + server_name + "</small></i>";
-            }
-        } else {
-            if (is_enabled) {
-                markup = null;
-            } else {
-                markup = "<i>" + channel_name + "</i>";
-            }
-        }
+        update_markup ();
     }
 
     public override Gtk.Menu? get_context_menu () {
@@ -171,6 +152,28 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
         menu.show_all ();
 
         return menu;
+    }
+
+    public void update_network_name (string network_name) {
+        this.network_name = network_name;
+        update_markup ();
+    }
+
+    private void update_markup () {
+        if (is_favorite) {
+            var server_text = network_name == null ? server_name : network_name;
+            if (is_enabled) {
+                markup = channel_name + " <small>" + server_text + "</small>";
+            } else {
+                markup = "<i>" + channel_name + " <small>" + server_text + "</small></i>";
+            }
+        } else {
+            if (is_enabled) {
+                markup = null;
+            } else {
+                markup = "<i>" + channel_name + "</i>";
+            }
+        }
     }
 
     public signal void edit_topic ();

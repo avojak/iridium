@@ -1100,7 +1100,10 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     private void on_network_name_received (string server_name, string network_name) {
         // Update side panel
-        side_panel.update_network_name (server_name, network_name);
+        Idle.add (() => {
+            side_panel.update_network_name (server_name, network_name);
+            return false;
+        });
 
         // Update the header
         var selected_row = side_panel.get_selected_row ();
