@@ -114,11 +114,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             } else {
                 header_bar.update_title (channel_name, server_name);
             }
-            //  if (channel_name != null) {
-            //      header_bar.update_title (channel_name, server_name);
-            //  } else {
-            //      header_bar.update_title (server_name, null);
-            //  }
 
             // Show or hide the channel users and topic buttons in the header
             if (item is Iridium.Widgets.SidePanel.ChannelRow) {
