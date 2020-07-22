@@ -25,7 +25,7 @@ public class Iridium.Models.ServerSupports : GLib.Object {
     // so we must be careful to not expect any of these values to exist.
 
     public string? network { get; set; }
-    
+
     public void append_all (string[] parameters) {
         foreach (var parameter in parameters) {
             append (parameter);

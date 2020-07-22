@@ -299,6 +299,8 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             case Iridium.Services.NumericCodes.RPL_ISUPPORT:
                 // Skip the first param because it's our nickname
                 for (int i = 1; i < message.params.length; i++) {
+                    // Append the new parameter to our model and then check for any
+                    // signals that need to be sent
                     switch (server_supports.append (message.params[i])) {
                         case Iridium.Models.ServerSupportsParameters.NETWORK:
                             network_name_received (server_supports.network);
