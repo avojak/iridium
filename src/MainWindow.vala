@@ -104,10 +104,15 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             main_layout.show_chat_view (server_name, channel_name);
 
             // Update the header bar title
-            if (channel_name != null) {
-                header_bar.update_title (channel_name, server_name);
+            if (row is Iridium.Widgets.SidePanel.ServerRow) {
+                string? network_name = ((Iridium.Widgets.SidePanel.ServerRow) row).network_name;
+                if (network_name != null) {
+                    header_bar.update_title (network_name, null);
+                } else {
+                    header_bar.update_title (server_name, null);
+                }
             } else {
-                header_bar.update_title (server_name, null);
+                header_bar.update_title (channel_name, server_name);
             }
 
             // Show or hide the channel users and topic buttons in the header
@@ -223,6 +228,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         connection_handler.nickname_changed.connect (on_nickname_changed);
         connection_handler.nickname_changed.connect (Iridium.Application.connection_dao.on_nickname_changed);
         connection_handler.user_changed_nickname.connect (on_user_changed_nickname);
+        connection_handler.network_name_received.connect (on_network_name_received);
 
         // Connect to all of the side panel signals to make settings changes
         // TODO: Should these connect to the connection handler signals rather than the side panel...?
@@ -1085,6 +1091,20 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             }
             return false;
         });
+    }
+
+    private void on_network_name_received (string server_name, string network_name) {
+        // Update side panel
+        Idle.add (() => {
+            side_panel.update_network_name (server_name, network_name);
+            return false;
+        });
+
+        // Update the header
+        var selected_row = side_panel.get_selected_row ();
+        if (selected_row != null && selected_row.get_server_name () == server_name) {
+            header_bar.update_title (network_name, null);
+        }
     }
 
     //

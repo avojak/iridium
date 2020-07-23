@@ -34,6 +34,8 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
     private Gee.Map<string, string> channel_topics = new Gee.HashMap<string, string> ();
 
+    private Iridium.Models.ServerSupports server_supports = new Iridium.Models.ServerSupports ();
+
     public ServerConnection (Iridium.Services.ServerConnectionDetails connection_details) {
         Object (
             connection_details: connection_details
@@ -293,6 +295,20 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             case Iridium.Services.NumericCodes.RPL_WELCOME:
                 is_registered = true;
                 open_successful (message);
+                break;
+            case Iridium.Services.NumericCodes.RPL_ISUPPORT:
+                // Skip the first param because it's our nickname
+                for (int i = 1; i < message.params.length; i++) {
+                    // Append the new parameter to our model and then check for any
+                    // signals that need to be sent
+                    switch (server_supports.append (message.params[i])) {
+                        case Iridium.Models.ServerSupportsParameters.NETWORK:
+                            network_name_received (server_supports.network);
+                            break;
+                        default:
+                            break;
+                    }
+                }
                 break;
             case Iridium.Services.MessageCommands.QUIT:
                 if (message.username == connection_details.nickname) {
@@ -651,5 +667,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     public signal void insufficient_privs (string channel_name, Iridium.Services.Message message);
     public signal void nickname_changed (string old_nickname, string new_nickname);
     public signal void user_changed_nickname (string old_nickname, string new_nickname);
+    public signal void network_name_received (string network_name);
 
 }

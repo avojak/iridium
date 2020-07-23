@@ -165,6 +165,11 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         server_item.expanded = true;
         channel_items.get (server_name).add (channel_item);
 
+        string? network_name = ((Iridium.Widgets.SidePanel.ServerRow) server_item).network_name;
+        if (network_name != null) {
+            channel_item.update_network_name (network_name);
+        }
+
         /* selected = channel_item; */
         channel_row_added (server_name, channel_name);
     }
@@ -452,6 +457,26 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
                 unowned Iridium.Widgets.SidePanel.PrivateMessageRow private_message_item = (Iridium.Widgets.SidePanel.PrivateMessageRow) child;
                 if (private_message_item.username == old_nickname) {
                     private_message_item.set_nickname (new_nickname);
+                }
+            }
+        }
+    }
+
+    public void update_network_name (string server_name, string network_name) {
+        // Update the server item
+        ((Iridium.Widgets.SidePanel.ServerRow) server_items.get (server_name)).update_network_name (network_name);
+
+        // Update the channel items
+        foreach (var channel_row in channel_items.get (server_name)) {
+            if (channel_row.get_server_name () == server_name) {
+                channel_row.update_network_name (network_name);
+            }
+        }
+        foreach (var child in favorites_category.children) {
+            if (child is Iridium.Widgets.SidePanel.ChannelRow) {
+                unowned Iridium.Widgets.SidePanel.ChannelRow channel_row = (Iridium.Widgets.SidePanel.ChannelRow) child;
+                if (channel_row.get_server_name () == server_name) {
+                    channel_row.update_network_name (network_name);
                 }
             }
         }

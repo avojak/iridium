@@ -24,6 +24,8 @@ iridium_files = files(
     join_paths('Models', 'ServerErrorMessageText.vala'),
     join_paths('Models', 'ServerIdentity.vala'),
     join_paths('Models', 'ServerMessageText.vala'),
+    join_paths('Models', 'ServerSupports.vala'),
+    join_paths('Models', 'ServerSupportsParameters.vala'),
     join_paths('Services', 'CertificateManager.vala'),
     join_paths('Services', 'Message.vala'),
     join_paths('Services', 'MessageCommands.vala'),

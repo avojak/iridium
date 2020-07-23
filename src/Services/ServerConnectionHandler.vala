@@ -55,6 +55,7 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         server_connection.insufficient_privs.connect (on_insufficient_privs_received);
         server_connection.nickname_changed.connect (on_nickname_changed);
         server_connection.user_changed_nickname.connect (on_user_changed_nickname);
+        server_connection.network_name_received.connect (on_network_name_received);
 
         //  server_connection.open_successful.connect (() => {
             open_connections.set (server, server_connection);
@@ -263,6 +264,10 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         user_changed_nickname (source.connection_details.server, old_nickname, new_nickname);
     }
 
+    private void on_network_name_received (Iridium.Services.ServerConnection source, string network_name) {
+        network_name_received (source.connection_details.server, network_name);
+    }
+
     //
     // Signals
     //
@@ -288,5 +293,6 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
     public signal void insufficient_privs_received (string server_name, string channel_name, Iridium.Services.Message message);
     public signal void nickname_changed (string server_name, string old_nickname, string new_nickname);
     public signal void user_changed_nickname (string server_name, string old_nickname, string new_nickname);
+    public signal void network_name_received (string server_name, string network_name);
 
 }

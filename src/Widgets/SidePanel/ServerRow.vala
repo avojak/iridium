@@ -22,6 +22,7 @@
 public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.ExpandableItem, Granite.Widgets.SourceListSortable, Iridium.Widgets.SidePanel.Row {
 
     public string server_name { get; construct; }
+    public string? network_name { get; set; }
 
     private bool is_enabled = true;
 
@@ -144,6 +145,11 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
         menu.show_all ();
 
         return menu;
+    }
+
+    public void update_network_name (string network_name) {
+        this.network_name = network_name;
+        this.name = network_name;
     }
 
     public signal void join_channel ();
