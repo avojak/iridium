@@ -23,6 +23,7 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
 
     public unowned Iridium.MainWindow main_window { get; construct; }
     public string[] servers { get; construct; }
+    public string[] network_names { get; construct; }
     public string? current_server { get; construct; }
 
     private bool is_favorite = false;
@@ -31,7 +32,7 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
     private Gtk.Spinner spinner;
     private Gtk.Label status_label;
 
-    public ChannelJoinDialog (Iridium.MainWindow main_window, string[] servers, string? current_server) {
+    public ChannelJoinDialog (Iridium.MainWindow main_window, string[] servers, string[] network_names, string? current_server) {
         Object (
             deletable: false,
             resizable: false,
@@ -40,6 +41,7 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
             modal: true,
             main_window: main_window,
             servers: servers,
+            network_names: network_names,
             current_server: current_server
         );
     }
@@ -93,7 +95,8 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
         for (int i = 0; i < servers.length; i++) {
             Gtk.TreeIter iter;
             list_store.append (out iter);
-            list_store.set (iter, 0, servers[i]);
+            var display_string = network_names[i] == null ? servers[i] : network_names[i];
+            list_store.set (iter, 0, display_string);
             if (current_server != null && servers[i] == current_server) {
                 active_index = i;
             }
@@ -156,7 +159,7 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
             spinner.start ();
             status_stack.set_visible_child_name ("spinner");
             status_label.label = "";
-            var server_name = server_cell.text;
+            var server_name = servers[server_combo.get_active ()];
             var channel_name = channel_entry.get_text ().chug ().chomp ();
             join_button_clicked (server_name, channel_name);
         });

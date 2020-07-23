@@ -67,12 +67,13 @@ public class Iridium.Services.SQLClient : GLib.Object {
                 "id" INTEGER PRIMARY KEY AUTOINCREMENT,
                 "hostname" TEXT NOT NULL,
                 "port" INTEGER NOT NULL,
-                "nickname" TEXT,
-                "username" TEXT,
-                "realname" TEXT,
-                "auth_method" TEXT,
-                "tls" BOOL,
-                "enabled" BOOL
+                "nickname" TEXT NOT NULL,
+                "username" TEXT NOT NULL,
+                "realname" TEXT NOT NULL,
+                "auth_method" TEXT NOT NULL,
+                "tls" BOOL NOT NULL,
+                "enabled" BOOL NOT NULL,
+                "network_name" TEXT
             );
             CREATE TABLE IF NOT EXISTS "channels" (
                 "id" INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -93,8 +94,8 @@ public class Iridium.Services.SQLClient : GLib.Object {
 
     public void insert_server (Iridium.Services.Server server) {
         var sql = """
-            INSERT INTO servers (hostname, port, nickname, username, realname, auth_method, tls, enabled) 
-            VALUES ($HOSTNAME, $PORT, $NICKNAME, $USERNAME, $REALNAME, $AUTH_METHOD, $TLS, $ENABLED);
+            INSERT INTO servers (hostname, port, nickname, username, realname, auth_method, tls, enabled, network_name) 
+            VALUES ($HOSTNAME, $PORT, $NICKNAME, $USERNAME, $REALNAME, $AUTH_METHOD, $TLS, $NETWORK_NAME, $ENABLED);
             """;
 
         Sqlite.Statement statement;
@@ -111,6 +112,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
         statement.bind_text (6, server.connection_details.auth_method.to_string ());
         statement.bind_int (7, bool_to_int (server.connection_details.tls));
         statement.bind_int (8, bool_to_int (server.enabled));
+        statement.bind_text (9, server.network_name);
 
         statement.step ();
         statement.reset ();
@@ -137,7 +139,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
         var sql = """
             UPDATE servers
             SET hostname = $HOSTNAME, port = $PORT, nickname = $NICKNAME, username = $USERNAME, realname = $REALNAME,
-                auth_method = $AUTH_METHOD, tls = $TLS, enabled = $ENABLED
+                auth_method = $AUTH_METHOD, tls = $TLS, enabled = $ENABLED, network_name = $NETWORK_NAME
             WHERE id = $ID;
             """;
 
@@ -154,7 +156,8 @@ public class Iridium.Services.SQLClient : GLib.Object {
         statement.bind_text (6, server.connection_details.auth_method.to_string ());
         statement.bind_int (7, bool_to_int (server.connection_details.tls));
         statement.bind_int (8, bool_to_int (server.enabled));
-        statement.bind_int (9, server.id);
+        statement.bind_text (9, server.network_name);
+        statement.bind_int (10, server.id);
 
         statement.step ();
         statement.reset ();
@@ -371,6 +374,9 @@ public class Iridium.Services.SQLClient : GLib.Object {
                     break;
                 case "enabled":
                     server.enabled = int_to_bool (statement.column_int (i));
+                    break;
+                case "network_name":
+                    server.network_name = statement.column_text (i);
                     break;
                 default:
                     break;

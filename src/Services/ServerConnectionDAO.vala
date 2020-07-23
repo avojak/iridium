@@ -191,6 +191,17 @@ public class Iridium.Services.ServerConnectionDAO : GLib.Object {
         }
     }
 
+    public void on_network_name_received (string server_name, string network_name) {
+        lock (sql_client) {
+            Iridium.Services.Server? server = sql_client.get_server (server_name);
+            if (server == null) {
+                return;
+            }
+            server.network_name = network_name;
+            sql_client.update_server (server);
+        }
+    }
+
     //  public void clear () {
     //      lock (sql_client) {
     //          sql_client.remove_servers ();
