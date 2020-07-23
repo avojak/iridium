@@ -229,6 +229,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         connection_handler.nickname_changed.connect (Iridium.Application.connection_dao.on_nickname_changed);
         connection_handler.user_changed_nickname.connect (on_user_changed_nickname);
         connection_handler.network_name_received.connect (on_network_name_received);
+        connection_handler.network_name_received.connect (Iridium.Application.connection_dao.on_network_name_received);
 
         // Connect to all of the side panel signals to make settings changes
         // TODO: Should these connect to the connection handler signals rather than the side panel...?
@@ -321,6 +322,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             var server_name = server.connection_details.server;
             Idle.add (() => {
                 side_panel.add_server (server_name);
+                if (server.network_name != null) {
+                    side_panel.update_network_name (server_name, server.network_name);
+                }
                 side_panel.disable_server_row (server_name);
                 return false;
             });
@@ -512,8 +516,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     private void show_channel_join_dialog (string? target_server) {
         if (channel_join_dialog == null) {
             var connected_servers = connection_handler.get_connected_servers ();
+            var network_names = connection_handler.get_connected_server_network_names ();
             //  var current_server = side_panel.get_current_server ();
-            channel_join_dialog = new Iridium.Widgets.ChannelJoinDialog (this, connected_servers, target_server);
+            channel_join_dialog = new Iridium.Widgets.ChannelJoinDialog (this, connected_servers, network_names, target_server);
             channel_join_dialog.show_all ();
             channel_join_dialog.join_button_clicked.connect ((server_name, channel_name) => {
                 join_channel (server_name, channel_name);
@@ -1101,10 +1106,13 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         });
 
         // Update the header
-        var selected_row = side_panel.get_selected_row ();
-        if (selected_row != null && selected_row.get_server_name () == server_name) {
-            header_bar.update_title (network_name, null);
-        }
+        Idle.add (() => {
+            var selected_row = side_panel.get_selected_row ();
+            if (selected_row != null && selected_row.get_server_name () == server_name) {
+                header_bar.update_title (network_name, null);
+            }
+            return false;
+        });
     }
 
     //

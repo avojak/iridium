@@ -85,7 +85,7 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
         //  }
         //  icon = new GLib.ThemedIcon ("user-offline");
         icon = new GLib.ThemedIcon ("network-server");
-        markup = "<i>" + server_name + "</i>";
+        markup = "<i>" + (network_name == null ? server_name : network_name) + "</i>";
         is_enabled = false;
     }
 
@@ -99,7 +99,7 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
     public new void updating () {
         //  icon = new GLib.ThemedIcon ("mail-unread");
         icon = new GLib.ThemedIcon (Constants.APP_ID + ".image-loading-symbolic");
-        markup = "<i>" + server_name + "</i>";
+        markup = "<i>" + (network_name == null ? server_name : network_name) + "</i>";
         is_enabled = false;
     }
 

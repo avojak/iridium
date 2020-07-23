@@ -24,5 +24,6 @@ public class Iridium.Services.Server : GLib.Object {
     public int id { get; set; }
     public Iridium.Services.ServerConnectionDetails connection_details { get; set; }
     public bool enabled { get; set; }
+    public string? network_name { get; set; }
 
 }

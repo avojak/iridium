@@ -67,12 +67,8 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
         //  icon = new GLib.ThemedIcon ("user-offline");
         icon = new GLib.ThemedIcon ("internet-chat");
         //  icon = null;
-        if (is_favorite) {
-            markup = "<i>" + channel_name + " <small>" + server_name + "</small></i>";
-        } else {
-            markup = "<i>" + channel_name + "</i>";
-        }
-        is_enabled = false;
+        this.is_enabled = false;
+        update_markup ();
     }
 
     //  public new void error () {

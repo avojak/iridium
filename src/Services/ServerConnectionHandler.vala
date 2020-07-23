@@ -109,6 +109,15 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         return servers;
     }
 
+    public string[] get_connected_server_network_names () {
+        string[] network_names = { };
+        foreach (var key in open_connections.keys) {
+            var server_connection = open_connections.get (key);
+            network_names += server_connection.server_supports.network;
+        }
+        return network_names;
+    }
+
     public Gee.List<string> get_channels (string server_name) {
         var connection = open_connections.get (server_name);
         if (connection == null) {

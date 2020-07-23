@@ -34,7 +34,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
     private Gee.Map<string, string> channel_topics = new Gee.HashMap<string, string> ();
 
-    private Iridium.Models.ServerSupports server_supports = new Iridium.Models.ServerSupports ();
+    public Iridium.Models.ServerSupports server_supports = new Iridium.Models.ServerSupports ();
 
     public ServerConnection (Iridium.Services.ServerConnectionDetails connection_details) {
         Object (
