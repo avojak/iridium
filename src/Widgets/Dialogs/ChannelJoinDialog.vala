@@ -28,6 +28,9 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
 
     private bool is_favorite = false;
 
+    private Gtk.ComboBox server_combo;
+    private Gtk.Entry channel_entry;
+
     private Gtk.Stack status_stack;
     private Gtk.Spinner spinner;
     private Gtk.Label status_label;
@@ -101,7 +104,7 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
                 active_index = i;
             }
         }
-        var server_combo = new Gtk.ComboBox.with_model (list_store);
+        server_combo = new Gtk.ComboBox.with_model (list_store);
         var server_cell = new Gtk.CellRendererText ();
         server_combo.pack_start (server_cell, false);
         server_combo.set_attributes (server_cell, "text", 0);
@@ -110,7 +113,7 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
         var channel_label = new Gtk.Label (_("Channel:"));
         channel_label.halign = Gtk.Align.END;
 
-        var channel_entry = new Gtk.Entry ();
+        channel_entry = new Gtk.Entry ();
         channel_entry.hexpand = true;
         /* channel_entry.placeholder_text = "#"; */
         channel_entry.text = "#";
@@ -175,6 +178,20 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
 
     public bool is_favorite_button_selected () {
         return is_favorite;
+    }
+
+    public string? get_server () {
+        if (servers.length == 0) {
+            return null;
+        }
+        if (server_combo.get_active () == -1) {
+            return null;
+        }
+        return servers[server_combo.get_active ()];
+    }
+
+    public string? get_channel () {
+        return channel_entry.get_text ().chug ().chomp ();
     }
 
     public void dismiss () {

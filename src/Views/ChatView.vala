@@ -26,11 +26,11 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
 
     // TODO: Should toggle these colors slightly depending on whether user is in dark mode or not
     // Colors defined by the elementary OS Human Interface Guidelines
-    private static string COLOR_STRAWBERRY = "#ed5353"; // "#c6262e"; // vala-lint=naming-convention
-    private static string COLOR_ORANGE = "#ffa154"; // "#f37329"; // vala-lint=naming-convention
-    private static string COLOR_LIME = "#9bdb4d"; // "#68b723"; // vala-lint=naming-convention
-    private static string COLOR_BLUEBERRY = "#64baff"; // "#3689e6"; // vala-lint=naming-convention
-    //  private static string COLOR_GRAPE = "#a56de2"; // vala-lint=naming-convention
+    private const string COLOR_STRAWBERRY = "#ed5353"; // "#c6262e";
+    private const string COLOR_ORANGE = "#ffa154"; // "#f37329";
+    private const string COLOR_LIME = "#9bdb4d"; // "#68b723";
+    private const string COLOR_BLUEBERRY = "#64baff"; // "#3689e6";
+    //  private const string COLOR_GRAPE = "#a56de2";
 
     public string nickname { get; construct; }
 
@@ -42,6 +42,8 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
 
     private Gdk.Cursor cursor_pointer;
     private Gdk.Cursor cursor_text;
+
+    private bool is_enabled = true;
 
     protected ChatView (string nickname) {
         Object (
@@ -248,6 +250,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     }
 
     public void set_enabled (bool enabled) {
+        this.is_enabled = enabled;
         nickname_button.sensitive = enabled;
         entry.set_can_focus (enabled);
         entry.set_editable (enabled);
@@ -260,6 +263,10 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         //       but I'm having issues where it will grab focus even if this
         //       chat view isn't currently visible. This means you would be
         //       typing in a view that isn't visible.
+    }
+
+    public bool get_enabled () {
+        return is_enabled;
     }
 
     private bool on_username_clicked (Gtk.TextTag source, GLib.Object event_object, Gdk.Event event, Gtk.TextIter iter) {
@@ -318,6 +325,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
 
     public abstract void display_self_private_msg (Iridium.Services.Message message);
     public abstract void display_server_msg (Iridium.Services.Message message);
+    public abstract void display_server_error_msg (Iridium.Services.Message message);
 
     protected abstract int get_indent ();
     protected abstract string get_disabled_message ();

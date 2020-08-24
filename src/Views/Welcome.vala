@@ -21,8 +21,11 @@
 
 public class Iridium.Views.Welcome : Granite.Widgets.Welcome {
 
-    public Welcome () {
+    public unowned Iridium.MainWindow window { get; construct; }
+
+    public Welcome (Iridium.MainWindow window) {
         Object (
+            window: window,
             title: _("Welcome to Iridium"),
             subtitle: _("Connect to Any IRC Server")
         );
@@ -45,12 +48,10 @@ public class Iridium.Views.Welcome : Granite.Widgets.Welcome {
         activated.connect (index => {
             switch (index) {
                 case 0:
-                    new_connection_button_clicked ();
+                    Iridium.Services.ActionManager.action_from_group (Iridium.Services.ActionManager.ACTION_NEW_SERVER_CONNECTION, window.get_action_group ("win"));
                 break;
             }
         });
     }
-
-    public signal void new_connection_button_clicked ();
 
 }

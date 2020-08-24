@@ -19,11 +19,21 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Services.ServerConnectionHandler : GLib.Object {
+public class Iridium.Services.ServerConnectionManager : GLib.Object {
 
     private Gee.Map<string, Iridium.Services.ServerConnection> open_connections;
 
-    public ServerConnectionHandler () {
+    private static Iridium.Services.ServerConnectionManager _instance = null;
+    public static Iridium.Services.ServerConnectionManager instance {
+        get {
+            if (_instance == null) {
+                _instance = new Iridium.Services.ServerConnectionManager ();
+            }
+            return _instance;
+        }
+    }
+
+    private ServerConnectionManager () {
         open_connections = new Gee.HashMap<string, Iridium.Services.ServerConnection> ();
     }
 
@@ -118,6 +128,14 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
         return network_names;
     }
 
+    public string? get_network_name (string server_name) {
+        var connection = open_connections.get (server_name);
+        if (connection == null) {
+            return null;
+        }
+        return connection.server_supports.network;
+    }
+
     public Gee.List<string> get_channels (string server_name) {
         var connection = open_connections.get (server_name);
         if (connection == null) {
@@ -131,6 +149,7 @@ public class Iridium.Services.ServerConnectionHandler : GLib.Object {
     }
 
     public void close_all_connections () {
+        debug ("Closing all connections...");
         foreach (var connection in open_connections.entries) {
             connection.value.close ();
         }

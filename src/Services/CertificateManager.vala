@@ -23,6 +23,19 @@ public class Iridium.Services.CertificateManager : GLib.Object {
 
     public Iridium.Services.SQLClient sql_client { get; set; }
 
+    private static Iridium.Services.CertificateManager _instance = null;
+    public static Iridium.Services.CertificateManager instance {
+        get {
+            if (_instance == null) {
+                _instance = new Iridium.Services.CertificateManager ();
+            }
+            return _instance;
+        }
+    }
+
+    private CertificateManager () {
+    }
+
     public static string parse_host (SocketConnectable connectable) {
         return connectable.to_string ().split (":")[0]; // e.g.: chat.freenode.net:6697 -> chat.freenode.net
     }

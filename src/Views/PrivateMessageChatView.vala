@@ -25,9 +25,9 @@ public class Iridium.Views.PrivateMessageChatView : Iridium.Views.ChatView {
 
     private string last_sender = null;
 
-    public PrivateMessageChatView (string nickname, string username) {
+    public PrivateMessageChatView (string self_nickname, string username) {
         Object (
-            nickname: nickname,
+            nickname: self_nickname,
             username: username
         );
     }
@@ -41,7 +41,7 @@ public class Iridium.Views.PrivateMessageChatView : Iridium.Views.ChatView {
     }
 
     public override void display_self_private_msg (Iridium.Services.Message message) {
-        var rich_text = new Iridium.Models.SelfPrivateMessageText (message);
+        var rich_text = new Iridium.Models.Text.SelfPrivateMessageText (message);
         rich_text.suppress_sender_username = is_repeat_sender (message);
         rich_text.display (text_view.get_buffer ());
         do_autoscroll ();
@@ -49,14 +49,21 @@ public class Iridium.Views.PrivateMessageChatView : Iridium.Views.ChatView {
     }
 
     public override void display_server_msg (Iridium.Services.Message message) {
-        var rich_text = new Iridium.Models.ServerMessageText (message);
+        var rich_text = new Iridium.Models.Text.ServerMessageText (message);
+        rich_text.display (text_view.get_buffer ());
+        do_autoscroll ();
+        last_sender = null;
+    }
+
+    public override void display_server_error_msg (Iridium.Services.Message message) {
+        var rich_text = new Iridium.Models.Text.ServerErrorMessageText (message);
         rich_text.display (text_view.get_buffer ());
         do_autoscroll ();
         last_sender = null;
     }
 
     public void display_private_msg (Iridium.Services.Message message) {
-        var rich_text = new Iridium.Models.OthersPrivateMessageText (message);
+        var rich_text = new Iridium.Models.Text.OthersPrivateMessageText (message);
         rich_text.suppress_sender_username = is_repeat_sender (message);
         rich_text.display (text_view.get_buffer ());
         do_autoscroll ();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Andrew Vojak (https://avojak.com)
+ * Copyright (c) 2020 Andrew Vojak (https://avojak.com)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -19,16 +19,24 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Models.SelfPrivateMessageText : Iridium.Models.PrivateMessageText {
+public class Iridium.Models.Text.ChannelErrorMessageText : Iridium.Models.Text.RichText {
 
-    public SelfPrivateMessageText (Iridium.Services.Message message) {
+    public ChannelErrorMessageText (Iridium.Services.Message message) {
         Object (
             message: message
         );
     }
 
-    public override string get_tag_name () {
-        return "self-username";
+    public override void do_display (Gtk.TextBuffer buffer) {
+        //  Gtk.TextIter iter;
+        //  buffer.get_end_iter (out iter);
+        //  buffer.insert_text (ref iter, message.message, message.message.length);
+
+        //  // Format the message
+        //  Gtk.TextIter start = iter;
+        //  start.backward_chars (message.message.length);
+        //  buffer.apply_tag_by_name ("error", start, iter);
+        //  buffer.insert (ref iter, "\n", 1);
     }
 
 }
