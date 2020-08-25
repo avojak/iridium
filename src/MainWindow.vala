@@ -451,6 +451,10 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         Iridium.Application.connection_manager.send_user_message (server_name, text);
     }
 
+    public void toggle_sidebar () {
+        main_layout.toggle_sidebar ();
+    }
+
     //
     // Respond to network connection changes
     //

@@ -31,6 +31,8 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
     //  private Gee.Map<string, Gee.Map<string, string>> view_mapping;
     private Gee.List<Iridium.Views.ChatView> chat_views;
 
+    private Gtk.Paned paned;
+
     private Iridium.Widgets.NetworkInfoBar network_info_bar;
     private Gtk.Overlay overlay;
     private Granite.Widgets.OverlayBar? overlay_bar;
@@ -48,7 +50,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         main_stack = new Gtk.Stack ();
         main_stack.add_named (welcome_view, "welcome");
 
-        var paned = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
+        paned = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
         paned.position = 240;
         paned.pack1 (side_panel, false, false);
         paned.pack2 (main_stack, true, false);
@@ -534,6 +536,10 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         debug ("rename: found uuid %s for old nickname %s", uuid, old_nickname);
         nickname_mapping.get (server_name).set (new_nickname, uuid);
         nickname_mapping.get (server_name).unset (old_nickname);
+    }
+
+    public void toggle_sidebar () {
+        side_panel.visible = !side_panel.visible;
     }
 
     /*

@@ -59,6 +59,16 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         mode_switch.bind_property ("active", Gtk.Settings.get_default (), "gtk_application_prefer_dark_theme");
         Iridium.Application.settings.bind ("prefer-dark-style", mode_switch, "active", GLib.SettingsBindFlags.DEFAULT);
 
+        var toggle_sidebar_accellabel = new Granite.AccelLabel.from_action_name (
+            _("Toggle Sidebar"),
+            Iridium.Services.ActionManager.ACTION_PREFIX + Iridium.Services.ActionManager.ACTION_TOGGLE_SIDEBAR
+        );
+
+        var toggle_sidebar_menu_item = new Gtk.ModelButton ();
+        toggle_sidebar_menu_item.action_name = Iridium.Services.ActionManager.ACTION_PREFIX + Iridium.Services.ActionManager.ACTION_TOGGLE_SIDEBAR;
+        toggle_sidebar_menu_item.get_child ().destroy ();
+        toggle_sidebar_menu_item.add (toggle_sidebar_accellabel);
+
         var new_server_connection_accellabel = new Granite.AccelLabel.from_action_name (
             _("New Server Connection"),
             Iridium.Services.ActionManager.ACTION_PREFIX + Iridium.Services.ActionManager.ACTION_NEW_SERVER_CONNECTION
@@ -105,11 +115,12 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         settings_popover_grid.width_request = 200;
         settings_popover_grid.attach (mode_switch, 0, 0, 1, 1);
         settings_popover_grid.attach (create_menu_separator (12), 0, 1, 1, 1);
-        settings_popover_grid.attach (new_server_connection_menu_item, 0, 2, 1, 1);
-        settings_popover_grid.attach (join_channel_menu_item, 0, 3, 1, 1);
-        settings_popover_grid.attach (preferences_menu_item, 0, 4, 1, 1);
-        settings_popover_grid.attach (create_menu_separator (), 0, 5, 1, 1);
-        settings_popover_grid.attach (quit_menu_item, 0, 6, 1, 1);
+        settings_popover_grid.attach (toggle_sidebar_menu_item, 0, 2, 1, 1);
+        settings_popover_grid.attach (new_server_connection_menu_item, 0, 3, 1, 1);
+        settings_popover_grid.attach (join_channel_menu_item, 0, 4, 1, 1);
+        settings_popover_grid.attach (preferences_menu_item, 0, 5, 1, 1);
+        settings_popover_grid.attach (create_menu_separator (), 0, 6, 1, 1);
+        settings_popover_grid.attach (quit_menu_item, 0, 7, 1, 1);
         settings_popover_grid.show_all ();
 
         var settings_popover = new Gtk.Popover (null);

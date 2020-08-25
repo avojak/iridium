@@ -40,9 +40,13 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
     private Gee.Map<string, Gee.List<Iridium.Widgets.SidePanel.ChannelRow>> channel_items;
     private Gee.Map<string, Gee.List<Iridium.Widgets.SidePanel.PrivateMessageRow>> private_message_items;
 
-    construct {
-        orientation = Gtk.Orientation.VERTICAL;
+    public Panel () {
+        Object (
+            orientation: Gtk.Orientation.VERTICAL
+        );
+    }
 
+    construct {
         source_list = new Granite.Widgets.SourceList ();
         status_bar = new Iridium.Widgets.StatusBar ();
 
