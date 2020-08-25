@@ -567,7 +567,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
     public signal void channel_message_to_send (string server_name, string channel_name, string message);
     public signal void private_message_to_send (string server_name, string username, string message);
     public signal void nickname_button_clicked (string server_name);
-    
+
     public signal void join_channel_button_clicked (string server_name, string? channel_name);
     public signal void leave_channel_button_clicked (string server_name, string channel_name);
     public signal void connect_to_server_button_clicked (string server_name);
