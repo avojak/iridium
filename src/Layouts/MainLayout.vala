@@ -146,6 +146,9 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         // and then this method is called when the channel is actually joined.
         if (get_channel_chat_view (server_name, channel_name) != null) {
             //  warning ("A channel chat view with the name %s already exists", server_name);
+            // Create the side panel row - unlike the chat view, it is removed
+            side_panel.add_channel_row (server_name, channel_name);
+            side_panel.disable_channel_row (server_name, channel_name); // TODO: Should be disabled by default?
             return;
         }
 
@@ -178,6 +181,8 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         // Ensure that we're not adding a view which already exists
         if (get_private_message_chat_view (server_name, username) != null) {
             //  warning ("A private message chat view with the name %s already exists", server_name);
+            // Create the side panel row - unlike the chat view, it is removed
+            side_panel.add_private_message_row (server_name, username);
             return;
         }
 

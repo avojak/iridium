@@ -276,11 +276,14 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
 
     private void remove_private_message_row (string server_name, string username) {
         var server_item = server_items.get (server_name);
-        foreach (var private_message_item in server_item.children) {
-            unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) private_message_item;
-            if (row.get_channel_name () == username) {
-                server_item.remove (private_message_item);
-                return;
+        foreach (var child in server_item.children) {
+            if (child is Iridium.Widgets.SidePanel.PrivateMessageRow) {
+                unowned Iridium.Widgets.SidePanel.PrivateMessageRow private_message_row = (Iridium.Widgets.SidePanel.PrivateMessageRow) child;
+                if (private_message_row.get_channel_name () == username) {
+                    server_item.remove (child);
+                    private_message_items.get (server_name).remove (private_message_row);
+                    return;
+                }
             }
         }
     }

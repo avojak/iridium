@@ -637,8 +637,15 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     private void on_channel_topic_received (string server_name, string channel_name) {
-        update_channel_topic (server_name, channel_name);
-        if (channel_topic_edit_dialog != null) {
+        var topic = Iridium.Application.connection_manager.get_topic (server_name, channel_name);
+        var network_name = Iridium.Application.connection_manager.get_network_name (server_name);
+        if (main_layout.get_visible_server () == server_name && main_layout.get_visible_channel () == channel_name) {
+            header_bar.update_title (channel_name, (topic == null || topic.length == 0) ? (network_name == null || network_name.length == 0 ? server_name : network_name) : topic);
+            header_bar.set_tooltip_text ((topic == null || topic.length == 0) ? null : channel_name + ": " + topic);
+        }
+
+        // If we were editing the dialog, close it
+        if (channel_topic_edit_dialog != null && channel_topic_edit_dialog.get_topic () == topic) {
             channel_topic_edit_dialog.dismiss ();
         }
     }
@@ -755,14 +762,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         }
     }
 
-    private void update_channel_topic (string server_name, string channel_name) {
-        var topic = Iridium.Application.connection_manager.get_topic (server_name, channel_name);
-        if (main_layout.get_visible_server () == server_name && main_layout.get_visible_channel () == channel_name) {
-            header_bar.update_title (channel_name, topic);
-            header_bar.set_tooltip_text ((topic == null || topic.length == 0) ? null : channel_name + ": " + topic);
-        }
-    }
-
     private void on_insufficient_privs_received (string server_name, string channel_name, Iridium.Services.Message message) {
         //  Idle.add (() => {
         //      // Display a message in the channel chat view
@@ -828,7 +827,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
     
     private void on_server_chat_view_shown (string server_name) {
-        var network_name = Iridium.Application.connection_manager.get_network_name (server_name); 
+        var network_name = Iridium.Application.connection_manager.get_network_name (server_name);
         header_bar.update_title (network_name != null ? network_name : server_name, null);
         header_bar.set_channel_users_button_visible (false);
         header_bar.set_tooltip_text (null);
