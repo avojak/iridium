@@ -150,5 +150,5 @@ public class Iridium.Services.ActionManager : GLib.Object {
     private void action_preferences () {
         window.show_preferences_dialog ();
     }
-    
+
 }

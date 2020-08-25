@@ -149,7 +149,7 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
     }
 
     public void close_all_connections () {
-        debug ("Closing all connections...");
+        debug ("Closing all connections…");
         foreach (var connection in open_connections.entries) {
             connection.value.close ();
         }

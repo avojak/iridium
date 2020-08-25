@@ -54,7 +54,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         paned.pack2 (main_stack, true, false);
 
         network_info_bar = new Iridium.Widgets.NetworkInfoBar ();
-        
+
         overlay = new Gtk.Overlay ();
         overlay.add (paned);
 
@@ -294,7 +294,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
             warning ("No chat view exists for server name %s and channel name %s", server_name, channel_name);
             return;
         }
-        
+
         chat_view.show_all ();
         main_stack.set_visible_child_full (get_child_name (server_name, channel_name), Gtk.StackTransitionType.SLIDE_RIGHT);
 
@@ -401,7 +401,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         }
 
         chat_view.display_server_error_msg (message);
-        
+
         if (chat_view is Iridium.Views.ServerChatView) {
             side_panel.increment_server_badge (server_name);
         } else if (chat_view is Iridium.Views.ChannelChatView) {
@@ -562,7 +562,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
     public signal void server_chat_view_shown (string server_name);
     public signal void channel_chat_view_shown (string server_name, string channel_name);
     public signal void private_message_chat_view_shown (string server_name, string username);
-    
+
     public signal void server_message_to_send (string server_name, string message);
     public signal void channel_message_to_send (string server_name, string channel_name, string message);
     public signal void private_message_to_send (string server_name, string username, string message);

@@ -49,7 +49,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     construct {
         accel_group = new Gtk.AccelGroup ();
         add_accel_group (accel_group);
-        action_manager = new Iridium.Services.ActionManager(app, this);
+        action_manager = new Iridium.Services.ActionManager (app, this);
 
         header_bar = new Iridium.Widgets.HeaderBar ();
         header_bar.set_channel_users_button_visible (false);
@@ -103,7 +103,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         Iridium.Application.connection_manager.user_changed_nickname.connect (on_user_changed_nickname);
         Iridium.Application.connection_manager.network_name_received.connect (on_network_name_received);
         Iridium.Application.connection_manager.network_name_received.connect (Iridium.Application.connection_repository.on_network_name_received);
-        
+
         // Connect to the connection handler signal to make settings changes for new connections
         Iridium.Application.connection_manager.server_connection_successful.connect ((server_name, message) => {
             var connection_details = Iridium.Application.connection_manager.get_connection_details (server_name);
@@ -825,7 +825,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         header_bar.set_channel_users_button_visible (false);
         header_bar.set_tooltip_text (null);
     }
-    
+
     private void on_server_chat_view_shown (string server_name) {
         var network_name = Iridium.Application.connection_manager.get_network_name (server_name);
         header_bar.update_title (network_name != null ? network_name : server_name, null);
@@ -834,7 +834,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     private void on_channel_chat_view_shown (string server_name, string channel_name) {
-        var network_name = Iridium.Application.connection_manager.get_network_name (server_name); 
+        var network_name = Iridium.Application.connection_manager.get_network_name (server_name);
         header_bar.update_title (channel_name, network_name != null ? network_name : server_name);
         header_bar.set_channel_users_button_visible (true);
         header_bar.set_channel_users_button_enabled (main_layout.is_view_enabled (server_name, channel_name));
@@ -842,7 +842,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     private void on_private_message_chat_view_shown (string server_name, string username) {
-        var network_name = Iridium.Application.connection_manager.get_network_name (server_name); 
+        var network_name = Iridium.Application.connection_manager.get_network_name (server_name);
         header_bar.update_title (username, network_name != null ? network_name : server_name);
         header_bar.set_channel_users_button_visible (false);
         header_bar.set_tooltip_text (null);
