@@ -119,12 +119,12 @@ public class Iridium.Widgets.ChannelTopicEditDialog : Gtk.Dialog {
         submit_button.clicked.connect (() => {
             spinner.start ();
             status_label.label = "";
-            submit_button_clicked (get_new_topic ());
+            submit_button_clicked (get_topic ());
         });
 
-        submit_button.sensitive = get_new_topic () != current_topic;
+        submit_button.sensitive = get_topic () != current_topic;
         text_view.get_buffer ().changed.connect (() => {
-            var new_topic = get_new_topic ();
+            var new_topic = get_topic ();
             submit_button.sensitive = new_topic != current_topic;
             if (new_topic.length == 0 && current_topic.length != 0) {
                 // Make sure current topic isn't empty - doesn't make sense to clear
@@ -139,7 +139,7 @@ public class Iridium.Widgets.ChannelTopicEditDialog : Gtk.Dialog {
         add_action_widget (submit_button, 1);
     }
 
-    private string get_new_topic () {
+    public string get_topic () {
         Gtk.TextIter start;
         text_view.get_buffer ().get_start_iter (out start);
         Gtk.TextIter end;

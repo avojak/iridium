@@ -21,7 +21,7 @@
 
 public class Iridium.Services.SecretManager : GLib.Object {
 
-    private static string SCHEMA_VERSION = "1"; // vala-lint=naming-convention
+    private const string SCHEMA_VERSION = "1";
 
     private static Secret.Schema schema = new Secret.Schema (
         Constants.APP_ID,
@@ -32,13 +32,25 @@ public class Iridium.Services.SecretManager : GLib.Object {
         "user", Secret.SchemaAttributeType.STRING
     );
 
+    private static Iridium.Services.SecretManager _instance = null;
+    public static Iridium.Services.SecretManager instance {
+        get {
+            if (_instance == null) {
+                _instance = new Iridium.Services.SecretManager ();
+            }
+            return _instance;
+        }
+    }
+
     static construct {
         info ("Secret schema version: %s", SCHEMA_VERSION);
     }
 
+    private SecretManager () {
+    }
+
     public void store_secret (string server, int port, string user, string secret) throws GLib.Error {
         debug ("Storing secret for server: %s, port: %s, user: %s", server, port.to_string (), user);
-
         var attributes = new GLib.HashTable<string, string> (str_hash, str_equal);
         attributes.insert ("version", SCHEMA_VERSION);
         attributes.insert ("server", server);
@@ -46,11 +58,15 @@ public class Iridium.Services.SecretManager : GLib.Object {
         attributes.insert ("user", user);
         var label = Constants.APP_ID + ":" + user + "@" + server + ":" + port.to_string ();
         Secret.password_storev.begin (schema, attributes, null, label, secret, null, (obj, async_res) => {
-            if (Secret.password_store.end (async_res)) {
-                debug ("Stored secret: %s", label);
-            } else {
-                // TODO: Handle this better
-                warning ("Failed to store secret: %s", label);
+            try {
+                if (Secret.password_store.end (async_res)) {
+                    debug ("Stored secret: %s", label);
+                } else {
+                    // TODO: Handle this better
+                    warning ("Failed to store secret: %s", label);
+                }
+            } catch (GLib.Error e) {
+                warning ("Error while storing password: %s", e.message);
             }
         });
     }

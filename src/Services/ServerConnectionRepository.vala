@@ -19,9 +19,22 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Services.ServerConnectionDAO : GLib.Object {
+public class Iridium.Services.ServerConnectionRepository : GLib.Object {
 
     public Iridium.Services.SQLClient sql_client { get; set; }
+
+    private static Iridium.Services.ServerConnectionRepository _instance = null;
+    public static Iridium.Services.ServerConnectionRepository instance {
+        get {
+            if (_instance == null) {
+                _instance = new Iridium.Services.ServerConnectionRepository ();
+            }
+            return _instance;
+        }
+    }
+
+    private ServerConnectionRepository () {
+    }
 
     public void on_server_connection_successful (Iridium.Services.ServerConnectionDetails connection_details) {
         lock (sql_client) {
@@ -166,6 +179,12 @@ public class Iridium.Services.ServerConnectionDAO : GLib.Object {
 
     public void on_private_message_row_disabled (string server_name, string username) {
         // TODO: Implement
+    }
+
+    public Iridium.Services.Server? get_server (string server_name) {
+        lock (sql_client) {
+            return sql_client.get_server (server_name);
+        }
     }
 
     public Gee.List<Iridium.Services.Server> get_servers () {

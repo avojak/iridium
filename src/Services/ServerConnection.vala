@@ -79,15 +79,15 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         return 1;
     }
 
-    private InetAddress resolve_server_hostname (string hostname) throws GLib.Error {
-        Resolver resolver = Resolver.get_default ();
-        List<InetAddress> addresses = resolver.lookup_by_name (hostname, null);
-        InetAddress address = addresses.nth_data (0);
-        return address;
-    }
+    //  private InetAddress resolve_server_hostname (string hostname) throws GLib.Error {
+    //      Resolver resolver = Resolver.get_default ();
+    //      List<InetAddress> addresses = resolver.lookup_by_name (hostname, null);
+    //      InetAddress address = addresses.nth_data (0);
+    //      return address;
+    //  }
 
     private IOStream connect_to_server (string host, uint16 port, bool tls) throws GLib.Error {
-        InetAddress address = resolve_server_hostname (connection_details.server);
+        //  InetAddress address = resolve_server_hostname (connection_details.server);
         SocketClient client = new SocketClient ();
         client.event.connect (on_socket_client_event);
         client.set_tls (tls);
@@ -630,9 +630,9 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         channel_topic_received (channel_name);
     }
 
-    private void request_updated_channel_users (string channel_name) {
-        send_output (Iridium.Services.MessageCommands.NAMES + " " + channel_name);
-    }
+    //  private void request_updated_channel_users (string channel_name) {
+    //      send_output (Iridium.Services.MessageCommands.NAMES + " " + channel_name);
+    //  }
 
     public string? get_channel_topic (string channel_name) {
         if (!channel_topics.has_key (channel_name)) {

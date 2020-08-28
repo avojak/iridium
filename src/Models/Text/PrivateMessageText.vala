@@ -19,7 +19,7 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public abstract class Iridium.Models.PrivateMessageText : Iridium.Models.RichText {
+public abstract class Iridium.Models.Text.PrivateMessageText : Iridium.Models.Text.RichText {
 
     private static uint16 USERNAME_SPACING = 20; // vala-lint=naming-convention
 

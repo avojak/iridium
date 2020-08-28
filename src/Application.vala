@@ -22,12 +22,13 @@
 public class Iridium.Application : Gtk.Application {
 
     public static GLib.Settings settings;
-    public static Iridium.Services.ServerConnectionDAO connection_dao;
+    public static Iridium.Services.ServerConnectionRepository connection_repository;
     public static Iridium.Services.SecretManager secret_manager;
     public static Iridium.Services.CertificateManager certificate_manager;
+    public static Iridium.Services.ServerConnectionManager connection_manager;
+    public static NetworkMonitor network_monitor;
 
-    private static Iridium.Services.ServerConnectionHandler connection_handler;
-
+    private GLib.List <Iridium.MainWindow> windows;
     private bool is_network_available;
 
     public Application () {
@@ -46,29 +47,61 @@ public class Iridium.Application : Gtk.Application {
         }
         info ("%s version: %s", Constants.APP_ID, Constants.VERSION);
         info ("Kernel version: %s", Posix.utsname ().release);
+    }
 
+    construct {
         settings = new GLib.Settings (Constants.APP_ID);
-        connection_handler = new Iridium.Services.ServerConnectionHandler ();
-        connection_dao = new Iridium.Services.ServerConnectionDAO ();
-        secret_manager = new Iridium.Services.SecretManager ();
-        certificate_manager = new Iridium.Services.CertificateManager ();
+        network_monitor = NetworkMonitor.get_default ();
+        connection_repository = Iridium.Services.ServerConnectionRepository.instance;
+        secret_manager = Iridium.Services.SecretManager.instance;
+        certificate_manager = Iridium.Services.CertificateManager.instance;
+        connection_manager = Iridium.Services.ServerConnectionManager.instance;
+
+        windows = new GLib.List<Iridium.MainWindow> ();
+
+        network_monitor.network_changed.connect ((available) => {
+            warning ("Network availability changed: %s", available.to_string ());
+        });
+    }
+
+    public void new_window () {
+        var main_window = new Iridium.MainWindow (this);
+        main_window.present ();
+        //  restore_state (main_window);
+    }
+
+    public override void window_added (Gtk.Window window) {
+        windows.append (window as Iridium.MainWindow);
+        base.window_added (window);
+    }
+
+    public override void window_removed (Gtk.Window window) {
+        windows.remove (window as Iridium.MainWindow);
+        base.window_removed (window);
+    }
+
+    private Iridium.MainWindow add_new_window () {
+        var window = new Iridium.MainWindow (this);
+        this.add_window (window);
+        return window;
     }
 
     protected override void activate () {
-        var main_window = new Iridium.MainWindow (this, connection_handler);
-        main_window.show_all ();
+        //  var main_window = new Iridium.MainWindow (this);
+        //  main_window.show_all ();
 
         // This must happen here because the main event loops will have started
-        connection_dao.sql_client = Iridium.Services.SQLClient.get_instance ();
-        certificate_manager.sql_client = Iridium.Services.SQLClient.get_instance ();
+        connection_repository.sql_client = Iridium.Services.SQLClient.instance;
+        certificate_manager.sql_client = Iridium.Services.SQLClient.instance;
 
         // TODO: Connect to signals to save window size and position in settings
 
-        var network_monitor = NetworkMonitor.get_default ();
         // Check the initial state of the network connection
         is_network_available = network_monitor.get_network_available ();
         if (!is_network_available) {
-            main_window.network_connection_lost ();
+            foreach (var window in windows) {
+                window.network_connection_lost ();
+            }
         }
         // Note: These signals may be fired many times in a row, so be careful
         //       about what sorts of actions are triggered as a result.
@@ -77,23 +110,25 @@ public class Iridium.Application : Gtk.Application {
             if (is_network_available != available) {
                 is_network_available = available;
                 if (!is_network_available) {
-                    main_window.network_connection_lost ();
+                    foreach (var window in windows) {
+                        window.network_connection_lost ();
+                    }
                 } else {
-                    main_window.network_connection_gained ();
-                    restore_state (main_window);
+                    foreach (var window in windows) {
+                        window.network_connection_gained ();
+                        //  restore_state (window);
+                    }
                 }
             }
         });
-        network_monitor.network_changed.connect ((available) => {
-            warning ("Network availability changed: %s", available.to_string ());
-        });
 
-        restore_state (main_window);
+        var window = this.add_new_window ();
+        restore_state (window);
     }
 
     private void restore_state (Iridium.MainWindow main_window) {
-        var servers = connection_dao.get_servers ();
-        var channels = connection_dao.get_channels ();
+        var servers = connection_repository.get_servers ();
+        var channels = connection_repository.get_channels ();
         main_window.initialize (servers, channels);
     }
 

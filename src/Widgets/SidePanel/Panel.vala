@@ -19,11 +19,14 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
+public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
 
     // TODO: Look into custom implementation of SourceList to add CellRendererSpinner as an option for
     //       the row items. Might allow us to display a spinner while connecting to a server or joining
     //       a channel.
+
+    private Granite.Widgets.SourceList source_list;
+    public Iridium.Widgets.StatusBar status_bar;
 
     private Granite.Widgets.SourceList.ExpandableItem favorites_category;
     private Granite.Widgets.SourceList.ExpandableItem servers_category;
@@ -38,6 +41,15 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
     private Gee.Map<string, Gee.List<Iridium.Widgets.SidePanel.PrivateMessageRow>> private_message_items;
 
     public Panel () {
+        Object (
+            orientation: Gtk.Orientation.VERTICAL
+        );
+    }
+
+    construct {
+        source_list = new Granite.Widgets.SourceList ();
+        status_bar = new Iridium.Widgets.StatusBar ();
+
         // TODO: Refactor these ExpandableItems to be a subclass that implements the sortable interface
         //       so that we can sort servers and favorite channels.
         favorites_category = new Granite.Widgets.SourceList.ExpandableItem (_("Favorite Channels"));
@@ -70,20 +82,26 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
             }
         });
 
-        root.add (favorites_category);
-        root.add (servers_category);
+        source_list.root.add (favorites_category);
+        source_list.root.add (servers_category);
 
         server_items = new Gee.HashMap<string, Granite.Widgets.SourceList.ExpandableItem> ();
         channel_items = new Gee.HashMap<string, Gee.List<Iridium.Widgets.SidePanel.ChannelRow>> ();
         private_message_items = new Gee.HashMap<string, Gee.List<Iridium.Widgets.SidePanel.PrivateMessageRow>> ();
 
         // Reset the badge when an item is selected
-        item_selected.connect ((item) => {
-            item.badge = "";
+        source_list.item_selected.connect ((item) => {
+            if (item != null) {
+                item.badge = "";
+            }
+            item_selected (item);
         });
+
+        add (source_list);
+        //  add (status_bar);
     }
 
-    public void add_server (string server_name) {
+    public void add_server_row (string server_name) {
         // Check if this server row already exists
         if (server_items.has_key (server_name)) {
             return;
@@ -91,7 +109,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
 
         var server_item = new Iridium.Widgets.SidePanel.ServerRow (server_name);
         server_item.join_channel.connect (() => {
-            join_channel_for_server (server_name);
+            join_channel (server_name, null);
         });
         server_item.disconnect_from_server.connect ((should_close) => {
             disconnect_from_server (server_name);
@@ -100,7 +118,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
             connect_to_server (server_name);
         });
         server_item.remove_server.connect (() => {
-            remove_server (server_item, server_name);
+            remove_server_row (server_item, server_name);
         });
         server_items.set (server_name, server_item);
         channel_items.set (server_name, new Gee.ArrayList<Iridium.Widgets.SidePanel.ChannelRow> ());
@@ -112,7 +130,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         server_row_added (server_name);
     }
 
-    private void remove_server (Iridium.Widgets.SidePanel.ServerRow server_item, string server_name) {
+    private void remove_server_row (Iridium.Widgets.SidePanel.ServerRow server_item, string server_name) {
         servers_category.remove (server_item);
 
         foreach (var channel_item in channel_items.get (server_name)) {
@@ -123,16 +141,17 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
 
         server_items.unset (server_name);
         channel_items.unset (server_name);
+        private_message_items.unset (server_name);
 
         // If there aren't anymore servers to show, set selected to null
         if (server_items.is_empty) {
-            selected = null;
+            source_list.selected = null;
         }
 
         server_row_removed (server_name);
     }
 
-    public void add_channel (string server_name, string channel_name) {
+    public void add_channel_row (string server_name, string channel_name) {
         // Check if this channel row already exists
         foreach (var channel_item in channel_items.get (server_name)) {
             if (channel_item.channel_name == channel_name) {
@@ -157,7 +176,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
             leave_channel (server_name, channel_name);
         });
         channel_item.remove_channel.connect (() => {
-            remove_channel (server_name, channel_name);
+            remove_channel_row (server_name, channel_name);
         });
 
         var server_item = server_items.get (server_name);
@@ -200,7 +219,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         channel_favorite_removed (server_name, channel_name);
     }
 
-    public void remove_channel (string server_name, string channel_name) {
+    public void remove_channel_row (string server_name, string channel_name) {
         var server_item = server_items.get (server_name);
         foreach (var child in server_item.children) {
             if (child is Iridium.Widgets.SidePanel.ChannelRow) {
@@ -218,6 +237,16 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
                 if (channel_row.get_server_name () == server_name && channel_row.get_channel_name () == channel_name) {
                     favorites_category.remove (child);
                     channel_items.get (server_name).remove (channel_row);
+                    // If we've just removed the only favorited channel, select its server
+                    if (favorites_category.n_children == 1) {
+                        source_list.selected = server_item;
+                    }
+                    // If we've just removed the last item (not the only item) in the list, we 
+                    // need to manually select the new last item because the source list does 
+                    // not automatically select another item in this case
+                    if (favorites_category.n_children > 1) {
+                        source_list.selected = favorites_category.children.to_array ()[favorites_category.n_children - 1];
+                    }
                     break;
                 }
             }
@@ -227,7 +256,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
 
     // TODO: Lots of refactoring can be done here. Lots of code is shared
     //       with the channel functions!
-    public void add_private_message (string server_name, string username) {
+    public void add_private_message_row (string server_name, string username) {
         // Check if this private message row already exists
         var server_item = server_items.get (server_name);
         foreach (var child in server_item.children) {
@@ -241,7 +270,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
 
         var private_message_item = new Iridium.Widgets.SidePanel.PrivateMessageRow (username, server_name);
         private_message_item.close_private_message.connect (() => {
-            remove_private_message (server_name, private_message_item.get_channel_name ());
+            remove_private_message_row (server_name, private_message_item.get_channel_name ());
         });
 
         server_item.add (private_message_item);
@@ -249,27 +278,30 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         private_message_items.get (server_name).add (private_message_item);
     }
 
-    private void remove_private_message (string server_name, string username) {
+    private void remove_private_message_row (string server_name, string username) {
         var server_item = server_items.get (server_name);
-        foreach (var private_message_item in server_item.children) {
-            unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) private_message_item;
-            if (row.get_channel_name () == username) {
-                server_item.remove (private_message_item);
-                return;
+        foreach (var child in server_item.children) {
+            if (child is Iridium.Widgets.SidePanel.PrivateMessageRow) {
+                unowned Iridium.Widgets.SidePanel.PrivateMessageRow private_message_row = (Iridium.Widgets.SidePanel.PrivateMessageRow) child;
+                if (private_message_row.get_channel_name () == username) {
+                    server_item.remove (child);
+                    private_message_items.get (server_name).remove (private_message_row);
+                    return;
+                }
             }
         }
     }
 
     public string? get_current_server () {
-        if (selected == null) {
+        if (source_list.selected == null) {
             return null;
         }
         // Don't consider the dummy rows
-        if (selected.name == "") {
+        if (source_list.selected.name == "") {
             return null;
         }
         // TODO: This feels wrong…
-        unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) selected;
+        unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) source_list.selected;
         return row.get_server_name ();
     }
 
@@ -361,7 +393,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         if (server_item == null) {
             return;
         }
-        selected = server_item;
+        source_list.selected = server_item;
     }
 
     public void select_channel_row (string server_name, string channel_name) {
@@ -371,7 +403,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         }
         foreach (var channel_row in channel_items.get (server_name)) {
             if (channel_row.get_channel_name () == channel_name) {
-                selected = channel_row;
+                source_list.selected = channel_row;
                 return;
             }
         }
@@ -387,7 +419,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
             if (channel_item is Iridium.Widgets.SidePanel.PrivateMessageRow) {
                 unowned Iridium.Widgets.SidePanel.PrivateMessageRow row = (Iridium.Widgets.SidePanel.PrivateMessageRow) channel_item;
                 if (row.get_channel_name () == username) {
-                    selected = channel_item;
+                    source_list.selected = channel_item;
                     return;
                 }
             }
@@ -395,14 +427,14 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
     }
 
     public Iridium.Widgets.SidePanel.Row? get_selected_row () {
-        if (selected == null) {
+        if (source_list.selected == null) {
             return null;
         }
         // Don't consider the dummy rows
-        if (selected.name == "") {
+        if (source_list.selected.name == "") {
             return null;
         }
-        unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) selected;
+        unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) source_list.selected;
         return row;
     }
 
@@ -412,7 +444,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
             return;
         }
         // Don't increment if the item is currently selected
-        if (selected == server_item) {
+        if (source_list.selected == server_item) {
             return;
         }
         var current_count = int.parse (server_item.badge);
@@ -428,7 +460,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         foreach (var channel_row in channel_items.get (server_name)) {
             if (channel_row.get_channel_name () == channel_name) {
                 // Don't increment if the item is currently selected
-                if (selected == channel_row) {
+                if (source_list.selected == channel_row) {
                     return;
                 }
                 var current_count = int.parse (channel_row.badge);
@@ -439,7 +471,7 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         foreach (var private_message_row in private_message_items.get (server_name)) {
             if (private_message_row.get_channel_name () == channel_name) {
                 // Don't increment if the item is currently selected
-                if (selected == private_message_row) {
+                if (source_list.selected == private_message_row) {
                     return;
                 }
                 var current_count = int.parse (private_message_row.badge);
@@ -464,7 +496,11 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
 
     public void update_network_name (string server_name, string network_name) {
         // Update the server item
-        ((Iridium.Widgets.SidePanel.ServerRow) server_items.get (server_name)).update_network_name (network_name);
+        Iridium.Widgets.SidePanel.ServerRow? server_item = (Iridium.Widgets.SidePanel.ServerRow) server_items.get (server_name);
+        if (server_item == null) {
+            return;
+        }
+        server_item.update_network_name (network_name);
 
         // Update the channel items
         foreach (var channel_row in channel_items.get (server_name)) {
@@ -482,8 +518,9 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
         }
     }
 
-    public signal void join_channel_for_server (string server_name);
-    public signal void join_channel (string server_name, string channel_name);
+    public signal void item_selected (Granite.Widgets.SourceList.Item item);
+
+    public signal void join_channel (string server_name, string? channel_name);
     public signal void leave_channel (string server_name, string channel_name);
     public signal void channel_favorite_added (string server_name, string channel_name);
     public signal void channel_favorite_removed (string server_name, string channel_name);
@@ -499,9 +536,9 @@ public class Iridium.Widgets.SidePanel.Panel : Granite.Widgets.SourceList {
     public signal void channel_row_removed (string server_name, string channel_name);
     public signal void channel_row_enabled (string server_name, string channel_name);
     public signal void channel_row_disabled (string server_name, string channel_name);
-    public signal void dm_row_added (string server_name, string username);
-    public signal void dm_row_removed (string server_name, string username);
-    public signal void dm_row_enabled (string server_name, string username);
-    public signal void dm_row_disabled (string server_name, string username);
+    public signal void private_message_row_added (string server_name, string username);
+    public signal void private_message_row_removed (string server_name, string username);
+    public signal void private_message_row_enabled (string server_name, string username);
+    public signal void private_message_row_disabled (string server_name, string username);
 
 }

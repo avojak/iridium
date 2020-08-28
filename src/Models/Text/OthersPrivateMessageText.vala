@@ -19,19 +19,16 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Models.ServerMessageText : Iridium.Models.RichText {
+public class Iridium.Models.Text.OthersPrivateMessageText : Iridium.Models.Text.PrivateMessageText {
 
-    public ServerMessageText (Iridium.Services.Message message) {
+    public OthersPrivateMessageText (Iridium.Services.Message message) {
         Object (
             message: message
         );
     }
 
-    public override void do_display (Gtk.TextBuffer buffer) {
-        Gtk.TextIter iter;
-        buffer.get_end_iter (out iter);
-        buffer.insert_text (ref iter, message.message, message.message.length);
-        buffer.insert (ref iter, "\n", 1);
+    public override string get_tag_name () {
+        return "username";
     }
 
 }

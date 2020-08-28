@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Andrew Vojak (https://avojak.com)
+ * Copyright (c) 2019 Andrew Vojak (https://avojak.com)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -19,24 +19,19 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Models.ChannelErrorMessageText : Iridium.Models.RichText {
+public class Iridium.Models.Text.ServerMessageText : Iridium.Models.Text.RichText {
 
-    public ChannelErrorMessageText (Iridium.Services.Message message) {
+    public ServerMessageText (Iridium.Services.Message message) {
         Object (
             message: message
         );
     }
 
     public override void do_display (Gtk.TextBuffer buffer) {
-        //  Gtk.TextIter iter;
-        //  buffer.get_end_iter (out iter);
-        //  buffer.insert_text (ref iter, message.message, message.message.length);
-
-        //  // Format the message
-        //  Gtk.TextIter start = iter;
-        //  start.backward_chars (message.message.length);
-        //  buffer.apply_tag_by_name ("error", start, iter);
-        //  buffer.insert (ref iter, "\n", 1);
+        Gtk.TextIter iter;
+        buffer.get_end_iter (out iter);
+        buffer.insert_text (ref iter, message.message, message.message.length);
+        buffer.insert (ref iter, "\n", 1);
     }
 
 }

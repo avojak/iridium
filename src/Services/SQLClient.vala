@@ -21,16 +21,18 @@
 
 public class Iridium.Services.SQLClient : GLib.Object {
 
-    private static string DATABASE_FILE = "iridium01.db"; // vala-lint=naming-convention
-    private static Iridium.Services.SQLClient INSTANCE; // vala-lint=naming-convention
+    private const string DATABASE_FILE = "iridium01.db";
 
     private Sqlite.Database database;
 
-    public static Iridium.Services.SQLClient get_instance () {
-        if (INSTANCE == null) {
-            INSTANCE = new Iridium.Services.SQLClient ();
+    private static Iridium.Services.SQLClient _instance = null;
+    public static Iridium.Services.SQLClient instance {
+        get {
+            if (_instance == null) {
+                _instance = new Iridium.Services.SQLClient ();
+            }
+            return _instance;
         }
-        return INSTANCE;
     }
 
     private SQLClient () {
