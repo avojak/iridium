@@ -575,11 +575,12 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             if (connection_dialog != null) {
                 connection_dialog.display_error (error_message);
             }
+            main_layout.disable_chat_view (server_name, null);
+            // TODO: Improve messaging when this fails in the background on app initialization
             // TODO: Add message to the side panel?
+            main_layout.error_chat_view (server_name, null, error_message);
             return false;
         });
-        main_layout.disable_chat_view (server_name, null);
-        // TODO: Improve messaging when this fails in the background on app initialization
     }
 
     private void on_server_connection_closed (string server_name) {
@@ -809,13 +810,11 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     private void on_network_name_received (string server_name, string network_name) {
-        main_layout.update_network_name (server_name, network_name);
-
-        // Update the header
         Idle.add (() => {
             if (main_layout.get_visible_server () == server_name) {
                 header_bar.update_title (network_name, null);
             }
+            main_layout.update_network_name (server_name, network_name);
             return false;
         });
     }

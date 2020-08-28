@@ -23,6 +23,7 @@ public class Iridium.Widgets.SidePanel.PrivateMessageRow : Granite.Widgets.Sourc
 
     public string username { get; set; }
     public string server_name { get; construct; }
+    public Iridium.Widgets.SidePanel.Row.State state { get; set; }
 
     private bool is_enabled = true;
 
@@ -30,13 +31,16 @@ public class Iridium.Widgets.SidePanel.PrivateMessageRow : Granite.Widgets.Sourc
         Object (
             name: username,
             username: username,
-            server_name: server_name
+            server_name: server_name,
+            icon: new GLib.ThemedIcon ("system-users"),
+            state: Iridium.Widgets.SidePanel.Row.State.DISABLED
         );
     }
 
     construct {
         //  icon = new GLib.ThemedIcon ("user-available");
-        icon = new GLib.ThemedIcon ("system-users");
+        //  icon = new GLib.ThemedIcon ("system-users");
+        //  state = Iridium.Widgets.SidePanel.Row.State.DISABLED;
     }
 
     public new string get_server_name () {
@@ -66,8 +70,8 @@ public class Iridium.Widgets.SidePanel.PrivateMessageRow : Granite.Widgets.Sourc
         is_enabled = false;
     }
 
-    //  public new void error () {
-    //  }
+    public new void error (string error_message) {
+    }
 
     public new void updating () {
         //  icon = new GLib.ThemedIcon ("mail-unread");

@@ -45,7 +45,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
     }
 
     construct {
-        side_panel = new Iridium.Widgets.SidePanel.Panel ();
+        side_panel = new Iridium.Widgets.SidePanel.Panel (window);
         welcome_view = new Iridium.Views.Welcome (window);
         main_stack = new Gtk.Stack ();
         main_stack.add_named (welcome_view, "welcome");
@@ -276,6 +276,25 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
             side_panel.disable_channel_row (server_name, channel_name);
         } else if (chat_view is Iridium.Views.PrivateMessageChatView) {
             // Do nothing
+        } else {
+            assert_not_reached ();
+        }
+    }
+
+    public void error_chat_view (string server_name, string? channel_name, string error_message) {
+        Iridium.Views.ChatView? chat_view = get_chat_view (server_name, channel_name);
+        if (chat_view == null) {
+            warning ("No chat view exists for server name %s and channel name %s", server_name, channel_name);
+            return;
+        }
+
+        // Display the error on the side panel row
+        if (chat_view is Iridium.Views.ServerChatView) {
+            side_panel.error_server_row (server_name, error_message);
+        } else if (chat_view is Iridium.Views.ChannelChatView) {
+            // TODO
+        } else if (chat_view is Iridium.Views.PrivateMessageChatView) {
+            // TODO
         } else {
             assert_not_reached ();
         }

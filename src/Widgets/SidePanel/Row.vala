@@ -21,13 +21,20 @@
 
 public interface Iridium.Widgets.SidePanel.Row : GLib.Object {
 
+    protected enum State {
+        ENABLED,
+        DISABLED,
+        UPDATING
+    }
+
     public abstract string get_server_name ();
     public abstract string? get_channel_name ();
     public abstract void enable ();
     public abstract void disable ();
-    //  public abstract void error ();
+    public abstract void error (string error_message);
     // TODO: Maybe remove this from interface and add to implementations as 'joining', 'connecting', etc.
     public abstract void updating ();
+    //  public abstract State get_state ();
     public abstract bool get_enabled ();
 
 }
