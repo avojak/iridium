@@ -76,7 +76,11 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             } while (line != null && !should_exit);
         } catch (GLib.Error e) {
             critical ("Error while connecting: %s\n", e.message);
-            open_failed (connection_error_message == null ? e.message : connection_error_message, connection_error_details);
+            if (connection_error_message == null) {
+                open_failed (_("Error while connecting"), e.message);
+            } else {
+                open_failed (connection_error_message, connection_error_details);
+            }
             connection_error_message = null;
             connection_error_details = null;
             return 0;
