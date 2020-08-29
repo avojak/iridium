@@ -30,9 +30,10 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
     private string? error_message = null;
     private string? error_details = null;
 
-    public ServerRow (string server_name, Iridium.MainWindow window) {
+    public ServerRow (string server_name, Iridium.MainWindow window, string? network_name) {
         Object (
-            name: server_name,
+            name: network_name == null ? server_name : network_name,
+            network_name: network_name,
             server_name: server_name,
             window: window,
             icon: new GLib.ThemedIcon ("user-available"),

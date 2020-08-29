@@ -180,10 +180,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             var server_id = server.id;
             var server_name = server.connection_details.server;
             Idle.add (() => {
-                main_layout.add_server_chat_view (server_name, lookup_nickname (server_name));
-                if (server.network_name != null) {
-                    main_layout.update_network_name (server_name, server.network_name);
-                }
+                main_layout.add_server_chat_view (server_name, lookup_nickname (server_name), server.network_name != null ? server.network_name : null);
                 return false;
             });
             foreach (Iridium.Services.Channel channel in channels) {
@@ -542,7 +539,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     private void on_server_connection_successful (string server_name, Iridium.Services.Message message) {
         Idle.add (() => {
-            main_layout.add_server_chat_view (server_name, lookup_nickname (server_name));
+            main_layout.add_server_chat_view (server_name, lookup_nickname (server_name), null);
             main_layout.enable_chat_view (server_name, null);
             main_layout.display_server_message (server_name, null, message);
             // If we've just connected to the server that the dialog is for, close the dialog and set the focus on that view

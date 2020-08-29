@@ -104,13 +104,13 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
         //  add (status_bar);
     }
 
-    public void add_server_row (string server_name) {
+    public void add_server_row (string server_name, string? network_name) {
         // Check if this server row already exists
         if (server_items.has_key (server_name)) {
             return;
         }
 
-        var server_item = new Iridium.Widgets.SidePanel.ServerRow (server_name, window);
+        var server_item = new Iridium.Widgets.SidePanel.ServerRow (server_name, window, network_name);
         server_item.join_channel.connect (() => {
             join_channel (server_name, null);
         });
