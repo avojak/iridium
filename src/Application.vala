@@ -95,14 +95,7 @@ public class Iridium.Application : Gtk.Application {
         certificate_manager.sql_client = Iridium.Services.SQLClient.instance;
 
         // TODO: Connect to signals to save window size and position in settings
-
-        // Check the initial state of the network connection
-        is_network_available = network_monitor.get_network_available ();
-        if (!is_network_available) {
-            foreach (var window in windows) {
-                window.network_connection_lost ();
-            }
-        }
+        
         // Note: These signals may be fired many times in a row, so be careful
         //       about what sorts of actions are triggered as a result.
         network_monitor.network_changed.connect ((available) => {
@@ -123,6 +116,15 @@ public class Iridium.Application : Gtk.Application {
         });
 
         var window = this.add_new_window ();
+
+        // Check the initial state of the network connection
+        is_network_available = network_monitor.get_network_available ();
+        if (!is_network_available) {
+            foreach (var _window in windows) {
+                _window.network_connection_lost ();
+            }
+        }
+
         restore_state (window);
     }
 
