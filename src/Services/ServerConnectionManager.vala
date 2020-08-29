@@ -153,6 +153,7 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
         foreach (var connection in open_connections.entries) {
             connection.value.close ();
         }
+        open_connections.clear ();
     }
 
     public void send_user_message (string server_name, string message) {

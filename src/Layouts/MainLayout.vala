@@ -371,7 +371,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
     public void show_initialization_overlay () {
         if (overlay_bar == null) {
             overlay_bar = new Granite.Widgets.OverlayBar (overlay);
-            overlay_bar.label = _("Restoring server connections");
+            overlay_bar.label = _("Restoring server connections…");
             overlay_bar.active = true;
             overlay.show_all ();
         }
