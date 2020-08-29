@@ -36,6 +36,9 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
     public Iridium.Models.ServerSupports server_supports = new Iridium.Models.ServerSupports ();
 
+    private string? connection_error_message = null;
+    private string? connection_error_details = null;
+
     public ServerConnection (Iridium.Services.ServerConnectionDetails connection_details) {
         Object (
             connection_details: connection_details
@@ -73,7 +76,9 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             } while (line != null && !should_exit);
         } catch (GLib.Error e) {
             critical ("Error while connecting: %s\n", e.message);
-            open_failed (e.message);
+            open_failed (connection_error_message == null ? e.message : connection_error_message, connection_error_details);
+            connection_error_message = null;
+            connection_error_details = null;
             return 0;
         }
         return 1;
@@ -151,11 +156,13 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             TlsCertificateFlags.UNKNOWN_CA
         };
         string error_string = "";
+        string formatted_error_string = "";
         Gee.List<TlsCertificateFlags> encountered_errors = new Gee.ArrayList<TlsCertificateFlags> ();
         foreach (var flag in flags) {
             if (flag in errors) {
                 encountered_errors.add (flag);
                 error_string += @"$(flag), ";
+                formatted_error_string += " • " + Iridium.Models.CertificateErrorMapping.get_description (flag) + "\n";
             }
         }
         warning (@"TLS certificate errors: $(error_string)");
@@ -164,7 +171,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         switch (Iridium.Models.InvalidCertificatePolicy.get_value_by_short_name (cert_policy)) {
             case REJECT:
                 debug ("Rejecting certificate per policy");
-                open_failed (@"TLS certificate errors: $(error_string)\n");
+                connection_error_details = _("Certificate rejected:") + "\n\n" + formatted_error_string + "\n" + _("See the application preferences to configure the certificate validation policy.");
                 return false;
             case WARN:
                 debug (@"Warning about certificate per policy: $(error_string)");
@@ -181,7 +188,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 if (unacceptable_certificate (peer_cert, encountered_errors, connectable)) {
                     return true;
                 } else {
-                    open_failed (@"TLS certificate errors: $(error_string)\n");
+                    connection_error_details = _("Certificate was rejected by the user.");
                     return false;
                 }
 
@@ -647,7 +654,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
     public signal bool unacceptable_certificate (TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors, SocketConnectable connectable);
     public signal void open_successful (Iridium.Services.Message message);
-    public signal void open_failed (string error_message);
+    public signal void open_failed (string error_message, string? error_details = null);
     public signal void connection_closed ();
     /* public signal void close_failed (string message); */
     public signal void server_message_received (Iridium.Services.Message message);

@@ -39,12 +39,6 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
         );
     }
 
-    construct {
-        //  icon = new GLib.ThemedIcon ("user-available");
-        //  //  icon = new GLib.ThemedIcon ("internet-chat");
-        //  state = Iridium.Widgets.SidePanel.Row.State.DISABLED;
-    }
-
     public new string get_server_name () {
         return server_name;
     }
@@ -75,7 +69,7 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
         update_markup ();
     }
 
-    public new void error (string error_message) {
+    public new void error (string error_message, string? error_details) {
     }
 
     public new void updating () {

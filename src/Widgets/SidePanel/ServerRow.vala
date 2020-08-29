@@ -27,8 +27,8 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
 
     public unowned Iridium.MainWindow window { get; construct; }
 
-    //  private bool is_enabled = true;
-    private bool has_error = false;
+    private string? error_message = null;
+    private string? error_details = null;
 
     public ServerRow (string server_name, Iridium.MainWindow window) {
         Object (
@@ -41,21 +41,28 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
     }
 
     construct {
-        //  icon = new GLib.ThemedIcon ("user-available");
-        //  icon = new GLib.ThemedIcon ("network-server");
         action_activated.connect (() => {
-            if (has_error) {
+            if (error_message != null) {
                 var message_dialog = new Granite.MessageDialog.with_image_from_icon_name (
                     activatable_tooltip,
-                    "", // "Further details, including information that explains any unobvious consequences of actions.",
-                    "dialog-error",
-                    Gtk.ButtonsType.CLOSE
+                    error_details == null ? "" : error_details,
+                    "network-server",
+                    Gtk.ButtonsType.CANCEL
                 );
+                message_dialog.badge_icon = new ThemedIcon ("dialog-error");
                 message_dialog.transient_for = window;
 
-                //  message_dialog.show_error_details ("The details of a possible error.");
+                var suggested_button = new Gtk.Button.with_label (_("Dismiss"));
+                suggested_button.get_style_context ().add_class (Gtk.STYLE_CLASS_SUGGESTED_ACTION);
+                message_dialog.add_action_widget (suggested_button, Gtk.ResponseType.ACCEPT);
+
                 message_dialog.show_all ();
-                message_dialog.run ();
+                if (message_dialog.run () == Gtk.ResponseType.ACCEPT) {
+                    activatable = null;
+                    activatable_tooltip = null;
+                    error_message = null;
+                    error_details = null;
+                };
                 message_dialog.destroy ();
             }
         });
@@ -99,51 +106,38 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
         icon = new GLib.ThemedIcon ("user-available");
         //  icon = new GLib.ThemedIcon ("network-server");
         markup = null;
-        //  is_enabled = true;
 
-        activatable = null;
-        activatable_tooltip = null;
-        has_error = false;
+        clear_error ();
 
         state = Iridium.Widgets.SidePanel.Row.State.ENABLED;
     }
 
     public new void disable () {
-        //  if (state == Iridium.Widgets.SidePanel.Row.State.DISABLED) {
-        //      return;
-        //  }
         icon = new GLib.ThemedIcon ("user-offline");
         //  icon = new GLib.ThemedIcon ("network-server");
         markup = "<i>" + (network_name == null ? server_name : network_name) + "</i>";
-        //  is_enabled = false;
 
-        activatable = null;
-        activatable_tooltip = null;
-        has_error = false;
+        clear_error ();
 
         state = Iridium.Widgets.SidePanel.Row.State.DISABLED;
     }
 
-    public new void error (string error_message) {
+    public new void error (string error_message, string? error_details) {
         //  icon = new GLib.ThemedIcon ("dialog-error");
         //  markup = "<i>" + server_name + "</i>";
-        //  //  is_enabled = false;
-        //  state = Iridium.Widgets.SidePanel.Row.State.DISABLED;
 
         activatable = new GLib.ThemedIcon ("dialog-error");
         activatable_tooltip = error_message;
-        has_error = true;
+        this.error_message = error_message;
+        this.error_details = error_details;
     }
 
     public new void updating () {
         icon = new GLib.ThemedIcon ("mail-unread");
         //  icon = new GLib.ThemedIcon (Constants.APP_ID + ".image-loading-symbolic");
         markup = "<i>" + (network_name == null ? server_name : network_name) + "</i>";
-        //  is_enabled = false;
 
-        activatable = null;
-        activatable_tooltip = null;
-        has_error = false;
+        clear_error ();
 
         state = Iridium.Widgets.SidePanel.Row.State.UPDATING;
     }
@@ -195,6 +189,13 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
     public void update_network_name (string network_name) {
         this.network_name = network_name;
         this.name = network_name;
+    }
+
+    private void clear_error () {
+        activatable = null;
+        activatable_tooltip = null;
+        error_message = null;
+        error_details = null;
     }
 
     public signal void join_channel ();

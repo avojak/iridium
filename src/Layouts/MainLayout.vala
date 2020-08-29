@@ -281,7 +281,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         }
     }
 
-    public void error_chat_view (string server_name, string? channel_name, string error_message) {
+    public void error_chat_view (string server_name, string? channel_name, string error_message, string? error_details) {
         Iridium.Views.ChatView? chat_view = get_chat_view (server_name, channel_name);
         if (chat_view == null) {
             warning ("No chat view exists for server name %s and channel name %s", server_name, channel_name);
@@ -290,7 +290,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
 
         // Display the error on the side panel row
         if (chat_view is Iridium.Views.ServerChatView) {
-            side_panel.error_server_row (server_name, error_message);
+            side_panel.error_server_row (server_name, error_message, error_details);
         } else if (chat_view is Iridium.Views.ChannelChatView) {
             // TODO
         } else if (chat_view is Iridium.Views.PrivateMessageChatView) {

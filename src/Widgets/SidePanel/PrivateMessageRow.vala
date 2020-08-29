@@ -37,12 +37,6 @@ public class Iridium.Widgets.SidePanel.PrivateMessageRow : Granite.Widgets.Sourc
         );
     }
 
-    construct {
-        //  icon = new GLib.ThemedIcon ("user-available");
-        //  icon = new GLib.ThemedIcon ("system-users");
-        //  state = Iridium.Widgets.SidePanel.Row.State.DISABLED;
-    }
-
     public new string get_server_name () {
         return server_name;
     }
@@ -70,7 +64,7 @@ public class Iridium.Widgets.SidePanel.PrivateMessageRow : Granite.Widgets.Sourc
         is_enabled = false;
     }
 
-    public new void error (string error_message) {
+    public new void error (string error_message, string? error_details) {
     }
 
     public new void updating () {
