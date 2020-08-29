@@ -73,7 +73,7 @@ public class Iridium.Widgets.CertificateWarningDialog : Granite.MessageDialog {
         int row_index = 0;
         foreach (var error in errors) {
             error_grid.attach (create_error_icon (), 0, row_index);
-            var label = new Gtk.Label(Iridium.Models.CertificateErrorMapping.get_description (error));
+            var label = new Gtk.Label (Iridium.Models.CertificateErrorMapping.get_description (error));
             label.halign = Gtk.Align.START;
             error_grid.attach (label, 1, row_index);
             row_index++;
