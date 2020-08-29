@@ -23,19 +23,50 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
 
     public string server_name { get; construct; }
     public string? network_name { get; set; }
+    public Iridium.Widgets.SidePanel.Row.State state { get; set; }
 
-    private bool is_enabled = true;
+    public unowned Iridium.MainWindow window { get; construct; }
 
-    public ServerRow (string server_name) {
+    private string? error_message = null;
+    private string? error_details = null;
+
+    public ServerRow (string server_name, Iridium.MainWindow window, string? network_name) {
         Object (
-            name: server_name,
-            server_name: server_name
+            name: network_name == null ? server_name : network_name,
+            network_name: network_name,
+            server_name: server_name,
+            window: window,
+            icon: new GLib.ThemedIcon ("user-available"),
+            state: Iridium.Widgets.SidePanel.Row.State.DISABLED
         );
     }
 
     construct {
-        //  icon = new GLib.ThemedIcon ("user-available");
-        icon = new GLib.ThemedIcon ("network-server");
+        action_activated.connect (() => {
+            if (error_message != null) {
+                var message_dialog = new Granite.MessageDialog.with_image_from_icon_name (
+                    activatable_tooltip,
+                    error_details == null ? "" : error_details,
+                    "network-server",
+                    Gtk.ButtonsType.CANCEL
+                );
+                message_dialog.badge_icon = new ThemedIcon ("dialog-error");
+                message_dialog.transient_for = window;
+
+                var suggested_button = new Gtk.Button.with_label (_("Dismiss"));
+                suggested_button.get_style_context ().add_class (Gtk.STYLE_CLASS_SUGGESTED_ACTION);
+                message_dialog.add_action_widget (suggested_button, Gtk.ResponseType.ACCEPT);
+
+                message_dialog.show_all ();
+                if (message_dialog.run () == Gtk.ResponseType.ACCEPT) {
+                    activatable = null;
+                    activatable_tooltip = null;
+                    error_message = null;
+                    error_details = null;
+                };
+                message_dialog.destroy ();
+            }
+        });
     }
 
     public new bool allow_dnd_sorting () {
@@ -70,41 +101,50 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
     }
 
     public new void enable () {
-        if (is_enabled) {
-            return;
-        }
-        //  icon = new GLib.ThemedIcon ("user-available");
-        icon = new GLib.ThemedIcon ("network-server");
+        //  if (state == Iridium.Widgets.SidePanel.Row.State.ENABLED) {
+        //      return;
+        //  }
+        icon = new GLib.ThemedIcon ("user-available");
+        //  icon = new GLib.ThemedIcon ("network-server");
         markup = null;
-        is_enabled = true;
+
+        clear_error ();
+
+        state = Iridium.Widgets.SidePanel.Row.State.ENABLED;
     }
 
     public new void disable () {
-        //  if (!is_enabled) {
-        //      return;
-        //  }
-        //  icon = new GLib.ThemedIcon ("user-offline");
-        icon = new GLib.ThemedIcon ("network-server");
+        icon = new GLib.ThemedIcon ("user-offline");
+        //  icon = new GLib.ThemedIcon ("network-server");
         markup = "<i>" + (network_name == null ? server_name : network_name) + "</i>";
-        is_enabled = false;
+
+        clear_error ();
+
+        state = Iridium.Widgets.SidePanel.Row.State.DISABLED;
     }
 
-    //  public new void error () {
-        //  print ("SERVERROW ERROR\n");
+    public new void error (string error_message, string? error_details) {
         //  icon = new GLib.ThemedIcon ("dialog-error");
         //  markup = "<i>" + server_name + "</i>";
-        //  is_enabled = false;
-    //  }
+
+        activatable = new GLib.ThemedIcon ("dialog-error");
+        activatable_tooltip = error_message;
+        this.error_message = error_message;
+        this.error_details = error_details;
+    }
 
     public new void updating () {
-        //  icon = new GLib.ThemedIcon ("mail-unread");
-        icon = new GLib.ThemedIcon (Constants.APP_ID + ".image-loading-symbolic");
+        icon = new GLib.ThemedIcon ("mail-unread");
+        //  icon = new GLib.ThemedIcon (Constants.APP_ID + ".image-loading-symbolic");
         markup = "<i>" + (network_name == null ? server_name : network_name) + "</i>";
-        is_enabled = false;
+
+        clear_error ();
+
+        state = Iridium.Widgets.SidePanel.Row.State.UPDATING;
     }
 
     public new bool get_enabled () {
-        return is_enabled;
+        return state == Iridium.Widgets.SidePanel.Row.State.ENABLED;
     }
 
     public override Gtk.Menu? get_context_menu () {
@@ -127,13 +167,13 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
 
         var close_item = new Gtk.MenuItem.with_label (_("Close"));
         close_item.activate.connect (() => {
-            if (is_enabled) {
+            if (get_enabled ()) {
                 disconnect_from_server ();
             }
             remove_server ();
         });
 
-        if (is_enabled) {
+        if (get_enabled ()) {
             menu.append (join_item);
             menu.append (new Gtk.SeparatorMenuItem ());
             menu.append (disconnect_item);
@@ -150,6 +190,13 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
     public void update_network_name (string network_name) {
         this.network_name = network_name;
         this.name = network_name;
+    }
+
+    private void clear_error () {
+        activatable = null;
+        activatable_tooltip = null;
+        error_message = null;
+        error_details = null;
     }
 
     public signal void join_channel ();

@@ -180,10 +180,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             var server_id = server.id;
             var server_name = server.connection_details.server;
             Idle.add (() => {
-                main_layout.add_server_chat_view (server_name, lookup_nickname (server_name));
-                if (server.network_name != null) {
-                    main_layout.update_network_name (server_name, server.network_name);
-                }
+                main_layout.add_server_chat_view (server_name, lookup_nickname (server_name), server.network_name != null ? server.network_name : null);
                 return false;
             });
             foreach (Iridium.Services.Channel channel in channels) {
@@ -542,7 +539,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     private void on_server_connection_successful (string server_name, Iridium.Services.Message message) {
         Idle.add (() => {
-            main_layout.add_server_chat_view (server_name, lookup_nickname (server_name));
+            main_layout.add_server_chat_view (server_name, lookup_nickname (server_name), null);
             main_layout.enable_chat_view (server_name, null);
             main_layout.display_server_message (server_name, null, message);
             // If we've just connected to the server that the dialog is for, close the dialog and set the focus on that view
@@ -570,16 +567,17 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         return server.connection_details.nickname;
     }
 
-    private void on_server_connection_failed (string server_name, string error_message) {
+    private void on_server_connection_failed (string server_name, string error_message, string? error_details) {
         Idle.add (() => {
             if (connection_dialog != null) {
                 connection_dialog.display_error (error_message);
             }
+            main_layout.disable_chat_view (server_name, null);
+            // TODO: Improve messaging when this fails in the background on app initialization
             // TODO: Add message to the side panel?
+            main_layout.error_chat_view (server_name, null, error_message, error_details);
             return false;
         });
-        main_layout.disable_chat_view (server_name, null);
-        // TODO: Improve messaging when this fails in the background on app initialization
     }
 
     private void on_server_connection_closed (string server_name) {
@@ -809,13 +807,11 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     private void on_network_name_received (string server_name, string network_name) {
-        main_layout.update_network_name (server_name, network_name);
-
-        // Update the header
         Idle.add (() => {
             if (main_layout.get_visible_server () == server_name) {
                 header_bar.update_title (network_name, null);
             }
+            main_layout.update_network_name (server_name, network_name);
             return false;
         });
     }

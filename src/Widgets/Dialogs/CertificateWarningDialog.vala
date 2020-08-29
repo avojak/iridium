@@ -71,51 +71,9 @@ public class Iridium.Widgets.CertificateWarningDialog : Granite.MessageDialog {
         error_grid.row_spacing = 12;
 
         int row_index = 0;
-        if (TlsCertificateFlags.GENERIC_ERROR in errors) {
+        foreach (var error in errors) {
             error_grid.attach (create_error_icon (), 0, row_index);
-            var label = new Gtk.Label (_("An error has occurred processing the server's certificate"));
-            label.halign = Gtk.Align.START;
-            error_grid.attach (label, 1, row_index);
-            row_index++;
-        }
-        if (TlsCertificateFlags.INSECURE in errors) {
-            error_grid.attach (create_error_icon (), 0, row_index);
-            var label = new Gtk.Label (_("The server's certificate is considered insecure"));
-            label.halign = Gtk.Align.START;
-            error_grid.attach (label, 1, row_index);
-            row_index++;
-        }
-        if (TlsCertificateFlags.REVOKED in errors) {
-            error_grid.attach (create_error_icon (), 0, row_index);
-            var label = new Gtk.Label (_("The server's certificate has been revoked and is now invalid"));
-            label.halign = Gtk.Align.START;
-            error_grid.attach (label, 1, row_index);
-            row_index++;
-        }
-        if (TlsCertificateFlags.EXPIRED in errors) {
-            error_grid.attach (create_error_icon (), 0, row_index);
-            var label = new Gtk.Label (_("The server's certificate has expired"));
-            label.halign = Gtk.Align.START;
-            error_grid.attach (label, 1, row_index);
-            row_index++;
-        }
-        if (TlsCertificateFlags.NOT_ACTIVATED in errors) {
-            error_grid.attach (create_error_icon (), 0, row_index);
-            var label = new Gtk.Label (_("The server's certificate has not been activated"));
-            label.halign = Gtk.Align.START;
-            error_grid.attach (label, 1, row_index);
-            row_index++;
-        }
-        if (TlsCertificateFlags.BAD_IDENTITY in errors) {
-            error_grid.attach (create_error_icon (), 0, row_index);
-            var label = new Gtk.Label (_("The server's identity does not match the identity in the certificate"));
-            label.halign = Gtk.Align.START;
-            error_grid.attach (label, 1, row_index);
-            row_index++;
-        }
-        if (TlsCertificateFlags.UNKNOWN_CA in errors) {
-            error_grid.attach (create_error_icon (), 0, row_index);
-            var label = new Gtk.Label (_("The server's certificate is not signed by a known authority"));
+            var label = new Gtk.Label (Iridium.Models.CertificateErrorMapping.get_description (error));
             label.halign = Gtk.Align.START;
             error_grid.attach (label, 1, row_index);
             row_index++;

@@ -40,9 +40,12 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
     private Gee.Map<string, Gee.List<Iridium.Widgets.SidePanel.ChannelRow>> channel_items;
     private Gee.Map<string, Gee.List<Iridium.Widgets.SidePanel.PrivateMessageRow>> private_message_items;
 
-    public Panel () {
+    public unowned Iridium.MainWindow window { get; construct; }
+
+    public Panel (Iridium.MainWindow window) {
         Object (
-            orientation: Gtk.Orientation.VERTICAL
+            orientation: Gtk.Orientation.VERTICAL,
+            window: window
         );
     }
 
@@ -101,13 +104,13 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
         //  add (status_bar);
     }
 
-    public void add_server_row (string server_name) {
+    public void add_server_row (string server_name, string? network_name) {
         // Check if this server row already exists
         if (server_items.has_key (server_name)) {
             return;
         }
 
-        var server_item = new Iridium.Widgets.SidePanel.ServerRow (server_name);
+        var server_item = new Iridium.Widgets.SidePanel.ServerRow (server_name, window, network_name);
         server_item.join_channel.connect (() => {
             join_channel (server_name, null);
         });
@@ -329,14 +332,14 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
         server_row_disabled (server_name);
     }
 
-    //  public void error_server_row (string server_name) {
-    //      var server_item = server_items.get (server_name);
-    //      if (server_item == null) {
-    //          return;
-    //      }
-    //      unowned Iridium.Widgets.SidePanel.Row server_row = (Iridium.Widgets.SidePanel.Row) server_item;
-    //      server_row.error ();
-    //  }
+    public void error_server_row (string server_name, string error_message, string? error_details) {
+        var server_item = server_items.get (server_name);
+        if (server_item == null) {
+            return;
+        }
+        unowned Iridium.Widgets.SidePanel.Row server_row = (Iridium.Widgets.SidePanel.Row) server_item;
+        server_row.error (error_message, error_details);
+    }
 
     public void updating_server_row (string server_name) {
         var server_item = server_items.get (server_name);
@@ -517,6 +520,14 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
             }
         }
     }
+
+    //  public void display_server_error (string server_name, string error_message) {
+    //      Iridium.Widgets.SidePanel.ServerRow? server_item = (Iridium.Widgets.SidePanel.ServerRow) server_items.get (server_name);
+    //      if (server_item == null) {
+    //          return;
+    //      }
+    //      server_item.error ();
+    //  }
 
     public signal void item_selected (Granite.Widgets.SourceList.Item item);
 

@@ -24,6 +24,7 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
     public string channel_name { get; construct; }
     public string server_name { get; construct; }
     public string? network_name { get; set; }
+    public Iridium.Widgets.SidePanel.Row.State state { get; set; }
 
     private bool is_enabled = true;
     private bool is_favorite = false;
@@ -32,13 +33,10 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
         Object (
             name: channel_name,
             channel_name: channel_name,
-            server_name: server_name
+            server_name: server_name,
+            icon: new GLib.ThemedIcon ("user-available"),
+            state: Iridium.Widgets.SidePanel.Row.State.DISABLED
         );
-    }
-
-    construct {
-        //  icon = new GLib.ThemedIcon ("user-available");
-        icon = new GLib.ThemedIcon ("internet-chat");
     }
 
     public new string get_server_name () {
@@ -53,8 +51,8 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
         if (is_enabled) {
             return;
         }
-        //  icon = new GLib.ThemedIcon ("user-available");
-        icon = new GLib.ThemedIcon ("internet-chat");
+        icon = new GLib.ThemedIcon ("user-available");
+        //  icon = new GLib.ThemedIcon ("internet-chat");
         //  icon = null;
         this.is_enabled = true;
         update_markup ();
@@ -64,21 +62,21 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
         if (!is_enabled) {
             return;
         }
-        //  icon = new GLib.ThemedIcon ("user-offline");
-        icon = new GLib.ThemedIcon ("internet-chat");
+        icon = new GLib.ThemedIcon ("user-offline");
+        //  icon = new GLib.ThemedIcon ("internet-chat");
         //  icon = null;
         this.is_enabled = false;
         update_markup ();
     }
 
-    //  public new void error () {
-    //  }
+    public new void error (string error_message, string? error_details) {
+    }
 
     public new void updating () {
-        //  icon = new GLib.ThemedIcon ("mail-unread");
+        icon = new GLib.ThemedIcon ("mail-unread");
         // Maybe add the symbolic chat and user icons so we can specifically use them when not loading?
         // Could also create "disabled" versions of each that are greyed out slightly
-        icon = new GLib.ThemedIcon (Constants.APP_ID + ".image-loading-symbolic");
+        //  icon = new GLib.ThemedIcon (Constants.APP_ID + ".image-loading-symbolic");
         this.is_enabled = false;
         update_markup ();
     }

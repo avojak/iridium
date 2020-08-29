@@ -45,7 +45,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
     }
 
     construct {
-        side_panel = new Iridium.Widgets.SidePanel.Panel ();
+        side_panel = new Iridium.Widgets.SidePanel.Panel (window);
         welcome_view = new Iridium.Views.Welcome (window);
         main_stack = new Gtk.Stack ();
         main_stack.add_named (welcome_view, "welcome");
@@ -108,14 +108,14 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         show_all ();
     }
 
-    public void add_server_chat_view (string server_name, string nickname) {
+    public void add_server_chat_view (string server_name, string nickname, string? network_name) {
         // Ensure that we're not adding a view which already exists.
         // This can happen if the view was already created during initialization,
         // and then this method is called when the server is actually connected.
         if (get_server_chat_view (server_name) != null) {
             //  warning ("A server chat view with the name %s already exists", server_name);
             // Create the side panel row - unlike the chat view, it is removed upon disconnect
-            side_panel.add_server_row (server_name);
+            side_panel.add_server_row (server_name, network_name);
             side_panel.disable_server_row (server_name); // TODO: Should be disabled by default?
             return;
         }
@@ -138,7 +138,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         });
 
         // Create the side panel row
-        side_panel.add_server_row (server_name);
+        side_panel.add_server_row (server_name, network_name);
         side_panel.disable_server_row (server_name); // TODO: Should be disabled by default?
     }
 
@@ -276,6 +276,25 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
             side_panel.disable_channel_row (server_name, channel_name);
         } else if (chat_view is Iridium.Views.PrivateMessageChatView) {
             // Do nothing
+        } else {
+            assert_not_reached ();
+        }
+    }
+
+    public void error_chat_view (string server_name, string? channel_name, string error_message, string? error_details) {
+        Iridium.Views.ChatView? chat_view = get_chat_view (server_name, channel_name);
+        if (chat_view == null) {
+            warning ("No chat view exists for server name %s and channel name %s", server_name, channel_name);
+            return;
+        }
+
+        // Display the error on the side panel row
+        if (chat_view is Iridium.Views.ServerChatView) {
+            side_panel.error_server_row (server_name, error_message, error_details);
+        } else if (chat_view is Iridium.Views.ChannelChatView) {
+            // TODO
+        } else if (chat_view is Iridium.Views.PrivateMessageChatView) {
+            // TODO
         } else {
             assert_not_reached ();
         }
