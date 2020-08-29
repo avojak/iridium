@@ -95,7 +95,7 @@ public class Iridium.Application : Gtk.Application {
         certificate_manager.sql_client = Iridium.Services.SQLClient.instance;
 
         // TODO: Connect to signals to save window size and position in settings
-        
+
         // Note: These signals may be fired many times in a row, so be careful
         //       about what sorts of actions are triggered as a result.
         network_monitor.network_changed.connect ((available) => {
