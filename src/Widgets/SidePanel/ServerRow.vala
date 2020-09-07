@@ -198,7 +198,7 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
         bool should_close = false;
         var message_dialog = new Granite.MessageDialog.with_image_from_icon_name (
             _("Are you sure you want to proceed?"),
-            _("By removing this connection will be disconnected, and you won’t be able to recover the connection settings. If you wish to join this server again in the future, you will need to re-enter the connection settings."),
+            _("By removing this connection you will be disconnected, and will not be able to recover the connection settings. If you wish to join this server again in the future, you will need to re-enter the connection settings."),
             "dialog-warning",
             Gtk.ButtonsType.CANCEL);
         message_dialog.transient_for = window;
