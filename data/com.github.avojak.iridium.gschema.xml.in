@@ -21,5 +21,10 @@
       <summary>The default real name when connecting to a server</summary>
       <description>The default real name when connecting to a server</description>
     </key>
+    <key name="suppress-connection-close-warnings" type="b">
+      <default>false</default>
+      <summary>If warnings should be suppressed when closing a server connection</summary>
+      <description>If warnings should be suppressed when closing a server connection</description>
+    </key>
   </schema>
 </schemalist>
