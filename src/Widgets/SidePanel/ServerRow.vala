@@ -167,10 +167,12 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
 
         var close_item = new Gtk.MenuItem.with_label (_("Close"));
         close_item.activate.connect (() => {
-            if (get_enabled ()) {
-                disconnect_from_server ();
+            if (warn_before_close ()) {
+                if (get_enabled ()) {
+                    disconnect_from_server ();
+                }
+                remove_server ();
             }
-            remove_server ();
         });
 
         if (get_enabled ()) {
@@ -185,6 +187,36 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
         menu.show_all ();
 
         return menu;
+    }
+
+    private bool warn_before_close () {
+        // First check the settings to see if the user has already opted to not be warned
+        if (Iridium.Application.settings.get_boolean ("suppress-connection-close-warnings")) {
+            return true;
+        }
+
+        bool should_close = false;
+        var message_dialog = new Granite.MessageDialog.with_image_from_icon_name (
+            _("Are you sure you want to proceed?"),
+            _("By closing this connection you won’t be able to recover the connection settings."),
+            "dialog-warning",
+            Gtk.ButtonsType.CANCEL);
+        message_dialog.transient_for = window;
+
+        var suggested_button = new Gtk.Button.with_label (_("Yes, disconnect"));
+        suggested_button.get_style_context ().add_class (Gtk.STYLE_CLASS_DESTRUCTIVE_ACTION);
+        message_dialog.add_action_widget (suggested_button, Gtk.ResponseType.ACCEPT);
+
+        var remember_decision_button = new Gtk.CheckButton.with_label (_("Don't warn me again"));
+        message_dialog.custom_bin.add (remember_decision_button);
+
+        message_dialog.show_all ();
+        if (message_dialog.run () == Gtk.ResponseType.ACCEPT) {
+            Iridium.Application.settings.set_boolean ("suppress-connection-close-warnings", remember_decision_button.get_active ());
+            should_close = true;
+        };
+        message_dialog.destroy ();
+        return should_close;
     }
 
     public void update_network_name (string network_name) {
