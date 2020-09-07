@@ -117,20 +117,8 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         status_label.set_line_wrap (true);
         status_label.margin_bottom = 10;
 
-        var status_stack_grid = new Gtk.Grid ();
-        status_stack_grid.expand = true;
-        status_stack_grid.margin_start = 30;
-        status_stack_grid.margin_end = 30;
-        status_stack_grid.margin_bottom = 10;
-
-        status_stack = new Gtk.Stack ();
-        status_stack.expand = true;
-        status_stack.add_named (spinner, "spinner");
-        status_stack.add_named (status_label, "status-label");
-        status_stack.set_visible_child_name ("status-label");
-
-        status_stack_grid.attach (status_stack, 0, 1, 1, 1);
-        body.add (status_stack_grid);
+        body.add (spinner);
+        body.add (status_label);
 
         // Add action buttons
         var cancel_button = new Gtk.Button.with_label (_("Cancel"));
@@ -317,7 +305,6 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
     private void do_connect () {
         // TODO: Validate entries first!
         spinner.start ();
-        status_stack.set_visible_child_name ("spinner");
         status_label.label = "";
         var server_name = server_entry.get_text ().chomp ().chug ();
         var nickname = nickname_entry.get_text ().chomp ().chug ();
@@ -346,7 +333,6 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         // TODO: We can make the error messaging better (wrap text!)
         spinner.stop ();
         status_label.label = message;
-        status_stack.set_visible_child_name ("status-label");
     }
 
     public signal void connect_button_clicked (string server, string nickname, string username, string realname,
