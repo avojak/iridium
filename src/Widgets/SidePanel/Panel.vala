@@ -199,10 +199,17 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
     public void favorite_channel (string server_name, string channel_name) {
         foreach (var channel_item in channel_items.get (server_name)) {
             if (channel_item.get_channel_name () == channel_name) {
+                bool preserve_focus = source_list.selected == channel_item;
                 var server_item = server_items.get (server_name);
                 server_item.remove (channel_item);
                 favorites_category.add (channel_item);
                 channel_item.set_favorite (true);
+                // We've favorited the item that's currently selected, so we want to maintain focus
+                if (preserve_focus) {
+                    // XXX: This is a little hacky, and causes another view to become briefly available
+                    //      during the transition. I'm not sure of a better way to do this currently.
+                    select_channel_row (server_name, channel_name);
+                }
                 break;
             }
         }
