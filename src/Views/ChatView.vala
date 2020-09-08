@@ -34,7 +34,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
 
     public string nickname { get; construct; }
 
-    protected Gtk.TextView text_view;
+    protected Gtk.SourceView text_view;
 
     private Gtk.ScrolledWindow scrolled_window;
     private Gtk.Button nickname_button;
@@ -54,7 +54,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
 
     construct {
         // TODO: WHY CANT YOU CLICK AND DRAG TO SELECT TEXT???
-        text_view = new Gtk.TextView ();
+        text_view = new Gtk.SourceView ();
         text_view.set_pixels_below_lines (3);
         text_view.set_border_width (12);
         text_view.set_wrap_mode (Gtk.WrapMode.WORD_CHAR);
@@ -65,6 +65,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         text_view.set_cursor_visible (false);
         text_view.set_vexpand (true);
         text_view.set_hexpand (true);
+        text_view.set_show_line_numbers (false);
 
         // Initialize the buffer iterator
         Gtk.TextIter iter;

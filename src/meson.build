@@ -76,7 +76,8 @@ executable(
         dependency('glib-2.0', version: '>= 2.30.0'),
         dependency('granite', version: '>= 0.5.1'),
         dependency('libsecret-1', version: '>= 0.18.6'),
-        dependency('sqlite3', version: '>= 3.22.0')
+        dependency('sqlite3', version: '>= 3.22.0'),
+        dependency('gtksourceview-3.0')
     ],
     vala_args: vala_args,
     install: true

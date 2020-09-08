@@ -10,7 +10,8 @@ Build-Depends: debhelper (>= 10.5.1),
                libgranite-dev,
                libgee-0.8-dev,
                libsecret-1-dev,
-               libsqlite3-dev
+               libsqlite3-dev,
+               libgtksourceview-3.0-dev
 Standards-Version: 4.1.1
 
 Package: com.github.avojak.iridium
