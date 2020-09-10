@@ -33,7 +33,6 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
     private Gtk.Entry port_entry;
 
     private Gtk.Stack header_image_stack;
-    private Gtk.Stack status_stack;
     private Gtk.Spinner spinner;
     private Gtk.Label status_label;
 

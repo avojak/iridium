@@ -49,6 +49,38 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         settings_button.relief = Gtk.ReliefStyle.NONE;
         settings_button.valign = Gtk.Align.CENTER;
 
+        var app_instance = (Iridium.Application) GLib.Application.get_default ();
+
+        var zoom_out_button = new Gtk.Button.from_icon_name ("zoom-out-symbolic", Gtk.IconSize.MENU);
+        zoom_out_button.action_name = Iridium.Services.ActionManager.ACTION_PREFIX + Iridium.Services.ActionManager.ACTION_ZOOM_OUT;
+        zoom_out_button.tooltip_markup = Granite.markup_accel_tooltip (
+            app_instance.get_accels_for_action (zoom_out_button.action_name),
+            _("Zoom Out")
+        );
+
+        var zoom_default_button = new Gtk.Button.with_label ("100%");
+        zoom_default_button.action_name = Iridium.Services.ActionManager.ACTION_PREFIX + Iridium.Services.ActionManager.ACTION_ZOOM_DEFAULT;
+        zoom_default_button.tooltip_markup = Granite.markup_accel_tooltip (
+            app_instance.get_accels_for_action (zoom_default_button.action_name),
+            _("Zoom 1:1")
+        );
+
+        var zoom_in_button = new Gtk.Button.from_icon_name ("zoom-in-symbolic", Gtk.IconSize.MENU);
+        zoom_in_button.action_name = Iridium.Services.ActionManager.ACTION_PREFIX + Iridium.Services.ActionManager.ACTION_ZOOM_IN;
+        zoom_in_button.tooltip_markup = Granite.markup_accel_tooltip (
+            app_instance.get_accels_for_action (zoom_in_button.action_name),
+            _("Zoom In")
+        );
+
+        var font_size_grid = new Gtk.Grid ();
+        font_size_grid.column_homogeneous = true;
+        font_size_grid.hexpand = true;
+        font_size_grid.margin = 12;
+        font_size_grid.get_style_context ().add_class (Gtk.STYLE_CLASS_LINKED);
+        font_size_grid.add (zoom_out_button);
+        font_size_grid.add (zoom_default_button);
+        font_size_grid.add (zoom_in_button);
+
         var mode_switch = new Granite.ModeSwitch.from_icon_name ("display-brightness-symbolic", "weather-clear-night-symbolic");
         mode_switch.primary_icon_tooltip_text = _("Light background");
         mode_switch.secondary_icon_tooltip_text = _("Dark background");
@@ -114,13 +146,14 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         settings_popover_grid.orientation = Gtk.Orientation.VERTICAL;
         settings_popover_grid.width_request = 200;
         settings_popover_grid.attach (mode_switch, 0, 0, 1, 1);
-        settings_popover_grid.attach (create_menu_separator (12), 0, 1, 1, 1);
-        settings_popover_grid.attach (toggle_sidebar_menu_item, 0, 2, 1, 1);
-        settings_popover_grid.attach (new_server_connection_menu_item, 0, 3, 1, 1);
-        settings_popover_grid.attach (join_channel_menu_item, 0, 4, 1, 1);
-        settings_popover_grid.attach (preferences_menu_item, 0, 5, 1, 1);
-        settings_popover_grid.attach (create_menu_separator (), 0, 6, 1, 1);
-        settings_popover_grid.attach (quit_menu_item, 0, 7, 1, 1);
+        settings_popover_grid.attach (font_size_grid, 0, 1, 3, 1);
+        settings_popover_grid.attach (create_menu_separator (12), 0, 2, 1, 1);
+        settings_popover_grid.attach (toggle_sidebar_menu_item, 0, 3, 1, 1);
+        settings_popover_grid.attach (new_server_connection_menu_item, 0, 4, 1, 1);
+        settings_popover_grid.attach (join_channel_menu_item, 0, 5, 1, 1);
+        settings_popover_grid.attach (preferences_menu_item, 0, 6, 1, 1);
+        settings_popover_grid.attach (create_menu_separator (), 0, 7, 1, 1);
+        settings_popover_grid.attach (quit_menu_item, 0, 8, 1, 1);
         settings_popover_grid.show_all ();
 
         var settings_popover = new Gtk.Popover (null);
