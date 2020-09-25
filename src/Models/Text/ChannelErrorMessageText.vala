@@ -30,7 +30,7 @@ public class Iridium.Models.Text.ChannelErrorMessageText : Iridium.Models.Text.R
     public override void do_display (Gtk.TextBuffer buffer) {
         //  Gtk.TextIter iter;
         //  buffer.get_end_iter (out iter);
-        //  buffer.insert_text (ref iter, message.message, message.message.length);
+        //  buffer.insert (ref iter, message.message, message.message.length);
 
         //  // Format the message
         //  Gtk.TextIter start = iter;

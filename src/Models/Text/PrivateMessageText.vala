@@ -46,7 +46,7 @@ public abstract class Iridium.Models.Text.PrivateMessageText : Iridium.Models.Te
         } else {
             username += string.nfill (USERNAME_SPACING - username.length, ' ');
         }
-        buffer.insert_text (ref iter, username, username.length);
+        buffer.insert (ref iter, username, username.length);
 
         // Format the username
         Gtk.TextIter username_start = iter;
@@ -55,7 +55,7 @@ public abstract class Iridium.Models.Text.PrivateMessageText : Iridium.Models.Te
         username_end.forward_chars (message.username.length);
         buffer.apply_tag_by_name (get_tag_name (), username_start, username_end);
         buffer.apply_tag_by_name ("selectable", username_start, username_end);
-        buffer.insert_text (ref iter, message.message, message.message.length);
+        buffer.insert (ref iter, message.message, message.message.length);
         buffer.insert (ref iter, "\n", 1);
     }
 

@@ -43,6 +43,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     private Gdk.Cursor cursor_pointer;
     private Gdk.Cursor cursor_text;
 
+    private bool is_in_focus = false;
     private bool is_enabled = true;
 
     protected ChatView (string nickname) {
@@ -120,10 +121,6 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
             }
         });
 
-        /* scrolled_window.get_vadjustment ().value_changed.connect (() => {
-            print (scrolled_window.get_vadjustment ().value.to_string () + "\n");
-        }); */
-
         // This approach for detecting the mouse motion over a TextTag and changing the cursor
         // was adapted from:
         // https://www.kksou.com/php-gtk2/sample-codes/insert-links-in-GtkTextView-Part-4-Change-Cursor-over-Link.php
@@ -173,6 +170,8 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         event_box.leave_notify_event.connect ((event) => {
             clear_selectable_underlining ();
         });
+
+        show_all ();
     }
 
     private void create_text_tags () {
@@ -230,16 +229,6 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         Gtk.TextIter buffer_end;
         text_view.get_buffer ().get_end_iter (out buffer_end);
         text_view.get_buffer ().remove_tag_by_name ("selectable-underline", buffer_start, buffer_end);
-    }
-
-    // TODO: Need to figure out a good way to lock scrolling… Might be annoying
-    //       to experience the auto-scroll when you're looking back at old
-    //       messages…
-    protected void do_autoscroll () {
-        var buffer_end_mark = text_view.get_buffer ().get_mark ("buffer-end");
-        if (buffer_end_mark != null) {
-            text_view.scroll_mark_onscreen (buffer_end_mark);
-        }
     }
 
     public void set_entry_focus () {
@@ -323,9 +312,86 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         nickname_button.set_label (new_nickname);
     }
 
-    public abstract void display_self_private_msg (Iridium.Services.Message message);
-    public abstract void display_server_msg (Iridium.Services.Message message);
-    public abstract void display_server_error_msg (Iridium.Services.Message message);
+    public void display_self_private_msg (Iridium.Services.Message message) {
+        bool should_autoscroll = should_autoscroll ();
+        do_display_self_private_msg (message);
+        if (should_autoscroll) {
+            do_autoscroll ();
+        }
+    }
+
+    public void display_server_msg (Iridium.Services.Message message) {
+        bool should_autoscroll = should_autoscroll ();
+        do_display_server_msg (message);
+        if (should_autoscroll) {
+            do_autoscroll ();
+        }
+    }
+
+    public void display_server_error_msg (Iridium.Services.Message message) {
+        bool should_autoscroll = should_autoscroll ();
+        do_display_server_error_msg (message);
+        if (should_autoscroll) {
+            do_autoscroll ();
+        }
+    }
+
+    public void focus_gained () {
+        print("Focus gained\n");
+        is_in_focus = true;
+    }
+
+    public void focus_lost () {
+        print("Focus lost\n");
+        is_in_focus = false;
+
+        // Add/move the mark in the text buffer to indicate the last read message
+        Gtk.TextIter iter;
+        text_view.get_buffer ().get_end_iter (out iter);
+        if (text_view.get_buffer ().get_mark ("last-read-message") == null) {
+            text_view.get_buffer ().create_mark ("last-read-message", iter, false);
+        } else {
+            text_view.get_buffer ().move_mark_by_name ("last-read-message", iter);
+        }
+    }
+
+    //  private bool is_last_read_message_visible () {
+    //      if (text_view.get_buffer ().get_mark ("last-read-message") == null) {
+    //          return true;
+    //      } else {
+    //          //  text_view.get_buffer ().move_mark_by_name ("last-read-message", iter);
+    //      }
+    //  }
+
+    private void do_autoscroll () {
+        var buffer_end_mark = text_view.get_buffer ().get_mark ("buffer-end");
+        if (buffer_end_mark != null) {
+            text_view.scroll_mark_onscreen (buffer_end_mark);
+        }
+    }
+
+    private bool should_autoscroll () {
+        // If we've never opened this view the adjustment won't return the values you'd expect,
+        // so instead simply check whether there is a last read message and if the view has focus
+        if (!is_in_focus && text_view.get_buffer ().get_mark ("last-read-message") == null) {
+            return true;
+        }
+
+        var adjustment = scrolled_window.get_vadjustment ();
+        double page_size = adjustment.get_page_size ();
+        double max_view_size = adjustment.get_upper ();
+        double current_position = adjustment.get_value ();
+        int padding = text_view.get_pixels_below_lines ();
+
+        if (current_position + page_size + padding < max_view_size) {
+            return false;
+        }
+        return true;
+    }
+
+    public abstract void do_display_self_private_msg (Iridium.Services.Message message);
+    public abstract void do_display_server_msg (Iridium.Services.Message message);
+    public abstract void do_display_server_error_msg (Iridium.Services.Message message);
 
     protected abstract int get_indent ();
     protected abstract string get_disabled_message ();
