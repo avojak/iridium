@@ -53,4 +53,8 @@ public class Iridium.Views.ServerChatView : Iridium.Views.ChatView {
         //  do_autoscroll ();
     }
 
+    public override void do_display_private_msg (Iridium.Services.Message message) {
+        // Do nothing
+    }
+
 }

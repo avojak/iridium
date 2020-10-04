@@ -62,7 +62,7 @@ public class Iridium.Views.PrivateMessageChatView : Iridium.Views.ChatView {
         last_sender = null;
     }
 
-    public void display_private_msg (Iridium.Services.Message message) {
+    public override void do_display_private_msg (Iridium.Services.Message message) {
         var rich_text = new Iridium.Models.Text.OthersPrivateMessageText (message);
         rich_text.suppress_sender_username = is_repeat_sender (message);
         rich_text.display (text_view.get_buffer ());

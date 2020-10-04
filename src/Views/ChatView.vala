@@ -34,9 +34,10 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
 
     public string nickname { get; construct; }
 
-    protected Gtk.TextView text_view;
+    protected Gtk.SourceView text_view;
 
     private Gtk.ScrolledWindow scrolled_window;
+    //  private Gtk.Overlay overlay;
     private Gtk.Button nickname_button;
     private Gtk.Entry entry;
 
@@ -55,7 +56,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
 
     construct {
         // TODO: WHY CANT YOU CLICK AND DRAG TO SELECT TEXT???
-        text_view = new Gtk.TextView ();
+        text_view = new Gtk.SourceView ();
         text_view.set_pixels_below_lines (3);
         text_view.set_border_width (12);
         text_view.set_wrap_mode (Gtk.WrapMode.WORD_CHAR);
@@ -67,6 +68,8 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         text_view.set_vexpand (true);
         text_view.set_hexpand (true);
 
+        text_view.get_window (Gtk.TextWindowType.TEXT).draw_line ();
+
         // Initialize the buffer iterator
         Gtk.TextIter iter;
         text_view.get_buffer ().get_end_iter (out iter);
@@ -74,6 +77,33 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         scrolled_window = new Gtk.ScrolledWindow (null, null);
         scrolled_window.set_policy (Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
         scrolled_window.add (text_view);
+
+        //  // Create a context:
+        //  Gtk.DrawingArea drawing_area = new Gtk.DrawingArea ();
+        //  //  drawing_area.get_window ().set_pass_through (true);
+        //  drawing_area.draw.connect ((context) => {
+        //      Gdk.RGBA rgba = Gdk.RGBA ();
+        //      rgba.parse (COLOR_ORANGE);
+        //      context.set_source_rgba (rgba.red, rgba.green, rgba.blue, 1);
+        //      context.set_line_width (1);
+
+        //      context.move_to (10, 10);
+        //      context.line_to (190, 10);
+        //      context.line_to (190, 20);
+
+        //      context.move_to (10, 20);
+        //      context.line_to (190, 20);
+
+        //      context.stroke ();
+        //  });
+
+        //  overlay = new Gtk.Overlay ();
+        //  overlay.add (scrolled_window);
+        //  overlay.add_overlay (drawing_area);
+        //  drawing_area.event.connect ((event) => {
+        //      print ("drawing_area event\n");
+        //      scrolled_window.event (event);
+        //  });
 
         var event_box = new Gtk.EventBox ();
         event_box.add (scrolled_window);
@@ -170,6 +200,22 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         event_box.leave_notify_event.connect ((event) => {
             clear_selectable_underlining ();
         });
+
+        //  scrolled_window.scroll_child.connect ((scroll, horizontal) => {
+        //      print ("scroll_child\n");
+        //  });
+        //  scrolled_window.scroll_event.connect (() => {
+        //      print ("scrolled_window scroll event\n");
+        //  });
+        //  scrolled_window.edge_reached.connect ((pos) => {
+        //      print ("edge reached: %s\n", pos.to_string ());
+        //  });
+        //  text_view.scroll_event.connect ((event) => {
+        //      print ("scroll event\n");
+        //  });
+        //  scrolled_window.get_vscrollbar ().event.connect ((event) => {
+        //      print (event.type.to_string () + "\n");
+        //  });
 
         show_all ();
     }
@@ -321,11 +367,13 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     }
 
     public void display_server_msg (Iridium.Services.Message message) {
-        bool should_autoscroll = should_autoscroll ();
+        //  bool should_autoscroll = should_autoscroll ();
         do_display_server_msg (message);
-        if (should_autoscroll) {
-            do_autoscroll ();
-        }
+        //  if (should_autoscroll) {
+        // Always auto-scroll server messages (The large number of messages received upon connecting
+        // break the auto-scrolling's ability to keep up)
+        do_autoscroll ();
+        //  }
     }
 
     public void display_server_error_msg (Iridium.Services.Message message) {
@@ -336,13 +384,21 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         }
     }
 
+    public void display_private_msg (Iridium.Services.Message message) {
+        bool should_autoscroll = should_autoscroll ();
+        do_display_private_msg (message);
+        if (should_autoscroll) {
+            do_autoscroll ();
+        }
+    }
+
     public void focus_gained () {
-        print("Focus gained\n");
+        //  print ("Focus gained\n");
         is_in_focus = true;
     }
 
     public void focus_lost () {
-        print("Focus lost\n");
+        //  print ("Focus lost\n");
         is_in_focus = false;
 
         // Add/move the mark in the text buffer to indicate the last read message
@@ -383,15 +439,19 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         double current_position = adjustment.get_value ();
         int padding = text_view.get_pixels_below_lines ();
 
-        if (current_position + page_size + padding < max_view_size) {
+        //  if (current_position + page_size + padding < max_view_size) {
+        if (current_position < max_view_size - page_size - padding) {
+            print ("%g - %g - %d > %g\n", max_view_size, page_size, padding, current_position);
             return false;
         }
+        print ("%g - %g - %d <= %g\n", max_view_size, page_size, padding, current_position);
         return true;
     }
 
     public abstract void do_display_self_private_msg (Iridium.Services.Message message);
     public abstract void do_display_server_msg (Iridium.Services.Message message);
     public abstract void do_display_server_error_msg (Iridium.Services.Message message);
+    public abstract void do_display_private_msg (Iridium.Services.Message message);
 
     protected abstract int get_indent ();
     protected abstract string get_disabled_message ();
