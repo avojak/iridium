@@ -41,6 +41,7 @@ iridium_files = files(
     join_paths('Services', 'SecretManager.vala'),
     join_paths('Services', 'SQLClient.vala'),
     join_paths('Views', 'ChatView.vala'),
+    join_paths('Views', 'ChatTextView.vala'),
     join_paths('Views', 'ChannelChatView.vala'),
     join_paths('Views', 'PrivateMessageChatView.vala'),
     join_paths('Views', 'ServerChatView.vala'),

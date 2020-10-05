@@ -56,19 +56,39 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
 
     construct {
         // TODO: WHY CANT YOU CLICK AND DRAG TO SELECT TEXT???
-        text_view = new Gtk.SourceView ();
-        text_view.set_pixels_below_lines (3);
-        text_view.set_border_width (12);
-        text_view.set_wrap_mode (Gtk.WrapMode.WORD_CHAR);
-        /* text_view.left_margin = 140; */
-        text_view.set_indent (get_indent ());
-        text_view.set_monospace (true);
-        text_view.set_editable (false);
-        text_view.set_cursor_visible (false);
-        text_view.set_vexpand (true);
-        text_view.set_hexpand (true);
+        //  text_view = new Gtk.SourceView ();
+        //  text_view.set_pixels_below_lines (3);
+        //  text_view.set_border_width (12);
+        //  text_view.set_wrap_mode (Gtk.WrapMode.WORD_CHAR);
+        //  /* text_view.left_margin = 140; */
+        //  text_view.set_indent (get_indent ());
+        //  text_view.set_monospace (true);
+        //  text_view.set_editable (false);
+        //  text_view.set_cursor_visible (false);
+        //  text_view.set_vexpand (true);
+        //  text_view.set_hexpand (true);
 
-        text_view.get_window (Gtk.TextWindowType.TEXT).draw_line ();
+        text_view = new Iridium.Views.ChatTextView (get_indent ());
+        
+        //  var attributes = new Gtk.SourceMarkAttributes ();
+        //  attributes.icon_name = "mail-mark-important";
+        //  text_view.set_mark_attributes ("last-read-message", attributes, 0);
+
+        //  text_view.get_window (Gtk.TextWindowType.TEXT).draw_line ();
+        //  text_view.draw.connect ((context) => {
+        //      context.save ();
+        //      context.set_source_rgb (0, 0, 0);
+        //      context.set_line_width (2);
+        //      context.move_to (0, 0);
+        //      context.rel_line_to (20, 0);
+        //      context.rel_line_to (0, 20);
+        //      context.rel_line_to (-20, 0);
+        //      context.close_path ();
+        //      text_view.draw_layer (Gtk.TextViewLayer.ABOVE_TEXT, context);
+        //      context.restore ();
+        //  });
+        //  var ctx = Gdk.cairo_create (text_view.get_window (Gtk.TextWindowType.TEXT));
+        //  text_view.draw_layer (Gtk.TextViewLayer.ABOVE_TEXT, ctx);
 
         // Initialize the buffer iterator
         Gtk.TextIter iter;
@@ -393,12 +413,12 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     }
 
     public void focus_gained () {
-        //  print ("Focus gained\n");
+        print ("Focus gained\n");
         is_in_focus = true;
     }
 
     public void focus_lost () {
-        //  print ("Focus lost\n");
+        print ("Focus lost\n");
         is_in_focus = false;
 
         // Add/move the mark in the text buffer to indicate the last read message
@@ -441,10 +461,10 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
 
         //  if (current_position + page_size + padding < max_view_size) {
         if (current_position < max_view_size - page_size - padding) {
-            print ("%g - %g - %d > %g\n", max_view_size, page_size, padding, current_position);
+            //  print ("%g - %g - %d > %g\n", max_view_size, page_size, padding, current_position);
             return false;
         }
-        print ("%g - %g - %d <= %g\n", max_view_size, page_size, padding, current_position);
+        //  print ("%g - %g - %d <= %g\n", max_view_size, page_size, padding, current_position);
         return true;
     }
 
