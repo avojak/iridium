@@ -121,7 +121,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         }
 
         // Create the new chat view and add it to the stack
-        var chat_view = new Iridium.Views.ServerChatView (nickname);
+        var chat_view = new Iridium.Views.ServerChatView (window, nickname);
         chat_view.set_enabled (false); // TODO: Should be disabled by default?
         //  if (!view_mapping.has_key (server_name)) {
         //      view_mapping.set (server_name, new Gee.HashMap<string, string> ());
@@ -155,7 +155,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         }
 
         // Create the new chat view and add it to the stack
-        var chat_view = new Iridium.Views.ChannelChatView (nickname);
+        var chat_view = new Iridium.Views.ChannelChatView (window, nickname);
         chat_view.set_enabled (false); // TODO: Should be disabled by default?
         //  if (!view_mapping.has_key (server_name)) {
         //      view_mapping.set (server_name, new Gee.HashMap<string, string> ());
@@ -189,7 +189,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         }
 
         // Create the new chat view and add it to the stack
-        var chat_view = new Iridium.Views.PrivateMessageChatView (self_nickname, username);
+        var chat_view = new Iridium.Views.PrivateMessageChatView (window, self_nickname, username);
         chat_view.set_enabled (false); // TODO: Should be disabled by default?
         if (!nickname_mapping.has_key (server_name)) {
             nickname_mapping.set (server_name, new Gee.HashMap<string, string> ());

@@ -138,6 +138,16 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             GLib.Process.exit (0);
         });
 
+        //  this.focus.connect ((direction) => {
+        //      print ("Window focus changed\n");
+        //  });
+        //  this.focus_in_event.connect ((event) => {
+        //      print ("Window focus_in\n");
+        //  });
+        //  this.focus_out_event.connect ((event) => {
+        //      print ("Window focus_out\n");
+        //  });
+
         show_app ();
     }
 

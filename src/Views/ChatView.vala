@@ -21,6 +21,13 @@
 
 public abstract class Iridium.Views.ChatView : Gtk.Grid {
 
+    /*
+    Scrolling desirements
+    1. Lock when scrolling backwards
+    2. Auto-scroll when at the latest message
+    3. Update the marker when a message is received and the view is not in focus
+     */
+
     // TODO: Disable or somehow indicate that you are disconnected from a server
     //       and cannot send messages.
 
@@ -32,24 +39,29 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     private const string COLOR_BLUEBERRY = "#64baff"; // "#3689e6";
     //  private const string COLOR_GRAPE = "#a56de2";
 
+    public unowned Iridium.MainWindow window { get; construct; }
     public string nickname { get; construct; }
 
-    protected Gtk.SourceView text_view;
+    protected Iridium.Views.ChatTextView text_view;
 
     private Gtk.ScrolledWindow scrolled_window;
-    //  private Gtk.Overlay overlay;
     private Gtk.Button nickname_button;
     private Gtk.Entry entry;
+    private Granite.Widgets.Toast toast;
 
     private Gdk.Cursor cursor_pointer;
     private Gdk.Cursor cursor_text;
 
-    private bool is_in_focus = false;
+    private bool is_view_in_focus = false;
+    private bool is_window_in_focus = true;
     private bool is_enabled = true;
+    private bool has_unread_messages = false;
+    private int last_read_line = -1;
 
-    protected ChatView (string nickname) {
+    protected ChatView (Iridium.MainWindow window, string nickname) {
         Object (
             orientation: Gtk.Orientation.VERTICAL,
+            window: window,
             nickname: nickname
         );
     }
@@ -117,18 +129,20 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         //      context.stroke ();
         //  });
 
-        //  overlay = new Gtk.Overlay ();
-        //  overlay.add (scrolled_window);
-        //  overlay.add_overlay (drawing_area);
-        //  drawing_area.event.connect ((event) => {
-        //      print ("drawing_area event\n");
-        //      scrolled_window.event (event);
-        //  });
-
         var event_box = new Gtk.EventBox ();
         event_box.add (scrolled_window);
         event_box.set_events (Gdk.EventMask.ENTER_NOTIFY_MASK);
         event_box.set_events (Gdk.EventMask.LEAVE_NOTIFY_MASK);
+
+        toast = new Granite.Widgets.Toast (_("You have unread messages!"));
+        toast.set_default_action (_("Take me there"));
+        toast.default_action.connect (() => {
+            do_autoscroll ();
+        });
+
+        var overlay = new Gtk.Overlay ();
+        overlay.add_overlay (event_box);
+        overlay.add_overlay (toast);
 
         var entry_grid = new Gtk.Grid ();
 
@@ -146,7 +160,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         entry_grid.attach (nickname_button, 0, 0, 1, 1);
         entry_grid.attach (entry, 1, 0, 1, 1);
 
-        attach (event_box, 0, 0, 1, 1);
+        attach (overlay, 0, 0, 1, 1);
         attach (entry_grid, 0, 1, 1, 1);
 
         create_text_tags ();
@@ -231,11 +245,32 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         //      print ("edge reached: %s\n", pos.to_string ());
         //  });
         //  text_view.scroll_event.connect ((event) => {
-        //      print ("scroll event\n");
+        //      print ("text_view scroll event\n");
         //  });
         //  scrolled_window.get_vscrollbar ().event.connect ((event) => {
         //      print (event.type.to_string () + "\n");
         //  });
+        //  event_box.scroll_event.connect ((event) => {
+        //      print ("event_box scroll event\n");
+        //  });
+        //  scrolled_window.get_vscrollbar ().event.connect ((event) => {
+        //      print ("scrollbar event: %s\n", event.type.to_string ());
+        //  });
+
+        window.focus_in_event.connect (() => {
+            is_window_in_focus = true;
+            if (is_view_in_focus) {
+                on_focus_gained ();
+            }
+            return false;
+        });
+        window.focus_out_event.connect (() => {
+            is_window_in_focus = false;
+            if (is_view_in_focus) {
+                on_focus_lost ();
+            }
+            return false;
+        });
 
         show_all ();
     }
@@ -324,6 +359,14 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         return is_enabled;
     }
 
+    public void scroll_to_marker_line () {
+        // TODO
+    }
+
+    public void reset_marker_line () {
+        // TODO
+    }
+
     private bool on_username_clicked (Gtk.TextTag source, GLib.Object event_object, Gdk.Event event, Gtk.TextIter iter) {
         // TODO: Check for right click and show some options in a popup menu (eg. block, PM, etc.)
         if (event.type == Gdk.EventType.BUTTON_RELEASE) {
@@ -379,11 +422,12 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     }
 
     public void display_self_private_msg (Iridium.Services.Message message) {
-        bool should_autoscroll = should_autoscroll ();
+        //  bool should_autoscroll = should_autoscroll ();
         do_display_self_private_msg (message);
-        if (should_autoscroll) {
-            do_autoscroll ();
-        }
+        //  if (should_autoscroll) {
+        // Always auto-scroll after the user sends a message
+        do_autoscroll ();
+        //  }
     }
 
     public void display_server_msg (Iridium.Services.Message message) {
@@ -405,6 +449,12 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     }
 
     public void display_private_msg (Iridium.Services.Message message) {
+        if (!is_in_focus ()) {
+            update_last_read_message_mark ();
+            has_unread_messages = true;
+            //  text_view.show_marker_line ();
+        }
+
         bool should_autoscroll = should_autoscroll ();
         do_display_private_msg (message);
         if (should_autoscroll) {
@@ -414,21 +464,59 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
 
     public void focus_gained () {
         print ("Focus gained\n");
-        is_in_focus = true;
+        is_view_in_focus = true;
+        on_focus_gained ();
     }
 
     public void focus_lost () {
         print ("Focus lost\n");
-        is_in_focus = false;
+        is_view_in_focus = false;
+        on_focus_lost ();
 
-        // Add/move the mark in the text buffer to indicate the last read message
-        Gtk.TextIter iter;
-        text_view.get_buffer ().get_end_iter (out iter);
-        if (text_view.get_buffer ().get_mark ("last-read-message") == null) {
-            text_view.get_buffer ().create_mark ("last-read-message", iter, false);
+        //  if (text_view.get_buffer ().text.length == 0) {
+        //      return;
+        //  }
+
+        //  last_read_line = text_view.get_buffer ().get_line_count ();
+
+        //  // Add/move the mark in the text buffer to indicate the last read message
+        //  Gtk.TextIter iter;
+        //  text_view.get_buffer ().get_end_iter (out iter);
+        //  //  text_view.get_buffer ().get_iter_at_line (out iter, text_view.get_buffer ().get_line_count ());
+        //  //  iter.forward_to_line_end ();
+        //  if (text_view.get_buffer ().get_mark ("last-read-message") == null) {
+        //      text_view.get_buffer ().create_mark ("last-read-message", iter, true);
+        //  } else {
+        //      text_view.get_buffer ().move_mark_by_name ("last-read-message", iter);
+        //  }
+    }
+
+    private void on_focus_gained () {
+        // Check if the marker is within the view
+        //  if (text_view.is_marker_onscreen ()) {
+        if (has_unread_messages) {
+            print ("Focus gained with unread messages\n");
+            // Check if the end of the buffer is in view, and show the prompt if not
+            if (!at_bottom_of_screen ()) {
+                print ("not at bottom of screen\n");
+                toast.send_notification ();
+            } else {
+                print ("at the bottom of the screen\n");
+            }
         } else {
-            text_view.get_buffer ().move_mark_by_name ("last-read-message", iter);
+            print ("focus gained with no unread messages\n");
         }
+        has_unread_messages = false;
+        //  }
+        //  set_entry_focus ();
+    }
+
+    private void on_focus_lost () {
+
+    }
+
+    private bool is_in_focus () {
+        return is_view_in_focus && is_window_in_focus;
     }
 
     //  private bool is_last_read_message_visible () {
@@ -449,10 +537,14 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     private bool should_autoscroll () {
         // If we've never opened this view the adjustment won't return the values you'd expect,
         // so instead simply check whether there is a last read message and if the view has focus
-        if (!is_in_focus && text_view.get_buffer ().get_mark ("last-read-message") == null) {
+        if (!is_view_in_focus && text_view.get_buffer ().get_mark ("last-read-message") == null) {
             return true;
         }
 
+        return at_bottom_of_screen ();
+    }
+
+    private bool at_bottom_of_screen () {
         var adjustment = scrolled_window.get_vadjustment ();
         double page_size = adjustment.get_page_size ();
         double max_view_size = adjustment.get_upper ();
@@ -466,6 +558,36 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         }
         //  print ("%g - %g - %d <= %g\n", max_view_size, page_size, padding, current_position);
         return true;
+    }
+
+    private void update_last_read_message_mark () {
+        // If there's nothing in the buffer, there's nothing to do
+        if (text_view.get_buffer ().text.length == 0) {
+            print ("Not updating marker - the buffer is empty\n");
+            return;
+        }
+
+        // Only change the mark in the background
+        if (is_in_focus ()) {
+            print ("Not updating marker - view is in focus\n");
+            return;
+        }
+
+        // There are already unread messages, don't move the mark further down the buffer
+        if (has_unread_messages) {
+            print ("Not updating marker - there are already unread messages\n");
+            return;
+        }
+        
+        // Add/move the mark in the text buffer to indicate the last read message
+        Gtk.TextIter iter;
+        text_view.get_buffer ().get_end_iter (out iter);
+        if (text_view.get_buffer ().get_mark ("last-read-message") == null) {
+            text_view.get_buffer ().create_mark ("last-read-message", iter, true);
+        } else {
+            text_view.get_buffer ().move_mark_by_name ("last-read-message", iter);
+        }
+        text_view.queue_draw ();
     }
 
     public abstract void do_display_self_private_msg (Iridium.Services.Message message);

@@ -24,8 +24,9 @@ public class Iridium.Views.ChannelChatView : Iridium.Views.ChatView {
     private Gee.List<string> usernames = new Gee.ArrayList<string> ();
     private string? last_sender = null;
 
-    public ChannelChatView (string nickname) {
+    public ChannelChatView (Iridium.MainWindow window, string nickname) {
         Object (
+            window: window,
             nickname: nickname
         );
     }

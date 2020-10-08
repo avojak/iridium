@@ -21,8 +21,9 @@
 
 public class Iridium.Views.ServerChatView : Iridium.Views.ChatView {
 
-    public ServerChatView (string nickname) {
+    public ServerChatView (Iridium.MainWindow window, string nickname) {
         Object (
+            window: window,
             nickname: nickname
         );
     }

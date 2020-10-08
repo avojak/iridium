@@ -23,6 +23,8 @@ public class Iridium.Views.ChatTextView : Gtk.SourceView {
 
     private const string COLOR_ORANGE = "#ffa154"; // "#f37329";
 
+    private bool should_show_marker_line = false;
+
     public ChatTextView (int text_indent) {
         Object (
             pixels_below_lines: 3,
@@ -38,11 +40,16 @@ public class Iridium.Views.ChatTextView : Gtk.SourceView {
         );
     }
 
-    protected override bool draw (Cairo.Context ctx) {
-        base.draw (ctx);
+    public void show_marker_line () {
+        should_show_marker_line = true;
+    }
 
-        // If there's no last read message mark, there's no place to draw the line
-        if (buffer.get_mark ("last-read-message") == null) {
+    public void hide_marker_line () {
+        should_show_marker_line = false;
+    }
+
+    public bool is_marker_onscreen () {
+         if (buffer.get_mark ("last-read-message") == null) {
             print ("No mark\n");
             return false;
         }
@@ -50,6 +57,40 @@ public class Iridium.Views.ChatTextView : Gtk.SourceView {
         // Get the location of the last read message
         Gtk.TextIter iter;
         buffer.get_iter_at_mark (out iter, buffer.get_mark ("last-read-message"));
+        iter.forward_to_line_end ();
+
+        Gdk.Rectangle rect;
+        get_iter_location (iter, out rect);
+
+        // Convert to window coordinates
+        int window_x;
+        int window_y;
+        buffer_to_window_coords (Gtk.TextWindowType.TEXT, rect.x, rect.y, out window_x, out window_y);
+
+        print ("Marker is at y=%d\n", window_y);
+        print ("View is lower=%g, upper=%g, value=%g\n", vadjustment.lower, vadjustment.upper, vadjustment.value);
+
+        return window_y > 0 && window_y < vadjustment.upper;
+    }
+
+    protected override bool draw (Cairo.Context ctx) {
+        base.draw (ctx);
+
+        //  if (!should_show_marker_line) {
+        //      return false;
+        //  }
+
+        // If there's no last read message mark, there's no place to draw the line
+        if (buffer.get_mark ("last-read-message") == null) {
+            //  print ("No mark\n");
+            return false;
+        }
+
+        // Get the location of the last read message
+        Gtk.TextIter iter;
+        buffer.get_iter_at_mark (out iter, buffer.get_mark ("last-read-message"));
+        iter.forward_to_line_end ();
+
         Gdk.Rectangle rect;
         get_iter_location (iter, out rect);
 
@@ -59,9 +100,10 @@ public class Iridium.Views.ChatTextView : Gtk.SourceView {
         buffer_to_window_coords (Gtk.TextWindowType.TEXT, rect.x, rect.y, out window_x, out window_y);
         //  print ("x: %d, y: %d\n, left_margin: %d, width: %g\n", window_x, window_y, left_margin, hadjustment.upper);
 
-        double line_width = hadjustment.upper;
+        // Don't include the border_width, because it gets buggy and sometimes doesn't update the part of the line in the border
+        double line_width = hadjustment.upper + left_margin + right_margin;
         double line_x = left_margin + border_width;
-        double line_y = window_y + 14; // TODO: Compute this based on font size and padding between lines
+        double line_y = window_y + 10; // TODO: Compute this based on font size and padding between lines
 
         ctx.save();
 

@@ -25,8 +25,9 @@ public class Iridium.Views.PrivateMessageChatView : Iridium.Views.ChatView {
 
     private string last_sender = null;
 
-    public PrivateMessageChatView (string self_nickname, string username) {
+    public PrivateMessageChatView (Iridium.MainWindow window, string self_nickname, string username) {
         Object (
+            window: window,
             nickname: self_nickname,
             username: username
         );
