@@ -33,6 +33,45 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
     }
 
     construct {
+        var join_button = new Gtk.MenuButton ();
+        join_button.set_image (new Gtk.Image.from_icon_name ("list-add-symbolic", Gtk.IconSize.BUTTON));
+        join_button.tooltip_text = _("Join");
+        join_button.relief = Gtk.ReliefStyle.NONE;
+        join_button.valign = Gtk.Align.CENTER;
+
+        var new_server_connection_accellabel = new Granite.AccelLabel.from_action_name (
+            _("New Server Connection"),
+            Iridium.Services.ActionManager.ACTION_PREFIX + Iridium.Services.ActionManager.ACTION_NEW_SERVER_CONNECTION
+        );
+
+        var new_server_connection_menu_item = new Gtk.ModelButton ();
+        new_server_connection_menu_item.action_name = Iridium.Services.ActionManager.ACTION_PREFIX + Iridium.Services.ActionManager.ACTION_NEW_SERVER_CONNECTION;
+        new_server_connection_menu_item.get_child ().destroy ();
+        new_server_connection_menu_item.add (new_server_connection_accellabel);
+
+        var join_channel_accellabel = new Granite.AccelLabel.from_action_name (
+            _("Join Channel"),
+            Iridium.Services.ActionManager.ACTION_PREFIX + Iridium.Services.ActionManager.ACTION_JOIN_CHANNEL
+        );
+
+        var join_channel_menu_item = new Gtk.ModelButton ();
+        join_channel_menu_item.action_name = Iridium.Services.ActionManager.ACTION_PREFIX + Iridium.Services.ActionManager.ACTION_JOIN_CHANNEL;
+        join_channel_menu_item.get_child ().destroy ();
+        join_channel_menu_item.add (join_channel_accellabel);
+
+        var join_popover_grid = new Gtk.Grid ();
+        join_popover_grid.margin_bottom = 3;
+        join_popover_grid.orientation = Gtk.Orientation.VERTICAL;
+        join_popover_grid.width_request = 200;
+        join_popover_grid.attach (new_server_connection_menu_item, 0, 0, 1, 1);
+        join_popover_grid.attach (join_channel_menu_item, 0, 1, 1, 1);
+        join_popover_grid.show_all ();
+
+        var join_popover = new Gtk.Popover (null);
+        join_popover.add (join_popover_grid);
+
+        join_button.popover = join_popover;
+
         channel_users_button = new Gtk.MenuButton ();
         channel_users_button.set_image (new Gtk.Image.from_icon_name ("system-users-symbolic", Gtk.IconSize.BUTTON));
         channel_users_button.tooltip_text = _("Channel users"); // TODO: Enable accelerator
@@ -79,26 +118,6 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         reset_marker_menu_item.get_child ().destroy ();
         reset_marker_menu_item.add (reset_marker_accellabel);
 
-        var new_server_connection_accellabel = new Granite.AccelLabel.from_action_name (
-            _("New Server Connection"),
-            Iridium.Services.ActionManager.ACTION_PREFIX + Iridium.Services.ActionManager.ACTION_NEW_SERVER_CONNECTION
-        );
-
-        var new_server_connection_menu_item = new Gtk.ModelButton ();
-        new_server_connection_menu_item.action_name = Iridium.Services.ActionManager.ACTION_PREFIX + Iridium.Services.ActionManager.ACTION_NEW_SERVER_CONNECTION;
-        new_server_connection_menu_item.get_child ().destroy ();
-        new_server_connection_menu_item.add (new_server_connection_accellabel);
-
-        var join_channel_accellabel = new Granite.AccelLabel.from_action_name (
-            _("Join Channel"),
-            Iridium.Services.ActionManager.ACTION_PREFIX + Iridium.Services.ActionManager.ACTION_JOIN_CHANNEL
-        );
-
-        var join_channel_menu_item = new Gtk.ModelButton ();
-        join_channel_menu_item.action_name = Iridium.Services.ActionManager.ACTION_PREFIX + Iridium.Services.ActionManager.ACTION_JOIN_CHANNEL;
-        join_channel_menu_item.get_child ().destroy ();
-        join_channel_menu_item.add (join_channel_accellabel);
-
         var preferences_accellabel = new Granite.AccelLabel.from_action_name (
             _("Preferences"),
             Iridium.Services.ActionManager.ACTION_PREFIX + Iridium.Services.ActionManager.ACTION_PREFERENCES
@@ -127,11 +146,9 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         settings_popover_grid.attach (create_menu_separator (12), 0, 1, 1, 1);
         settings_popover_grid.attach (toggle_sidebar_menu_item, 0, 2, 1, 1);
         settings_popover_grid.attach (reset_marker_menu_item, 0, 3, 1, 1);
-        settings_popover_grid.attach (new_server_connection_menu_item, 0, 4, 1, 1);
-        settings_popover_grid.attach (join_channel_menu_item, 0, 5, 1, 1);
-        settings_popover_grid.attach (preferences_menu_item, 0, 6, 1, 1);
-        settings_popover_grid.attach (create_menu_separator (), 0, 7, 1, 1);
-        settings_popover_grid.attach (quit_menu_item, 0, 8, 1, 1);
+        settings_popover_grid.attach (preferences_menu_item, 0, 4, 1, 1);
+        settings_popover_grid.attach (create_menu_separator (), 0, 5, 1, 1);
+        settings_popover_grid.attach (quit_menu_item, 0, 6, 1, 1);
         settings_popover_grid.show_all ();
 
         var settings_popover = new Gtk.Popover (null);
@@ -142,6 +159,7 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         pack_end (settings_button);
         pack_end (channel_users_button);
         pack_end (new Gtk.Separator (Gtk.Orientation.VERTICAL));
+        pack_start (join_button);
         pack_start (new Gtk.Separator (Gtk.Orientation.VERTICAL));
     }
 
