@@ -28,6 +28,7 @@ dependencies required:
 - `meson`
 - `valac (>= 0.28.0)`
 - `libsqlite3-dev`
+- `libgtksourceview-3.0-dev`
 
 An `install-dev-dependencies.sh` script is available to help developers get up and running.
 

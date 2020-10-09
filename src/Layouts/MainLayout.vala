@@ -121,7 +121,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         }
 
         // Create the new chat view and add it to the stack
-        var chat_view = new Iridium.Views.ServerChatView (nickname);
+        var chat_view = new Iridium.Views.ServerChatView (window, nickname);
         chat_view.set_enabled (false); // TODO: Should be disabled by default?
         //  if (!view_mapping.has_key (server_name)) {
         //      view_mapping.set (server_name, new Gee.HashMap<string, string> ());
@@ -155,7 +155,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         }
 
         // Create the new chat view and add it to the stack
-        var chat_view = new Iridium.Views.ChannelChatView (nickname);
+        var chat_view = new Iridium.Views.ChannelChatView (window, nickname);
         chat_view.set_enabled (false); // TODO: Should be disabled by default?
         //  if (!view_mapping.has_key (server_name)) {
         //      view_mapping.set (server_name, new Gee.HashMap<string, string> ());
@@ -189,7 +189,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         }
 
         // Create the new chat view and add it to the stack
-        var chat_view = new Iridium.Views.PrivateMessageChatView (self_nickname, username);
+        var chat_view = new Iridium.Views.PrivateMessageChatView (window, self_nickname, username);
         chat_view.set_enabled (false); // TODO: Should be disabled by default?
         if (!nickname_mapping.has_key (server_name)) {
             nickname_mapping.set (server_name, new Gee.HashMap<string, string> ());
@@ -316,8 +316,18 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
             return;
         }
 
+        // Notify the currently visible chat view that it is losing focus
+        Gtk.Widget? visible_child = main_stack.get_visible_child ();
+        if (visible_child != null && visible_child is Iridium.Views.ChatView) {
+            ((Iridium.Views.ChatView) visible_child).focus_lost ();
+        }
+
+        // Show the chat view
         chat_view.show_all ();
         main_stack.set_visible_child_full (get_child_name (server_name, channel_name), Gtk.StackTransitionType.SLIDE_RIGHT);
+
+        // Notify the chat view that it has gained focus
+        chat_view.focus_gained ();
 
         // Select side panel row and call signals
         if (chat_view is Iridium.Views.ServerChatView) {
@@ -333,8 +343,8 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
             assert_not_reached ();
         }
 
-        // Set focus on the text entry
         Idle.add (() => {
+            // Set focus on the text entry
             chat_view.set_entry_focus ();
             return false;
         });

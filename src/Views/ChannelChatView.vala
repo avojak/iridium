@@ -24,8 +24,9 @@ public class Iridium.Views.ChannelChatView : Iridium.Views.ChatView {
     private Gee.List<string> usernames = new Gee.ArrayList<string> ();
     private string? last_sender = null;
 
-    public ChannelChatView (string nickname) {
+    public ChannelChatView (Iridium.MainWindow window, string nickname) {
         Object (
+            window: window,
             nickname: nickname
         );
     }
@@ -38,35 +39,31 @@ public class Iridium.Views.ChannelChatView : Iridium.Views.ChatView {
         return _("You must join this channel to begin chatting");
     }
 
-    public override void display_self_private_msg (Iridium.Services.Message message) {
+    public override void do_display_self_private_msg (Iridium.Services.Message message) {
         var rich_text = new Iridium.Models.Text.SelfPrivateMessageText (message);
         rich_text.set_usernames (usernames);
         rich_text.suppress_sender_username = is_repeat_sender (message);
         rich_text.display (text_view.get_buffer ());
-        do_autoscroll ();
         last_sender = message.username;
     }
 
-    public override void display_server_msg (Iridium.Services.Message message) {
+    public override void do_display_server_msg (Iridium.Services.Message message) {
         var rich_text = new Iridium.Models.Text.ServerMessageText (message);
         rich_text.display (text_view.get_buffer ());
-        do_autoscroll ();
         last_sender = null;
     }
 
-    public override void display_server_error_msg (Iridium.Services.Message message) {
+    public override void do_display_server_error_msg (Iridium.Services.Message message) {
         var rich_text = new Iridium.Models.Text.ServerErrorMessageText (message);
         rich_text.display (text_view.get_buffer ());
-        do_autoscroll ();
         last_sender = null;
     }
 
-    public void display_private_msg (Iridium.Services.Message message) {
+    public override void do_display_private_msg (Iridium.Services.Message message) {
         var rich_text = new Iridium.Models.Text.OthersPrivateMessageText (message);
         rich_text.set_usernames (usernames);
         rich_text.suppress_sender_username = is_repeat_sender (message);
         rich_text.display (text_view.get_buffer ());
-        do_autoscroll ();
         last_sender = message.username;
     }
 

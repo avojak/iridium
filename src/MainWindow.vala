@@ -29,7 +29,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     private Iridium.Widgets.ServerConnectionDialog? connection_dialog = null;
     private Iridium.Widgets.ChannelJoinDialog? channel_join_dialog = null;
     private Iridium.Widgets.ChannelTopicEditDialog? channel_topic_edit_dialog = null;
-    private Iridium.Widgets.ManageConnectionsDialog? manage_connections_dialog = null;
+    //  private Iridium.Widgets.ManageConnectionsDialog? manage_connections_dialog = null;
     private Iridium.Widgets.PreferencesDialog? preferences_dialog = null;
     private Iridium.Widgets.NicknameEditDialog? nickname_edit_dialog = null;
 
@@ -317,17 +317,17 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         channel_topic_edit_dialog.present ();
     }
 
-    private void show_manage_connections_dialog () {
-        if (manage_connections_dialog == null) {
-            var servers = Iridium.Application.connection_repository.get_servers ();
-            manage_connections_dialog = new Iridium.Widgets.ManageConnectionsDialog (this, servers);
-            manage_connections_dialog.show_all ();
-            manage_connections_dialog.destroy.connect (() => {
-                manage_connections_dialog = null;
-            });
-        }
-        manage_connections_dialog.present ();
-    }
+    //  private void show_manage_connections_dialog () {
+    //      if (manage_connections_dialog == null) {
+    //          var servers = Iridium.Application.connection_repository.get_servers ();
+    //          manage_connections_dialog = new Iridium.Widgets.ManageConnectionsDialog (this, servers);
+    //          manage_connections_dialog.show_all ();
+    //          manage_connections_dialog.destroy.connect (() => {
+    //              manage_connections_dialog = null;
+    //          });
+    //      }
+    //      manage_connections_dialog.present ();
+    //  }
 
     public void show_preferences_dialog () {
         if (preferences_dialog == null) {

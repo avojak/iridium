@@ -48,6 +48,7 @@ iridium_files = files(
     join_paths('Widgets', 'HeaderBar.vala'),
     join_paths('Widgets', 'NetworkInfoBar.vala'),
     join_paths('Widgets', 'StatusBar.vala'),
+    join_paths('Widgets', 'TextView.vala'),
     join_paths('Widgets', 'Dialogs', 'CertificateWarningDialog.vala'),
     join_paths('Widgets', 'Dialogs', 'ChannelJoinDialog.vala'),
     join_paths('Widgets', 'Dialogs', 'ChannelTopicEditDialog.vala'),
@@ -76,7 +77,8 @@ executable(
         dependency('glib-2.0', version: '>= 2.30.0'),
         dependency('granite', version: '>= 0.5.1'),
         dependency('libsecret-1', version: '>= 0.18.6'),
-        dependency('sqlite3', version: '>= 3.22.0')
+        dependency('sqlite3', version: '>= 3.22.0'),
+        dependency('gtksourceview-3.0')
     ],
     vala_args: vala_args,
     install: true
