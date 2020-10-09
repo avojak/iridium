@@ -452,6 +452,10 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         main_layout.toggle_sidebar ();
     }
 
+    public void reset_marker_line () {
+        main_layout.reset_marker_line ();
+    }
+
     //
     // Respond to network connection changes
     //

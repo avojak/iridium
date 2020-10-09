@@ -571,6 +571,13 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         side_panel.visible = !side_panel.visible;
     }
 
+    public void reset_marker_line () {
+        Gtk.Widget? visible_child = main_stack.get_visible_child ();
+        if (visible_child != null && visible_child is Iridium.Views.ChatView) {
+            ((Iridium.Views.ChatView) visible_child).reset_marker_line ();
+        }
+    }
+
     /*
      * Handlers for the side panel signals
      */

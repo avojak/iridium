@@ -34,6 +34,7 @@ public class Iridium.Services.ActionManager : GLib.Object {
     public const string ACTION_FAVORITE_CHANNEL = "action_favorite_channel";
     public const string ACTION_PREFERENCES = "action_preferences";
     public const string ACTION_TOGGLE_SIDEBAR = "action_toggle_sidebar";
+    public const string ACTION_RESET_MARKER = "action_reset_marker";
 
     private const GLib.ActionEntry[] ACTION_ENTRIES = {
         { ACTION_NEW_WINDOW, action_new_window },
@@ -47,7 +48,8 @@ public class Iridium.Services.ActionManager : GLib.Object {
         { ACTION_LEAVE_CHANNEL, action_leave_channel },
         { ACTION_FAVORITE_CHANNEL, action_favorite_channel },
         { ACTION_PREFERENCES, action_preferences },
-        { ACTION_TOGGLE_SIDEBAR, action_toggle_sidebar }
+        { ACTION_TOGGLE_SIDEBAR, action_toggle_sidebar },
+        { ACTION_RESET_MARKER, action_reset_marker }
     };
 
     private static Gee.MultiMap<string, string> accelerators;
@@ -82,6 +84,7 @@ public class Iridium.Services.ActionManager : GLib.Object {
         //  accelerators.set (ACTION_FAVORITE_CHANNEL, "<Control>s");
         accelerators.set (ACTION_PREFERENCES, "<Control><Shift>p");
         accelerators.set (ACTION_TOGGLE_SIDEBAR, "<Control>backslash");
+        accelerators.set (ACTION_RESET_MARKER, "<Control>m");
     }
 
     construct {
@@ -156,6 +159,10 @@ public class Iridium.Services.ActionManager : GLib.Object {
 
     private void action_toggle_sidebar () {
         window.toggle_sidebar ();
+    }
+
+    private void action_reset_marker () {
+        window.reset_marker_line ();
     }
 
 }
