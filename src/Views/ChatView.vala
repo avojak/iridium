@@ -442,7 +442,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         if (has_unread_messages) {
             return;
         }
-        
+
         // Add/move the mark in the text buffer to indicate the last read message
         Gtk.TextIter iter;
         text_view.get_buffer ().get_end_iter (out iter);

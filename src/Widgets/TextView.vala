@@ -87,7 +87,7 @@ public class Iridium.Widgets.TextView : Gtk.SourceView {
         double line_x = left_margin + border_width;
         double line_y = window_y + 10; // TODO: Compute this based on font size and padding between lines
 
-        ctx.save();
+        ctx.save ();
 
         var rgba = Gdk.RGBA ();
         rgba.parse (COLOR_ORANGE);
@@ -98,7 +98,7 @@ public class Iridium.Widgets.TextView : Gtk.SourceView {
         ctx.line_to (line_width, line_y);
 
         ctx.stroke ();
-        ctx.restore();
+        ctx.restore ();
 
         return false;
     }
