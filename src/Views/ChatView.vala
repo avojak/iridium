@@ -278,7 +278,13 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     }
 
     public void reset_marker_line () {
-        // TODO
+        var last_read_message_mark = text_view.get_buffer ().get_mark ("last-read-message");
+        if (last_read_message_mark != null) {
+            text_view.get_buffer ().delete_mark (last_read_message_mark);
+        }
+
+        // Force the view to immediately be redrawn without the marker line
+        text_view.queue_draw ();
     }
 
     private bool on_username_clicked (Gtk.TextTag source, GLib.Object event_object, Gdk.Event event, Gtk.TextIter iter) {
@@ -360,7 +366,6 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         if (!is_in_focus ()) {
             update_last_read_message_mark ();
             has_unread_messages = true;
-            //  text_view.show_marker_line ();
         }
 
         bool should_autoscroll = should_autoscroll ();
