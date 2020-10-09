@@ -19,13 +19,13 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Views.ChatTextView : Gtk.SourceView {
+public class Iridium.Widgets.TextView : Gtk.SourceView {
+
+    // TODO: WHY CANT YOU CLICK AND DRAG TO SELECT TEXT???
 
     private const string COLOR_ORANGE = "#ffa154"; // "#f37329";
 
-    private bool should_show_marker_line = false;
-
-    public ChatTextView (int text_indent) {
+    public TextView (int text_indent) {
         Object (
             pixels_below_lines: 3,
             border_width: 12,
@@ -40,17 +40,8 @@ public class Iridium.Views.ChatTextView : Gtk.SourceView {
         );
     }
 
-    public void show_marker_line () {
-        should_show_marker_line = true;
-    }
-
-    public void hide_marker_line () {
-        should_show_marker_line = false;
-    }
-
     public bool is_marker_onscreen () {
          if (buffer.get_mark ("last-read-message") == null) {
-            print ("No mark\n");
             return false;
         }
 
@@ -66,9 +57,6 @@ public class Iridium.Views.ChatTextView : Gtk.SourceView {
         int window_x;
         int window_y;
         buffer_to_window_coords (Gtk.TextWindowType.TEXT, rect.x, rect.y, out window_x, out window_y);
-
-        print ("Marker is at y=%d\n", window_y);
-        print ("View is lower=%g, upper=%g, value=%g\n", vadjustment.lower, vadjustment.upper, vadjustment.value);
 
         return window_y > 0 && window_y < vadjustment.upper;
     }
@@ -76,13 +64,8 @@ public class Iridium.Views.ChatTextView : Gtk.SourceView {
     protected override bool draw (Cairo.Context ctx) {
         base.draw (ctx);
 
-        //  if (!should_show_marker_line) {
-        //      return false;
-        //  }
-
         // If there's no last read message mark, there's no place to draw the line
         if (buffer.get_mark ("last-read-message") == null) {
-            //  print ("No mark\n");
             return false;
         }
 
@@ -98,7 +81,6 @@ public class Iridium.Views.ChatTextView : Gtk.SourceView {
         int window_x;
         int window_y;
         buffer_to_window_coords (Gtk.TextWindowType.TEXT, rect.x, rect.y, out window_x, out window_y);
-        //  print ("x: %d, y: %d\n, left_margin: %d, width: %g\n", window_x, window_y, left_margin, hadjustment.upper);
 
         // Don't include the border_width, because it gets buggy and sometimes doesn't update the part of the line in the border
         double line_width = hadjustment.upper + left_margin + right_margin;

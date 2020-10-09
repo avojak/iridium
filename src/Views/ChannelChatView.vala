@@ -44,21 +44,18 @@ public class Iridium.Views.ChannelChatView : Iridium.Views.ChatView {
         rich_text.set_usernames (usernames);
         rich_text.suppress_sender_username = is_repeat_sender (message);
         rich_text.display (text_view.get_buffer ());
-        //  do_autoscroll ();
         last_sender = message.username;
     }
 
     public override void do_display_server_msg (Iridium.Services.Message message) {
         var rich_text = new Iridium.Models.Text.ServerMessageText (message);
         rich_text.display (text_view.get_buffer ());
-        //  do_autoscroll ();
         last_sender = null;
     }
 
     public override void do_display_server_error_msg (Iridium.Services.Message message) {
         var rich_text = new Iridium.Models.Text.ServerErrorMessageText (message);
         rich_text.display (text_view.get_buffer ());
-        //  do_autoscroll ();
         last_sender = null;
     }
 
@@ -67,7 +64,6 @@ public class Iridium.Views.ChannelChatView : Iridium.Views.ChatView {
         rich_text.set_usernames (usernames);
         rich_text.suppress_sender_username = is_repeat_sender (message);
         rich_text.display (text_view.get_buffer ());
-        //  do_autoscroll ();
         last_sender = message.username;
     }
 

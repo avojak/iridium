@@ -39,19 +39,16 @@ public class Iridium.Views.ServerChatView : Iridium.Views.ChatView {
     public override void do_display_self_private_msg (Iridium.Services.Message message) {
         var rich_text = new Iridium.Models.Text.SelfPrivateMessageText (message);
         rich_text.display (text_view.get_buffer ());
-        //  do_autoscroll ();
     }
 
     public override void do_display_server_msg (Iridium.Services.Message message) {
         var rich_text = new Iridium.Models.Text.ServerMessageText (message);
         rich_text.display (text_view.get_buffer ());
-        //  do_autoscroll ();
     }
 
     public override void do_display_server_error_msg (Iridium.Services.Message message) {
         var rich_text = new Iridium.Models.Text.ServerErrorMessageText (message);
         rich_text.display (text_view.get_buffer ());
-        //  do_autoscroll ();
     }
 
     public override void do_display_private_msg (Iridium.Services.Message message) {
