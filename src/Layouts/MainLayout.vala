@@ -28,7 +28,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
     public Iridium.Widgets.StatusBar status_bar { get; construct; }
 
     private Gee.Map<string, Gee.Map<string, string>> nickname_mapping;
-    //  private Gee.Map<string, Gee.Map<string, string>> view_mapping;
+    private Gee.Map<string, Gee.List<Iridium.Views.ChatView>> server_child_views;
     private Gee.List<Iridium.Views.ChatView> chat_views;
 
     private Gtk.Paned paned;
@@ -64,7 +64,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         attach (overlay, 0, 1, 1, 1);
 
         nickname_mapping = new Gee.HashMap<string, Gee.Map<string, string>> ();
-        //  view_mapping = new Gee.HashMap<string, Gee.Map<string, string>> ();
+        server_child_views = new Gee.HashMap<string, Gee.List<Iridium.Views.ChatView>> ();
         chat_views = new Gee.ArrayList<Iridium.Views.ChatView> ();
 
         // Connect to side panel signals
@@ -123,11 +123,11 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         // Create the new chat view and add it to the stack
         var chat_view = new Iridium.Views.ServerChatView (window, nickname);
         chat_view.set_enabled (false); // TODO: Should be disabled by default?
-        //  if (!view_mapping.has_key (server_name)) {
-        //      view_mapping.set (server_name, new Gee.HashMap<string, string> ());
-        //  }
         main_stack.add_named (chat_view, server_name);
         chat_views.add (chat_view);
+        if (!server_child_views.has_key (server_name)) {
+            server_child_views.set (server_name, new Gee.ArrayList<Iridium.Views.ChatView> ());
+        }
 
         // Connect to signals
         chat_view.message_to_send.connect ((message) => {
@@ -157,14 +157,12 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         // Create the new chat view and add it to the stack
         var chat_view = new Iridium.Views.ChannelChatView (window, nickname);
         chat_view.set_enabled (false); // TODO: Should be disabled by default?
-        //  if (!view_mapping.has_key (server_name)) {
-        //      view_mapping.set (server_name, new Gee.HashMap<string, string> ());
-        //  }
-        //  var uuid = GLib.Uuid.string_random ();
-        //  view_mapping.get (server_name).set (channel_name, uuid);
         main_stack.add_named (chat_view, server_name + ":" + channel_name);
-        //  main_stack.add_named (chat_view, uuid);
         chat_views.add (chat_view);
+        if (!server_child_views.has_key (server_name)) {
+            server_child_views.set (server_name, new Gee.ArrayList<Iridium.Views.ChatView> ());
+        }
+        server_child_views.get (server_name).add (chat_view);
 
         // Connect to signals
         chat_view.message_to_send.connect ((message) => {
@@ -194,14 +192,14 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         if (!nickname_mapping.has_key (server_name)) {
             nickname_mapping.set (server_name, new Gee.HashMap<string, string> ());
         }
-        //  if (!view_mapping.has_key (server_name)) {
-        //      view_mapping.set (server_name, new Gee.HashMap<string, string> ());
-        //  }
         var uuid = GLib.Uuid.string_random ();
         nickname_mapping.get (server_name).set (username, uuid);
-        //  view_mapping.get (server_name).set (username, uuid);
         main_stack.add_named (chat_view, server_name + ":" + uuid);
         chat_views.add (chat_view);
+        if (!server_child_views.has_key (server_name)) {
+            server_child_views.set (server_name, new Gee.ArrayList<Iridium.Views.ChatView> ());
+        }
+        server_child_views.get (server_name).add (chat_view);
 
         // Connect to signals
         chat_view.message_to_send.connect ((message) => {
@@ -252,6 +250,12 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         // Enable the side panel row
         if (chat_view is Iridium.Views.ServerChatView) {
             side_panel.enable_server_row (server_name);
+            // Private message rows are directly tied to the server row
+            foreach (var child_view in server_child_views.get (server_name)) {
+                if (child_view is Iridium.Views.PrivateMessageChatView) {
+                    child_view.set_enabled (true);
+                }
+            }
         } else if (chat_view is Iridium.Views.ChannelChatView) {
             side_panel.enable_channel_row (server_name, channel_name);
         } else if (chat_view is Iridium.Views.PrivateMessageChatView) {
@@ -272,6 +276,10 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         // Disable the side panel row
         if (chat_view is Iridium.Views.ServerChatView) {
             side_panel.disable_server_row (server_name);
+            // Disable all child views
+            foreach (var child_view in server_child_views.get (server_name)) {
+                child_view.set_enabled (false);
+            }
         } else if (chat_view is Iridium.Views.ChannelChatView) {
             side_panel.disable_channel_row (server_name, channel_name);
         } else if (chat_view is Iridium.Views.PrivateMessageChatView) {

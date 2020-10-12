@@ -322,6 +322,10 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
         }
         unowned Iridium.Widgets.SidePanel.Row row = (Iridium.Widgets.SidePanel.Row) server_item;
         row.enable ();
+        // Private message rows are directly tied to the server row
+        foreach (var private_message_row in private_message_items.get (server_name)) {
+            private_message_row.enable ();
+        }
         server_row_enabled (server_name);
     }
 
@@ -335,6 +339,9 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
         // Disable all of the children
         foreach (var channel_row in channel_items.get (server_name)) {
             channel_row.disable ();
+        }
+        foreach (var private_message_row in private_message_items.get (server_name)) {
+            private_message_row.disable ();
         }
         server_row_disabled (server_name);
     }
