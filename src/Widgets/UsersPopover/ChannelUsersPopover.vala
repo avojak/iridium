@@ -103,6 +103,9 @@ public class Iridium.Widgets.UsersPopover.ChannelUsersPopover : Gtk.Popover {
             widget.destroy ();
         });
         foreach (string username in usernames) {
+            if (username == null || username.chomp ().length == 0) {
+                continue;
+            }
             var row = new Iridium.Widgets.UsersPopover.UserListBoxRow (username);
             list_box.insert (row, -1);
         }
