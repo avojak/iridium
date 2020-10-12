@@ -38,7 +38,7 @@ public class Iridium.Views.PrivateMessageChatView : Iridium.Views.ChatView {
     }
 
     protected override string get_disabled_message () {
-        return ""; // TODO: Does this even make sense since we don't allow disabled PM items?
+        return _("You are not connected to this server");
     }
 
     public override void do_display_self_private_msg (Iridium.Services.Message message) {
