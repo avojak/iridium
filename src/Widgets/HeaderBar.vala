@@ -60,6 +60,7 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         join_channel_menu_item.add (join_channel_accellabel);
 
         var join_popover_grid = new Gtk.Grid ();
+        join_popover_grid.margin_top = 3;
         join_popover_grid.margin_bottom = 3;
         join_popover_grid.orientation = Gtk.Orientation.VERTICAL;
         join_popover_grid.width_request = 200;
