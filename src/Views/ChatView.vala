@@ -24,14 +24,6 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     // TODO: Disable or somehow indicate that you are disconnected from a server
     //       and cannot send messages.
 
-    // TODO: Should toggle these colors slightly depending on whether user is in dark mode or not
-    // Colors defined by the elementary OS Human Interface Guidelines
-    private const string COLOR_STRAWBERRY = "#ed5353"; // "#c6262e";
-    private const string COLOR_ORANGE = "#ffa154"; // "#f37329";
-    private const string COLOR_LIME = "#9bdb4d"; // "#68b723";
-    private const string COLOR_BLUEBERRY = "#64baff"; // "#3689e6";
-    //  private const string COLOR_GRAPE = "#a56de2";
-
     public unowned Iridium.MainWindow window { get; construct; }
     public string nickname { get; construct; }
 
@@ -190,43 +182,34 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
             return false;
         });
 
+        Iridium.Application.settings.changed["prefer-dark-style"].connect (update_tag_colors);
+
         show_all ();
     }
 
     private void create_text_tags () {
         var buffer = text_view.get_buffer ();
-        var color = Gdk.RGBA ();
 
         // Other usernames
-        color.parse (COLOR_BLUEBERRY);
         unowned Gtk.TextTag username_tag = buffer.create_tag ("username");
-        username_tag.foreground_rgba = color;
         username_tag.weight = Pango.Weight.SEMIBOLD;
         username_tag.event.connect (on_username_clicked);
 
         // Self username
-        color.parse (COLOR_LIME);
         unowned Gtk.TextTag self_username_tag = buffer.create_tag ("self-username");
-        self_username_tag.foreground_rgba = color;
         self_username_tag.weight = Pango.Weight.SEMIBOLD;
         self_username_tag.event.connect (on_username_clicked);
 
         // Errors
-        color.parse (COLOR_STRAWBERRY);
         unowned Gtk.TextTag error_tag = buffer.create_tag ("error");
-        error_tag.foreground_rgba = color;
         error_tag.weight = Pango.Weight.SEMIBOLD;
 
         // Inline usernames
-        color.parse (COLOR_ORANGE);
         unowned Gtk.TextTag inline_username_tag = buffer.create_tag ("inline-username");
-        inline_username_tag.foreground_rgba = color;
         inline_username_tag.event.connect (on_username_clicked);
 
         // Inline self username
-        color.parse (COLOR_LIME);
-        unowned Gtk.TextTag inline_self_username_tag = buffer.create_tag ("inline-self-username");
-        inline_self_username_tag.foreground_rgba = color;
+        buffer.create_tag ("inline-self-username");
 
         // Selectable
         buffer.create_tag ("selectable");
@@ -236,10 +219,39 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         selectable_underline_tag.underline = Pango.Underline.SINGLE;
 
         // Hyperlinks
-        color.parse (COLOR_BLUEBERRY);
         unowned Gtk.TextTag hyperlink_tag = buffer.create_tag ("hyperlink");
-        hyperlink_tag.foreground_rgba = color;
         hyperlink_tag.event.connect (on_hyperlink_clicked);
+
+        update_tag_colors ();
+    }
+
+    private void update_tag_colors () {
+        var tag_table = text_view.get_buffer ().get_tag_table ();
+        var color = Gdk.RGBA ();
+
+        // Other usernames
+        color.parse (Iridium.Models.ColorPalette.COLOR_BLUEBERRY.get_value ());
+        tag_table.lookup ("username").foreground_rgba = color;
+
+        // Self username
+        color.parse (Iridium.Models.ColorPalette.COLOR_LIME.get_value ());
+        tag_table.lookup ("self-username").foreground_rgba = color;
+
+        // Errors
+        color.parse (Iridium.Models.ColorPalette.COLOR_STRAWBERRY.get_value ());
+        tag_table.lookup ("error").foreground_rgba = color;
+
+        // Inline usernames
+        color.parse (Iridium.Models.ColorPalette.COLOR_ORANGE.get_value ());
+        tag_table.lookup ("inline-username").foreground_rgba = color;
+
+        // Inline self username
+        color.parse (Iridium.Models.ColorPalette.COLOR_LIME.get_value ());
+        tag_table.lookup ("inline-self-username").foreground_rgba = color;
+
+        // Hyperlinks
+        color.parse (Iridium.Models.ColorPalette.COLOR_BLUEBERRY.get_value ());
+        tag_table.lookup ("hyperlink").foreground_rgba = color;
     }
 
     private void clear_selectable_underlining () {
