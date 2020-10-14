@@ -92,10 +92,7 @@ public class Iridium.Widgets.TextView : Gtk.SourceView {
         var rgba = Gdk.RGBA ();
         rgba.parse (Iridium.Models.ColorPalette.COLOR_ORANGE.get_value ());
         ctx.set_source_rgba (rgba.red, rgba.green, rgba.blue, 1);
-        double line_width_a = 1.0;
-        double line_width_b = 1.0;
-        ctx.device_to_user_distance (ref line_width_a, ref line_width_b);
-        ctx.set_line_width (double.min (line_width_a, line_width_b));
+        ctx.set_line_width (1);
 
         ctx.move_to (line_x, line_y);
         ctx.line_to (line_width, line_y);
