@@ -24,7 +24,7 @@ public class Iridium.Widgets.PreferencesDialog : Gtk.Dialog {
     private static Gtk.CssProvider provider;
 
     public unowned Iridium.MainWindow main_window { get; construct; }
-    
+
     private Gtk.Entry default_nickname_entry;
     private Gtk.Entry default_realname_entry;
     private Gee.Map<int, Iridium.Models.InvalidCertificatePolicy> cert_policies;

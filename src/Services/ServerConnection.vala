@@ -674,7 +674,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     public signal void channel_message_received (string channel_name, Iridium.Services.Message message);
     public signal void user_joined_channel (string channel_name, string username);
     public signal void user_left_channel (string channel_name, string username);
-    public signal void private_message_received (string username, string self_nickname,  Iridium.Services.Message message);
+    public signal void private_message_received (string username, string self_nickname, Iridium.Services.Message message);
     public signal void insufficient_privs (string channel_name, Iridium.Services.Message message);
     public signal void nickname_changed (string old_nickname, string new_nickname);
     public signal void user_changed_nickname (string old_nickname, string new_nickname);
