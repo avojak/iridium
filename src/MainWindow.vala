@@ -563,15 +563,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         });
     }
 
-    //  private string? lookup_nickname (string server_name) {
-    //      Iridium.Services.Server? server = Iridium.Application.connection_repository.get_server (server_name);
-    //      if (server == null) {
-    //          warning ("No server found with the name %s", server_name);
-    //          return null;
-    //      }
-    //      return server.connection_details.nickname;
-    //  }
-
     private void on_server_connection_failed (string server_name, string error_message, string? error_details) {
         Idle.add (() => {
             if (connection_dialog != null) {
