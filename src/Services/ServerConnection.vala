@@ -305,7 +305,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 break;
             case Iridium.Services.NumericCodes.RPL_WELCOME:
                 is_registered = true;
-                open_successful (message);
+                open_successful (connection_details.nickname, message);
                 break;
             case Iridium.Services.NumericCodes.RPL_ISUPPORT:
                 // Skip the first param because it's our nickname
@@ -334,10 +334,10 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 if (message.username == connection_details.nickname) {
                     if (message.message == null || message.message.strip () == "") {
                         joined_channels.add (message.params[0]);
-                        channel_joined (message.params[0]);
+                        channel_joined (message.params[0], connection_details.nickname);
                     } else {
                         joined_channels.add (message.message);
-                        channel_joined (message.message);
+                        channel_joined (message.message, connection_details.nickname);
                     }
                 } else {
                     if (message.message == null || message.message.strip () == "") {
@@ -371,7 +371,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 // If the first param is our nickname, it's a PM. Otherwise, it's
                 // a general message on a channel
                 if (message.params[0] == connection_details.nickname) {
-                    private_message_received (message.username, message);
+                    private_message_received (message.username, connection_details.nickname, message);
                 } else {
                     channel_message_received (message.params[0], message);
                 }
@@ -657,7 +657,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     }
 
     public signal bool unacceptable_certificate (TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors, SocketConnectable connectable);
-    public signal void open_successful (Iridium.Services.Message message);
+    public signal void open_successful (string nickname, Iridium.Services.Message message);
     public signal void open_failed (string error_message, string? error_details = null);
     public signal void connection_closed ();
     /* public signal void close_failed (string message); */
@@ -669,12 +669,12 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     public signal void channel_topic_received (string channel);
     public signal void nickname_in_use (Iridium.Services.Message message);
     public signal void erroneous_nickname (string current_nickname, string requested_nickname);
-    public signal void channel_joined (string channel);
+    public signal void channel_joined (string channel, string nickname);
     public signal void channel_left (string channel);
     public signal void channel_message_received (string channel_name, Iridium.Services.Message message);
     public signal void user_joined_channel (string channel_name, string username);
     public signal void user_left_channel (string channel_name, string username);
-    public signal void private_message_received (string username, Iridium.Services.Message message);
+    public signal void private_message_received (string username, string self_nickname,  Iridium.Services.Message message);
     public signal void insufficient_privs (string channel_name, Iridium.Services.Message message);
     public signal void nickname_changed (string old_nickname, string new_nickname);
     public signal void user_changed_nickname (string old_nickname, string new_nickname);
