@@ -213,8 +213,8 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
         return unacceptable_certificate (peer_cert, errors, connectable);
     }
 
-    private void on_server_connection_successful (Iridium.Services.ServerConnection source, Iridium.Services.Message message) {
-        server_connection_successful (source.connection_details.server, message);
+    private void on_server_connection_successful (Iridium.Services.ServerConnection source, string nickname, Iridium.Services.Message message) {
+        server_connection_successful (source.connection_details.server, nickname, message);
     }
 
     private void on_server_connection_failed (Iridium.Services.ServerConnection source, string error_message, string? error_details) {
@@ -257,8 +257,8 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
         erroneous_nickname (source.connection_details.server, current_nickname, requested_nickname);
     }
 
-    private void on_channel_joined (Iridium.Services.ServerConnection source, string channel_name) {
-        channel_joined (source.connection_details.server, channel_name);
+    private void on_channel_joined (Iridium.Services.ServerConnection source, string channel_name, string nickname) {
+        channel_joined (source.connection_details.server, channel_name, nickname);
     }
 
     private void on_channel_left (Iridium.Services.ServerConnection source, string channel_name) {
@@ -277,8 +277,8 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
         user_left_channel (source.connection_details.server, channel_name, username);
     }
 
-    private void on_private_message_received (Iridium.Services.ServerConnection source, string username, Iridium.Services.Message message) {
-        private_message_received (source.connection_details.server, username, message);
+    private void on_private_message_received (Iridium.Services.ServerConnection source, string username, string self_nickname, Iridium.Services.Message message) {
+        private_message_received (source.connection_details.server, username, self_nickname, message);
     }
 
     private void on_insufficient_privs_received (Iridium.Services.ServerConnection source, string channel_name, Iridium.Services.Message message) {
@@ -302,7 +302,7 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
     //
 
     public signal bool unacceptable_certificate (TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors, SocketConnectable connectable);
-    public signal void server_connection_successful (string server_name, Iridium.Services.Message message);
+    public signal void server_connection_successful (string server_name, string nickname, Iridium.Services.Message message);
     public signal void server_connection_failed (string server_name, string error_message, string? error_details);
     public signal void server_connection_closed (string server_name);
     public signal void server_message_received (string server_name, Iridium.Services.Message message);
@@ -313,12 +313,12 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
     public signal void channel_topic_received (string server_name, string channel_name);
     public signal void nickname_in_use (string server_name, Iridium.Services.Message message);
     public signal void erroneous_nickname (string server_name, string current_nickname, string requested_nickname);
-    public signal void channel_joined (string server_name, string channel_name);
+    public signal void channel_joined (string server_name, string channel_name, string nickname);
     public signal void channel_left (string server_name, string channel_name);
     public signal void channel_message_received (string server_name, string channel_name, Iridium.Services.Message message);
     public signal void user_joined_channel (string server_name, string channel_name, string username);
     public signal void user_left_channel (string server_name, string channel_name, string username);
-    public signal void private_message_received (string server_name, string username, Iridium.Services.Message message);
+    public signal void private_message_received (string server_name, string username, string self_nickname, Iridium.Services.Message message);
     public signal void insufficient_privs_received (string server_name, string channel_name, Iridium.Services.Message message);
     public signal void nickname_changed (string server_name, string old_nickname, string new_nickname);
     public signal void user_changed_nickname (string server_name, string old_nickname, string new_nickname);

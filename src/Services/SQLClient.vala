@@ -192,16 +192,16 @@ public class Iridium.Services.SQLClient : GLib.Object {
         statement.reset ();
     }
 
-    //  public void remove_servers () {
-    //      var sql = "DELETE * FROM servers;";
-    //      Sqlite.Statement statement;
-    //      if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
-    //          log_database_error (database.errcode (), database.errmsg ());
-    //          return;
-    //      }
-    //      statement.step ();
-    //      statement.reset ();
-    //  }
+    public void remove_all_servers () {
+        var sql = "DELETE FROM servers;";
+        Sqlite.Statement statement;
+        if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
+            log_database_error (database.errcode (), database.errmsg ());
+            return;
+        }
+        statement.step ();
+        statement.reset ();
+    }
 
     public void insert_channel (int server_id, Iridium.Services.Channel channel) {
         var sql = """
@@ -282,6 +282,17 @@ public class Iridium.Services.SQLClient : GLib.Object {
         }
         statement.bind_int (1, server_id);
 
+        statement.step ();
+        statement.reset ();
+    }
+
+    public void remove_all_channels () {
+        var sql = "DELETE FROM channels;";
+        Sqlite.Statement statement;
+        if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
+            log_database_error (database.errcode (), database.errmsg ());
+            return;
+        }
         statement.step ();
         statement.reset ();
     }
@@ -444,6 +455,17 @@ public class Iridium.Services.SQLClient : GLib.Object {
         }
         statement.bind_text (1, host);
 
+        statement.step ();
+        statement.reset ();
+    }
+
+    public void remove_all_server_identities () {
+        var sql = "DELETE FROM server_identities;";
+        Sqlite.Statement statement;
+        if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
+            log_database_error (database.errcode (), database.errmsg ());
+            return;
+        }
         statement.step ();
         statement.reset ();
     }

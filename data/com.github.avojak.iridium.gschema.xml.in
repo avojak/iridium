@@ -26,5 +26,10 @@
       <summary>If warnings should be suppressed when closing a server connection</summary>
       <description>If warnings should be suppressed when closing a server connection</description>
     </key>
+    <key name="remember-connections" type="b">
+      <default>true</default>
+      <summary>If server connections should be remembered between sessions</summary>
+      <description>If server connections should be remembered between sessions</description>
+    </key>
   </schema>
 </schemalist>

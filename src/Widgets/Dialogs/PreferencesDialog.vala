@@ -23,6 +23,8 @@ public class Iridium.Widgets.PreferencesDialog : Gtk.Dialog {
 
     private static Gtk.CssProvider provider;
 
+    public unowned Iridium.MainWindow main_window { get; construct; }
+
     private Gtk.Entry default_nickname_entry;
     private Gtk.Entry default_realname_entry;
     private Gee.Map<int, Iridium.Models.InvalidCertificatePolicy> cert_policies;
@@ -39,7 +41,8 @@ public class Iridium.Widgets.PreferencesDialog : Gtk.Dialog {
             resizable: false,
             title: _("Preferences"),
             transient_for: main_window,
-            modal: true
+            modal: false,
+            main_window: main_window
         );
     }
 
@@ -96,7 +99,7 @@ public class Iridium.Widgets.PreferencesDialog : Gtk.Dialog {
             Iridium.Application.settings.set_string ("default-realname", default_realname_entry.text.chomp ().chug ());
         });
 
-        var security_header_label = new Granite.HeaderLabel (_("Security"));
+        var security_header_label = new Granite.HeaderLabel (_("Security and Privacy"));
 
         var cert_validation_policy_label = new Gtk.Label (_("Unacceptable SSL/TLS Certificates:"));
         cert_validation_policy_label.halign = Gtk.Align.END;
@@ -133,6 +136,8 @@ public class Iridium.Widgets.PreferencesDialog : Gtk.Dialog {
         security_posture_stack.expand = true;
         security_posture_stack.hhomogeneous = true;
         security_posture_stack.vhomogeneous = true;
+        security_posture_stack.margin_bottom = 10;
+        security_posture_stack.halign = Gtk.Align.END;
 
         var tls_cert_reject_grid = new Gtk.Grid ();
         tls_cert_reject_grid.column_spacing = 10;
@@ -190,6 +195,28 @@ public class Iridium.Widgets.PreferencesDialog : Gtk.Dialog {
         security_posture_stack.add_named (tls_cert_allow_grid, "cert-allow");
         security_posture_stack.show_all (); // Required in order to set the visible child from preferences
 
+        var remember_connections_label = new Gtk.Label (_("Remember connections between sessions:"));
+        var remember_connections_switch = new Gtk.Switch ();
+        remember_connections_switch.halign = Gtk.Align.START;
+        remember_connections_switch.valign = Gtk.Align.CENTER;
+        Iridium.Application.settings.bind ("remember-connections", remember_connections_switch, "active", SettingsBindFlags.DEFAULT);
+
+        remember_connections_switch.notify["active"].connect (() => {
+            if (!remember_connections_switch.get_active ()) {
+                Idle.add (() => {
+                    var dialog = new Iridium.Widgets.ForgetConnectionsWarningDialog (this);
+                    int result = dialog.run ();
+                    dialog.dismiss ();
+                    if (result == Gtk.ResponseType.CANCEL) {
+                        remember_connections_switch.set_active (true);
+                    } else {
+                        Iridium.Application.connection_repository.clear ();
+                    }
+                    return false;
+                });
+            }
+        });
+
         form_grid.attach (general_header_label, 0, 0, 1);
         form_grid.attach (default_nickname_label, 0, 1, 1);
         form_grid.attach (default_nickname_entry, 1, 1, 1);
@@ -199,6 +226,8 @@ public class Iridium.Widgets.PreferencesDialog : Gtk.Dialog {
         form_grid.attach (cert_validation_policy_label, 0, 4, 1);
         form_grid.attach (cert_validation_policy_combo, 1, 4, 1);
         form_grid.attach (security_posture_stack, 0, 5, 2);
+        form_grid.attach (remember_connections_label, 0, 6, 1);
+        form_grid.attach (remember_connections_switch, 1, 6, 1);
 
         body.add (header_grid);
         body.add (form_grid);

@@ -53,6 +53,7 @@ iridium_files = files(
     join_paths('Widgets', 'Dialogs', 'CertificateWarningDialog.vala'),
     join_paths('Widgets', 'Dialogs', 'ChannelJoinDialog.vala'),
     join_paths('Widgets', 'Dialogs', 'ChannelTopicEditDialog.vala'),
+    join_paths('Widgets', 'Dialogs', 'ForgetConnectionsWarningDialog.vala'),
     join_paths('Widgets', 'Dialogs', 'ManageConnectionsDialog.vala'),
     join_paths('Widgets', 'Dialogs', 'NicknameEditDialog.vala'),
     join_paths('Widgets', 'Dialogs', 'PreferencesDialog.vala'),

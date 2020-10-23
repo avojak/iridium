@@ -33,10 +33,19 @@ public class Iridium.Services.ServerConnectionRepository : GLib.Object {
         }
     }
 
+    private bool should_remember_connections;
+
     private ServerConnectionRepository () {
+        should_remember_connections = Iridium.Application.settings.get_boolean ("remember-connections");
+        Iridium.Application.settings.changed["remember-connections"].connect (() => {
+            should_remember_connections = Iridium.Application.settings.get_boolean ("remember-connections");
+        });
     }
 
     public void on_server_connection_successful (Iridium.Services.ServerConnectionDetails connection_details) {
+        if (!should_remember_connections) {
+            return;
+        }
         lock (sql_client) {
             // Don't add a duplicate server
             if (sql_client.get_server (connection_details.server) != null) {
@@ -55,6 +64,9 @@ public class Iridium.Services.ServerConnectionRepository : GLib.Object {
     }
 
     public void on_server_row_removed (string server_name) {
+        if (!should_remember_connections) {
+            return;
+        }
         lock (sql_client) {
             var server = sql_client.get_server (server_name);
             if (server == null) {
@@ -80,12 +92,18 @@ public class Iridium.Services.ServerConnectionRepository : GLib.Object {
     }
 
     private void set_server_row_enabled (string server_name, bool enabled) {
+        if (!should_remember_connections) {
+            return;
+        }
         lock (sql_client) {
             sql_client.set_server_enabled (server_name, enabled);
         }
     }
 
     public void on_channel_row_added (string server_name, string channel_name) {
+        if (!should_remember_connections) {
+            return;
+        }
         lock (sql_client) {
             var server = sql_client.get_server (server_name);
             if (server == null) {
@@ -108,6 +126,9 @@ public class Iridium.Services.ServerConnectionRepository : GLib.Object {
     }
 
     public void on_channel_row_removed (string server_name, string channel_name) {
+        if (!should_remember_connections) {
+            return;
+        }
         lock (sql_client) {
             var server = sql_client.get_server (server_name);
             if (server == null) {
@@ -130,6 +151,9 @@ public class Iridium.Services.ServerConnectionRepository : GLib.Object {
     }
 
     private void set_channel_row_enabled (string server_name, string channel_name, bool enabled) {
+        if (!should_remember_connections) {
+            return;
+        }
         lock (sql_client) {
             var server = sql_client.get_server (server_name);
             if (server == null) {
@@ -152,6 +176,9 @@ public class Iridium.Services.ServerConnectionRepository : GLib.Object {
     }
 
     private void set_channel_favorite (string server_name, string channel_name, bool favorite) {
+        if (!should_remember_connections) {
+            return;
+        }
         lock (sql_client) {
             var server = sql_client.get_server (server_name);
             if (server == null) {
@@ -182,24 +209,36 @@ public class Iridium.Services.ServerConnectionRepository : GLib.Object {
     }
 
     public Iridium.Services.Server? get_server (string server_name) {
+        if (!should_remember_connections) {
+            return null;
+        }
         lock (sql_client) {
             return sql_client.get_server (server_name);
         }
     }
 
     public Gee.List<Iridium.Services.Server> get_servers () {
+        if (!should_remember_connections) {
+            return new Gee.ArrayList<Iridium.Services.Server> ();
+        }
         lock (sql_client) {
             return sql_client.get_servers ();
         }
     }
 
     public Gee.List<Iridium.Services.Channel> get_channels () {
+        if (!should_remember_connections) {
+            return new Gee.ArrayList<Iridium.Services.Channel> ();
+        }
         lock (sql_client) {
             return sql_client.get_channels ();
         }
     }
 
     public void on_nickname_changed (string server_name, string old_nickname, string new_nickname) {
+        if (!should_remember_connections) {
+            return;
+        }
         lock (sql_client) {
             Iridium.Services.Server? server = sql_client.get_server (server_name);
             if (server == null) {
@@ -211,6 +250,9 @@ public class Iridium.Services.ServerConnectionRepository : GLib.Object {
     }
 
     public void on_network_name_received (string server_name, string network_name) {
+        if (!should_remember_connections) {
+            return;
+        }
         lock (sql_client) {
             Iridium.Services.Server? server = sql_client.get_server (server_name);
             if (server == null) {
@@ -221,11 +263,13 @@ public class Iridium.Services.ServerConnectionRepository : GLib.Object {
         }
     }
 
-    //  public void clear () {
-    //      lock (sql_client) {
-    //          sql_client.remove_servers ();
-    //          sql_client.remove_channels ();
-    //      }
-    //  }
+    public void clear () {
+        debug ("Clearing all database content…");
+        lock (sql_client) {
+            sql_client.remove_all_servers ();
+            sql_client.remove_all_channels ();
+            sql_client.remove_all_server_identities ();
+        }
+    }
 
 }

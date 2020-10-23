@@ -180,7 +180,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             var server_id = server.id;
             var server_name = server.connection_details.server;
             Idle.add (() => {
-                main_layout.add_server_chat_view (server_name, lookup_nickname (server_name), server.network_name != null ? server.network_name : null);
+                main_layout.add_server_chat_view (server_name, server.connection_details.nickname, server.network_name != null ? server.network_name : null);
                 return false;
             });
             foreach (Iridium.Services.Channel channel in channels) {
@@ -192,7 +192,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                     continue;
                 }
                 Idle.add (() => {
-                    main_layout.add_channel_chat_view (server_name, channel_name, lookup_nickname (server_name));
+                    main_layout.add_channel_chat_view (server_name, channel_name, server.connection_details.nickname);
                     if (channel.favorite) {
                         main_layout.favorite_channel (server_name, channel_name);
                     }
@@ -492,9 +492,10 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         if (server_name == null) {
             return;
         }
+        var self_nickname = main_layout.get_server_chat_view (server_name).nickname;
         var trimmed_username = strip_username_prefix (username);
         Idle.add (() => {
-            main_layout.add_private_message_chat_view (server_name, trimmed_username, lookup_nickname (server_name));
+            main_layout.add_private_message_chat_view (server_name, trimmed_username, self_nickname);
             main_layout.enable_chat_view (server_name, trimmed_username);
             main_layout.show_chat_view (server_name, trimmed_username);
             return false;
@@ -541,9 +542,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         return is_accepted;
     }
 
-    private void on_server_connection_successful (string server_name, Iridium.Services.Message message) {
+    private void on_server_connection_successful (string server_name, string nickname, Iridium.Services.Message message) {
         Idle.add (() => {
-            main_layout.add_server_chat_view (server_name, lookup_nickname (server_name), null);
+            main_layout.add_server_chat_view (server_name, nickname, null);
             main_layout.enable_chat_view (server_name, null);
             main_layout.display_server_message (server_name, null, message);
             // If we've just connected to the server that the dialog is for, close the dialog and set the focus on that view
@@ -560,15 +561,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
             return false;
         });
-    }
-
-    private string? lookup_nickname (string server_name) {
-        Iridium.Services.Server? server = Iridium.Application.connection_repository.get_server (server_name);
-        if (server == null) {
-            warning ("No server found with the name %s", server_name);
-            return null;
-        }
-        return server.connection_details.nickname;
     }
 
     private void on_server_connection_failed (string server_name, string error_message, string? error_details) {
@@ -684,9 +676,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         });
     }
 
-    private void on_channel_joined (string server_name, string channel_name) {
+    private void on_channel_joined (string server_name, string channel_name, string nickname) {
         Idle.add (() => {
-            main_layout.add_channel_chat_view (server_name, channel_name, lookup_nickname (server_name));
+            main_layout.add_channel_chat_view (server_name, channel_name, nickname);
             main_layout.enable_chat_view (server_name, channel_name);
             // If we've just joined the channel that the dialog is for, close the dialog and set the focus on that view
             if (channel_join_dialog != null && channel_join_dialog.get_server () == server_name && channel_join_dialog.get_channel () == channel_name) {
@@ -741,9 +733,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         update_channel_users_list (server_name, channel_name);
     }
 
-    private void on_private_message_received (string server_name, string username, Iridium.Services.Message message) {
+    private void on_private_message_received (string server_name, string username, string self_nickname, Iridium.Services.Message message) {
         Idle.add (() => {
-            main_layout.add_private_message_chat_view (server_name, username, lookup_nickname (server_name));
+            main_layout.add_private_message_chat_view (server_name, username, self_nickname);
             main_layout.enable_chat_view (server_name, username);
             main_layout.display_private_message (server_name, username, message);
             return false;
