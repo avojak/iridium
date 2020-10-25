@@ -21,14 +21,14 @@
 
 public abstract class Iridium.Models.Text.PrivateMessageText : Iridium.Models.Text.RichText {
 
-    private static uint16 USERNAME_SPACING = 20; // vala-lint=naming-convention
+    private static uint16 NICKNAME_SPACING = 20; // vala-lint=naming-convention
 
-    public bool suppress_sender_username { get; set; }
+    public bool suppress_sender_nickname { get; set; }
 
     protected PrivateMessageText (Iridium.Services.Message message) {
         Object (
             message: message,
-            suppress_sender_username: false
+            suppress_sender_nickname: false
         );
     }
 
@@ -36,25 +36,25 @@ public abstract class Iridium.Models.Text.PrivateMessageText : Iridium.Models.Te
         Gtk.TextIter iter;
         buffer.get_end_iter (out iter);
 
-        // Display username
-        var username = message.username;
-        if (suppress_sender_username) {
-            username = string.nfill (USERNAME_SPACING, ' ');
-        } else if (username.length > USERNAME_SPACING) {
-            username = username.substring (0, USERNAME_SPACING - 3);
-            username += "…";
+        // Display nickname
+        var nickname = message.nickname;
+        if (suppress_sender_nickname) {
+            nickname = string.nfill (NICKNAME_SPACING, ' ');
+        } else if (nickname.length > NICKNAME_SPACING) {
+            nickname = nickname.substring (0, NICKNAME_SPACING - 3);
+            nickname += "…";
         } else {
-            username += string.nfill (USERNAME_SPACING - username.length, ' ');
+            nickname += string.nfill (NICKNAME_SPACING - nickname.length, ' ');
         }
-        buffer.insert (ref iter, username, username.length);
+        buffer.insert (ref iter, nickname, nickname.length);
 
-        // Format the username
-        Gtk.TextIter username_start = iter;
-        username_start.backward_chars (username.length);
-        Gtk.TextIter username_end = username_start;
-        username_end.forward_chars (message.username.length);
-        buffer.apply_tag_by_name (get_tag_name (), username_start, username_end);
-        buffer.apply_tag_by_name ("selectable", username_start, username_end);
+        // Format the nickname
+        Gtk.TextIter nickname_start = iter;
+        nickname_start.backward_chars (nickname.length);
+        Gtk.TextIter nickname_end = nickname_start;
+        nickname_end.forward_chars (message.nickname.length);
+        buffer.apply_tag_by_name (get_tag_name (), nickname_start, nickname_end);
+        buffer.apply_tag_by_name ("selectable", nickname_start, nickname_end);
         buffer.insert (ref iter, message.message, message.message.length);
         buffer.insert (ref iter, "\n", 1);
     }

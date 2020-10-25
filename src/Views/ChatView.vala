@@ -190,26 +190,26 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     private void create_text_tags () {
         var buffer = text_view.get_buffer ();
 
-        // Other usernames
-        unowned Gtk.TextTag username_tag = buffer.create_tag ("username");
-        username_tag.weight = Pango.Weight.SEMIBOLD;
-        username_tag.event.connect (on_username_clicked);
+        // Other nicknames
+        unowned Gtk.TextTag nickname_tag = buffer.create_tag ("nickname");
+        nickname_tag.weight = Pango.Weight.SEMIBOLD;
+        nickname_tag.event.connect (on_nickname_clicked);
 
-        // Self username
-        unowned Gtk.TextTag self_username_tag = buffer.create_tag ("self-username");
-        self_username_tag.weight = Pango.Weight.SEMIBOLD;
-        self_username_tag.event.connect (on_username_clicked);
+        // Self nickname
+        unowned Gtk.TextTag self_nickname_tag = buffer.create_tag ("self-nickname");
+        self_nickname_tag.weight = Pango.Weight.SEMIBOLD;
+        self_nickname_tag.event.connect (on_nickname_clicked);
 
         // Errors
         unowned Gtk.TextTag error_tag = buffer.create_tag ("error");
         error_tag.weight = Pango.Weight.SEMIBOLD;
 
-        // Inline usernames
-        unowned Gtk.TextTag inline_username_tag = buffer.create_tag ("inline-username");
-        inline_username_tag.event.connect (on_username_clicked);
+        // Inline nicknames
+        unowned Gtk.TextTag inline_nickname_tag = buffer.create_tag ("inline-nickname");
+        inline_nickname_tag.event.connect (on_nickname_clicked);
 
-        // Inline self username
-        buffer.create_tag ("inline-self-username");
+        // Inline self nickname
+        buffer.create_tag ("inline-self-nickname");
 
         // Selectable
         buffer.create_tag ("selectable");
@@ -229,25 +229,25 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         var tag_table = text_view.get_buffer ().get_tag_table ();
         var color = Gdk.RGBA ();
 
-        // Other usernames
+        // Other nicknames
         color.parse (Iridium.Models.ColorPalette.COLOR_BLUEBERRY.get_value ());
-        tag_table.lookup ("username").foreground_rgba = color;
+        tag_table.lookup ("nickname").foreground_rgba = color;
 
-        // Self username
+        // Self nickname
         color.parse (Iridium.Models.ColorPalette.COLOR_LIME.get_value ());
-        tag_table.lookup ("self-username").foreground_rgba = color;
+        tag_table.lookup ("self-nickname").foreground_rgba = color;
 
         // Errors
         color.parse (Iridium.Models.ColorPalette.COLOR_STRAWBERRY.get_value ());
         tag_table.lookup ("error").foreground_rgba = color;
 
-        // Inline usernames
+        // Inline nicknames
         color.parse (Iridium.Models.ColorPalette.COLOR_ORANGE.get_value ());
-        tag_table.lookup ("inline-username").foreground_rgba = color;
+        tag_table.lookup ("inline-nickname").foreground_rgba = color;
 
-        // Inline self username
+        // Inline self nickname
         color.parse (Iridium.Models.ColorPalette.COLOR_LIME.get_value ());
-        tag_table.lookup ("inline-self-username").foreground_rgba = color;
+        tag_table.lookup ("inline-self-nickname").foreground_rgba = color;
 
         // Hyperlinks
         color.parse (Iridium.Models.ColorPalette.COLOR_BLUEBERRY.get_value ());
@@ -299,19 +299,19 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         text_view.queue_draw ();
     }
 
-    private bool on_username_clicked (Gtk.TextTag source, GLib.Object event_object, Gdk.Event event, Gtk.TextIter iter) {
+    private bool on_nickname_clicked (Gtk.TextTag source, GLib.Object event_object, Gdk.Event event, Gtk.TextIter iter) {
         // TODO: Check for right click and show some options in a popup menu (eg. block, PM, etc.)
         if (event.type == Gdk.EventType.BUTTON_RELEASE) {
-            var username = get_selectable_text (iter);
-            if (username == null) {
-                warning ("Encountered click of null username");
+            var nickname = get_selectable_text (iter);
+            if (nickname == null) {
+                warning ("Encountered click of null nickname");
                 return false;
             }
             if (entry.text.length == 0) {
-                entry.text = username + ": ";
+                entry.text = nickname + ": ";
                 set_entry_focus ();
             } else {
-                entry.text += username;
+                entry.text += nickname;
                 set_entry_focus ();
             }
         }

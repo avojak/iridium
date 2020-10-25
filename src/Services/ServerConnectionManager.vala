@@ -237,8 +237,8 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
         server_quit (source.connection_details.server, message);
     }
 
-    private void on_user_quit_server (Iridium.Services.ServerConnection source, string username, Gee.List<string> channels, Iridium.Services.Message message) {
-        user_quit_server (source.connection_details.server, username, channels, message);
+    private void on_user_quit_server (Iridium.Services.ServerConnection source, string nickname, Gee.List<string> channels, Iridium.Services.Message message) {
+        user_quit_server (source.connection_details.server, nickname, channels, message);
     }
 
     private void on_channel_users_received (Iridium.Services.ServerConnection source, string channel_name) {
@@ -269,16 +269,16 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
         channel_message_received (source.connection_details.server, channel_name, message);
     }
 
-    private void on_user_joined_channel (Iridium.Services.ServerConnection source, string channel_name, string username) {
-        user_joined_channel (source.connection_details.server, channel_name, username);
+    private void on_user_joined_channel (Iridium.Services.ServerConnection source, string channel_name, string nickname) {
+        user_joined_channel (source.connection_details.server, channel_name, nickname);
     }
 
-    private void on_user_left_channel (Iridium.Services.ServerConnection source, string channel_name, string username) {
-        user_left_channel (source.connection_details.server, channel_name, username);
+    private void on_user_left_channel (Iridium.Services.ServerConnection source, string channel_name, string nickname) {
+        user_left_channel (source.connection_details.server, channel_name, nickname);
     }
 
-    private void on_private_message_received (Iridium.Services.ServerConnection source, string username, string self_nickname, Iridium.Services.Message message) {
-        private_message_received (source.connection_details.server, username, self_nickname, message);
+    private void on_private_message_received (Iridium.Services.ServerConnection source, string nickname, string self_nickname, Iridium.Services.Message message) {
+        private_message_received (source.connection_details.server, nickname, self_nickname, message);
     }
 
     private void on_insufficient_privs_received (Iridium.Services.ServerConnection source, string channel_name, Iridium.Services.Message message) {
@@ -308,7 +308,7 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
     public signal void server_message_received (string server_name, Iridium.Services.Message message);
     public signal void server_error_received (string server_name, Iridium.Services.Message message);
     public signal void server_quit (string server_name, string message);
-    public signal void user_quit_server (string server_name, string username, Gee.List<string> channels, Iridium.Services.Message message);
+    public signal void user_quit_server (string server_name, string nickname, Gee.List<string> channels, Iridium.Services.Message message);
     public signal void channel_users_received (string server_name, string channel_name);
     public signal void channel_topic_received (string server_name, string channel_name);
     public signal void nickname_in_use (string server_name, Iridium.Services.Message message);
@@ -316,9 +316,9 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
     public signal void channel_joined (string server_name, string channel_name, string nickname);
     public signal void channel_left (string server_name, string channel_name);
     public signal void channel_message_received (string server_name, string channel_name, Iridium.Services.Message message);
-    public signal void user_joined_channel (string server_name, string channel_name, string username);
-    public signal void user_left_channel (string server_name, string channel_name, string username);
-    public signal void private_message_received (string server_name, string username, string self_nickname, Iridium.Services.Message message);
+    public signal void user_joined_channel (string server_name, string channel_name, string nickname);
+    public signal void user_left_channel (string server_name, string channel_name, string nickname);
+    public signal void private_message_received (string server_name, string nickname, string self_nickname, Iridium.Services.Message message);
     public signal void insufficient_privs_received (string server_name, string channel_name, Iridium.Services.Message message);
     public signal void nickname_changed (string server_name, string old_nickname, string new_nickname);
     public signal void user_changed_nickname (string server_name, string old_nickname, string new_nickname);

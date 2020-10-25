@@ -192,19 +192,19 @@ public class Iridium.Services.ServerConnectionRepository : GLib.Object {
         }
     }
 
-    public void on_private_message_row_added (string server_name, string username) {
+    public void on_private_message_row_added (string server_name, string nickname) {
         // TODO: Implement
     }
 
-    public void on_private_message_row_removed (string server_name, string username) {
+    public void on_private_message_row_removed (string server_name, string nickname) {
         // TODO: Implement
     }
 
-    public void on_private_message_row_enabled (string server_name, string username) {
+    public void on_private_message_row_enabled (string server_name, string nickname) {
         // TODO: Implement
     }
 
-    public void on_private_message_row_disabled (string server_name, string username) {
+    public void on_private_message_row_disabled (string server_name, string nickname) {
         // TODO: Implement
     }
 

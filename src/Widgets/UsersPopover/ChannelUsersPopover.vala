@@ -21,8 +21,8 @@
 
 public class Iridium.Widgets.UsersPopover.ChannelUsersPopover : Gtk.Popover {
 
-    // TODO: Need to handle usernames for OPs and other special cases where the
-    //       username starts with a symbol (e.g. @)
+    // TODO: Need to handle nicknames for OPs and other special cases where the
+    //       nickname starts with a symbol (e.g. @)
 
     private Gtk.SearchEntry search_entry;
     private Gtk.ScrolledWindow scrolled_window;
@@ -75,7 +75,7 @@ public class Iridium.Widgets.UsersPopover.ChannelUsersPopover : Gtk.Popover {
                 return;
             }
             Iridium.Widgets.UsersPopover.UserListBoxRow user_row = (Iridium.Widgets.UsersPopover.UserListBoxRow) row;
-            username_selected (user_row.username);
+            nickname_selected (user_row.nickname);
             popdown ();
         });
         this.closed.connect (() => {
@@ -89,24 +89,24 @@ public class Iridium.Widgets.UsersPopover.ChannelUsersPopover : Gtk.Popover {
             return true;
         }
         Iridium.Widgets.UsersPopover.UserListBoxRow user_row = (Iridium.Widgets.UsersPopover.UserListBoxRow) row;
-        return user_row.username.contains (search_entry.text);
+        return user_row.nickname.contains (search_entry.text);
     }
 
     private int sort_func (Gtk.ListBoxRow row1, Gtk.ListBoxRow row2) {
         Iridium.Widgets.UsersPopover.UserListBoxRow user_row1 = (Iridium.Widgets.UsersPopover.UserListBoxRow) row1;
         Iridium.Widgets.UsersPopover.UserListBoxRow user_row2 = (Iridium.Widgets.UsersPopover.UserListBoxRow) row2;
-        return user_row1.username.collate (user_row2.username);
+        return user_row1.nickname.collate (user_row2.nickname);
     }
 
-    public void set_users (Gee.List<string> usernames) {
+    public void set_users (Gee.List<string> nicknames) {
         list_box.foreach ((widget) => {
             widget.destroy ();
         });
-        foreach (string username in usernames) {
-            if (username == null || username.chomp ().length == 0) {
+        foreach (string nickname in nicknames) {
+            if (nickname == null || nickname.chomp ().length == 0) {
                 continue;
             }
-            var row = new Iridium.Widgets.UsersPopover.UserListBoxRow (username);
+            var row = new Iridium.Widgets.UsersPopover.UserListBoxRow (nickname);
             list_box.insert (row, -1);
         }
         list_box.show_all ();
@@ -115,6 +115,6 @@ public class Iridium.Widgets.UsersPopover.ChannelUsersPopover : Gtk.Popover {
         scrolled_window.check_resize ();
     }
 
-    public signal void username_selected (string username);
+    public signal void nickname_selected (string nickname);
 
 }

@@ -42,7 +42,7 @@ public class Iridium.Services.Message : GLib.Object {
     public string message { get; set; }
     public string prefix { get; set; }
     public string[] params { get; set; }
-    public string username { get; set; }
+    public string nickname { get; set; }
 
     static construct {
         try {
@@ -78,7 +78,7 @@ public class Iridium.Services.Message : GLib.Object {
                     strip_non_printable_chars ();
                 }
                 if ((prefix != null) && (command in USER_COMMANDS)) {  // vala-lint=naming-convention
-                    username = prefix.split ("!")[0];
+                    nickname = prefix.split ("!")[0];
                 }
                 return false;
             });

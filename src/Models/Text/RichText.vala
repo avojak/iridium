@@ -27,8 +27,8 @@ public abstract class Iridium.Models.Text.RichText : GLib.Object {
 
     public Iridium.Services.Message message { get; construct; }
 
-    //  private string self_username;
-    private Gee.List<string> usernames = new Gee.ArrayList<string> ();
+    //  private string self_nickname;
+    private Gee.List<string> nicknames = new Gee.ArrayList<string> ();
 
     protected RichText (Iridium.Services.Message message) {
         Object (
@@ -46,23 +46,23 @@ public abstract class Iridium.Models.Text.RichText : GLib.Object {
         }
     }
 
-    // Set our username so we can check for it and apply different styling
-    //  public void set_username (string username) {
-    //      this.self_username = username;
+    // Set our nickname so we can check for it and apply different styling
+    //  public void set_nickname (string nickname) {
+    //      this.self_nickname = nickname;
     //  }
 
-    // Set the usernames that will be checked for to apply different styling
-    public void set_usernames (Gee.List<string> usernames) {
-        this.usernames = usernames;
+    // Set the nicknames that will be checked for to apply different styling
+    public void set_nicknames (Gee.List<string> nicknames) {
+        this.nicknames = nicknames;
     }
 
     public void display (Gtk.TextBuffer buffer) {
         // Display the rich text in the buffer
         do_display (buffer);
 
-        // Apply tags for usernames first (this prevents 'username:' being picked up
+        // Apply tags for nicknames first (this prevents 'nickname:' being picked up
         // as a URI)
-        apply_username_tags (buffer);
+        apply_nickname_tags (buffer);
 
         // Apply tag for URIs
         apply_uri_tags (buffer);
@@ -100,7 +100,7 @@ public abstract class Iridium.Models.Text.RichText : GLib.Object {
         foreach (string token in tokens) {
             if (URI_REGEX.match (token)) {
                 iter = search_start;
-                // Make sure we're not trying to tag something that's already selectable (i.e. a username)
+                // Make sure we're not trying to tag something that's already selectable (i.e. a nickname)
                 if (iter.has_tag (selectable_tag)) {
                     continue;
                 }
@@ -113,37 +113,37 @@ public abstract class Iridium.Models.Text.RichText : GLib.Object {
         }
     }
 
-    private void apply_username_tags (Gtk.TextBuffer buffer) {
+    private void apply_nickname_tags (Gtk.TextBuffer buffer) {
         Gtk.TextIter search_start;
         Gtk.TextIter search_end;
         Gtk.TextIter match_start;
         Gtk.TextIter match_end;
-        foreach (var username in usernames) {
+        foreach (var nickname in nicknames) {
             // Set start_iter and end_iter for the portion of the buffer with the new message
             buffer.get_end_iter (out search_start);
             search_start.backward_chars (message.message.length + 1); // +1 for newline char
             buffer.get_end_iter (out search_end);
             search_end.backward_chars (1);
 
-            while (search_start.forward_search (username, Gtk.TextSearchFlags.CASE_INSENSITIVE, out match_start, out match_end, search_end)) {
+            while (search_start.forward_search (nickname, Gtk.TextSearchFlags.CASE_INSENSITIVE, out match_start, out match_end, search_end)) {
                 if (match_start.starts_word () && match_end.ends_word ()) {
-                    buffer.apply_tag_by_name ("inline-username", match_start, match_end);
+                    buffer.apply_tag_by_name ("inline-nickname", match_start, match_end);
                     buffer.apply_tag_by_name ("selectable", match_start, match_end);
                 }
                 search_start = match_end;
             }
         }
 
-        // TODO: Check for our username and style the whole message
+        // TODO: Check for our nickname and style the whole message
         //  // Reset the search iters
         //  buffer.get_end_iter (out search_start);
         //  search_start.backward_chars (message.message.length + 1); // +1 for newline char
         //  buffer.get_end_iter (out search_end);
         //  search_end.backward_chars (1);
 
-        //  // The our username appears, color the whole message
-        //  if (search_start.forward_search (self_username, Gtk.TextSearchFlags.CASE_INSENSITIVE, out match_start, out match_end, search_end)) {
-        //      buffer.apply_tag_by_name ("inline-self-username", search_start, search_end);
+        //  // The our nickname appears, color the whole message
+        //  if (search_start.forward_search (self_nickname, Gtk.TextSearchFlags.CASE_INSENSITIVE, out match_start, out match_end, search_end)) {
+        //      buffer.apply_tag_by_name ("inline-self-nickname", search_start, search_end);
         //  }
     }
 

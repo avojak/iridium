@@ -28,7 +28,7 @@ public class Iridium.Models.Text.OthersPrivateMessageText : Iridium.Models.Text.
     }
 
     public override string get_tag_name () {
-        return "username";
+        return "nickname";
     }
 
 }

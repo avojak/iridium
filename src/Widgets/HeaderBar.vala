@@ -80,7 +80,7 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         channel_users_button.valign = Gtk.Align.CENTER;
 
         channel_users_popover = new Iridium.Widgets.UsersPopover.ChannelUsersPopover (channel_users_button);
-        channel_users_popover.username_selected.connect (on_username_selected);
+        channel_users_popover.nickname_selected.connect (on_nickname_selected);
         channel_users_button.popover = channel_users_popover;
 
         var settings_button = new Gtk.MenuButton ();
@@ -184,14 +184,14 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         channel_users_button.sensitive = enabled;
     }
 
-    public void set_channel_users (Gee.List<string> usernames) {
-        channel_users_popover.set_users (usernames);
+    public void set_channel_users (Gee.List<string> nicknames) {
+        channel_users_popover.set_users (nicknames);
     }
 
-    private void on_username_selected (string username) {
-        username_selected (username);
+    private void on_nickname_selected (string nickname) {
+        nickname_selected (nickname);
     }
 
-    public signal void username_selected (string username);
+    public signal void nickname_selected (string nickname);
 
 }

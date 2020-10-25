@@ -85,7 +85,7 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
         } else if (a is Iridium.Widgets.SidePanel.PrivateMessageRow && b is Iridium.Widgets.SidePanel.PrivateMessageRow) {
             var pm_a = a as Iridium.Widgets.SidePanel.PrivateMessageRow;
             var pm_b = b as Iridium.Widgets.SidePanel.PrivateMessageRow;
-            return pm_a.username.ascii_casecmp (pm_b.username);
+            return pm_a.nickname.ascii_casecmp (pm_b.nickname);
         } else {
             // TODO: Log this undefined behavior that should never happen
             return 0;

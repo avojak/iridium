@@ -21,16 +21,16 @@
 
 public class Iridium.Widgets.SidePanel.PrivateMessageRow : Granite.Widgets.SourceList.ExpandableItem, Iridium.Widgets.SidePanel.Row {
 
-    public string username { get; set; }
+    public string nickname { get; set; }
     public string server_name { get; construct; }
     public Iridium.Widgets.SidePanel.Row.State state { get; set; }
 
     private bool is_enabled = true;
 
-    public PrivateMessageRow (string username, string server_name) {
+    public PrivateMessageRow (string nickname, string server_name) {
         Object (
-            name: username,
-            username: username,
+            name: nickname,
+            nickname: nickname,
             server_name: server_name,
             icon: new GLib.ThemedIcon ("system-users"),
             state: Iridium.Widgets.SidePanel.Row.State.DISABLED
@@ -42,7 +42,7 @@ public class Iridium.Widgets.SidePanel.PrivateMessageRow : Granite.Widgets.Sourc
     }
 
     public new string? get_channel_name () {
-        return username;
+        return nickname;
     }
 
     public new void enable () {
@@ -60,7 +60,7 @@ public class Iridium.Widgets.SidePanel.PrivateMessageRow : Granite.Widgets.Sourc
             return;
         }
         //  icon = new GLib.ThemedIcon ("user-offline");
-        markup = "<i>" + username + "</i>";
+        markup = "<i>" + nickname + "</i>";
         is_enabled = false;
     }
 
@@ -70,7 +70,7 @@ public class Iridium.Widgets.SidePanel.PrivateMessageRow : Granite.Widgets.Sourc
     public new void updating () {
         //  icon = new GLib.ThemedIcon ("mail-unread");
         icon = new GLib.ThemedIcon (Constants.APP_ID + ".image-loading-symbolic");
-        markup = "<i>" + username + "</i>";
+        markup = "<i>" + nickname + "</i>";
         is_enabled = false;
     }
 
@@ -92,9 +92,9 @@ public class Iridium.Widgets.SidePanel.PrivateMessageRow : Granite.Widgets.Sourc
         return menu;
     }
 
-    public void set_nickname (string nickname) {
+    public void update_nickname (string nickname) {
         this.name = nickname;
-        this.username = nickname;
+        this.nickname = nickname;
     }
 
     public signal void close_private_message ();

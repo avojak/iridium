@@ -21,7 +21,7 @@
 
 public class Iridium.Views.ChannelChatView : Iridium.Views.ChatView {
 
-    private Gee.List<string> usernames = new Gee.ArrayList<string> ();
+    private Gee.List<string> nicknames = new Gee.ArrayList<string> ();
     private string? last_sender = null;
 
     public ChannelChatView (Iridium.MainWindow window, string nickname) {
@@ -41,10 +41,10 @@ public class Iridium.Views.ChannelChatView : Iridium.Views.ChatView {
 
     public override void do_display_self_private_msg (Iridium.Services.Message message) {
         var rich_text = new Iridium.Models.Text.SelfPrivateMessageText (message);
-        rich_text.set_usernames (usernames);
-        rich_text.suppress_sender_username = is_repeat_sender (message);
+        rich_text.set_nicknames (nicknames);
+        rich_text.suppress_sender_nickname = is_repeat_sender (message);
         rich_text.display (text_view.get_buffer ());
-        last_sender = message.username;
+        last_sender = message.nickname;
     }
 
     public override void do_display_server_msg (Iridium.Services.Message message) {
@@ -61,14 +61,14 @@ public class Iridium.Views.ChannelChatView : Iridium.Views.ChatView {
 
     public override void do_display_private_msg (Iridium.Services.Message message) {
         var rich_text = new Iridium.Models.Text.OthersPrivateMessageText (message);
-        rich_text.set_usernames (usernames);
-        rich_text.suppress_sender_username = is_repeat_sender (message);
+        rich_text.set_nicknames (nicknames);
+        rich_text.suppress_sender_nickname = is_repeat_sender (message);
         rich_text.display (text_view.get_buffer ());
-        last_sender = message.username;
+        last_sender = message.nickname;
     }
 
     private bool is_repeat_sender (Iridium.Services.Message message) {
-        return last_sender == message.username;
+        return last_sender == message.nickname;
     }
 
     //  public void display_channel_error_msg (Iridium.Services.Message message) {
@@ -78,8 +78,8 @@ public class Iridium.Views.ChannelChatView : Iridium.Views.ChatView {
     //      //  }
     //  }
 
-    public void set_usernames (Gee.List<string> usernames) {
-        this.usernames = usernames;
+    public void set_nicknames (Gee.List<string> nicknames) {
+        this.nicknames = nicknames;
     }
 
 }
