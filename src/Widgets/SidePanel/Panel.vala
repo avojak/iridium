@@ -266,19 +266,19 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
 
     // TODO: Lots of refactoring can be done here. Lots of code is shared
     //       with the channel functions!
-    public void add_private_message_row (string server_name, string username) {
+    public void add_private_message_row (string server_name, string nickname) {
         // Check if this private message row already exists
         var server_item = server_items.get (server_name);
         foreach (var child in server_item.children) {
             if (child is Iridium.Widgets.SidePanel.PrivateMessageRow) {
                 unowned Iridium.Widgets.SidePanel.PrivateMessageRow private_message_item = (Iridium.Widgets.SidePanel.PrivateMessageRow) child;
-                if (private_message_item.username == username) {
+                if (private_message_item.nickname == nickname) {
                     return;
                 }
             }
         }
 
-        var private_message_item = new Iridium.Widgets.SidePanel.PrivateMessageRow (username, server_name);
+        var private_message_item = new Iridium.Widgets.SidePanel.PrivateMessageRow (nickname, server_name);
         private_message_item.close_private_message.connect (() => {
             remove_private_message_row (server_name, private_message_item.get_channel_name ());
         });
@@ -288,12 +288,12 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
         private_message_items.get (server_name).add (private_message_item);
     }
 
-    private void remove_private_message_row (string server_name, string username) {
+    private void remove_private_message_row (string server_name, string nickname) {
         var server_item = server_items.get (server_name);
         foreach (var child in server_item.children) {
             if (child is Iridium.Widgets.SidePanel.PrivateMessageRow) {
                 unowned Iridium.Widgets.SidePanel.PrivateMessageRow private_message_row = (Iridium.Widgets.SidePanel.PrivateMessageRow) child;
-                if (private_message_row.get_channel_name () == username) {
+                if (private_message_row.get_channel_name () == nickname) {
                     server_item.remove (child);
                     private_message_items.get (server_name).remove (private_message_row);
                     return;
@@ -426,7 +426,7 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
         }
     }
 
-    public void select_private_message_row (string server_name, string username) {
+    public void select_private_message_row (string server_name, string nickname) {
         var server_item = server_items.get (server_name);
         if (server_item == null) {
             return;
@@ -435,7 +435,7 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
             // TODO: Apply this type check in other places
             if (channel_item is Iridium.Widgets.SidePanel.PrivateMessageRow) {
                 unowned Iridium.Widgets.SidePanel.PrivateMessageRow row = (Iridium.Widgets.SidePanel.PrivateMessageRow) channel_item;
-                if (row.get_channel_name () == username) {
+                if (row.get_channel_name () == nickname) {
                     source_list.selected = channel_item;
                     return;
                 }
@@ -504,8 +504,8 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
         foreach (var child in server_item.children) {
             if (child is Iridium.Widgets.SidePanel.PrivateMessageRow) {
                 unowned Iridium.Widgets.SidePanel.PrivateMessageRow private_message_item = (Iridium.Widgets.SidePanel.PrivateMessageRow) child;
-                if (private_message_item.username == old_nickname) {
-                    private_message_item.set_nickname (new_nickname);
+                if (private_message_item.nickname == old_nickname) {
+                    private_message_item.update_nickname (new_nickname);
                 }
             }
         }
@@ -561,9 +561,9 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
     public signal void channel_row_removed (string server_name, string channel_name);
     public signal void channel_row_enabled (string server_name, string channel_name);
     public signal void channel_row_disabled (string server_name, string channel_name);
-    public signal void private_message_row_added (string server_name, string username);
-    public signal void private_message_row_removed (string server_name, string username);
-    public signal void private_message_row_enabled (string server_name, string username);
-    public signal void private_message_row_disabled (string server_name, string username);
+    public signal void private_message_row_added (string server_name, string nickname);
+    public signal void private_message_row_removed (string server_name, string nickname);
+    public signal void private_message_row_enabled (string server_name, string nickname);
+    public signal void private_message_row_disabled (string server_name, string nickname);
 
 }

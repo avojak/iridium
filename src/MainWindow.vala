@@ -76,7 +76,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         main_layout.edit_channel_topic_button_clicked.connect (on_edit_channel_topic_button_clicked);
 
         // Connect to header signals
-        header_bar.username_selected.connect (on_username_selected);
+        header_bar.nickname_selected.connect (on_nickname_selected);
 
         // Connect to connection handler signals
         Iridium.Application.connection_manager.unacceptable_certificate.connect (on_unacceptable_certificate);
@@ -120,7 +120,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 return;
             }
             try {
-                Iridium.Application.secret_manager.store_secret (connection_details.server, connection_details.port, connection_details.username, connection_details.auth_token);
+                Iridium.Application.secret_manager.store_secret (connection_details.server, connection_details.port, connection_details.nickname, connection_details.auth_token);
             } catch (GLib.Error e) {
                 warning ("Error while storing secret: %s", e.message);
             }
@@ -257,7 +257,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         if (connection_dialog == null) {
             connection_dialog = new Iridium.Widgets.ServerConnectionDialog (this);
             connection_dialog.show_all ();
-            connection_dialog.connect_button_clicked.connect ((server, nickname, username, realname, port, auth_method, tls, auth_token) => {
+            connection_dialog.connect_button_clicked.connect ((server, nickname, realname, port, auth_method, tls, auth_token) => {
                 // Prevent duplicate connections
                 if (Iridium.Application.connection_manager.has_connection (server)) {
                     connection_dialog.display_error (_("Already connected to this server!"));
@@ -269,7 +269,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 connection_details.server = server;
                 connection_details.port = port;
                 connection_details.nickname = nickname;
-                connection_details.username = username;
+                connection_details.username = nickname; // Keep these the same for now
                 connection_details.realname = realname;
                 connection_details.auth_method = auth_method;
                 connection_details.auth_token = auth_token;
@@ -421,11 +421,11 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         Iridium.Application.connection_manager.send_user_message (server_name, message_text);
         // Display the message in the chat view
         var message = new Iridium.Services.Message (message_text);
-        message.username = Iridium.Application.connection_manager.get_nickname (server_name);
+        message.nickname = Iridium.Application.connection_manager.get_nickname (server_name);
         main_layout.display_self_channel_message (server_name, channel_name, message);
     }
 
-    private void on_private_message_to_send (string server_name, string username, string text) {
+    private void on_private_message_to_send (string server_name, string nickname, string text) {
         if (text == null || text.strip ().length == 0) {
             return;
         }
@@ -435,12 +435,12 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             return;
         }
         // Send the message
-        var message_text = "PRIVMSG " + username + " :" + text;
+        var message_text = "PRIVMSG " + nickname + " :" + text;
         Iridium.Application.connection_manager.send_user_message (server_name, message_text);
         // Display the message in the chat view
         var message = new Iridium.Services.Message (message_text);
-        message.username = Iridium.Application.connection_manager.get_nickname (server_name);
-        main_layout.display_self_private_message (server_name, username, message);
+        message.nickname = Iridium.Application.connection_manager.get_nickname (server_name);
+        main_layout.display_self_private_message (server_name, nickname, message);
     }
 
     private void send_server_command (string server_name, string text) {
@@ -487,29 +487,29 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     // HeaderBar Callbacks
     //
 
-    private void on_username_selected (string username) {
+    private void on_nickname_selected (string nickname) {
         var server_name = main_layout.get_visible_server ();
         if (server_name == null) {
             return;
         }
         var self_nickname = main_layout.get_server_chat_view (server_name).nickname;
-        var trimmed_username = strip_username_prefix (username);
+        var trimmed_nickname = strip_nickname_prefix (nickname);
         Idle.add (() => {
-            main_layout.add_private_message_chat_view (server_name, trimmed_username, self_nickname);
-            main_layout.enable_chat_view (server_name, trimmed_username);
-            main_layout.show_chat_view (server_name, trimmed_username);
+            main_layout.add_private_message_chat_view (server_name, trimmed_nickname, self_nickname);
+            main_layout.enable_chat_view (server_name, trimmed_nickname);
+            main_layout.show_chat_view (server_name, trimmed_nickname);
             return false;
         });
     }
 
-    private string strip_username_prefix (string username) {
+    private string strip_nickname_prefix (string nickname) {
         var prefixes = new string[] { "@", "&" };
         foreach (string prefix in prefixes) {
-            if (username.has_prefix (prefix)) {
-                return username.substring (1, username.length - 1);
+            if (nickname.has_prefix (prefix)) {
+                return nickname.substring (1, nickname.length - 1);
             }
         }
-        return username;
+        return nickname;
     }
 
     //
@@ -602,12 +602,12 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         Iridium.Application.connection_manager.disconnect_from_server (server_name);
     }
 
-    private void on_user_quit_server (string server_name, string username, Gee.List<string> channels, Iridium.Services.Message message) {
+    private void on_user_quit_server (string server_name, string nickname, Gee.List<string> channels, Iridium.Services.Message message) {
         // Display a message in any channel that the user was in
         Idle.add (() => {
             foreach (string channel in channels) {
                 var message_to_display = new Iridium.Services.Message ();
-                message_to_display.message = username + _(" has quit");
+                message_to_display.message = nickname + _(" has quit");
                 if (message.message != null && message.message.strip () != "") {
                     message_to_display.message += " (" + message.message + ")";
                 }
@@ -621,11 +621,11 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         Idle.add (() => {
             // Display a message in the channel chat view
             var message_to_display = new Iridium.Services.Message ();
-            message_to_display.message = username + _(" has quit");
+            message_to_display.message = nickname + _(" has quit");
             if (message.message != null && message.message.strip () != "") {
                 message_to_display.message += " (" + message.message + ")";
             }
-            main_layout.display_server_message (server_name, username, message_to_display);
+            main_layout.display_server_message (server_name, nickname, message_to_display);
             return false;
         });
     }
@@ -711,44 +711,44 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         });
     }
 
-    private void on_user_joined_channel (string server_name, string channel_name, string username) {
+    private void on_user_joined_channel (string server_name, string channel_name, string nickname) {
         Idle.add (() => {
             // Display a message in the channel chat view
             var message = new Iridium.Services.Message ();
-            message.message = username + _(" has joined");
+            message.message = nickname + _(" has joined");
             main_layout.display_server_message (server_name, channel_name, message);
             return false;
         });
         update_channel_users_list (server_name, channel_name);
     }
 
-    private void on_user_left_channel (string server_name, string channel_name, string username) {
+    private void on_user_left_channel (string server_name, string channel_name, string nickname) {
         Idle.add (() => {
             // Display a message in the channel chat view
             var message = new Iridium.Services.Message ();
-            message.message = username + _(" has left");
+            message.message = nickname + _(" has left");
             main_layout.display_server_message (server_name, channel_name, message);
             return false;
         });
         update_channel_users_list (server_name, channel_name);
     }
 
-    private void on_private_message_received (string server_name, string username, string self_nickname, Iridium.Services.Message message) {
+    private void on_private_message_received (string server_name, string nickname, string self_nickname, Iridium.Services.Message message) {
         Idle.add (() => {
-            main_layout.add_private_message_chat_view (server_name, username, self_nickname);
-            main_layout.enable_chat_view (server_name, username);
-            main_layout.display_private_message (server_name, username, message);
+            main_layout.add_private_message_chat_view (server_name, nickname, self_nickname);
+            main_layout.enable_chat_view (server_name, nickname);
+            main_layout.display_private_message (server_name, nickname, message);
             return false;
         });
     }
 
     // Simply updates the UI based on changes that were already made to the underlying data model
     private void update_channel_users_list (string server_name, string channel_name) {
-        var usernames = Iridium.Application.connection_manager.get_users (server_name, channel_name);
+        var nicknames = Iridium.Application.connection_manager.get_users (server_name, channel_name);
         Idle.add (() => {
-            main_layout.update_channel_users (server_name, channel_name, usernames);
+            main_layout.update_channel_users (server_name, channel_name, nicknames);
             if (main_layout.get_visible_server () == server_name && main_layout.get_visible_channel () == channel_name) {
-                header_bar.set_channel_users (usernames);
+                header_bar.set_channel_users (nicknames);
             }
             return false;
         });
@@ -837,9 +837,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         update_channel_users_list (server_name, channel_name);
     }
 
-    private void on_private_message_chat_view_shown (string server_name, string username) {
+    private void on_private_message_chat_view_shown (string server_name, string nickname) {
         var network_name = Iridium.Application.connection_manager.get_network_name (server_name);
-        header_bar.update_title (username, network_name != null ? network_name : server_name);
+        header_bar.update_title (nickname, network_name != null ? network_name : server_name);
         header_bar.set_channel_users_button_visible (false);
         header_bar.set_tooltip_text (null);
     }

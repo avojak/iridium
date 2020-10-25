@@ -21,15 +21,15 @@
 
 public class Iridium.Views.PrivateMessageChatView : Iridium.Views.ChatView {
 
-    public string username { get; set; }
+    public string other_nickname { get; set; }
 
     private string last_sender = null;
 
-    public PrivateMessageChatView (Iridium.MainWindow window, string self_nickname, string username) {
+    public PrivateMessageChatView (Iridium.MainWindow window, string self_nickname, string other_nickname) {
         Object (
             window: window,
             nickname: self_nickname,
-            username: username
+            other_nickname: other_nickname
         );
     }
 
@@ -43,9 +43,9 @@ public class Iridium.Views.PrivateMessageChatView : Iridium.Views.ChatView {
 
     public override void do_display_self_private_msg (Iridium.Services.Message message) {
         var rich_text = new Iridium.Models.Text.SelfPrivateMessageText (message);
-        rich_text.suppress_sender_username = is_repeat_sender (message);
+        rich_text.suppress_sender_nickname = is_repeat_sender (message);
         rich_text.display (text_view.get_buffer ());
-        last_sender = message.username;
+        last_sender = message.nickname;
     }
 
     public override void do_display_server_msg (Iridium.Services.Message message) {
@@ -62,13 +62,13 @@ public class Iridium.Views.PrivateMessageChatView : Iridium.Views.ChatView {
 
     public override void do_display_private_msg (Iridium.Services.Message message) {
         var rich_text = new Iridium.Models.Text.OthersPrivateMessageText (message);
-        rich_text.suppress_sender_username = is_repeat_sender (message);
+        rich_text.suppress_sender_nickname = is_repeat_sender (message);
         rich_text.display (text_view.get_buffer ());
-        last_sender = message.username;
+        last_sender = message.nickname;
     }
 
     private bool is_repeat_sender (Iridium.Services.Message message) {
-        return last_sender == message.username;
+        return last_sender == message.nickname;
     }
 
 }

@@ -23,7 +23,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
 
     private Gtk.Entry server_entry;
     private Gtk.Entry nickname_entry;
-    private Gtk.Entry username_entry;
+    //  private Gtk.Entry username_entry;
     private Gtk.Entry realname_entry;
     private Gee.Map<int, Iridium.Models.AuthenticationMethod> auth_methods;
     private Gee.Map<int, string> auth_method_display_strings;
@@ -158,12 +158,12 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         nickname_entry.hexpand = true;
         nickname_entry.placeholder_text = "iridium";
 
-        var username_label = new Gtk.Label (_("Username:"));
-        username_label.halign = Gtk.Align.END;
+        //  var username_label = new Gtk.Label (_("Username:"));
+        //  username_label.halign = Gtk.Align.END;
 
-        username_entry = new Gtk.Entry ();
-        username_entry.hexpand = true;
-        username_entry.placeholder_text = "iridium";
+        //  username_entry = new Gtk.Entry ();
+        //  username_entry.hexpand = true;
+        //  username_entry.placeholder_text = "iridium";
 
         var realname_label = new Gtk.Label (_("Real Name:"));
         realname_label.halign = Gtk.Align.END;
@@ -223,14 +223,14 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         basic_form_grid.attach (server_entry, 1, 0, 1, 1);
         basic_form_grid.attach (nickname_label, 0, 1, 1, 1);
         basic_form_grid.attach (nickname_entry, 1, 1, 1, 1);
-        basic_form_grid.attach (username_label, 0, 2, 1, 1);
-        basic_form_grid.attach (username_entry, 1, 2, 1, 1);
-        basic_form_grid.attach (realname_label, 0, 3, 1, 1);
-        basic_form_grid.attach (realname_entry, 1, 3, 1, 1);
-        basic_form_grid.attach (auth_method_label, 0, 4, 1, 1);
-        basic_form_grid.attach (auth_method_combo, 1, 4, 1, 1);
-        basic_form_grid.attach (password_label, 0, 5, 1, 1);
-        basic_form_grid.attach (password_entry, 1, 5, 1, 1);
+        //  basic_form_grid.attach (username_label, 0, 2, 1, 1);
+        //  basic_form_grid.attach (username_entry, 1, 2, 1, 1);
+        basic_form_grid.attach (realname_label, 0, 2, 1, 1);
+        basic_form_grid.attach (realname_entry, 1, 2, 1, 1);
+        basic_form_grid.attach (auth_method_label, 0, 3, 1, 1);
+        basic_form_grid.attach (auth_method_combo, 1, 3, 1, 1);
+        basic_form_grid.attach (password_label, 0, 4, 1, 1);
+        basic_form_grid.attach (password_entry, 1, 4, 1, 1);
 
         return basic_form_grid;
     }
@@ -297,7 +297,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
     private void load_settings () {
         on_security_posture_changed ();
         nickname_entry.text = Iridium.Application.settings.get_string ("default-nickname");
-        username_entry.text = Iridium.Application.settings.get_string ("default-nickname");
+        //  username_entry.text = Iridium.Application.settings.get_string ("default-nickname");
         realname_entry.text = Iridium.Application.settings.get_string ("default-realname");
     }
 
@@ -307,7 +307,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         status_label.label = "";
         var server_name = server_entry.get_text ().chomp ().chug ();
         var nickname = nickname_entry.get_text ().chomp ().chug ();
-        var username = username_entry.get_text ().chomp ().chug ();
+        //  var username = username_entry.get_text ().chomp ().chug ();
         var realname = realname_entry.get_text ().chomp ().chug ();
         var port = (uint16) int.parse (port_entry.get_text ().chomp ().chug ());
         if (port == 0) {
@@ -316,7 +316,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         var auth_method = auth_methods.get (auth_method_combo.get_active ());
         var auth_token = password_entry.get_text ();
         var tls = ssl_tls_switch.get_active ();
-        connect_button_clicked (server_name, nickname, username, realname, port, auth_method, tls, auth_token);
+        connect_button_clicked (server_name, nickname, realname, port, auth_method, tls, auth_token);
     }
 
     public string get_server () {
@@ -334,7 +334,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         status_label.label = message;
     }
 
-    public signal void connect_button_clicked (string server, string nickname, string username, string realname,
+    public signal void connect_button_clicked (string server, string nickname, string realname,
         uint16 port, Iridium.Models.AuthenticationMethod auth_method, bool tls, string auth_token);
 
 }

@@ -21,13 +21,13 @@
 
 public class Iridium.Widgets.UsersPopover.UserListBoxRow : Gtk.ListBoxRow {
 
-    public string username { get; construct; }
+    public string nickname { get; construct; }
 
     private Gtk.EventBox event_box;
 
-    public UserListBoxRow (string username) {
+    public UserListBoxRow (string nickname) {
         Object (
-            username: username
+            nickname: nickname
         );
     }
 
@@ -42,7 +42,7 @@ public class Iridium.Widgets.UsersPopover.UserListBoxRow : Gtk.ListBoxRow {
             return false;
         });
 
-        var label = new Gtk.Label (username);
+        var label = new Gtk.Label (nickname);
         label.margin_top = 4;
         label.margin_bottom = 4;
 

@@ -177,23 +177,23 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         side_panel.disable_channel_row (server_name, channel_name); // TODO: Should be disabled by default?
     }
 
-    public void add_private_message_chat_view (string server_name, string username, string self_nickname) {
+    public void add_private_message_chat_view (string server_name, string nickname, string self_nickname) {
         // Ensure that we're not adding a view which already exists
-        if (get_private_message_chat_view (server_name, username) != null) {
+        if (get_private_message_chat_view (server_name, nickname) != null) {
             //  warning ("A private message chat view with the name %s already exists", server_name);
             // Create the side panel row - unlike the chat view, it is removed
-            side_panel.add_private_message_row (server_name, username);
+            side_panel.add_private_message_row (server_name, nickname);
             return;
         }
 
         // Create the new chat view and add it to the stack
-        var chat_view = new Iridium.Views.PrivateMessageChatView (window, self_nickname, username);
+        var chat_view = new Iridium.Views.PrivateMessageChatView (window, self_nickname, nickname);
         chat_view.set_enabled (false); // TODO: Should be disabled by default?
         if (!nickname_mapping.has_key (server_name)) {
             nickname_mapping.set (server_name, new Gee.HashMap<string, string> ());
         }
         var uuid = GLib.Uuid.string_random ();
-        nickname_mapping.get (server_name).set (username, uuid);
+        nickname_mapping.get (server_name).set (nickname, uuid);
         main_stack.add_named (chat_view, server_name + ":" + uuid);
         chat_views.add (chat_view);
         if (!server_child_views.has_key (server_name)) {
@@ -203,14 +203,14 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
 
         // Connect to signals
         chat_view.message_to_send.connect ((message) => {
-            private_message_to_send (server_name, chat_view.username, message);
+            private_message_to_send (server_name, chat_view.other_nickname, message);
         });
         chat_view.nickname_button_clicked.connect (() => {
             nickname_button_clicked (server_name);
         });
 
         // Create the side panel row
-        side_panel.add_private_message_row (server_name, username);
+        side_panel.add_private_message_row (server_name, nickname);
     }
 
     public void show_welcome_view () {
@@ -228,14 +228,14 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         return main_stack.get_child_by_name (server_name) as Iridium.Views.ServerChatView;
     }
 
-    public Iridium.Views.PrivateMessageChatView? get_private_message_chat_view (string server_name, string username) {
+    public Iridium.Views.PrivateMessageChatView? get_private_message_chat_view (string server_name, string nickname) {
         if (!nickname_mapping.has_key (server_name)) {
             return null;
         }
-        if (!nickname_mapping.get (server_name).has_key (username)) {
+        if (!nickname_mapping.get (server_name).has_key (nickname)) {
             return null;
         }
-        var uuid = nickname_mapping.get (server_name).get (username);
+        var uuid = nickname_mapping.get (server_name).get (nickname);
         return main_stack.get_child_by_name (server_name + ":" + uuid) as Iridium.Views.PrivateMessageChatView;
     }
 
@@ -471,20 +471,20 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         chat_view.display_self_private_msg (message);
     }
 
-    public void display_private_message (string server_name, string username, Iridium.Services.Message message) {
-        Iridium.Views.PrivateMessageChatView? chat_view = get_private_message_chat_view (server_name, username);
+    public void display_private_message (string server_name, string nickname, Iridium.Services.Message message) {
+        Iridium.Views.PrivateMessageChatView? chat_view = get_private_message_chat_view (server_name, nickname);
         if (chat_view == null) {
-            warning ("No private message chat view exists for %s, %s", server_name, username);
+            warning ("No private message chat view exists for %s, %s", server_name, nickname);
             return;
         }
         chat_view.display_private_msg (message);
-        side_panel.increment_channel_badge (server_name, username);
+        side_panel.increment_channel_badge (server_name, nickname);
     }
 
-    public void display_self_private_message (string server_name, string username, Iridium.Services.Message message) {
-        Iridium.Views.PrivateMessageChatView? chat_view = get_private_message_chat_view (server_name, username);
+    public void display_self_private_message (string server_name, string nickname, Iridium.Services.Message message) {
+        Iridium.Views.PrivateMessageChatView? chat_view = get_private_message_chat_view (server_name, nickname);
         if (chat_view == null) {
-            warning ("No private message chat view exists for %s, %s", server_name, username);
+            warning ("No private message chat view exists for %s, %s", server_name, nickname);
             return;
         }
         chat_view.display_self_private_msg (message);
@@ -521,7 +521,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         rename_private_message_chat_view (server_name, old_nickname, new_nickname);
         var chat_view = get_private_message_chat_view (server_name, new_nickname);
         if (chat_view != null) {
-            chat_view.username = new_nickname;
+            chat_view.other_nickname = new_nickname;
         }
 
         // Update private message side panel row
@@ -540,10 +540,10 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         side_panel.favorite_channel (server_name, channel_name);
     }
 
-    public void update_channel_users (string server_name, string channel_name, Gee.List<string> usernames) {
+    public void update_channel_users (string server_name, string channel_name, Gee.List<string> nicknames) {
         var channel_chat_view = get_channel_chat_view (server_name, channel_name);
         if (channel_chat_view != null) {
-            channel_chat_view.set_usernames (usernames);
+            channel_chat_view.set_nicknames (nicknames);
         }
     }
 
@@ -611,11 +611,11 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
     public signal void welcome_view_shown ();
     public signal void server_chat_view_shown (string server_name);
     public signal void channel_chat_view_shown (string server_name, string channel_name);
-    public signal void private_message_chat_view_shown (string server_name, string username);
+    public signal void private_message_chat_view_shown (string server_name, string nickname);
 
     public signal void server_message_to_send (string server_name, string message);
     public signal void channel_message_to_send (string server_name, string channel_name, string message);
-    public signal void private_message_to_send (string server_name, string username, string message);
+    public signal void private_message_to_send (string server_name, string nickname, string message);
     public signal void nickname_button_clicked (string server_name);
 
     public signal void join_channel_button_clicked (string server_name, string? channel_name);
