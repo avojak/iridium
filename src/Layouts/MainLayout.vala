@@ -424,9 +424,9 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         if (chat_view is Iridium.Views.ServerChatView) {
             side_panel.increment_server_badge (server_name);
         } else if (chat_view is Iridium.Views.ChannelChatView) {
-            side_panel.increment_channel_badge (server_name, channel_name);
+            // Don't update the badge for server messages to this view
         } else if (chat_view is Iridium.Views.PrivateMessageChatView) {
-            side_panel.increment_channel_badge (server_name, channel_name);
+            // Don't update the badge for server messages to this view
         } else {
             assert_not_reached ();
         }
@@ -444,9 +444,9 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         if (chat_view is Iridium.Views.ServerChatView) {
             side_panel.increment_server_badge (server_name);
         } else if (chat_view is Iridium.Views.ChannelChatView) {
-            side_panel.increment_channel_badge (server_name, channel_name);
+            // Don't update the badge for server error messages to this view
         } else if (chat_view is Iridium.Views.PrivateMessageChatView) {
-            side_panel.increment_channel_badge (server_name, channel_name);
+            // Don't update the badge for server error messages to this view
         } else {
             assert_not_reached ();
         }
