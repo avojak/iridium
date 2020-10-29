@@ -23,6 +23,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
     public Iridium.Services.ServerConnectionDetails connection_details { get; construct; }
 
+    private IOStream connection;
     private DataInputStream input_stream;
     private DataOutputStream output_stream;
     private bool should_exit = false;
@@ -53,11 +54,10 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
     private int do_connect () {
         try {
-            //  InetAddress address = resolve_server_hostname (connection_details.server);
             var host = connection_details.server;
             var port = connection_details.port;
             var tls = connection_details.tls;
-            IOStream connection = connect_to_server (host, port, tls);
+            connection = connect_to_server (host, port, tls);
 
             input_stream = new DataInputStream (connection.input_stream);
             output_stream = new DataOutputStream (connection.output_stream);
@@ -73,7 +73,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                     // TODO: Handle this differently on initialization (currently fails silently in the background)
                     critical ("IOError while reading: %s\n", e.message);
                 }
-            } while (line != null && !should_exit);
+            } while (should_keep_reading(line));
         } catch (GLib.Error e) {
             critical ("Error while connecting: %s\n", e.message);
             if (connection_error_message == null) {
@@ -88,15 +88,13 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         return 1;
     }
 
-    //  private InetAddress resolve_server_hostname (string hostname) throws GLib.Error {
-    //      Resolver resolver = Resolver.get_default ();
-    //      List<InetAddress> addresses = resolver.lookup_by_name (hostname, null);
-    //      InetAddress address = addresses.nth_data (0);
-    //      return address;
-    //  }
+    private bool should_keep_reading (string? line) {
+        lock (should_exit) {
+            return line != null && !should_exit;
+        }
+    }
 
     private IOStream connect_to_server (string host, uint16 port, bool tls) throws GLib.Error {
-        //  InetAddress address = resolve_server_hostname (connection_details.server);
         SocketClient client = new SocketClient ();
         client.event.connect (on_socket_client_event);
         client.set_tls (tls);
@@ -456,40 +454,23 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
     public void close () {
         debug ("Closing connection for server: " + connection_details.server);
-        should_exit = true;
+        lock (should_exit) {
+            should_exit = true;
+        }
         send_output (Iridium.Services.MessageCommands.QUIT + " :Iridium IRC Client");
         channel_users.clear ();
         do_close ();
     }
 
     private void do_close () {
-        should_exit = true;
-
-        try {
-            if (input_stream != null) {
-                if (input_stream is GLib.DataInputStream && !input_stream.is_closed ()) {
-                    input_stream.clear_pending ();
-                    input_stream.close ();
-                }
-                input_stream = null;
-            }
-        } catch (GLib.IOError e) {
-            // TODO: Handle errors!
-            warning ("Error while closing connection input stream: %s", e.message);
+        lock (should_exit) {
+            should_exit = true;
         }
 
         try {
-            if (output_stream != null) {
-                if (output_stream is GLib.DataOutputStream && !output_stream.is_closed ()) {
-                    output_stream.clear_pending ();
-                    output_stream.flush ();
-                    output_stream.close ();
-                }
-                output_stream = null;
-            }
-        } catch (GLib.Error e) {
-            // TODO: Handle errors!
-            warning ("Error while closing connection output stream: %s", e.message);
+            connection.close ();
+        } catch (GLib.IOError e) {
+            warning ("Error while closing connection: %s", e.message);
         }
 
         connection_closed ();
