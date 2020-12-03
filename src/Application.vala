@@ -87,6 +87,13 @@ public class Iridium.Application : Gtk.Application {
     }
 
     protected override void activate () {
+        var network_stabilization_monitor = new Iridium.Services.NetworkStabilizationMonitor ();
+        network_stabilization_monitor.connection_stablized.connect (() => {
+            foreach (var window in windows) {
+                restore_state (window, true);
+            }
+        });
+        network_stabilization_monitor.start ();
         //  var main_window = new Iridium.MainWindow (this);
         //  main_window.show_all ();
 
@@ -125,13 +132,13 @@ public class Iridium.Application : Gtk.Application {
             }
         }
 
-        restore_state (window);
+        restore_state (window, false);
     }
 
-    private void restore_state (Iridium.MainWindow main_window) {
+    private void restore_state (Iridium.MainWindow main_window, bool is_reconnecting) {
         var servers = connection_repository.get_servers ();
         var channels = connection_repository.get_channels ();
-        main_window.initialize (servers, channels);
+        main_window.initialize (servers, channels, is_reconnecting);
     }
 
     public static int main (string[] args) {

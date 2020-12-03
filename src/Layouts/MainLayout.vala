@@ -405,11 +405,17 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
     }
 
     public void show_network_info_bar () {
-        network_info_bar.revealed = true;
+        Idle.add (() => {
+            network_info_bar.revealed = true;
+            return false;
+        });
     }
 
     public void hide_network_info_bar () {
-        network_info_bar.revealed = false;
+        Idle.add (() => {
+            network_info_bar.revealed = false;
+            return false;
+        });
     }
 
     public void display_server_message (string server_name, string? channel_name, Iridium.Services.Message message) {
