@@ -23,6 +23,9 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
     public Iridium.Services.ServerConnectionDetails connection_details { get; construct; }
 
+    private Thread<int>? connection_thread;
+    private Cancellable cancellable = new Cancellable ();
+
     private IOStream connection;
     private DataInputStream input_stream;
     private DataOutputStream output_stream;
@@ -49,7 +52,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     public void open () {
         should_exit = false;
         var server = connection_details.server;
-        new Thread<int> (@"Server connection [$server]", do_connect);
+        connection_thread = new Thread<int> (@"Server connection [$server]", do_connect);
     }
 
     private int do_connect () {
@@ -67,7 +70,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             string line = "";
             do {
                 try {
-                    line = input_stream.read_line (null);
+                    line = input_stream.read_line (null, cancellable);
                     handle_line (line);
                 } catch (GLib.IOError e) {
                     // TODO: Handle this differently on initialization (currently fails silently in the background)
@@ -472,6 +475,8 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         } catch (GLib.IOError e) {
             warning ("Error while closing connection: %s", e.message);
         }
+
+        cancellable.cancel ();
 
         connection_closed ();
     }

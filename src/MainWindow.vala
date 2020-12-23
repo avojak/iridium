@@ -204,6 +204,10 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             }
         }
 
+        if (is_reconnecting) {
+            debug ("Attempting reconnection for %d servers", num_enabled_servers);
+        }
+
         // Open connections to enabled servers
         debug ("Opening server connections...");
         foreach (Iridium.Services.Server server in servers) {

@@ -59,8 +59,11 @@ public class Iridium.Application : Gtk.Application {
 
         windows = new GLib.List<Iridium.MainWindow> ();
 
-        network_monitor.network_changed.connect ((available) => {
-            warning ("Network availability changed: %s", available.to_string ());
+        //  network_monitor.network_changed.connect ((available) => {
+        //      warning ("Network availability changed: %s", available.to_string ());
+        //  });
+        network_monitor.network_changed.connect (() => {
+            warning ("Network availability changed: %s", network_monitor.get_network_available ().to_string ());
         });
     }
 
@@ -87,13 +90,13 @@ public class Iridium.Application : Gtk.Application {
     }
 
     protected override void activate () {
-        var network_stabilization_monitor = new Iridium.Services.NetworkStabilizationMonitor ();
-        network_stabilization_monitor.connection_stablized.connect (() => {
-            foreach (var window in windows) {
-                restore_state (window, true);
-            }
-        });
-        network_stabilization_monitor.start ();
+        //  var network_stabilization_monitor = new Iridium.Services.NetworkStabilizationMonitor ();
+        //  network_stabilization_monitor.connection_stablized.connect (() => {
+        //      foreach (var window in windows) {
+        //          restore_state (window, true);
+        //      }
+        //  });
+        //  network_stabilization_monitor.start ();
         //  var main_window = new Iridium.MainWindow (this);
         //  main_window.show_all ();
 
@@ -105,27 +108,52 @@ public class Iridium.Application : Gtk.Application {
 
         // Note: These signals may be fired many times in a row, so be careful
         //       about what sorts of actions are triggered as a result.
-        network_monitor.network_changed.connect ((available) => {
-            // TODO: Might be able to get better behavior by checking connectivity as well?
-            if (is_network_available != available) {
-                is_network_available = available;
-                if (!is_network_available) {
-                    foreach (var window in windows) {
-                        window.network_connection_lost ();
-                    }
-                } else {
-                    foreach (var window in windows) {
-                        window.network_connection_gained ();
-                        //  restore_state (window);
-                    }
+        //  network_monitor.network_changed.connect ((available) => {
+        //      // TODO: Might be able to get better behavior by checking connectivity as well?
+        //      if (is_network_available != available) {
+        //          is_network_available = available;
+        //          if (!is_network_available) {
+        //              foreach (var window in windows) {
+        //                  window.network_connection_lost ();
+        //              }
+        //          } else {
+        //              foreach (var window in windows) {
+        //                  window.network_connection_gained ();
+        //                  //  restore_state (window);
+        //              }
+        //          }
+        //      }
+        //  });
+        network_monitor.network_changed.connect (() => {
+            // Don't react to duplicate signals
+            bool updated_availability = network_monitor.get_network_available ();
+            if (is_network_available == updated_availability) {
+                debug ("Ignoring duplicate network availability change signal");
+                return;
+            }
+            is_network_available = updated_availability;
+            if (is_network_available) {
+                foreach (var window in windows) {
+                    window.network_connection_gained ();
+                    restore_state (window, true);
+                }
+            } else {
+                foreach (var window in windows) {
+                    window.network_connection_lost ();
                 }
             }
         });
+
 
         var window = this.add_new_window ();
 
         // Check the initial state of the network connection
         is_network_available = network_monitor.get_network_available ();
+        //  if (!is_network_available) {
+        //      foreach (var _window in windows) {
+        //          _window.network_connection_lost ();
+        //      }
+        //  }
         if (!is_network_available) {
             foreach (var _window in windows) {
                 _window.network_connection_lost ();
