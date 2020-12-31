@@ -327,7 +327,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                     }
                     display_message.message += message.params[i] + " ";
                 }
-                display_message.message += message.message;    
+                display_message.message += message.message;
                 server_message_received (display_message);
                 break;
             case Iridium.Services.MessageCommands.QUIT:
