@@ -157,7 +157,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     // TODO: Restore private messages from the side panel
-    public void initialize (Gee.List<Iridium.Services.Server> servers, Gee.List<Iridium.Services.Channel> channels) {
+    public void initialize (Gee.List<Iridium.Services.Server> servers, Gee.List<Iridium.Services.Channel> channels, bool is_reconnecting) {
         main_layout.show_initialization_overlay ();
 
         // Handle case were there's nothing to initialize!
@@ -176,32 +176,40 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         }
 
         // Initialize the UI with disabled rows and chat views for everything
-        foreach (Iridium.Services.Server server in servers) {
-            var server_id = server.id;
-            var server_name = server.connection_details.server;
-            Idle.add (() => {
-                main_layout.add_server_chat_view (server_name, server.connection_details.nickname, server.network_name != null ? server.network_name : null);
-                return false;
-            });
-            foreach (Iridium.Services.Channel channel in channels) {
-                //  var channel_id = channel.id;
-                var channel_server_id = channel.server_id;
-                var channel_name = channel.name;
-                if (channel_server_id != server_id) {
-                    // This channel isn't for the current server
-                    continue;
-                }
+        if (!is_reconnecting) {
+            debug ("Initializing side panel and chat views…");
+            foreach (Iridium.Services.Server server in servers) {
+                var server_id = server.id;
+                var server_name = server.connection_details.server;
                 Idle.add (() => {
-                    main_layout.add_channel_chat_view (server_name, channel_name, server.connection_details.nickname);
-                    if (channel.favorite) {
-                        main_layout.favorite_channel (server_name, channel_name);
-                    }
+                    main_layout.add_server_chat_view (server_name, server.connection_details.nickname, server.network_name != null ? server.network_name : null);
                     return false;
                 });
+                foreach (Iridium.Services.Channel channel in channels) {
+                    //  var channel_id = channel.id;
+                    var channel_server_id = channel.server_id;
+                    var channel_name = channel.name;
+                    if (channel_server_id != server_id) {
+                        // This channel isn't for the current server
+                        continue;
+                    }
+                    Idle.add (() => {
+                        main_layout.add_channel_chat_view (server_name, channel_name, server.connection_details.nickname);
+                        if (channel.favorite) {
+                            main_layout.favorite_channel (server_name, channel_name);
+                        }
+                        return false;
+                    });
+                }
             }
         }
 
+        if (is_reconnecting) {
+            debug ("Attempting reconnection for %d servers", num_enabled_servers);
+        }
+
         // Open connections to enabled servers
+        debug ("Opening server connections…");
         foreach (Iridium.Services.Server server in servers) {
             var server_id = server.id;
             var connection_details = server.connection_details;
@@ -240,6 +248,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 // TODO: Give some user feedback, maybe a toast? Don't want the UI to get too busy though
                 initialization_status.set (server_name, false);
                 if (initialization_status.size == num_enabled_servers) {
+                    debug ("Initialization complete");
                     main_layout.hide_initialization_overlay ();
                 }
             });
@@ -247,6 +256,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
         // We've initialized the UI, but if there aren't any connections to wait on, we're done
         if (num_enabled_servers == 0) {
+            debug ("Initialization complete");
             main_layout.hide_initialization_overlay ();
             return;
         }
