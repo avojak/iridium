@@ -177,7 +177,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
         // Initialize the UI with disabled rows and chat views for everything
         if (!is_reconnecting) {
-            debug ("Initializing side panel and chat views...");
+            debug ("Initializing side panel and chat views…");
             foreach (Iridium.Services.Server server in servers) {
                 var server_id = server.id;
                 var server_name = server.connection_details.server;
@@ -209,7 +209,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         }
 
         // Open connections to enabled servers
-        debug ("Opening server connections...");
+        debug ("Opening server connections…");
         foreach (Iridium.Services.Server server in servers) {
             var server_id = server.id;
             var connection_details = server.connection_details;
