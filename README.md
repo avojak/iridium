@@ -11,7 +11,7 @@
 
 ## The friendly IRC client
 
-Iridium is a native Linux IRC client built in Vala and Gtk for elementary OS.
+Iridium is a native Linux IRC client built in Vala and Gtk for [elementary OS](https://elementary.io).
 
 ## Install from Source
 
@@ -79,4 +79,4 @@ $ ./test-server.py [-h] {create|start|watch|stop|reset}
 
 This project is very much in-progress and has a lot of remaining work. Check out the [Projects](https://github.com/avojak/iridium/projects) page to track progress towards the next milestone.
 
-Please keep in mind that at this time I am developing Iridium as a personal project in my limited free time to learn Vala and contribute back to the elementary OS community, so do not be offended if I reject a pull request or other contribution.
+Please keep in mind that at this time I am developing Iridium as a personal project in my limited free time to learn Vala and contribute back to the [elementary OS](https://elementary.io) community, so do not be offended if I reject a pull request or other contribution.
