@@ -1,3 +1,5 @@
 src/Application
 build/
 builddir/
+
+.DS_Store
