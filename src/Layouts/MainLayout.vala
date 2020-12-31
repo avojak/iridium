@@ -332,7 +332,10 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
 
         // Show the chat view
         chat_view.show_all ();
-        main_stack.set_visible_child_full (get_child_name (server_name, channel_name), Gtk.StackTransitionType.SLIDE_RIGHT);
+        string? child_name = get_child_name (server_name, channel_name);
+        if (child_name != null) {
+            main_stack.set_visible_child_full (child_name, Gtk.StackTransitionType.SLIDE_RIGHT);
+        }
 
         // Notify the chat view that it has gained focus
         chat_view.focus_gained ();
@@ -554,18 +557,22 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
     }
 
     private Iridium.Views.ChatView? get_chat_view (string server_name, string? channel_name) {
-        var child_name = get_child_name (server_name, channel_name);
+        string? child_name = get_child_name (server_name, channel_name);
+        if (child_name == null) {
+            return null;
+        }
         return (Iridium.Views.ChatView) main_stack.get_child_by_name (child_name);
     }
 
-    private string get_child_name (string server_name, string? channel_name) {
+    private string? get_child_name (string server_name, string? channel_name) {
         if (channel_name == null) {
             return server_name;
         } else if (channel_name.has_prefix ("#") || channel_name.has_prefix ("&")) {
             return server_name + ":" + channel_name;
-        } else {
+        } else if (nickname_mapping.has_key (server_name)) {
             return server_name + ":" + nickname_mapping.get (server_name).get (channel_name);
         }
+        return null;
     }
 
     private void rename_private_message_chat_view (string server_name, string old_nickname, string new_nickname) {
