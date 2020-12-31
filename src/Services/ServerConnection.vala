@@ -76,7 +76,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                     // TODO: Handle this differently on initialization (currently fails silently in the background)
                     critical ("IOError while reading: %s\n", e.message);
                 }
-            } while (should_keep_reading(line));
+            } while (should_keep_reading (line));
         } catch (GLib.Error e) {
             critical ("Error while connecting: %s\n", e.message);
             if (connection_error_message == null) {
