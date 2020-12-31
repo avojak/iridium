@@ -475,9 +475,12 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         } catch (GLib.IOError e) {
             warning ("Error while closing connection: %s", e.message);
         }
-
         cancellable.cancel ();
 
+        foreach (var channel in joined_channels) {
+            channel_left (channel);
+        }
+        joined_channels.clear ();
         connection_closed ();
     }
 
