@@ -291,13 +291,11 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 server_error_received (message);
                 break;
             case Iridium.Services.MessageCommands.NOTICE:
+            case Iridium.Services.NumericCodes.RPL_CREATED:
             case Iridium.Services.NumericCodes.RPL_MOTD:
             case Iridium.Services.NumericCodes.RPL_MOTDSTART:
             case Iridium.Services.NumericCodes.RPL_YOURHOST:
             case Iridium.Services.NumericCodes.RPL_LUSERCLIENT:
-            case Iridium.Services.NumericCodes.RPL_LUSEROP:
-            case Iridium.Services.NumericCodes.RPL_LUSERUNKNOWN:
-            case Iridium.Services.NumericCodes.RPL_LUSERCHANNELS:
             case Iridium.Services.NumericCodes.RPL_UMODEIS:
             case Iridium.Services.NumericCodes.RPL_SERVLIST:
             case Iridium.Services.NumericCodes.RPL_ENDOFSTATS:
@@ -321,6 +319,16 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                             break;
                     }
                 }
+                // Display in the server chat view
+                var display_message = new Iridium.Services.Message ();
+                for (int i = 0; i < message.params.length; i++) {
+                    if (i == 0) {
+                        continue;
+                    }
+                    display_message.message += message.params[i] + " ";
+                }
+                display_message.message += message.message;    
+                server_message_received (display_message);
                 break;
             case Iridium.Services.MessageCommands.QUIT:
                 if (message.nickname == connection_details.nickname) {
@@ -405,16 +413,26 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             case Iridium.Services.NumericCodes.RPL_NOTOPIC:
                 on_channel_topic_received (message.params[1], "");
                 break;
+            case Iridium.Services.NumericCodes.RPL_LUSEROP:
+            case Iridium.Services.NumericCodes.RPL_LUSERUNKNOWN:
+            case Iridium.Services.NumericCodes.RPL_LUSERCHANNELS:
+                var display_message = new Iridium.Services.Message ();
+                display_message.message = message.params[1] + " " + message.message;
+                server_message_received (display_message);
+                break;
             case Iridium.Services.MessageCommands.MODE:
-                // TODO: Implement
-                //  print ("prefix: " + message.prefix + "\n");
-                //  print ("nickname: " + message.nickname + "\n");
-                //  print ("message: " + message.message + "\n");
-                //  print ("params[0]: " + message.params[0] + "\n");
-                //  print ("params[1]: " + message.params[1] + "\n");
-                //  print ("params[2]: " + message.params[2] + "\n");
                 // TODO: This may affect the nickname displayed in the channel
                 // user list
+
+                // If the first param is our nickname, this is being set on the server rather than for a channel
+                if (message.params[0] == connection_details.nickname) {
+                    char modifier = message.message[0];
+                    for (int i = 1; i < message.message.length; i++) {
+                        var display_message = new Iridium.Services.Message ();
+                        display_message.message = "%s sets mode %c%c on %s".printf (message.prefix, modifier, message.message[i], message.params[0]);
+                        server_message_received (display_message);
+                    }
+                }
                 break;
 
             // Errors
