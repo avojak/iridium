@@ -279,6 +279,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             return;
         }
         var message = new Iridium.Services.Message (line);
+        // TODO: Remove this!
         print (@"$line\n");
         switch (message.command) {
             case "PING":
@@ -291,13 +292,11 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 server_error_received (message);
                 break;
             case Iridium.Services.MessageCommands.NOTICE:
+            case Iridium.Services.NumericCodes.RPL_CREATED:
             case Iridium.Services.NumericCodes.RPL_MOTD:
             case Iridium.Services.NumericCodes.RPL_MOTDSTART:
             case Iridium.Services.NumericCodes.RPL_YOURHOST:
             case Iridium.Services.NumericCodes.RPL_LUSERCLIENT:
-            case Iridium.Services.NumericCodes.RPL_LUSEROP:
-            case Iridium.Services.NumericCodes.RPL_LUSERUNKNOWN:
-            case Iridium.Services.NumericCodes.RPL_LUSERCHANNELS:
             case Iridium.Services.NumericCodes.RPL_UMODEIS:
             case Iridium.Services.NumericCodes.RPL_SERVLIST:
             case Iridium.Services.NumericCodes.RPL_ENDOFSTATS:
@@ -321,6 +320,16 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                             break;
                     }
                 }
+                // Display in the server chat view
+                var display_message = new Iridium.Services.Message ();
+                for (int i = 0; i < message.params.length; i++) {
+                    if (i == 0) {
+                        continue;
+                    }
+                    display_message.message += message.params[i] + " ";
+                }
+                display_message.message += message.message;
+                server_message_received (display_message);
                 break;
             case Iridium.Services.MessageCommands.QUIT:
                 if (message.nickname == connection_details.nickname) {
@@ -372,7 +381,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 // If the first param is our nickname, it's a PM. Otherwise, it's
                 // a general message on a channel
                 if (message.params[0] == connection_details.nickname) {
-                    print ("received message from %s to %s\n", message.nickname, connection_details.nickname);
+                    //  print ("received message from %s to %s\n", message.nickname, connection_details.nickname);
                     private_message_received (message.nickname, connection_details.nickname, message);
                 } else {
                     channel_message_received (message.params[0], message);
@@ -405,16 +414,29 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             case Iridium.Services.NumericCodes.RPL_NOTOPIC:
                 on_channel_topic_received (message.params[1], "");
                 break;
+            case Iridium.Services.NumericCodes.RPL_LUSEROP:
+            case Iridium.Services.NumericCodes.RPL_LUSERUNKNOWN:
+            case Iridium.Services.NumericCodes.RPL_LUSERCHANNELS:
+                var display_message = new Iridium.Services.Message ();
+                display_message.message = message.params[1] + " " + message.message;
+                server_message_received (display_message);
+                break;
             case Iridium.Services.MessageCommands.MODE:
-                // TODO: Implement
-                //  print ("prefix: " + message.prefix + "\n");
-                //  print ("nickname: " + message.nickname + "\n");
-                //  print ("message: " + message.message + "\n");
-                //  print ("params[0]: " + message.params[0] + "\n");
-                //  print ("params[1]: " + message.params[1] + "\n");
-                //  print ("params[2]: " + message.params[2] + "\n");
                 // TODO: This may affect the nickname displayed in the channel
                 // user list
+
+                // If the first param is our nickname, this is being set on the server rather than for a channel
+                if (message.params[0] == connection_details.nickname) {
+                    char modifier = message.message[0];
+                    for (int i = 1; i < message.message.length; i++) {
+                        var display_message = new Iridium.Services.Message ();
+                        display_message.message = "%s sets mode %c%c on %s".printf (message.prefix, modifier, message.message[i], message.params[0]);
+                        server_message_received (display_message);
+                    }
+                }
+                break;
+            case Iridium.Services.NumericCodes.RPL_ENDOFMOTD:
+                // Do nothing
                 break;
 
             // Errors
@@ -433,20 +455,41 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 // Can remove this once errors are implemented in the channel chat view
                 server_error_received (message);
                 break;
+            case Iridium.Services.NumericCodes.ERR_NEEDMOREPARAMS:
+                var display_message = new Iridium.Services.Message ();
+                display_message.message = "%s for command: %s".printf (message.message, message.params[1]);
+                server_error_received (display_message);
+                break;
+            case Iridium.Services.NumericCodes.ERR_BADCHANMASK:
+            case Iridium.Services.NumericCodes.ERR_NOSUCHCHANNEL:
+                // If the first character of the channel isn't '#', display a (possibly) helpful message
+                if (message.params[1][0] != '#') {
+                    var display_message = new Iridium.Services.Message ();
+                    display_message.message = "%s: '%s' (Did you mean '#%s'?)".printf (message.message, message.params[1], message.params[1]);
+                    server_error_received (display_message);
+                } else {
+                    server_error_received (message);
+                }
+                break;
+            case Iridium.Services.NumericCodes.ERR_NORECIPIENT:
+            case Iridium.Services.NumericCodes.ERR_NOTEXTTOSEND:
             case Iridium.Services.NumericCodes.ERR_UNKNOWNCOMMAND:
             case Iridium.Services.NumericCodes.ERR_NOSUCHNICK:
+            case Iridium.Services.NumericCodes.ERR_CANNOTSENDTOCHAN:
                 // TODO: Handle no such nick for sending a PM. Should display the server 
                 //       error in the channel view, not the server view.
-            case Iridium.Services.NumericCodes.ERR_NOSUCHCHANNEL:
             case Iridium.Services.NumericCodes.ERR_NOMOTD:
             case Iridium.Services.NumericCodes.ERR_USERNOTINCHANNEL:
             case Iridium.Services.NumericCodes.ERR_NOTONCHANNEL:
             case Iridium.Services.NumericCodes.ERR_NOTREGISTERED:
-            case Iridium.Services.NumericCodes.ERR_NEEDMOREPARAMS:
+            case Iridium.Services.NumericCodes.ERR_PASSWDMISMATCH:
+            case Iridium.Services.NumericCodes.ERR_YOUREBANNEDCREEP:
+            case Iridium.Services.NumericCodes.ERR_YOUWILLBEBANNED:
             case Iridium.Services.NumericCodes.ERR_UNKNOWNMODE:
                 server_error_received (message);
                 break;
             default:
+                warning ("Command or numeric code not implemented: %s", message.command);
                 break;
         }
     }

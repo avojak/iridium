@@ -410,11 +410,10 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         if (text[0] != '/') {
             var message = new Iridium.Services.Message ();
             message.message = _("Start your message with a /");
-            //  chat_view.display_server_error_msg (message);
             main_layout.display_server_error_message (server_name, null, message);
             return;
         }
-        send_server_command (server_name, text.substring (1));
+        send_server_command (server_name, text.substring (1), null);
     }
 
     private void on_channel_message_to_send (string server_name, string channel_name, string text) {
@@ -423,16 +422,10 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         }
         // Check if it's a server command
         if (text[0] == '/') {
-            send_server_command (server_name, text.substring (1));
+            send_server_command (server_name, text.substring (1), channel_name);
             return;
         }
-        // Send the message
-        var message_text = "PRIVMSG " + channel_name + " :" + text;
-        Iridium.Application.connection_manager.send_user_message (server_name, message_text);
-        // Display the message in the chat view
-        var message = new Iridium.Services.Message (message_text);
-        message.nickname = Iridium.Application.connection_manager.get_nickname (server_name);
-        main_layout.display_self_channel_message (server_name, channel_name, message);
+        send_privmsg (server_name, channel_name, text);
     }
 
     private void on_private_message_to_send (string server_name, string nickname, string text) {
@@ -441,20 +434,53 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         }
         // Check if it's a server command
         if (text[0] == '/') {
-            send_server_command (server_name, text.substring (1));
+            send_server_command (server_name, text.substring (1), nickname);
             return;
         }
+        send_privmsg (server_name, nickname, text);
+    }
+
+    private void send_privmsg (string server_name, string recipient, string text) {
         // Send the message
-        var message_text = "PRIVMSG " + nickname + " :" + text;
+        var message_text = "PRIVMSG " + recipient + " :" + text;
         Iridium.Application.connection_manager.send_user_message (server_name, message_text);
+
+        // Ensure that a chat view exists if this is directed to another user
+        if ((recipient[0] != '#') && (recipient.down () != "nickserv")) {
+            var connection_details = get_connection_details_for_server (server_name);
+            if (connection_details == null) {
+                warning ("No connection details found for server %s", server_name);
+                return;
+            }
+            main_layout.add_private_message_chat_view (server_name, recipient, connection_details.nickname);
+            main_layout.enable_chat_view (server_name, recipient);
+        }
+
         // Display the message in the chat view
         var message = new Iridium.Services.Message (message_text);
         message.nickname = Iridium.Application.connection_manager.get_nickname (server_name);
-        main_layout.display_self_private_message (server_name, nickname, message);
+        main_layout.display_self_private_message (server_name, recipient, message);
     }
 
-    private void send_server_command (string server_name, string text) {
+    private void send_server_command (string server_name, string text, string? referring_channel) {
         // TODO: Check for actions (eg. /me, etc.)
+        string[] tokens = text.split (" ");
+        if (tokens.length > 0 && (tokens[0] == "msg" || tokens[0] == "MSG")) {
+            if (tokens.length == 1) {
+                var message = new Iridium.Services.Message ();
+                message.message = _("No recipient nickname specified (Usage: /msg <nickname> <message>)");
+                main_layout.display_server_error_message (server_name, referring_channel, message);
+            } else if (tokens.length == 2) {
+                var message = new Iridium.Services.Message ();
+                message.message = _("No message specified (Usage: /msg <nickname> <message>)");
+                main_layout.display_server_error_message (server_name, referring_channel, message);
+            } else {
+                string recipient = tokens[1];
+                string message = text.substring (tokens[0].length + tokens[1].length + 2);
+                send_privmsg (server_name, recipient, message);
+            }
+            return;
+        }
         Iridium.Application.connection_manager.send_user_message (server_name, text);
     }
 
