@@ -96,6 +96,8 @@ public class Iridium.Services.NumericCodes {
     public const string ERR_NOSUCHCHANNEL = "403";
     public const string ERR_CANNOTSENDTOCHAN = "404";
     public const string ERR_TOOMANYCHANNELS = "405";
+    public const string ERR_NORECIPIENT = "411";
+    public const string ERR_NOTEXTTOSEND = "412";
     public const string ERR_UNKNOWNCOMMAND = "421";
     public const string ERR_NOMOTD = "422";
     public const string ERR_ERRONEOUSNICKNAME = "432";
@@ -108,11 +110,13 @@ public class Iridium.Services.NumericCodes {
     public const string ERR_ALREADYREGISTERED = "462";
     public const string ERR_PASSWDMISMATCH = "464";
     public const string ERR_YOUREBANNEDCREEP = "465";
+    public const string ERR_YOUWILLBEBANNED = "466";
     public const string ERR_CHANNELISFULL = "471";
     public const string ERR_UNKNOWNMODE = "472";
     public const string ERR_INVITEONLYCHAN = "473";
     public const string ERR_BANNEDFROMCHAN = "474";
     public const string ERR_BADCHANNELKEY = "475";
+    public const string ERR_BADCHANMASK = "476";
     public const string ERR_NOPRIVILEGES = "481";
     public const string ERR_CHANOPRIVSNEEDED = "482";
     public const string ERR_CANTKILLSERVER = "483";

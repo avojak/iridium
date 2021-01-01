@@ -279,6 +279,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             return;
         }
         var message = new Iridium.Services.Message (line);
+        // TODO: Remove this!
         print (@"$line\n");
         switch (message.command) {
             case "PING":
@@ -380,7 +381,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 // If the first param is our nickname, it's a PM. Otherwise, it's
                 // a general message on a channel
                 if (message.params[0] == connection_details.nickname) {
-                    print ("received message from %s to %s\n", message.nickname, connection_details.nickname);
+                    //  print ("received message from %s to %s\n", message.nickname, connection_details.nickname);
                     private_message_received (message.nickname, connection_details.nickname, message);
                 } else {
                     channel_message_received (message.params[0], message);
@@ -434,6 +435,9 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                     }
                 }
                 break;
+            case Iridium.Services.NumericCodes.RPL_ENDOFMOTD:
+                // Do nothing
+                break;
 
             // Errors
             case Iridium.Services.NumericCodes.ERR_ERRONEOUSNICKNAME:
@@ -456,6 +460,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 display_message.message = "%s for command: %s".printf (message.message, message.params[1]);
                 server_error_received (display_message);
                 break;
+            case Iridium.Services.NumericCodes.ERR_BADCHANMASK:
             case Iridium.Services.NumericCodes.ERR_NOSUCHCHANNEL:
                 // If the first character of the channel isn't '#', display a (possibly) helpful message
                 if (message.params[1][0] != '#') {
@@ -466,18 +471,25 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                     server_error_received (message);
                 }
                 break;
+            case Iridium.Services.NumericCodes.ERR_NORECIPIENT:
+            case Iridium.Services.NumericCodes.ERR_NOTEXTTOSEND:
             case Iridium.Services.NumericCodes.ERR_UNKNOWNCOMMAND:
             case Iridium.Services.NumericCodes.ERR_NOSUCHNICK:
+            case Iridium.Services.NumericCodes.ERR_CANNOTSENDTOCHAN:
                 // TODO: Handle no such nick for sending a PM. Should display the server 
                 //       error in the channel view, not the server view.
             case Iridium.Services.NumericCodes.ERR_NOMOTD:
             case Iridium.Services.NumericCodes.ERR_USERNOTINCHANNEL:
             case Iridium.Services.NumericCodes.ERR_NOTONCHANNEL:
             case Iridium.Services.NumericCodes.ERR_NOTREGISTERED:
+            case Iridium.Services.NumericCodes.ERR_PASSWDMISMATCH:
+            case Iridium.Services.NumericCodes.ERR_YOUREBANNEDCREEP:
+            case Iridium.Services.NumericCodes.ERR_YOUWILLBEBANNED:
             case Iridium.Services.NumericCodes.ERR_UNKNOWNMODE:
                 server_error_received (message);
                 break;
             default:
+                warning ("Command or numeric code not implemented: %s", message.command);
                 break;
         }
     }

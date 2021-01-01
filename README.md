@@ -75,6 +75,33 @@ To facilitate testing, a `test-server.py` script is available which starts a loc
 $ ./test-server.py [-h] {create|start|watch|stop|reset}
 ```
 
+To create a new test server:
+
+```bash
+$ ./test-server.py create
+```
+
+You should now be able to connect to the server from Iridium using the Server `localhost`, and all other settings as default. (Note: If you have configured the settings to reject unacceptable SSL/TLS certificates, you may not be able to connect because the Docker IRC server uses self-signed certificates)
+
+### Troubleshooting and Debugging
+
+Log messages can be found using the `journalctl` command. For example, the following will show journal messages for the current boot of the OS:
+
+```bash
+$ journalctl -b
+```
+
+When the application starts, it logs a series of messages with basic information:
+
+```
+Jan 01 11:13:24 avojak-eOS plank.desktop[1992]: [INFO 11:13:24.802632] Application.vala:48: com.github.avojak.iridium-dev version: 1.0.0
+Jan 01 11:13:24 avojak-eOS plank.desktop[1992]: [INFO 11:13:24.802666] Application.vala:49: Kernel version: 5.4.0-58-generic
+Jan 01 11:13:24 avojak-eOS plank.desktop[1992]: [INFO 11:13:24.815561] SecretManager.vala:46: Secret schema version: 1
+Jan 01 11:13:24 avojak-eOS plank.desktop[1992]: [INFO 11:13:24.850977] SQLClient.vala:39: Database file: iridium01.db
+```
+
+This can also be useful to locate where the application started amidst all of the journal entries.
+
 ## Project Status
 
 This project is very much in-progress and has a lot of remaining work. Check out the [Projects](https://github.com/avojak/iridium/projects) page to track progress towards the next milestone.
