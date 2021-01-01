@@ -451,16 +451,29 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 // Can remove this once errors are implemented in the channel chat view
                 server_error_received (message);
                 break;
+            case Iridium.Services.NumericCodes.ERR_NEEDMOREPARAMS:
+                var display_message = new Iridium.Services.Message ();
+                display_message.message = "%s for command: %s".printf (message.message, message.params[1]);
+                server_error_received (display_message);
+                break;
+            case Iridium.Services.NumericCodes.ERR_NOSUCHCHANNEL:
+                // If the first character of the channel isn't '#', display a (possibly) helpful message
+                if (message.params[1][0] != '#') {
+                    var display_message = new Iridium.Services.Message ();
+                    display_message.message = "%s: '%s' (Did you mean '#%s'?)".printf (message.message, message.params[1], message.params[1]);
+                    server_error_received (display_message);
+                } else {
+                    server_error_received (message);
+                }
+                break;
             case Iridium.Services.NumericCodes.ERR_UNKNOWNCOMMAND:
             case Iridium.Services.NumericCodes.ERR_NOSUCHNICK:
                 // TODO: Handle no such nick for sending a PM. Should display the server 
                 //       error in the channel view, not the server view.
-            case Iridium.Services.NumericCodes.ERR_NOSUCHCHANNEL:
             case Iridium.Services.NumericCodes.ERR_NOMOTD:
             case Iridium.Services.NumericCodes.ERR_USERNOTINCHANNEL:
             case Iridium.Services.NumericCodes.ERR_NOTONCHANNEL:
             case Iridium.Services.NumericCodes.ERR_NOTREGISTERED:
-            case Iridium.Services.NumericCodes.ERR_NEEDMOREPARAMS:
             case Iridium.Services.NumericCodes.ERR_UNKNOWNMODE:
                 server_error_received (message);
                 break;
