@@ -446,13 +446,14 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         Iridium.Application.connection_manager.send_user_message (server_name, message_text);
 
         // Ensure that a chat view exists if this is directed to another user
-        if (recipient[0] != '#') {
+        if ((recipient[0] != '#') && (recipient.down () != "nickserv")) {
             var connection_details = get_connection_details_for_server (server_name);
             if (connection_details == null) {
                 warning ("No connection details found for server %s", server_name);
                 return;
             }
             main_layout.add_private_message_chat_view (server_name, recipient, connection_details.nickname);
+            main_layout.enable_chat_view (server_name, recipient);
         }
 
         // Display the message in the chat view
