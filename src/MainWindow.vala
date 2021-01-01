@@ -444,7 +444,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         // Send the message
         var message_text = "PRIVMSG " + recipient + " :" + text;
         Iridium.Application.connection_manager.send_user_message (server_name, message_text);
-        
+
         // Ensure that a chat view exists if this is directed to another user
         if (recipient[0] != '#') {
             var connection_details = get_connection_details_for_server (server_name);
@@ -454,7 +454,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             }
             main_layout.add_private_message_chat_view (server_name, recipient, connection_details.nickname);
         }
-        
+
         // Display the message in the chat view
         var message = new Iridium.Services.Message (message_text);
         message.nickname = Iridium.Application.connection_manager.get_nickname (server_name);
