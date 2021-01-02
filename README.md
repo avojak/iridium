@@ -58,13 +58,13 @@ reference to the file with the translatable string.
 Update the `.pot` file which contains the translatable strings:
 
 ```
-$ ninja com.github.avojak.iridium-pot
+$ ninja -C build com.github.avojak.iridium-pot
 ```
 
 Generate translations for the languages listed in the `po/LINGUAS` files:
 
 ```
-$ ninja com.github.avojak.iridium-update-po
+$ ninja -C build com.github.avojak.iridium-update-po
 ```
 
 ### Testing

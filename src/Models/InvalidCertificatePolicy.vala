@@ -41,11 +41,11 @@ public enum Iridium.Models.InvalidCertificatePolicy {
     public string get_short_name () {
         switch (this) {
             case REJECT:
-                return _("REJECT");
+                return "REJECT";
             case WARN:
-                return _("WARN");
+                return "WARN";
             case ALLOW:
-                return _("ALLOW");
+                return "ALLOW";
             default:
                 assert_not_reached ();
         }

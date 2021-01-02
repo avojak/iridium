@@ -1,22 +1,37 @@
-src/MainWindow.vala
+src/Layouts/MainLayout.vala
 
 src/Models/AuthenticationMethod.vala
 
+src/Models/AuthenticationMethod.vala
+src/Models/CertificateErrorMapping.vala
+src/Models/InvalidCertificatePolicy.vala
+
+src/Services/ServerConnection.vala
+
 src/Views/ChannelChatView.vala
 src/Views/ChatView.vala
+src/Views/PrivateMessageChatView.vala
 src/Views/ServerChatView.vala
 src/Views/Welcome.vala
 
-src/Widgets/ChannelJoinDialog.vala
-src/Widgets/ChannelTopicEditDialog.vala
-src/Widgets/HeaderBar.vala
-src/Widgets/ManageConnectionsDialog.vala
-src/Widgets/NetworkInfoBar.vala
-src/Widgets/ServerConnectionDialog.vala
-src/Widgets/StatusBar.vala
+src/Widgets/Dialogs/CertificateWarningDialog.vala
+src/Widgets/Dialogs/ChannelJoinDialog.vala
+src/Widgets/Dialogs/ChannelTopicEditDialog.vala
+src/Widgets/Dialogs/ForgetConnectionsWarningDialog.vala
+src/Widgets/Dialogs/ManageConnectionsDialog.vala
+src/Widgets/Dialogs/NicknameEditDialog.vala
+src/Widgets/Dialogs/PreferencesDialog.vala
+src/Widgets/Dialogs/ServerConnectionDialog.vala
+
 src/Widgets/SidePanel/ChannelRow.vala
 src/Widgets/SidePanel/Panel.vala
 src/Widgets/SidePanel/PrivateMessageRow.vala
 src/Widgets/SidePanel/ServerRow.vala
+
 src/Widgets/UsersPopover/ChannelUsersPopover.vala
 
+src/Widgets/HeaderBar.vala
+src/Widgets/NetworkInfoBar.vala
+src/Widgets/StatusBar.vala
+
+src/MainWindow.vala
