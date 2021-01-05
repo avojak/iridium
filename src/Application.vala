@@ -64,11 +64,11 @@ public class Iridium.Application : Gtk.Application {
         });
     }
 
-    public void new_window () {
-        var main_window = new Iridium.MainWindow (this);
-        main_window.present ();
-        //  restore_state (main_window);
-    }
+    //  public void new_window () {
+    //      var main_window = new Iridium.MainWindow (this);
+    //      main_window.present ();
+    //      //  restore_state (main_window);
+    //  }
 
     public override void window_added (Gtk.Window window) {
         windows.append (window as Iridium.MainWindow);
@@ -82,6 +82,9 @@ public class Iridium.Application : Gtk.Application {
 
     private Iridium.MainWindow add_new_window () {
         var window = new Iridium.MainWindow (this);
+        window.initialized.connect ((servers, channels, is_reconnecting) => {
+            window.open_connections (servers, channels, is_reconnecting);
+        });
         this.add_window (window);
         return window;
     }

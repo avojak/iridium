@@ -158,23 +158,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     // TODO: Restore private messages from the side panel
     public void initialize (Gee.List<Iridium.Services.Server> servers, Gee.List<Iridium.Services.Channel> channels, bool is_reconnecting) {
-        main_layout.show_initialization_overlay ();
-
-        // Handle case were there's nothing to initialize!
-        if (servers.size == 0) {
-            main_layout.hide_initialization_overlay ();
-            return;
-        }
-
-        // Map the server names to their initialization status (success or fail)
-        Gee.Map<string, bool> initialization_status = new Gee.HashMap<string, bool> ();
-        var num_enabled_servers = 0;
-        foreach (Iridium.Services.Server server in servers) {
-            if (server.enabled) {
-                num_enabled_servers++;
-            }
-        }
-
         // Initialize the UI with disabled rows and chat views for everything
         if (!is_reconnecting) {
             debug ("Initializing side panel and chat views…");
@@ -204,8 +187,48 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             }
         }
 
+        initialized (servers, channels, is_reconnecting);
+    }
+
+    public void open_connections (Gee.List<Iridium.Services.Server> servers, Gee.List<Iridium.Services.Channel> channels, bool is_reconnecting) {
+        main_layout.show_initialization_overlay ();
+
+        // Handle case were there's nothing to initialize!
+        if (servers.size == 0) {
+            main_layout.hide_initialization_overlay ();
+            return;
+        }
+
+        // Check if we should try to preemptively unlock the keyring
+        bool should_attempt_preempt = false;
+        foreach (Iridium.Services.Server server in servers) {
+            if (server.connection_details.auth_method.stores_secret ()) {
+                should_attempt_preempt = true;
+            }
+        }
+        if (should_attempt_preempt) {
+            Iridium.Services.PreemptKeyringThread preempty_keyring_thread = new Iridium.Services.PreemptKeyringThread ();
+            preempty_keyring_thread.preempt_complete.connect (() => {
+                do_open_connections (servers, channels, is_reconnecting);
+            });
+            new Thread<void> ("Preempt Keyring", preempty_keyring_thread.thread_func);
+        } else {
+            do_open_connections (servers, channels, is_reconnecting);
+        }
+    }
+
+    private void do_open_connections (Gee.List<Iridium.Services.Server> servers, Gee.List<Iridium.Services.Channel> channels, bool is_reconnecting) {
+        // Map the server names to their initialization status (success or fail)
+        Gee.Map<string, bool> initialization_status = new Gee.HashMap<string, bool> ();
+        var num_enabled_servers = 0;
+        foreach (Iridium.Services.Server server in servers) {
+            if (server.enabled) {
+                num_enabled_servers++;
+            }
+        }
+
         if (is_reconnecting) {
-            debug ("Attempting reconnection for %d servers", num_enabled_servers);
+            debug ("Attempting reconnection for %d servers…", num_enabled_servers);
         }
 
         // Open connections to enabled servers
@@ -260,7 +283,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             main_layout.hide_initialization_overlay ();
             return;
         }
-
     }
 
     public void show_server_connection_dialog () {
@@ -922,5 +944,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     private void on_edit_channel_topic_button_clicked (string server_name, string channel_name) {
         show_channel_topic_edit_dialog (server_name, channel_name);
     }
+
+    public signal void initialized (Gee.List<Iridium.Services.Server> servers, Gee.List<Iridium.Services.Channel> channels, bool is_reconnecting);
 
 }

@@ -38,6 +38,18 @@ public enum Iridium.Models.AuthenticationMethod {
         }
     }
 
+    public bool stores_secret () {
+        switch (this) {
+            case NONE:
+                return false;
+            case SERVER_PASSWORD:
+            case NICKSERV_MSG:
+                return true;
+            default:
+                assert_not_reached ();
+        }
+    }
+
     public static AuthenticationMethod get_value_by_name (string name) {
         EnumClass enumc = (EnumClass) typeof (AuthenticationMethod).class_ref ();
         unowned EnumValue? eval = enumc.get_value_by_name (name);

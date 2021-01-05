@@ -71,9 +71,7 @@ public class Iridium.Services.SecretManager : GLib.Object {
         });
     }
 
-    public string? retrieve_secret (string server, int port, string user) {
-        debug ("Retrieving password for server: %s, port: %s, user: %s", server, port.to_string (), user);
-
+    public void store_dummy_secret () {
         // This is a dirty, dirty hack. Force authentication check by storing a dummy secret. Otherwise,
         // we get a null secret back and no prompt for authentication if needed.
         var dummy_label = Constants.APP_ID + ":dummy@example.com:6667";
@@ -84,9 +82,16 @@ public class Iridium.Services.SecretManager : GLib.Object {
         dummy_attributes.insert ("user", "dummy");
         try {
             Secret.password_storev_sync (schema, dummy_attributes, null, dummy_label, "fake_not_real", null);
+            debug ("Successfully stored a dummy secret");
         } catch (GLib.Error e) {
             warning ("Error while storing dummy password: %s", e.message);
         }
+    }
+
+    public string? retrieve_secret (string server, int port, string user) {
+        debug ("Retrieving password for server: %s, port: %s, user: %s", server, port.to_string (), user);
+
+        store_dummy_secret ();        
 
         var label = Constants.APP_ID + ":" + user + "@" + server + ":" + port.to_string ();
         var attributes = new GLib.HashTable<string, string> (str_hash, str_equal);
