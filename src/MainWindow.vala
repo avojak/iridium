@@ -202,7 +202,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         // Check if we should try to preemptively unlock the keyring
         bool should_attempt_preempt = false;
         foreach (Iridium.Services.Server server in servers) {
-            if (server.connection_details.auth_method.stores_secret ()) {
+            if (server.connection_details.auth_method.stores_secret () && server.enabled) {
                 should_attempt_preempt = true;
             }
         }
