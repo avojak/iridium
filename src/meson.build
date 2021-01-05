@@ -36,6 +36,7 @@ iridium_files = files(
     join_paths('Models', 'Text', 'ServerMessageText.vala'),
     join_paths('Services', 'ActionManager.vala'),
     join_paths('Services', 'CertificateManager.vala'),
+    join_paths('Services', 'PreemptKeyringThread.vala'),
     join_paths('Services', 'ServerConnection.vala'),
     join_paths('Services', 'ServerConnectionRepository.vala'),
     join_paths('Services', 'ServerConnectionDetails.vala'),
