@@ -91,7 +91,7 @@ public class Iridium.Services.SecretManager : GLib.Object {
     public string? retrieve_secret (string server, int port, string user) {
         debug ("Retrieving password for server: %s, port: %s, user: %s", server, port.to_string (), user);
 
-        store_dummy_secret ();        
+        store_dummy_secret ();
 
         var label = Constants.APP_ID + ":" + user + "@" + server + ":" + port.to_string ();
         var attributes = new GLib.HashTable<string, string> (str_hash, str_equal);
