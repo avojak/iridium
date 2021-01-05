@@ -21,10 +21,11 @@
 
 public class Iridium.Services.PreemptKeyringThread : GLib.Object {
 
-    public void thread_func () {
+    public int thread_func () {
         debug ("Attempting to preempt keyring on startup by storing a dummy secret…");
         Iridium.Application.secret_manager.store_dummy_secret ();
         preempt_complete ();
+        return 0;
     }
 
     public signal void preempt_complete ();

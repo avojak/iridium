@@ -211,7 +211,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             preempty_keyring_thread.preempt_complete.connect (() => {
                 do_open_connections (servers, channels, is_reconnecting);
             });
-            new Thread<void> ("Preempt Keyring", preempty_keyring_thread.thread_func);
+            new Thread<int> ("Preempt Keyring", preempty_keyring_thread.thread_func);
         } else {
             do_open_connections (servers, channels, is_reconnecting);
         }
