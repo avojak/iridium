@@ -449,7 +449,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             send_server_command (server_name, text.substring (1), channel_name);
             return;
         }
-        
+
         // Send the message
         var message_text = "PRIVMSG " + channel_name + " :" + text;
         Iridium.Application.connection_manager.send_user_message (server_name, message_text);
@@ -722,7 +722,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     private void on_channel_topic_changed (string server_name, string channel_name, string nickname) {
         var topic = Iridium.Application.connection_manager.get_topic (server_name, channel_name);
         var message_to_display = new Iridium.Services.Message ();
-        
+
         if (topic == null || topic.length == 0) {
             message_to_display.message = nickname + _(" has cleared the topic");
         } else {
