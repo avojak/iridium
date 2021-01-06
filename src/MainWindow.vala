@@ -89,6 +89,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         Iridium.Application.connection_manager.user_quit_server.connect (on_user_quit_server);
         Iridium.Application.connection_manager.channel_users_received.connect (on_channel_users_received);
         Iridium.Application.connection_manager.channel_topic_received.connect (on_channel_topic_received);
+        Iridium.Application.connection_manager.channel_topic_changed.connect (on_channel_topic_changed);
+        Iridium.Application.connection_manager.channel_topic_whotime_received.connect (on_channel_topic_whotime_received);
         Iridium.Application.connection_manager.nickname_in_use.connect (on_nickname_in_use);
         Iridium.Application.connection_manager.erroneous_nickname.connect (on_erroneous_nickname);
         Iridium.Application.connection_manager.channel_joined.connect (on_channel_joined);
@@ -447,7 +449,15 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             send_server_command (server_name, text.substring (1), channel_name);
             return;
         }
-        send_privmsg (server_name, channel_name, text);
+        
+        // Send the message
+        var message_text = "PRIVMSG " + channel_name + " :" + text;
+        Iridium.Application.connection_manager.send_user_message (server_name, message_text);
+
+         // Display the message in the chat view
+         var message = new Iridium.Services.Message (message_text);
+         message.nickname = Iridium.Application.connection_manager.get_nickname (server_name);
+         main_layout.display_self_channel_message (server_name, channel_name, message);
     }
 
     private void on_private_message_to_send (string server_name, string nickname, string text) {
@@ -696,14 +706,49 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         var topic = Iridium.Application.connection_manager.get_topic (server_name, channel_name);
         var network_name = Iridium.Application.connection_manager.get_network_name (server_name);
         if (main_layout.get_visible_server () == server_name && main_layout.get_visible_channel () == channel_name) {
-            header_bar.update_title (channel_name, (topic == null || topic.length == 0) ? (network_name == null || network_name.length == 0 ? server_name : network_name) : topic);
-            header_bar.set_tooltip_text ((topic == null || topic.length == 0) ? null : channel_name + ": " + topic);
+            Idle.add (() => {
+                header_bar.update_title (channel_name, (topic == null || topic.length == 0) ? (network_name == null || network_name.length == 0 ? server_name : network_name) : topic);
+                header_bar.set_tooltip_text ((topic == null || topic.length == 0) ? null : channel_name + ": " + topic);
+                return false;
+            });
         }
 
         // If we were editing the dialog, close it
         if (channel_topic_edit_dialog != null && channel_topic_edit_dialog.get_topic () == topic) {
             channel_topic_edit_dialog.dismiss ();
         }
+    }
+
+    private void on_channel_topic_changed (string server_name, string channel_name, string nickname) {
+        var topic = Iridium.Application.connection_manager.get_topic (server_name, channel_name);
+        var message_to_display = new Iridium.Services.Message ();
+        
+        if (topic == null || topic.length == 0) {
+            message_to_display.message = nickname + _(" has cleared the topic");
+        } else {
+            message_to_display.message = nickname + _(" has changed the topic to: ") + topic;
+        }
+        Idle.add (() => {
+            main_layout.display_server_message (server_name, channel_name, message_to_display);
+            return false;
+        });
+    }
+
+    private void on_channel_topic_whotime_received (string server_name, string channel_name, string nickname, int64 unix_utc) {
+        var topic = Iridium.Application.connection_manager.get_topic (server_name, channel_name);
+        if (topic == null || topic.length == 0) {
+            return;
+        }
+
+        var message_to_display1 = new Iridium.Services.Message ();
+        message_to_display1.message = _("Topic for ") + channel_name + _(" is: ") + topic;
+        var message_to_display2 = new Iridium.Services.Message ();
+        message_to_display2.message = _("Topic set by ") + nickname + " (" + new DateTime.from_unix_utc (unix_utc).to_local ().format ("%x %X") + ")";
+        Idle.add (() => {
+            main_layout.display_server_message (server_name, channel_name, message_to_display1);
+            main_layout.display_server_message (server_name, channel_name, message_to_display2);
+            return false;
+        });
     }
 
     private void on_nickname_in_use (string server_name, Iridium.Services.Message message) {
@@ -889,7 +934,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     private void on_channel_chat_view_shown (string server_name, string channel_name) {
         var network_name = Iridium.Application.connection_manager.get_network_name (server_name);
-        header_bar.update_title (channel_name, network_name != null ? network_name : server_name);
+        var topic = Iridium.Application.connection_manager.get_topic (server_name, channel_name);
+        header_bar.update_title (channel_name, (topic == null || topic.length == 0) ? (network_name == null || network_name.length == 0 ? server_name : network_name) : topic);
         header_bar.set_channel_users_button_visible (true);
         header_bar.set_channel_users_button_enabled (main_layout.is_view_enabled (server_name, channel_name));
         update_channel_users_list (server_name, channel_name);

@@ -404,12 +404,13 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 break;
             case Iridium.Services.MessageCommands.TOPIC:
                 on_channel_topic_received (message.params[0], message.message);
+                on_channel_topic_changed (message.params[0], message.prefix.split ("!")[0]);
                 break;
             case Iridium.Services.NumericCodes.RPL_TOPIC:
                 on_channel_topic_received (message.params[1], message.message);
                 break;
             case Iridium.Services.NumericCodes.RPL_TOPICWHOTIME:
-                // TODO: Implement
+                channel_topic_whotime_received (message.params[1], message.params[2].split ("!")[0], int64.parse (message.params[3]));
                 break;
             case Iridium.Services.NumericCodes.RPL_NOTOPIC:
                 on_channel_topic_received (message.params[1], "");
@@ -674,6 +675,10 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         channel_topic_received (channel_name);
     }
 
+    private void on_channel_topic_changed (string channel_name, string nickname) {
+        channel_topic_changed (channel_name, nickname);
+    }
+
     //  private void request_updated_channel_users (string channel_name) {
     //      send_output (Iridium.Services.MessageCommands.NAMES + " " + channel_name);
     //  }
@@ -700,6 +705,8 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     public signal void user_quit_server (string nickname, Gee.List<string> channels, Iridium.Services.Message message);
     public signal void channel_users_received (string channel);
     public signal void channel_topic_received (string channel);
+    public signal void channel_topic_changed (string channel, string nickname);
+    public signal void channel_topic_whotime_received (string channel, string nickname, int64 unix_utc);
     public signal void nickname_in_use (Iridium.Services.Message message);
     public signal void erroneous_nickname (string current_nickname, string requested_nickname);
     public signal void channel_joined (string channel, string nickname);
