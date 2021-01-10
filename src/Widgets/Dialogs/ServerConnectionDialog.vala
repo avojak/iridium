@@ -31,6 +31,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
     private Gtk.Entry password_entry;
     private Gtk.Switch ssl_tls_switch;
     private Gtk.Entry port_entry;
+    private Gtk.Button connect_button;
 
     private Gtk.Stack header_image_stack;
     private Gtk.Spinner spinner;
@@ -125,17 +126,35 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
             close ();
         });
 
-        // TODO: Disable the connect button until sufficient information is filled out
-        var connect_button = new Gtk.Button.with_label (_("Connect"));
+        connect_button = new Gtk.Button.with_label (_("Connect"));
         connect_button.get_style_context ().add_class ("suggested-action");
+        connect_button.sensitive = false;
         connect_button.clicked.connect (() => {
             do_connect ();
         });
+
+        // Connect to signals to determine whether the connect button should be sensitive
+        server_entry.changed.connect (update_connect_button);
+        nickname_entry.changed.connect (update_connect_button);
+        realname_entry.changed.connect (update_connect_button);
+        port_entry.changed.connect (update_connect_button);
+
 
         add_action_widget (cancel_button, 0);
         add_action_widget (connect_button, 1);
 
         load_settings ();
+    }
+
+    private void update_connect_button () {
+        if (server_entry.get_text ().chomp ().chug () != "" &&
+            nickname_entry.get_text ().chomp ().chug () != "" &&
+            realname_entry.get_text ().chomp ().chug () != "" &&
+            port_entry.get_text ().chomp ().chug () != "") {
+                connect_button.sensitive = true;
+        } else {
+            connect_button.sensitive = false;
+        }
     }
 
     private Gtk.Grid create_basic_form () {
@@ -328,10 +347,14 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
         close ();
     }
 
-    public void display_error (string message) {
+    public void display_error (string message, string? details = null) {
         // TODO: We can make the error messaging better (wrap text!)
         spinner.stop ();
         status_label.label = message;
+        if (details != null) {
+            status_label.label += "\n";
+            status_label.label += details;
+        }
     }
 
     public signal void connect_button_clicked (string server, string nickname, string realname,

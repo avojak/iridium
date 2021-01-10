@@ -634,7 +634,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     private void on_server_connection_failed (string server_name, string error_message, string? error_details) {
         Idle.add (() => {
             if (connection_dialog != null) {
-                connection_dialog.display_error (error_message);
+                connection_dialog.display_error (error_message, error_details);
             }
             main_layout.disable_chat_view (server_name, null);
             // TODO: Improve messaging when this fails in the background on app initialization
