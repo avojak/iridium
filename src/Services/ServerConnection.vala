@@ -297,7 +297,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             case Iridium.Services.NumericCodes.RPL_MOTDSTART:
             case Iridium.Services.NumericCodes.RPL_YOURHOST:
             case Iridium.Services.NumericCodes.RPL_LUSERCLIENT:
-            case Iridium.Services.NumericCodes.RPL_UMODEIS:
             case Iridium.Services.NumericCodes.RPL_SERVLIST:
             case Iridium.Services.NumericCodes.RPL_ENDOFSTATS:
             case Iridium.Services.NumericCodes.RPL_STATSLINKINFO:
@@ -439,6 +438,11 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             case Iridium.Services.NumericCodes.RPL_ENDOFMOTD:
                 // Do nothing
                 break;
+            case Iridium.Services.NumericCodes.RPL_UMODEIS:
+                var display_message = new Iridium.Services.Message ();
+                display_message.message = message.params[0] + " has modes: " + message.params[1];
+                server_message_received (display_message);
+                break;
 
             // Errors
             case Iridium.Services.NumericCodes.ERR_ERRONEOUSNICKNAME:
@@ -487,6 +491,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             case Iridium.Services.NumericCodes.ERR_YOUREBANNEDCREEP:
             case Iridium.Services.NumericCodes.ERR_YOUWILLBEBANNED:
             case Iridium.Services.NumericCodes.ERR_UNKNOWNMODE:
+            case Iridium.Services.NumericCodes.ERR_USERSDONTMATCH:
                 server_error_received (message);
                 break;
             default:
