@@ -148,10 +148,10 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
 
     private void update_connect_button () {
         if (server_entry.get_text ().chomp ().chug () != "" &&
-            nickname_entry.get_text ().chomp ().chug () != "" &&
-            realname_entry.get_text ().chomp ().chug () != "" &&
-            port_entry.get_text ().chomp ().chug () != "") {
-                connect_button.sensitive = true;
+                nickname_entry.get_text ().chomp ().chug () != "" &&
+                realname_entry.get_text ().chomp ().chug () != "" &&
+                port_entry.get_text ().chomp ().chug () != "") {
+            connect_button.sensitive = true;
         } else {
             connect_button.sensitive = false;
         }
