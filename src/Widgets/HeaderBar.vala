@@ -40,7 +40,7 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         join_button.valign = Gtk.Align.CENTER;
 
         var new_server_connection_accellabel = new Granite.AccelLabel.from_action_name (
-            _("New Server Connection"),
+            _("New Server Connection…"),
             Iridium.Services.ActionManager.ACTION_PREFIX + Iridium.Services.ActionManager.ACTION_NEW_SERVER_CONNECTION
         );
 
@@ -50,7 +50,7 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         new_server_connection_menu_item.add (new_server_connection_accellabel);
 
         var join_channel_accellabel = new Granite.AccelLabel.from_action_name (
-            _("Join Channel"),
+            _("Join Channel…"),
             Iridium.Services.ActionManager.ACTION_PREFIX + Iridium.Services.ActionManager.ACTION_JOIN_CHANNEL
         );
 
@@ -120,7 +120,7 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         reset_marker_menu_item.add (reset_marker_accellabel);
 
         var preferences_accellabel = new Granite.AccelLabel.from_action_name (
-            _("Preferences"),
+            _("Preferences…"),
             Iridium.Services.ActionManager.ACTION_PREFIX + Iridium.Services.ActionManager.ACTION_PREFERENCES
         );
 

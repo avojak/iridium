@@ -149,7 +149,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
 
         server_entry = new Gtk.Entry ();
         server_entry.hexpand = true;
-        server_entry.placeholder_text = "irc.freenode.net";
+        server_entry.placeholder_text = "irc.example.com";
 
         var nickname_label = new Gtk.Label (_("Nickname:"));
         nickname_label.halign = Gtk.Align.END;

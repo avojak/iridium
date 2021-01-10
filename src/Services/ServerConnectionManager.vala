@@ -54,6 +54,8 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
         server_connection.user_quit_server.connect (on_user_quit_server);
         server_connection.channel_users_received.connect (on_channel_users_received);
         server_connection.channel_topic_received.connect (on_channel_topic_received);
+        server_connection.channel_topic_changed.connect (on_channel_topic_changed);
+        server_connection.channel_topic_whotime_received.connect (on_channel_topic_whotime_received);
         server_connection.nickname_in_use.connect (on_nickname_in_use);
         server_connection.erroneous_nickname.connect (on_erroneous_nickname);
         server_connection.channel_joined.connect (on_channel_joined);
@@ -68,7 +70,7 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
         server_connection.network_name_received.connect (on_network_name_received);
 
         //  server_connection.open_successful.connect (() => {
-            open_connections.set (server, server_connection);
+        open_connections.set (server, server_connection);
         //  });
         server_connection.open_failed.connect (() => {
             open_connections.unset (server);
@@ -249,6 +251,14 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
         channel_topic_received (source.connection_details.server, channel_name);
     }
 
+    private void on_channel_topic_changed (Iridium.Services.ServerConnection source, string channel_name, string nickname) {
+        channel_topic_changed (source.connection_details.server, channel_name, nickname);
+    }
+
+    private void on_channel_topic_whotime_received (Iridium.Services.ServerConnection source, string channel_name, string nickname, int64 unix_utc) {
+        channel_topic_whotime_received (source.connection_details.server, channel_name, nickname, unix_utc);
+    }
+
     private void on_nickname_in_use (Iridium.Services.ServerConnection source, Iridium.Services.Message message) {
         nickname_in_use (source.connection_details.server, message);
     }
@@ -311,6 +321,8 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
     public signal void user_quit_server (string server_name, string nickname, Gee.List<string> channels, Iridium.Services.Message message);
     public signal void channel_users_received (string server_name, string channel_name);
     public signal void channel_topic_received (string server_name, string channel_name);
+    public signal void channel_topic_changed (string server_name, string channel_name, string nickname);
+    public signal void channel_topic_whotime_received (string server_name, string channel_name, string nickname, int64 unix_utc);
     public signal void nickname_in_use (string server_name, Iridium.Services.Message message);
     public signal void erroneous_nickname (string server_name, string current_nickname, string requested_nickname);
     public signal void channel_joined (string server_name, string channel_name, string nickname);
