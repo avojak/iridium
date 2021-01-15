@@ -279,8 +279,9 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             return;
         }
         var message = new Iridium.Services.Message (line);
-        // TODO: Remove this!
-        print (@"$line\n");
+        if (Iridium.Application.is_dev_mode ()) {
+            print (@"$line\n");
+        }
         switch (message.command) {
             case "PING":
                 send_output ("PONG " + message.message);

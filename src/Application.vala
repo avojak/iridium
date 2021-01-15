@@ -40,7 +40,7 @@ public class Iridium.Application : Gtk.Application {
 
     static construct {
         Granite.Services.Logger.initialize (Constants.APP_ID);
-        if (Constants.APP_ID.has_suffix ("-dev")) {
+        if (is_dev_mode ()) {
             Granite.Services.Logger.DisplayLevel = Granite.Services.LogLevel.DEBUG;
         } else {
             Granite.Services.Logger.DisplayLevel = Granite.Services.LogLevel.WARN;
@@ -62,6 +62,10 @@ public class Iridium.Application : Gtk.Application {
         network_monitor.network_changed.connect (() => {
             warning ("Network availability changed: %s", network_monitor.get_network_available ().to_string ());
         });
+    }
+
+    public static bool is_dev_mode () {
+        return Constants.APP_ID.has_suffix ("-dev");
     }
 
     //  public void new_window () {
