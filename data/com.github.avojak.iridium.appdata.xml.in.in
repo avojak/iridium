@@ -7,11 +7,26 @@
   <name>@name@</name>
   <summary>Friendly IRC Client</summary>
   <description>
-    <p>TODO</p>
+    <p>Easily connect and chat on any IRC server.</p>
+    <p>Features include:</p>
+    <ul>
+      <li>Store your server connections and joined channels between sessions</li>
+      <li>Connect to servers securely with SSL support</li>
+      <li>Favorite channels for quick and easy access</li>
+      <li>Pick up where you left off with automatic server reconnection</li>
+      <li>Optionally disable remembered connections for increased privacy</li>
+    </ul>
   </description>
   <provides>
-	@appid@
+    <binary>@appid@</binary>
   </provides>
+  <releases>
+    <release version="1.0.0" date="TBD">
+      <description>
+        <p>Initial Release</p>
+      </description>
+    </release>
+  </releases>
   <screenshots>
     <screenshot type="default">
       <image>https://raw.githubusercontent.com/avojak/iridium/master/data/assets/screenshots/iridium-screenshot-01.png</image>
@@ -24,37 +39,37 @@
   <url type="help">https://github.com/avojak/iridium/issues</url>
   <update_contact>andrew.vojak@gmail.com</update_contact>
   <content_rating type="oars-1.1">
-		<content_attribute id="violence-cartoon">none</content_attribute>
-		<content_attribute id="violence-fantasy">none</content_attribute>
-		<content_attribute id="violence-realistic">none</content_attribute>
-		<content_attribute id="violence-bloodshed">none</content_attribute>
-		<content_attribute id="violence-sexual">none</content_attribute>
-		<content_attribute id="violence-desecration">none</content_attribute>
-		<content_attribute id="violence-slavery">none</content_attribute>
-		<content_attribute id="violence-worship">none</content_attribute>
-		<content_attribute id="drugs-alcohol">none</content_attribute>
-		<content_attribute id="drugs-narcotics">none</content_attribute>
-		<content_attribute id="drugs-tobacco">none</content_attribute>
-		<content_attribute id="sex-nudity">none</content_attribute>
-		<content_attribute id="sex-themes">none</content_attribute>
-		<content_attribute id="sex-homosexuality">none</content_attribute>
-		<content_attribute id="sex-prostitution">none</content_attribute>
-		<content_attribute id="sex-adultery">none</content_attribute>
-		<content_attribute id="sex-appearance">none</content_attribute>
-		<content_attribute id="language-profanity">none</content_attribute>
-		<content_attribute id="language-humor">none</content_attribute>
-		<content_attribute id="language-discrimination">none</content_attribute>
-		<content_attribute id="social-chat">intense</content_attribute>
-		<content_attribute id="social-info">none</content_attribute>
-		<content_attribute id="social-audio">none</content_attribute>
-		<content_attribute id="social-location">none</content_attribute>
-		<content_attribute id="social-contacts">intense</content_attribute>
-		<content_attribute id="money-purchasing">none</content_attribute>
-		<content_attribute id="money-gambling">none</content_attribute>
-	</content_rating>
+    <content_attribute id="violence-cartoon">none</content_attribute>
+    <content_attribute id="violence-fantasy">none</content_attribute>
+    <content_attribute id="violence-realistic">none</content_attribute>
+    <content_attribute id="violence-bloodshed">none</content_attribute>
+    <content_attribute id="violence-sexual">none</content_attribute>
+    <content_attribute id="violence-desecration">none</content_attribute>
+    <content_attribute id="violence-slavery">none</content_attribute>
+    <content_attribute id="violence-worship">none</content_attribute>
+    <content_attribute id="drugs-alcohol">none</content_attribute>
+    <content_attribute id="drugs-narcotics">none</content_attribute>
+    <content_attribute id="drugs-tobacco">none</content_attribute>
+    <content_attribute id="sex-nudity">none</content_attribute>
+    <content_attribute id="sex-themes">none</content_attribute>
+    <content_attribute id="sex-homosexuality">none</content_attribute>
+    <content_attribute id="sex-prostitution">none</content_attribute>
+    <content_attribute id="sex-adultery">none</content_attribute>
+    <content_attribute id="sex-appearance">none</content_attribute>
+    <content_attribute id="language-profanity">none</content_attribute>
+    <content_attribute id="language-humor">none</content_attribute>
+    <content_attribute id="language-discrimination">none</content_attribute>
+    <content_attribute id="social-chat">intense</content_attribute>
+    <content_attribute id="social-info">none</content_attribute>
+    <content_attribute id="social-audio">none</content_attribute>
+    <content_attribute id="social-location">none</content_attribute>
+    <content_attribute id="social-contacts">intense</content_attribute>
+    <content_attribute id="money-purchasing">none</content_attribute>
+    <content_attribute id="money-gambling">none</content_attribute>
+  </content_rating>
   <custom>
-    <value key="x-appcenter-color-primary">#078db2</value>
-    <value key="x-appcenter-color-primary-text">rgb(255, 255, 255)</value>
-    <value key="x-appcenter-suggested-price">1</value>
+    <value key="x-appcenter-color-primary">#fff</value>
+    <value key="x-appcenter-color-primary-text">#333</value>
+    <value key="x-appcenter-suggested-price">5</value>
   </custom>
 </component>
