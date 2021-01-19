@@ -2,7 +2,7 @@
 Name=@name@
 GenericName=IRC Client
 Comment=Friendly IRC client
-Categories=Network;Utility;Chat;IRCClient;
+Categories=Network;Chat;IRCClient;
 Exec=@binary@
 Icon=@icon@
 Terminal=false

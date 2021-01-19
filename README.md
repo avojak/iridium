@@ -7,7 +7,9 @@
 </p>
 <h1 align="center">Iridium</h1>
 
-![Screenshot](data/assets/screenshots/iridium-welcome-screenshot.png)
+| ![Screenshot](data/assets/screenshots/iridium-screenshot-01.png) | ![Screenshot](data/assets/screenshots/iridium-screenshot-02.png) |
+|------------------------------------------------------------------|------------------------------------------------------------------|
+| ![Screenshot](data/assets/screenshots/iridium-screenshot-03.png) | ![Screenshot](data/assets/screenshots/iridium-screenshot-04.png) |
 
 ## The friendly IRC client
 
