@@ -31,6 +31,15 @@
     <screenshot type="default">
       <image>https://raw.githubusercontent.com/avojak/iridium/master/data/assets/screenshots/iridium-screenshot-01.png</image>
     </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/avojak/iridium/master/data/assets/screenshots/iridium-screenshot-02.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/avojak/iridium/master/data/assets/screenshots/iridium-screenshot-03.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/avojak/iridium/master/data/assets/screenshots/iridium-screenshot-04.png</image>
+    </screenshot>
   </screenshots>
   <developer_name>Andrew Vojak</developer_name>
   <launchable type="desktop-id">@appid@.desktop</launchable>
