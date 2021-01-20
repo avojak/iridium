@@ -450,8 +450,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
             return;
         }
 
-        // Only change the mark in the background
-        if (is_in_focus ()) {
+        if (text_view.get_buffer ().get_line_count () < 2) {
             return;
         }
 
@@ -463,6 +462,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         // Add/move the mark in the text buffer to indicate the last read message
         Gtk.TextIter iter;
         text_view.get_buffer ().get_end_iter (out iter);
+        iter.backward_line ();
         if (text_view.get_buffer ().get_mark ("last-read-message") == null) {
             text_view.get_buffer ().create_mark ("last-read-message", iter, true);
         } else {

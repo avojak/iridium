@@ -85,7 +85,7 @@ public class Iridium.Widgets.TextView : Gtk.SourceView {
         // Don't include the border_width, because it gets buggy and sometimes doesn't update the part of the line in the border
         double line_width = hadjustment.upper + left_margin + right_margin;
         double line_x = left_margin + border_width;
-        double line_y = window_y + 10; // TODO: Compute this based on font size and padding between lines
+        double line_y = window_y + 26; // + 10; // TODO: Compute this based on font size and padding between lines
 
         ctx.save ();
 
