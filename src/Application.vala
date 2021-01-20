@@ -28,8 +28,11 @@ public class Iridium.Application : Gtk.Application {
     public static Iridium.Services.ServerConnectionManager connection_manager;
     public static NetworkMonitor network_monitor;
 
-    private GLib.List <Iridium.MainWindow> windows;
+    private GLib.List<Iridium.MainWindow> windows;
     private bool is_network_available;
+
+    private Gee.List<Iridium.Services.Server> restore_state_servers;
+    private Gee.List<Iridium.Services.Channel> restore_state_channels;
 
     public Application () {
         Object (
@@ -116,6 +119,8 @@ public class Iridium.Application : Gtk.Application {
                 }
             } else {
                 foreach (var window in windows) {
+                    restore_state_servers = connection_repository.get_servers ();
+                    restore_state_channels = connection_repository.get_channels ();
                     window.network_connection_lost ();
                 }
             }
@@ -136,8 +141,8 @@ public class Iridium.Application : Gtk.Application {
     }
 
     private void restore_state (Iridium.MainWindow main_window, bool is_reconnecting) {
-        var servers = connection_repository.get_servers ();
-        var channels = connection_repository.get_channels ();
+        var servers = is_reconnecting ? restore_state_servers : connection_repository.get_servers ();
+        var channels = is_reconnecting ? restore_state_channels : connection_repository.get_channels ();
         main_window.initialize (servers, channels, is_reconnecting);
     }
 

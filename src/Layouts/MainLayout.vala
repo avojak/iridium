@@ -402,6 +402,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         Idle.add (() => {
             if (overlay_bar != null) {
                 overlay_bar.destroy ();
+                overlay_bar = null;
             }
             return false;
         });
