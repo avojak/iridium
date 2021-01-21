@@ -30,7 +30,7 @@ public class Iridium.Services.ServerConnectionDetails : GLib.Object {
     public string username;
     public string realname;
     public Iridium.Models.AuthenticationMethod auth_method;
-    public string auth_token;
+    public string? auth_token;
     public bool tls;
 
 }

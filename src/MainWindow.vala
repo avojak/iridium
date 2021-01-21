@@ -27,6 +27,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     private Gtk.AccelGroup accel_group;
 
     private Iridium.Widgets.ServerConnectionDialog? connection_dialog = null;
+    private Iridium.Widgets.EditServerConnectionDialog? edit_connection_dialog = null;
     private Iridium.Widgets.ChannelJoinDialog? channel_join_dialog = null;
     private Iridium.Widgets.ChannelTopicEditDialog? channel_topic_edit_dialog = null;
     //  private Iridium.Widgets.ManageConnectionsDialog? manage_connections_dialog = null;
@@ -74,6 +75,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         main_layout.connect_to_server_button_clicked.connect (on_connect_to_server_button_clicked);
         main_layout.disconnect_from_server_button_clicked.connect (on_disconnect_from_server_button_clicked);
         main_layout.edit_channel_topic_button_clicked.connect (on_edit_channel_topic_button_clicked);
+        main_layout.edit_connection_button_clicked.connect (on_edit_connection_button_clicked);
 
         // Connect to header signals
         header_bar.nickname_selected.connect (on_nickname_selected);
@@ -317,6 +319,96 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             });
         }
         connection_dialog.present ();
+    }
+
+    public void show_edit_server_connection_dialog (string server_name) {
+        if (edit_connection_dialog == null) {
+            edit_connection_dialog = new Iridium.Widgets.EditServerConnectionDialog (this);
+            Iridium.Services.ServerConnectionDetails? existing_connection_details = Iridium.Application.connection_manager.get_connection_details (server_name);
+            if (existing_connection_details == null) {
+                Iridium.Services.Server? server = Iridium.Application.connection_repository.get_server (server_name);
+                if (server == null) {
+                    // TODO: Handle this
+                    return;
+                }
+                existing_connection_details = server.connection_details;
+            }
+            // Load the secret, but only if there is one (don't want to potentially trigger a keyring prompt unnecessarily)
+            if (existing_connection_details.auth_method.stores_secret ()) {
+                existing_connection_details.auth_token = Iridium.Application.secret_manager.retrieve_secret (existing_connection_details.server, existing_connection_details.port, existing_connection_details.nickname);
+            }
+            edit_connection_dialog.populate (existing_connection_details);
+            edit_connection_dialog.show_all ();
+            edit_connection_dialog.save_button_clicked.connect ((server, nickname, realname, port, auth_method, tls, auth_token) => {
+                // Prevent duplicate connections
+                if ((existing_connection_details.server != server) && (Iridium.Application.connection_manager.has_connection (server))) {
+                    connection_dialog.display_error (_("Already connected to this server!"));
+                    return;
+                }
+
+                // If no changes, don't do anything
+                if ((existing_connection_details.server == server)
+                        && (existing_connection_details.port == port)
+                        && (existing_connection_details.nickname == nickname)
+                        && (existing_connection_details.realname == realname)
+                        && (existing_connection_details.auth_method == auth_method)
+                        && (existing_connection_details.auth_token == (auth_token == "" ? null : auth_token))
+                        && (existing_connection_details.tls == tls)) {
+                    debug ("No changes to server connection details");
+                    edit_connection_dialog.dismiss ();
+                    return;
+                }
+
+                // Create the connection details
+                var updated_connection_details = new Iridium.Services.ServerConnectionDetails ();
+                updated_connection_details.server = server;
+                updated_connection_details.port = port;
+                updated_connection_details.nickname = nickname;
+                updated_connection_details.username = nickname; // Keep these the same for now
+                updated_connection_details.realname = realname;
+                updated_connection_details.auth_method = auth_method;
+                updated_connection_details.auth_token = auth_token;
+                updated_connection_details.tls = tls;
+
+                // Attempt the server re-connection with new settings if the connection is currently open
+                if (Iridium.Application.connection_manager.has_connection (existing_connection_details.server)) {
+                    debug ("Server connection details changed, attempting to reconnect");
+                    // Grab the currently joined channels so that they can be re-joined after re-connecting
+                    Gee.List<string> channels_to_rejoin = new Gee.ArrayList<string> ();
+                    channels_to_rejoin.add_all (Iridium.Application.connection_manager.get_channels (existing_connection_details.server));
+                    // Disconnect and update the settings
+                    Iridium.Application.connection_manager.disconnect_from_server (existing_connection_details.server);
+                    Iridium.Application.connection_repository.update_server_connection_details (existing_connection_details.server, updated_connection_details);
+                    // Re-connect
+                    var new_server_connection = Iridium.Application.connection_manager.connect_to_server (updated_connection_details);
+                    new_server_connection.open_successful.connect (() => {
+                        // In case the nickname changed, update the views
+                        if (existing_connection_details.nickname != nickname) {
+                            main_layout.update_nickname (existing_connection_details.server, existing_connection_details.nickname, nickname);
+                        }
+                        // Re-join the channels
+                        debug ("Attempting to rejoin %d channels", channels_to_rejoin.size);
+                        foreach (string channel in channels_to_rejoin) {
+                            Iridium.Application.connection_manager.join_channel (updated_connection_details.server, channel);
+                            main_layout.updating_channel (updated_connection_details.server, channel);
+                        }
+                    });
+                } else {
+                    // Otherwise just write the changes straight to the repository
+                    debug ("Server connection details changed, updating details in repository");
+                    Iridium.Application.connection_repository.update_server_connection_details (existing_connection_details.server, updated_connection_details);
+                    edit_connection_dialog.dismiss ();
+                    // In case the nickname changed, update the views
+                    if (existing_connection_details.nickname != nickname) {
+                        main_layout.update_nickname (existing_connection_details.server, existing_connection_details.nickname, nickname);
+                    }
+                }
+            });
+            edit_connection_dialog.destroy.connect (() => {
+                edit_connection_dialog = null;
+            });
+        }
+        edit_connection_dialog.present ();
     }
 
     public void show_channel_join_dialog (string? target_server) {
@@ -626,6 +718,10 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
                 main_layout.show_chat_view (server_name, null);
             }
+            if (edit_connection_dialog != null && edit_connection_dialog.get_server () == server_name) {
+                edit_connection_dialog.dismiss ();
+                main_layout.show_chat_view (server_name, null);
+            }
 
             return false;
         });
@@ -635,6 +731,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         Idle.add (() => {
             if (connection_dialog != null) {
                 connection_dialog.display_error (error_message, error_details);
+            }
+            if (edit_connection_dialog != null) {
+                edit_connection_dialog.display_error (error_message, error_details);
             }
             main_layout.disable_chat_view (server_name, null);
             // TODO: Improve messaging when this fails in the background on app initialization
@@ -756,6 +855,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             // TODO: Should this be outside the if-statement?
             Iridium.Application.connection_manager.disconnect_from_server (server_name);
             connection_dialog.display_error (_("Nickname already in use."));
+        } else if (edit_connection_dialog != null) {
+            Iridium.Application.connection_manager.disconnect_from_server (server_name);
+            edit_connection_dialog.display_error (_("Nickname already in use."));
         } else {
             // TODO: This should be an error
             var chat_view = main_layout.get_server_chat_view (server_name);
@@ -769,6 +871,10 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         Idle.add (() => {
             if (connection_dialog != null) {
                 connection_dialog.display_error (error_message);
+                return false;
+            }
+            if (edit_connection_dialog != null) {
+                edit_connection_dialog.display_error (error_message);
                 return false;
             }
             if (nickname_edit_dialog != null) {
@@ -989,6 +1095,10 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     private void on_edit_channel_topic_button_clicked (string server_name, string channel_name) {
         show_channel_topic_edit_dialog (server_name, channel_name);
+    }
+
+    private void on_edit_connection_button_clicked (string server_name) {
+        show_edit_server_connection_dialog (server_name);
     }
 
     public signal void initialized (Gee.List<Iridium.Services.Server> servers, Gee.List<Iridium.Services.Channel> channels, bool is_reconnecting);

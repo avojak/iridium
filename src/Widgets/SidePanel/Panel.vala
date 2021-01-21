@@ -114,6 +114,9 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
         server_item.join_channel.connect (() => {
             join_channel (server_name, null);
         });
+        server_item.edit_connection.connect (() => {
+            edit_connection (server_name);
+        });
         server_item.disconnect_from_server.connect ((should_close) => {
             disconnect_from_server (server_name);
         });
@@ -552,6 +555,7 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
     public signal void connect_to_server (string server_name);
     public signal void disconnect_from_server (string server_name);
     public signal void edit_channel_topic (string server_name, string channel_name);
+    public signal void edit_connection (string server_name);
 
     public signal void server_row_added (string server_name);
     public signal void server_row_removed (string server_name);
