@@ -263,6 +263,23 @@ public class Iridium.Services.ServerConnectionRepository : GLib.Object {
         }
     }
 
+    public void update_server_connection_details (string server_name, Iridium.Services.ServerConnectionDetails new_connection_details) {
+        if (!should_remember_connections) {
+            return;
+        }
+        lock (sql_client) {
+            var existing_server_entry = sql_client.get_server (server_name);
+            if (existing_server_entry == null) {
+                var server = new Iridium.Services.Server ();
+                server.connection_details = new_connection_details;
+                sql_client.insert_server (server);
+            } else {
+                existing_server_entry.connection_details = new_connection_details;
+                sql_client.update_server (existing_server_entry);
+            }
+        }
+    }
+
     public void clear () {
         debug ("Clearing all database content…");
         lock (sql_client) {

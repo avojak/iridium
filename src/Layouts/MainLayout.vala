@@ -84,6 +84,9 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         side_panel.edit_channel_topic.connect ((server_name, channel_name) => {
             edit_channel_topic_button_clicked (server_name, channel_name);
         });
+        side_panel.edit_connection.connect ((server_name) => {
+            edit_connection_button_clicked (server_name);
+        });
 
         // Add signal connections to maintain state
         // TODO: Should these connect to the connection handler signals rather than the side panel...?
@@ -637,4 +640,5 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
     public signal void connect_to_server_button_clicked (string server_name);
     public signal void disconnect_from_server_button_clicked (string server_name);
     public signal void edit_channel_topic_button_clicked (string server_name, string channel_name);
+    public signal void edit_connection_button_clicked (string server_name);
 }

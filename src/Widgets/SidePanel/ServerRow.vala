@@ -155,6 +155,11 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
             join_channel ();
         });
 
+        var edit_connection_item = new Gtk.MenuItem.with_label (_("Edit Connection…"));
+        edit_connection_item.activate.connect (() => {
+            edit_connection ();
+        });
+
         var connect_item = new Gtk.MenuItem.with_label (_("Connect"));
         connect_item.activate.connect (() => {
             connect_to_server ();
@@ -182,6 +187,8 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
         } else {
             menu.append (connect_item);
         }
+        menu.append (edit_connection_item);
+        menu.append (new Gtk.SeparatorMenuItem ());
         menu.append (remove_item);
 
         menu.show_all ();
@@ -232,6 +239,7 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
     }
 
     public signal void join_channel ();
+    public signal void edit_connection ();
     public signal void disconnect_from_server ();
     public signal void connect_to_server ();
     public signal void remove_server ();
