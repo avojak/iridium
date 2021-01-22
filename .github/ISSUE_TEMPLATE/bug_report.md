@@ -23,9 +23,9 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Version [e.g. 22]
+**Environment (please complete the following information):**
+ - OS Version: [e.g. elementary OS 5.1.7, or you can use: `uname -a && cat /etc/os-release`]
+ - Iridium Version [e.g. 1.0.0]
 
 **Additional context**
 Add any other context about the problem here.
