@@ -863,6 +863,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             var chat_view = main_layout.get_server_chat_view (server_name);
             chat_view.display_server_error_msg (message);
             // TODO: Prompt for new nickname?
+            Iridium.Application.connection_manager.fail_server_connection (server_name, _("Nickname already in use"), _("Choose a new nickname and retry the connection."));
         }
     }
 
