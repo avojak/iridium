@@ -89,6 +89,16 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
         open_connections.unset (server);
     }
 
+    public void fail_server_connection (string server, string error_message, string? error_details) {
+        var connection = open_connections.get (server);
+        if (connection == null) {
+            return;
+        }
+        connection.close ();
+        open_connections.unset (server);
+        connection.open_failed (error_message, error_details);
+    }
+
     public Iridium.Services.ServerConnectionDetails? get_connection_details (string server_name) {
         var connection = open_connections.get (server_name);
         if (connection == null) {
