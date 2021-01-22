@@ -1033,14 +1033,14 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     private void on_server_chat_view_shown (string server_name) {
-        var network_name = Iridium.Application.connection_manager.get_network_name (server_name);
+        string? network_name = get_network_name (server_name);
         header_bar.update_title (network_name != null ? network_name : server_name, null);
         header_bar.set_channel_users_button_visible (false);
         header_bar.set_tooltip_text (null);
     }
 
     private void on_channel_chat_view_shown (string server_name, string channel_name) {
-        var network_name = Iridium.Application.connection_manager.get_network_name (server_name);
+        string? network_name = get_network_name (server_name);
         var topic = Iridium.Application.connection_manager.get_topic (server_name, channel_name);
         header_bar.update_title (channel_name, (topic == null || topic.length == 0) ? (network_name == null || network_name.length == 0 ? server_name : network_name) : topic);
         header_bar.set_channel_users_button_visible (true);
@@ -1049,7 +1049,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     private void on_private_message_chat_view_shown (string server_name, string nickname) {
-        var network_name = Iridium.Application.connection_manager.get_network_name (server_name);
+        string? network_name = get_network_name (server_name);
         header_bar.update_title (nickname, network_name != null ? network_name : server_name);
         header_bar.set_channel_users_button_visible (false);
         header_bar.set_tooltip_text (null);
@@ -1100,6 +1100,19 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     private void on_edit_connection_button_clicked (string server_name) {
         show_edit_server_connection_dialog (server_name);
+    }
+
+    private string? get_network_name (string server_name) {
+        // Try to get the name from the connection manager cache first
+        string? network_name = Iridium.Application.connection_manager.get_network_name (server_name);
+        // If null, potentially from a closed connection, check the connection repository
+        if (network_name == null) {
+            Iridium.Services.Server server = Iridium.Application.connection_repository.get_server (server_name);
+            if (server != null) {
+                network_name = server.network_name;
+            }
+        }
+        return network_name;
     }
 
     public signal void initialized (Gee.List<Iridium.Services.Server> servers, Gee.List<Iridium.Services.Channel> channels, bool is_reconnecting);
