@@ -1,38 +1,36 @@
----
-name: Bug report
-about: Create a report to help us improve
-title: ''
-labels: ''
-assignees: ''
+## Expected Behavior
+<!--- If you're describing a bug, tell us what should happen -->
+<!--- If you're suggesting a change/improvement, tell us how it should work -->
 
----
+## Current Behavior
+<!--- If describing a bug, tell us what happens instead of the expected behavior -->
+<!--- If suggesting a change/improvement, explain the difference from current behavior -->
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+## Possible Solution
+<!--- Not obligatory, but suggest a fix/reason for the bug, -->
+<!--- or ideas how to implement the addition or change -->
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+## Steps to Reproduce (for bugs)
+<!--- Help us reproduce the issue by providing us a set of steps to -->
+<!--- reproduce this bug. -->
+1.
+2.
+3.
+4.
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+## Context
+<!--- How has this issue affected you? What are you trying to accomplish? -->
+<!--- Providing context helps us come up with a solution that is most useful in the real world -->
+<!--- If you have a terminal output you can share with us that would also be great! -->
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+## Screenshots of the Problem
+<!--- If you can show us a screenshot of the issue, this is the space for it! --> 
+<!--- If you're suggesting a feature and can give us a mockup, that would also be great! -->
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+## Your Environment (for bugs)
+<!--- Include as many relevant details about the environment you experienced the bug in -->
+<!--- If you can also run the following command and put the output here, that would be super helpful!  -->
+<!---                   uname -a && cat /etc/os-release          -->
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
-
-**Additional context**
-Add any other context about the problem here.
+- Iridium Version:
+- OS Info:
