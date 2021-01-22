@@ -2,7 +2,7 @@ Format: https://dep.debian.net/deps/dep5
 Upstream-Name: com.github.avojak.iridium
 Source: https://github.com/avojak/iridium
 
-Files: src/* data/* debian/*
+Files: src/* data/* debian/* meson/*
 Copyright: 2019 Andrew Vojak <andrew.vojak@gmail.com>
 License: GPL-3.0+
 

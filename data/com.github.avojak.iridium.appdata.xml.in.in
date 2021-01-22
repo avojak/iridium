@@ -21,7 +21,7 @@
     <binary>@appid@</binary>
   </provides>
   <releases>
-    <release version="1.0.0" date="TBD">
+    <release version="1.0.0" date="2020-01-21">
       <description>
         <p>Initial Release</p>
       </description>
