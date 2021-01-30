@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/avojak/iridium.svg?branch=master)](https://travis-ci.com/avojak/iridium)
+[![Build Status](https://travis-ci.com/avojak/iridium.svg?branch=develop)](https://travis-ci.com/avojak/iridium)
 ![Lint](https://github.com/avojak/iridium/workflows/Lint/badge.svg)
 ![GitHub](https://img.shields.io/github/license/avojak/iridium.svg?color=blue)
 
