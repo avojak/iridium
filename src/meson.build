@@ -29,6 +29,7 @@ iridium_files = files(
     join_paths('Models', 'NumericCodes.vala'),
     join_paths('Models', 'Text', 'RichText.vala'),
     join_paths('Models', 'Text', 'ChannelErrorMessageText.vala'),
+    join_paths('Models', 'Text', 'DateTimeMessageText.vala'),
     join_paths('Models', 'Text', 'PrivateMessageText.vala'),
     join_paths('Models', 'Text', 'SelfPrivateMessageText.vala'),
     join_paths('Models', 'Text', 'OthersPrivateMessageText.vala'),

@@ -24,10 +24,13 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     // TODO: Disable or somehow indicate that you are disconnected from a server
     //       and cannot send messages.
 
+    private const int DATETIME_DISPLAY_THRESHOLD_MINUTES = 15;
+
     public unowned Iridium.MainWindow window { get; construct; }
     public string nickname { get; construct; }
 
     protected Iridium.Widgets.TextView text_view;
+    protected string? last_sender = null;
 
     private Gtk.ScrolledWindow scrolled_window;
     private Gtk.Button nickname_button;
@@ -41,6 +44,8 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     private bool is_window_in_focus = true;
     private bool is_enabled = true;
     private bool has_unread_messages = false;
+
+    private DateTime? last_message_time = null;
 
     protected ChatView (Iridium.MainWindow window, string nickname) {
         Object (
@@ -222,6 +227,11 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         unowned Gtk.TextTag hyperlink_tag = buffer.create_tag ("hyperlink");
         hyperlink_tag.event.connect (on_hyperlink_clicked);
 
+        // Datetime
+        unowned Gtk.TextTag datetime_tag = buffer.create_tag ("datetime");
+        datetime_tag.style = Pango.Style.ITALIC;
+        datetime_tag.justification = Gtk.Justification.CENTER;
+
         update_tag_colors ();
     }
 
@@ -354,12 +364,20 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     }
 
     public void display_self_private_msg (Iridium.Services.Message message) {
+        if (should_display_datetime ()) {
+            do_display_datetime ();
+        }
+        last_message_time = new DateTime.now_utc ();
         do_display_self_private_msg (message);
         // Always auto-scroll after the user sends a message
         do_autoscroll ();
     }
 
     public void display_server_msg (Iridium.Services.Message message) {
+        if (should_display_datetime ()) {
+            do_display_datetime ();
+        }
+        last_message_time = new DateTime.now_utc ();
         do_display_server_msg (message);
         // Always auto-scroll server messages (The large number of messages received upon connecting
         // break the auto-scrolling's ability to keep up)
@@ -368,6 +386,10 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
 
     public void display_server_error_msg (Iridium.Services.Message message) {
         bool should_autoscroll = should_autoscroll ();
+        if (should_display_datetime ()) {
+            do_display_datetime ();
+        }
+        last_message_time = new DateTime.now_utc ();
         do_display_server_error_msg (message);
         if (should_autoscroll) {
             do_autoscroll ();
@@ -381,6 +403,10 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         }
 
         bool should_autoscroll = should_autoscroll ();
+        if (should_display_datetime ()) {
+            do_display_datetime ();
+        }
+        last_message_time = new DateTime.now_utc ();
         do_display_private_msg (message);
         if (should_autoscroll) {
             do_autoscroll ();
@@ -474,10 +500,26 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         text_view.queue_draw ();
     }
 
+    private bool should_display_datetime () {
+        if (last_message_time == null || !does_display_datetime ()) {
+            return false;
+        }
+        return new DateTime.now_utc ().difference (last_message_time) >= (DATETIME_DISPLAY_THRESHOLD_MINUTES * TimeSpan.MINUTE);
+    }
+
+    private void do_display_datetime () {
+        var message = new Iridium.Services.Message ();
+        message.message = new DateTime.now_local ().format ("%x %X");
+        var rich_text = new Iridium.Models.Text.DateTimeMessageText (message);
+        rich_text.display (text_view.get_buffer ());
+        last_sender = null;
+    }
+
     public abstract void do_display_self_private_msg (Iridium.Services.Message message);
     public abstract void do_display_server_msg (Iridium.Services.Message message);
     public abstract void do_display_server_error_msg (Iridium.Services.Message message);
     public abstract void do_display_private_msg (Iridium.Services.Message message);
+    public abstract bool does_display_datetime ();
 
     protected abstract int get_indent ();
     protected abstract string get_disabled_message ();
