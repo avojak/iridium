@@ -22,7 +22,6 @@
 public class Iridium.Views.ChannelChatView : Iridium.Views.ChatView {
 
     private Gee.List<string> nicknames = new Gee.ArrayList<string> ();
-    private string? last_sender = null;
 
     public ChannelChatView (Iridium.MainWindow window, string nickname) {
         Object (
@@ -65,6 +64,10 @@ public class Iridium.Views.ChannelChatView : Iridium.Views.ChatView {
         rich_text.suppress_sender_nickname = is_repeat_sender (message);
         rich_text.display (text_view.get_buffer ());
         last_sender = message.nickname;
+    }
+
+    public override bool does_display_datetime () {
+        return true;
     }
 
     private bool is_repeat_sender (Iridium.Services.Message message) {
