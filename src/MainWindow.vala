@@ -59,7 +59,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         main_layout = new Iridium.Layouts.MainLayout (this);
         add (main_layout);
 
-        resize (1000, 600);
+        move (Iridium.Application.settings.get_int ("pos-x"), Iridium.Application.settings.get_int ("pos-y"));
+        resize (Iridium.Application.settings.get_int ("window-width"), Iridium.Application.settings.get_int ("window-height"));
 
         // Connect to main layout signals
         main_layout.welcome_view_shown.connect (on_welcome_view_shown);
@@ -142,6 +143,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             GLib.Process.exit (0);
         });
 
+        this.delete_event.connect (before_destroy);
+
         show_app ();
     }
 
@@ -149,6 +152,24 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         show_all ();
         show ();
         present ();
+    }
+
+    public bool before_destroy () {
+        update_position_settings ();
+        destroy ();
+        return true;
+    }
+
+    private void update_position_settings () {
+        int width, height, x, y;
+
+        get_size (out width, out height);
+        get_position (out x, out y);
+
+        Iridium.Application.settings.set_int ("pos-x", x);
+        Iridium.Application.settings.set_int ("pos-y", y);
+        Iridium.Application.settings.set_int ("window-width", width);
+        Iridium.Application.settings.set_int ("window-height", height);
     }
 
     private Iridium.Services.ServerConnectionDetails? get_connection_details_for_server (string server_name) {
