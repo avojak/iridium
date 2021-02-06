@@ -37,7 +37,7 @@ public class Iridium.Application : Gtk.Application {
     public Application () {
         Object (
             application_id: Constants.APP_ID,
-            flags: ApplicationFlags.FLAGS_NONE
+            flags: ApplicationFlags.HANDLES_COMMAND_LINE
         );
     }
 
@@ -94,6 +94,30 @@ public class Iridium.Application : Gtk.Application {
         });
         this.add_window (window);
         return window;
+    }
+
+    protected override int command_line (ApplicationCommandLine command_line) {
+        activate ();
+
+        string[] argv = command_line.get_arguments ();
+        foreach (var uri_string in argv[1:argv.length]) {
+            try {
+                Soup.URI uri = new Soup.URI (uri_string);
+                if (uri == null) {
+                    throw new OptionError.BAD_VALUE ("Argument is not a URL.");
+                }
+                if (uri.scheme != "irc") {
+                    throw new OptionError.BAD_VALUE ("Cannot open non-irc: URL");
+                }
+                debug ("Attempting to handle URI: %s", uri.to_string (false));
+                debug ("host: %s", uri.get_host ());
+                debug ("port: %s", uri.get_port ().to_string ());
+            } catch (OptionError e) {
+                warning ("Argument parsing error: %s", e.message);
+            }
+        }
+
+        return 0;
     }
 
     protected override void activate () {
