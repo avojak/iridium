@@ -310,6 +310,27 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         }
     }
 
+    public void handle_uris (GLib.List<Iridium.Models.IRCURI> uris) {
+        foreach (var uri in uris) {
+            debug ("Handling uri: %s", uri.uri_string);
+            //  Iridium.Models.IRCURI uri = new Iridium.Models.IRCURI (uri_string);
+
+            //  if (host == "") {
+                // Treat an empty host as a local connection (i.e. localhost)
+            //  } else {
+                // Check if the host matches a known network name
+                // TODO
+
+                // Otherwise treat the host as a hostname
+                // TODO
+            //  }
+
+            //  if (path == "") {
+                // No target, so simply attempt to open a server connection
+            //  }
+        }
+    }
+
     public void show_server_connection_dialog () {
         if (connection_dialog == null) {
             connection_dialog = new Iridium.Widgets.ServerConnectionDialog (this);

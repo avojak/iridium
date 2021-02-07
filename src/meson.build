@@ -20,6 +20,7 @@ iridium_files = files(
     join_paths('Models', 'ConnectionState.vala'),
     join_paths('Models', 'Server.vala'),
     join_paths('Models', 'InvalidCertificatePolicy.vala'),
+    join_paths('Models', 'IRCURI.vala'),
     join_paths('Models', 'Nickname.vala'),
     join_paths('Models', 'ServerIdentity.vala'),
     join_paths('Models', 'ServerSupports.vala'),

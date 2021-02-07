@@ -97,9 +97,13 @@ public class Iridium.Application : Gtk.Application {
     }
 
     protected override int command_line (ApplicationCommandLine command_line) {
-        activate ();
+        // If the application wasn't already open, activate it now
+        if (windows.length () == 0) {
+            activate ();
+        }
 
         string[] argv = command_line.get_arguments ();
+        GLib.List<Iridium.Models.IRCURI> uris = new GLib.List<Iridium.Models.IRCURI> ();
         foreach (var uri_string in argv[1:argv.length]) {
             try {
                 Soup.URI uri = new Soup.URI (uri_string);
@@ -109,13 +113,20 @@ public class Iridium.Application : Gtk.Application {
                 if (uri.scheme != "irc") {
                     throw new OptionError.BAD_VALUE ("Cannot open non-irc: URL");
                 }
-                debug ("Attempting to handle URI: %s", uri.to_string (false));
-                debug ("host: %s", uri.get_host ());
-                debug ("port: %s", uri.get_port ().to_string ());
+                debug ("Received command line URI: %s", uri.to_string (false));
+                //  debug ("host: %s", uri.get_host ());
+                //  debug ("port: %s", uri.get_port ().to_string ());
+                uris.append (new Iridium.Models.IRCURI (uri));
             } catch (OptionError e) {
                 warning ("Argument parsing error: %s", e.message);
             }
         }
+
+        var window = get_active_window ();
+        // Ensure that the window is presented to the user when handling the URL.
+        // This can happen when the application is already open but in the background.
+        window.present ();
+        ((Iridium.MainWindow) window).handle_uris (uris);
 
         return 0;
     }
