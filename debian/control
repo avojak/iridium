@@ -12,7 +12,7 @@ Build-Depends: debhelper (>= 10.5.1),
                libsecret-1-dev,
                libsqlite3-dev,
                libgtksourceview-3.0-dev,
-               libsoup2.4
+               libsoup-2.4
 Standards-Version: 4.1.1
 
 Package: com.github.avojak.iridium
