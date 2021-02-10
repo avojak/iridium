@@ -392,7 +392,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         return chat_views;
     }
 
-    public void show_initialization_overlay () {
+    public void show_connecting_overlay () {
         if (overlay_bar == null) {
             overlay_bar = new Granite.Widgets.OverlayBar (overlay);
             overlay_bar.label = _("Restoring server connections…");
@@ -401,7 +401,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         }
     }
 
-    public void hide_initialization_overlay () {
+    public void hide_connecting_overlay () {
         Idle.add (() => {
             if (overlay_bar != null) {
                 overlay_bar.destroy ();

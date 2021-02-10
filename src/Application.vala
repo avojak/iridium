@@ -34,6 +34,8 @@ public class Iridium.Application : Gtk.Application {
     private Gee.List<Iridium.Services.Server> restore_state_servers;
     private Gee.List<Iridium.Services.Channel> restore_state_channels;
 
+    private string[]? queued_command_line_arguments;
+
     public Application () {
         Object (
             application_id: Constants.APP_ID,
@@ -89,7 +91,7 @@ public class Iridium.Application : Gtk.Application {
 
     private Iridium.MainWindow add_new_window () {
         var window = new Iridium.MainWindow (this);
-        window.initialized.connect ((servers, channels, is_reconnecting) => {
+        window.ui_initialized.connect ((servers, channels, is_reconnecting) => {
             window.open_connections (servers, channels, is_reconnecting);
         });
         this.add_window (window);
@@ -99,10 +101,20 @@ public class Iridium.Application : Gtk.Application {
     protected override int command_line (ApplicationCommandLine command_line) {
         // If the application wasn't already open, activate it now
         if (windows.length () == 0) {
+            debug ("Queueing command line arguments until initialization is complete");
+            queued_command_line_arguments = command_line.get_arguments ();
             activate ();
+        } else {
+            handle_command_line_arguments (command_line.get_arguments ());
         }
 
-        string[] argv = command_line.get_arguments ();
+        
+
+        return 0;
+    }
+
+    private void handle_command_line_arguments (string[] argv) {
+        //  string[] argv = command_line.get_arguments ();
         GLib.List<Iridium.Models.IRCURI> uris = new GLib.List<Iridium.Models.IRCURI> ();
         foreach (var uri_string in argv[1:argv.length]) {
             try {
@@ -127,8 +139,6 @@ public class Iridium.Application : Gtk.Application {
         // This can happen when the application is already open but in the background.
         window.present ();
         ((Iridium.MainWindow) window).handle_uris (uris);
-
-        return 0;
     }
 
     protected override void activate () {
@@ -178,7 +188,13 @@ public class Iridium.Application : Gtk.Application {
     private void restore_state (Iridium.MainWindow main_window, bool is_reconnecting) {
         var servers = is_reconnecting ? restore_state_servers : connection_repository.get_servers ();
         var channels = is_reconnecting ? restore_state_channels : connection_repository.get_channels ();
-        main_window.initialize (servers, channels, is_reconnecting);
+        main_window.connections_opened.connect (() => {
+            if (queued_command_line_arguments != null) {
+                debug ("Sending queued command line arguments to main window");
+                handle_command_line_arguments (queued_command_line_arguments);
+            }
+        });
+        main_window.initialize_ui (servers, channels, is_reconnecting);
     }
 
     public static int main (string[] args) {

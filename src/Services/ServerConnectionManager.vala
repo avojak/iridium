@@ -80,6 +80,17 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
         return server_connection;
     }
 
+    public Iridium.Services.ServerConnection connect_to_server_with_uri (Iridium.Models.IRCURI uri) {
+        var connection_details = new Iridium.Services.ServerConnectionDetails ();
+        connection_details.server = uri.get_server ();
+        connection_details.nickname = Iridium.Application.settings.get_string ("default-nickname");
+        connection_details.realname = Iridium.Application.settings.get_string ("default-realname");
+        connection_details.auth_method = Iridium.Models.AuthenticationMethod.NONE;
+        connection_details.tls = false;
+        connection_details.port = Iridium.Services.ServerConnectionDetails.DEFAULT_INSECURE_PORT;
+        return connect_to_server (connection_details);
+    }
+
     public void disconnect_from_server (string server) {
         var connection = open_connections.get (server);
         if (connection == null) {

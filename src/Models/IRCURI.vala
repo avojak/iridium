@@ -69,8 +69,6 @@ public class Iridium.Models.IRCURI : GLib.Object {
         debug ("User: %s", user);
         debug ("Password: %s", password);
 
-        
-
         try {
             REGEX.replace_eval (path, -1, 0, 0, (match_info, result) => {
                 target = Soup.URI.decode (match_info.fetch_named ("target")).chomp ().chug ();
@@ -99,7 +97,7 @@ public class Iridium.Models.IRCURI : GLib.Object {
     }
 
     public string? get_target_user () {
-        if (target.length == 0) {
+        if (target == null || target.length == 0) {
             // No target
             return null;
         }
@@ -115,7 +113,7 @@ public class Iridium.Models.IRCURI : GLib.Object {
     }
 
     public string? get_target_channel () {
-        if (target.length == 0) {
+        if (target == null || target.length == 0) {
             // No target
             return null;
         }
