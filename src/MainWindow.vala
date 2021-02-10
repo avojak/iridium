@@ -313,6 +313,11 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     public void handle_uris (GLib.List<Iridium.Models.IRCURI> uris) {
         foreach (var uri in uris) {
             debug ("Handling uri: %s", uri.uri_string);
+            debug ("Target user: %s", uri.get_target_user ());
+            debug ("Target channel: %s", uri.get_target_channel ());
+            debug ("Network: %s", uri.get_network ());
+            debug ("Server: %s", uri.get_server ());
+            debug ("Connection port: %s", uri.get_connection_port ().to_string ());
             //  Iridium.Models.IRCURI uri = new Iridium.Models.IRCURI (uri_string);
 
             //  if (host == "") {

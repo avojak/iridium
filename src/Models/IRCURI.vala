@@ -32,10 +32,10 @@ public class Iridium.Models.IRCURI : GLib.Object {
     public string nickname { get; set; }
 
     public string uri_string { get; set; }
-    //  public string host { get; set; }
-    //  public uint port { get; set; }
+    public string host { get; set; }
+    public uint port { get; set; }
     public string? target { get; set; }
-    public string? modifiers { get; set; }
+    public GLib.List<Iridium.Models.IRCURIModifier> modifiers = new GLib.List<Iridium.Models.IRCURIModifier> ();
 
 
     static construct {
@@ -50,15 +50,16 @@ public class Iridium.Models.IRCURI : GLib.Object {
     }
 
     public IRCURI (Soup.URI uri) {
-        uri_string = uri.to_string (false).chomp ().chug ();
+        uri_string = Soup.URI.decode (uri.to_string (false).chomp ().chug ()).down ();
+        debug ("URI string: %s", uri_string);
         if (uri_string.length == 0) {
             return;
         }
 
-        string host = uri.get_host ().chomp ().chug ();
-        uint port = uri.get_port ();
+        host = uri.get_host ().chomp ().chug ().down ();
+        port = uri.get_port ();
         string? fragment = uri.get_fragment ();
-        string path = uri.get_path ().chomp ().chug ();
+        string path = Soup.URI.decode (uri.get_path ().chomp ().chug ()).down ();
         string? user = uri.get_user ();
         string? password = uri.get_password ();
         debug ("Host: %s", host);
@@ -68,16 +69,21 @@ public class Iridium.Models.IRCURI : GLib.Object {
         debug ("User: %s", user);
         debug ("Password: %s", password);
 
-        //  host = uri.get_host ().chomp ().chug ();
-        //  port = uri.get_port ();
-
         
 
         try {
             REGEX.replace_eval (path, -1, 0, 0, (match_info, result) => {
-                target = match_info.fetch_named ("target");
+                target = Soup.URI.decode (match_info.fetch_named ("target")).chomp ().chug ();
                 if (match_info.fetch_named ("modifiers") != null) {
-                    modifiers = match_info.fetch_named ("modifiers");
+                    string[] modifier_tokens = match_info.fetch_named ("modifiers").split(",");
+                    foreach (var modifier_token in modifier_tokens) {
+                        if (modifier_token.chomp ().chug () != "") {
+                            Iridium.Models.IRCURIModifier? modifier = Iridium.Models.IRCURIModifier.get_value_by_string (modifier_token.chomp ().chug ().down ());
+                            if (modifier != null) {
+                                modifiers.append (modifier);
+                            }
+                        }
+                    }
                 }
                 return false;
             });
@@ -86,31 +92,78 @@ public class Iridium.Models.IRCURI : GLib.Object {
         }
 
         debug ("Target: %s", target);
-        debug ("Modifiers: %s", modifiers);
+        debug ("Modifiers:");
+        foreach (var modifier in modifiers) {
+            debug ("- %s", modifier.get_modifier_string ());
+        }
     }
 
-    //  private void parse_uri () {
-    //      try {
-    //          REGEX.replace_eval (message, -1, 0, 0, (match_info, result) => {
-    //              prefix = match_info.fetch_named ("prefix");
-    //              command = match_info.fetch_named ("command");
-    //              if (match_info.fetch_named ("params") != null) {
-    //                  params = match_info.fetch_named ("params").split (" ");
-    //              }
-    //              message = match_info.fetch_named ("trail");
-    //              if (message != null) {
-    //                  message.replace ("\t", "");
-    //                  strip_non_printable_chars ();
-    //              }
-    //              if ((prefix != null) && (command in USER_COMMANDS)) {  // vala-lint=naming-convention
-    //                  nickname = prefix.split ("!")[0];
-    //              }
-    //              return false;
-    //          });
-    //      } catch (GLib.RegexError e) {
-    //          // TODO: Handle errors!
-    //          warning ("Error while parsing message with regex: %s", e.message);
-    //      }
-    //  }
+    public string? get_target_user () {
+        if (target.length == 0) {
+            // No target
+            return null;
+        }
+        if (target.has_prefix ("#") || target.has_prefix ("+") || target.has_prefix ("&")) {
+            // Target is a channel
+            return null;
+        } else if (modifiers.find (IRCURIModifier.IS_NICK) == null) {
+            // No channel prefix and no isnick modifier means this should be treated as a channel name
+            return null;
+        }
+        // A target user could have additional nickinfo or userinfo, so trim that off
+        return target.split ("!")[0];
+    }
+
+    public string? get_target_channel () {
+        if (target.length == 0) {
+            // No target
+            return null;
+        }
+        if (modifiers.find (IRCURIModifier.IS_NICK) != null) {
+            // The isnick modifier means this should be treated as a nick
+            return null;
+        }
+        if (target.has_prefix ("#") || target.has_prefix ("+") || target.has_prefix ("&")) {
+            // If the URI has a channel prefix, keep it
+            return target;
+        }
+        // No channel prefix provided, but this is a channel, so provide the default prefix
+        return @"#$target";
+    }
+
+    public string? get_network () {
+        if (modifiers.find (IRCURIModifier.IS_SERVER) != null) {
+            // The isserver modifier means this should be treated as a server, not a network name
+            return null;
+        }
+        if (host == "") {
+            // We don't have a concept of a default network
+            return null;
+        }
+        if (host.contains (".")) {
+            // Treat this as a server
+            return null;
+        }
+        return host;
+    }
+
+    public string? get_server () {
+        if (host == "") {
+            // The default server is the localhost
+            return "localhost";
+        }
+        if ((modifiers.find (IRCURIModifier.IS_SERVER) == null) && !host.contains (".")) {
+            // No isserver modifier and no . indicates this should be treated as a network name
+            return null;
+        }
+        return host;
+    }
+
+    public uint get_connection_port () {
+        if (port == 0) {
+            return 6667;
+        }
+        return port;
+    }
 
 }
