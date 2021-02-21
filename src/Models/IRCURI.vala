@@ -22,7 +22,7 @@
 public class Iridium.Models.IRCURI : GLib.Object {
 
     //  private const string REGEX_STR = """^(:(?<prefix>\S+) )?(?<command>\S+)( (?!:)(?<params>.+?))?( :(?<trail>.+))?$""";
-    private const string REGEX_STR = """^(/(?<target>[^,]+)(?<modifiers>,\S+))$""";
+    private const string REGEX_STR = """^(\/(?<target>[^,]+)(?<modifiers>,\S+)*)$""";
     private static GLib.Regex REGEX; // vala-lint=naming-convention
 
     public string command { get; set; }

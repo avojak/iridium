@@ -334,16 +334,22 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 warning ("TODO: Support network names");
             }
 
+            var connection_details = Iridium.Services.ServerConnectionManager.create_connection_details (uri);
+
             // Make sure we don't already have a connection!
             if (Iridium.Application.connection_manager.has_connection (uri.get_server ())) {
                 connection_status.set (uri, false);
                 if (connection_status.size == num_uris) {
                     main_layout.hide_handle_uris_overlay ();
                 }
+                // Even though the server connection is open, check if there's a channel to join
+                if (uri.get_target_channel () != null) {
+                    main_layout.add_channel_chat_view (connection_details.server, uri.get_target_channel (), connection_details.nickname);
+                    Iridium.Application.connection_manager.join_channel (connection_details.server, uri.get_target_channel ());
+                    main_layout.updating_channel (connection_details.server, uri.get_target_channel ());
+                }
                 continue;
             }
-
-            var connection_details = Iridium.Services.ServerConnectionManager.create_connection_details (uri);
 
             // If we have connection details in the repository, use them instead (this allows us to use saved auth tokens, etc.)
             var stored_server = Iridium.Application.connection_repository.get_server (uri.get_server ());
@@ -354,6 +360,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             Idle.add (() => {
                 // Update the UI
                 main_layout.add_server_chat_view (connection_details.server, connection_details.nickname, uri.get_network () != null ? uri.get_network () : null);
+                if (uri.get_target_channel () != null) {
+                    main_layout.add_channel_chat_view (connection_details.server, uri.get_target_channel (), connection_details.nickname);
+                }
                 main_layout.updating_server (connection_details.server);
 
                 // Attempt to open connections (Do this here so that the visual status in the side panel is accurate - otherwise it keeps showing the connecting status)
@@ -362,6 +371,11 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                     connection_status.set (uri, true);
                     if (connection_status.size == num_uris) {
                         main_layout.hide_handle_uris_overlay ();
+                    }
+                    // Join the target channel if present
+                    if (uri.get_target_channel () != null) {
+                        Iridium.Application.connection_manager.join_channel (connection_details.server, uri.get_target_channel ());
+                        main_layout.updating_channel (connection_details.server, uri.get_target_channel ());
                     }
                 });
                 server_connection.open_failed.connect (() => {
@@ -373,7 +387,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
                 return false;
             });
-            
+
         }
     }
 
