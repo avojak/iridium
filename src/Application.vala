@@ -107,9 +107,6 @@ public class Iridium.Application : Gtk.Application {
         } else {
             handle_command_line_arguments (command_line.get_arguments ());
         }
-
-        
-
         return 0;
     }
 

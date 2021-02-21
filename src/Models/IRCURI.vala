@@ -73,7 +73,7 @@ public class Iridium.Models.IRCURI : GLib.Object {
             REGEX.replace_eval (path, -1, 0, 0, (match_info, result) => {
                 target = Soup.URI.decode (match_info.fetch_named ("target")).chomp ().chug ();
                 if (match_info.fetch_named ("modifiers") != null) {
-                    string[] modifier_tokens = match_info.fetch_named ("modifiers").split(",");
+                    string[] modifier_tokens = match_info.fetch_named ("modifiers").split (",");
                     foreach (var modifier_token in modifier_tokens) {
                         if (modifier_token.chomp ().chug () != "") {
                             Iridium.Models.IRCURIModifier? modifier = Iridium.Models.IRCURIModifier.get_value_by_string (modifier_token.chomp ().chug ().down ());
