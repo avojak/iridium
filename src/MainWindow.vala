@@ -316,6 +316,11 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     public void handle_uris (GLib.List<Iridium.Models.IRCURI> uris) {
+        int num_uris = (int) uris.length ();
+        if (num_uris > 0) {
+            main_layout.show_handle_uris_overlay ();
+        }
+        Gee.Map<Iridium.Models.IRCURI, bool> connection_status = new Gee.HashMap<Iridium.Models.IRCURI, bool> ();
         foreach (var uri in uris) {
             debug ("Handling uri: %s", uri.uri_string);
             debug ("Target user: %s", uri.get_target_user ());
@@ -323,18 +328,52 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             debug ("Network: %s", uri.get_network ());
             debug ("Server: %s", uri.get_server ());
             debug ("Connection port: %s", uri.get_connection_port ().to_string ());
+
+            if (uri.get_network () != null) {
+                // TODO
+                warning ("TODO: Support network names");
+            }
+
+            // Make sure we don't already have a connection!
+            if (Iridium.Application.connection_manager.has_connection (uri.get_server ())) {
+                connection_status.set (uri, false);
+                if (connection_status.size == num_uris) {
+                    main_layout.hide_handle_uris_overlay ();
+                }
+                continue;
+            }
+
+            var connection_details = Iridium.Services.ServerConnectionManager.create_connection_details (uri);
+
+            // If we have connection details in the repository, use them instead (this allows us to use saved auth tokens, etc.)
+            var stored_server = Iridium.Application.connection_repository.get_server (uri.get_server ());
+            if (stored_server != null) {
+                connection_details = stored_server.connection_details;
+            }
+
+            Idle.add (() => {
+                // Update the UI
+                main_layout.add_server_chat_view (connection_details.server, connection_details.nickname, uri.get_network () != null ? uri.get_network () : null);
+                main_layout.updating_server (connection_details.server);
+
+                // Attempt to open connections (Do this here so that the visual status in the side panel is accurate - otherwise it keeps showing the connecting status)
+                var server_connection = Iridium.Application.connection_manager.connect_to_server (connection_details);
+                server_connection.open_successful.connect (() => {
+                    connection_status.set (uri, true);
+                    if (connection_status.size == num_uris) {
+                        main_layout.hide_handle_uris_overlay ();
+                    }
+                });
+                server_connection.open_failed.connect (() => {
+                    connection_status.set (uri, false);
+                    if (connection_status.size == num_uris) {
+                        main_layout.hide_handle_uris_overlay ();
+                    }
+                });
+
+                return false;
+            });
             
-            //  string? server = uri.get_server ();
-            //  string? network = uri.get_network ();
-            //  string? user = uri.get_target_user ();
-            //  string? channel = uri.get_target_channel ();
-
-            // Create the UI
-            // TODO
-
-            // Attempt to open connections
-            // TODO
-            Iridium.Application.connection_manager.connect_to_server_with_uri (uri);
         }
     }
 

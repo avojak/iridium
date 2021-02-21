@@ -142,6 +142,10 @@ public class Iridium.Models.IRCURI : GLib.Object {
             // Treat this as a server
             return null;
         }
+        if (host == "localhost") {
+            // Localhost is not a network name
+            return null;
+        }
         return host;
     }
 
@@ -150,7 +154,7 @@ public class Iridium.Models.IRCURI : GLib.Object {
             // The default server is the localhost
             return "localhost";
         }
-        if ((modifiers.find (IRCURIModifier.IS_SERVER) == null) && !host.contains (".")) {
+        if ((modifiers.find (IRCURIModifier.IS_SERVER) == null) && !host.contains (".") && (host != "localhost")) {
             // No isserver modifier and no . indicates this should be treated as a network name
             return null;
         }
