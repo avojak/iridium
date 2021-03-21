@@ -6,6 +6,9 @@
   <img src="data/assets/iridium.svg" alt="Icon" />
 </p>
 <h1 align="center">Iridium</h1>
+<p align="center">
+  <a href="https://appcenter.elementary.io/com.github.avojak.iridium"><img src="https://appcenter.elementary.io/badge.svg" alt="Get it on AppCenter" /></a>
+</p>
 
 | ![Screenshot](data/assets/screenshots/iridium-screenshot-01.png) | ![Screenshot](data/assets/screenshots/iridium-screenshot-02.png) |
 |------------------------------------------------------------------|------------------------------------------------------------------|
