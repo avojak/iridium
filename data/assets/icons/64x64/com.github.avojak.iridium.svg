@@ -10,7 +10,7 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    inkscape:version="1.0.2 (e86c870879, 2021-01-15)"
-   sodipodi:docname="iridium.svg"
+   sodipodi:docname="com.github.avojak.iridium.svg"
    version="1.1"
    width="64"
    height="64"
@@ -23,15 +23,15 @@
      inkscape:current-layer="svg3489"
      inkscape:window-maximized="0"
      inkscape:window-y="30"
-     inkscape:window-x="302"
-     inkscape:cy="17.82581"
-     inkscape:cx="28.313372"
-     inkscape:zoom="7.335322"
+     inkscape:window-x="116"
+     inkscape:cy="35.857766"
+     inkscape:cx="12.818115"
+     inkscape:zoom="5.1773395"
      inkscape:snap-bbox="true"
      showgrid="true"
      id="namedview155"
      inkscape:window-height="765"
-     inkscape:window-width="1073"
+     inkscape:window-width="1211"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0"
      guidetolerance="10"
@@ -39,7 +39,8 @@
      objecttolerance="10"
      borderopacity="1"
      bordercolor="#666666"
-     pagecolor="#ffffff">
+     pagecolor="#ffffff"
+     showguides="false">
     <inkscape:grid
        id="grid674"
        type="xygrid" />
@@ -69,18 +70,6 @@
          style="stop-color:#1a1a1a;stop-opacity:1"
          offset="1"
          id="stop1321" />
-    </linearGradient>
-    <linearGradient
-       inkscape:collect="always"
-       id="linearGradient1259">
-      <stop
-         style="stop-color:#8cd5ff;stop-opacity:0.74901962"
-         offset="0"
-         id="stop1255" />
-      <stop
-         style="stop-color:#0b6cda;stop-opacity:1"
-         offset="1"
-         id="stop1257" />
     </linearGradient>
     <radialGradient
        cx="23.896"
@@ -1705,11 +1694,11 @@
        gradientTransform="matrix(114.289,172.268,-172.268,114.289,26.3072,-22.9385)">
       <stop
          offset="0"
-         style="stop-color:#aa46f7;stop-opacity:1"
+         style="stop-color:#ddb3fd;stop-opacity:1"
          id="stop60-7" />
       <stop
          offset="1"
-         style="stop-color:#8468f6;stop-opacity:1"
+         style="stop-color:#3944b3;stop-opacity:1"
          id="stop62-5" />
     </linearGradient>
     <clipPath
@@ -1970,7 +1959,7 @@
     </clipPath>
     <radialGradient
        inkscape:collect="always"
-       xlink:href="#linearGradient1259"
+       xlink:href="#_Linear5-6"
        id="radialGradient1261"
        cx="32"
        cy="35.221714"
@@ -2007,9 +1996,9 @@
        xlink:href="#linearGradient1323"
        id="radialGradient1353"
        gradientUnits="userSpaceOnUse"
-       cx="45"
+       cx="45.000015"
        cy="27"
-       fx="45"
+       fx="45.000015"
        fy="27"
        r="4"
        gradientTransform="translate(-13.000017)" />
@@ -2019,9 +2008,9 @@
        id="radialGradient1357"
        gradientUnits="userSpaceOnUse"
        gradientTransform="translate(-26.000019)"
-       cx="45"
+       cx="45.000019"
        cy="27"
-       fx="45"
+       fx="45.000019"
        fy="27"
        r="4" />
     <linearGradient
