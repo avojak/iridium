@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.com/avojak/iridium.svg?branch=develop)](https://travis-ci.com/avojak/iridium)
 ![Lint](https://github.com/avojak/iridium/workflows/Lint/badge.svg)
 ![GitHub](https://img.shields.io/github/license/avojak/iridium.svg?color=blue)
+[![Mentioned in Awesome IRC](https://awesome.re/mentioned-badge.svg)](https://github.com/davisonio/awesome-irc)
 
 <p align="center">
   <img src="data/assets/iridium.svg" alt="Icon" />
