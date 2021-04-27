@@ -182,7 +182,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     // TODO: Restore private messages from the side panel
-    public void initialize (Gee.List<Iridium.Services.Server> servers, Gee.List<Iridium.Services.Channel> channels, bool is_reconnecting) {
+    public void initialize_ui (Gee.List<Iridium.Services.Server> servers, Gee.List<Iridium.Services.Channel> channels, bool is_reconnecting) {
         // Initialize the UI with disabled rows and chat views for everything
         if (!is_reconnecting) {
             debug ("Initializing side panel and chat views…");
@@ -212,15 +212,16 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             }
         }
 
-        initialized (servers, channels, is_reconnecting);
+        ui_initialized (servers, channels, is_reconnecting);
     }
 
     public void open_connections (Gee.List<Iridium.Services.Server> servers, Gee.List<Iridium.Services.Channel> channels, bool is_reconnecting) {
-        main_layout.show_initialization_overlay ();
+        main_layout.show_connecting_overlay ();
 
         // Handle case were there's nothing to initialize!
         if (servers.size == 0) {
-            main_layout.hide_initialization_overlay ();
+            main_layout.hide_connecting_overlay ();
+            connections_opened ();
             return;
         }
 
@@ -244,7 +245,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     private void do_open_connections (Gee.List<Iridium.Services.Server> servers, Gee.List<Iridium.Services.Channel> channels, bool is_reconnecting) {
         // Map the server names to their initialization status (success or fail)
-        Gee.Map<string, bool> initialization_status = new Gee.HashMap<string, bool> ();
+        Gee.Map<string, bool> connection_status = new Gee.HashMap<string, bool> ();
         var num_enabled_servers = 0;
         foreach (Iridium.Services.Server server in servers) {
             if (server.enabled) {
@@ -287,26 +288,111 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
             });
             server_connection.open_successful.connect (() => {
-                initialization_status.set (server_name, true);
-                if (initialization_status.size == num_enabled_servers) {
-                    main_layout.hide_initialization_overlay ();
+                connection_status.set (server_name, true);
+                if (connection_status.size == num_enabled_servers) {
+                    completed_opening_connections ();
                 }
             });
             server_connection.open_failed.connect (() => {
                 // TODO: Give some user feedback, maybe a toast? Don't want the UI to get too busy though
-                initialization_status.set (server_name, false);
-                if (initialization_status.size == num_enabled_servers) {
-                    debug ("Initialization complete");
-                    main_layout.hide_initialization_overlay ();
+                connection_status.set (server_name, false);
+                if (connection_status.size == num_enabled_servers) {
+                    completed_opening_connections ();
                 }
             });
         }
 
         // We've initialized the UI, but if there aren't any connections to wait on, we're done
         if (num_enabled_servers == 0) {
-            debug ("Initialization complete");
-            main_layout.hide_initialization_overlay ();
+            completed_opening_connections ();
             return;
+        }
+    }
+
+    private void completed_opening_connections () {
+        debug ("Done opening connections");
+        main_layout.hide_connecting_overlay ();
+        connections_opened ();
+    }
+
+    public void handle_uris (GLib.List<Iridium.Models.IRCURI> uris) {
+        int num_uris = (int) uris.length ();
+        if (num_uris > 0) {
+            main_layout.show_handle_uris_overlay ();
+        }
+        Gee.Map<Iridium.Models.IRCURI, bool> connection_status = new Gee.HashMap<Iridium.Models.IRCURI, bool> ();
+        foreach (var uri in uris) {
+            debug ("Handling uri: %s", uri.uri_string);
+            debug ("Target user: %s", uri.get_target_user ());
+            debug ("Target channel: %s", uri.get_target_channel ());
+            debug ("Network: %s", uri.get_network ());
+            debug ("Server: %s", uri.get_server ());
+            debug ("Connection port: %s", uri.get_connection_port ().to_string ());
+
+            if (uri.get_network () != null) {
+                // TODO
+                warning ("TODO: Support network names");
+                connection_status.set (uri, false);
+                if (connection_status.size == num_uris) {
+                    main_layout.hide_handle_uris_overlay ();
+                }
+                continue;
+            }
+
+            var connection_details = Iridium.Services.ServerConnectionManager.create_connection_details (uri);
+
+            // Make sure we don't already have a connection!
+            if (Iridium.Application.connection_manager.has_connection (uri.get_server ())) {
+                connection_status.set (uri, false);
+                if (connection_status.size == num_uris) {
+                    main_layout.hide_handle_uris_overlay ();
+                }
+                // Even though the server connection is open, check if there's a channel to join
+                if (uri.get_target_channel () != null) {
+                    main_layout.add_channel_chat_view (connection_details.server, uri.get_target_channel (), connection_details.nickname);
+                    Iridium.Application.connection_manager.join_channel (connection_details.server, uri.get_target_channel ());
+                    main_layout.updating_channel (connection_details.server, uri.get_target_channel ());
+                }
+                continue;
+            }
+
+            // If we have connection details in the repository, use them instead (this allows us to use saved auth tokens, etc.)
+            var stored_server = Iridium.Application.connection_repository.get_server (uri.get_server ());
+            if (stored_server != null) {
+                connection_details = stored_server.connection_details;
+            }
+
+            Idle.add (() => {
+                // Update the UI
+                main_layout.add_server_chat_view (connection_details.server, connection_details.nickname, uri.get_network () != null ? uri.get_network () : null);
+                if (uri.get_target_channel () != null) {
+                    main_layout.add_channel_chat_view (connection_details.server, uri.get_target_channel (), connection_details.nickname);
+                }
+                main_layout.updating_server (connection_details.server);
+
+                // Attempt to open connections (Do this here so that the visual status in the side panel is accurate - otherwise it keeps showing the connecting status)
+                var server_connection = Iridium.Application.connection_manager.connect_to_server (connection_details);
+                server_connection.open_successful.connect (() => {
+                    connection_status.set (uri, true);
+                    if (connection_status.size == num_uris) {
+                        main_layout.hide_handle_uris_overlay ();
+                    }
+                    // Join the target channel if present
+                    if (uri.get_target_channel () != null) {
+                        Iridium.Application.connection_manager.join_channel (connection_details.server, uri.get_target_channel ());
+                        main_layout.updating_channel (connection_details.server, uri.get_target_channel ());
+                    }
+                });
+                server_connection.open_failed.connect (() => {
+                    connection_status.set (uri, false);
+                    if (connection_status.size == num_uris) {
+                        main_layout.hide_handle_uris_overlay ();
+                    }
+                });
+
+                return false;
+            });
+
         }
     }
 
@@ -1136,6 +1222,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         return network_name;
     }
 
-    public signal void initialized (Gee.List<Iridium.Services.Server> servers, Gee.List<Iridium.Services.Channel> channels, bool is_reconnecting);
+    public signal void ui_initialized (Gee.List<Iridium.Services.Server> servers, Gee.List<Iridium.Services.Channel> channels, bool is_reconnecting);
+    public signal void connections_opened ();
 
 }

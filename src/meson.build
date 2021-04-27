@@ -20,6 +20,9 @@ iridium_files = files(
     join_paths('Models', 'ConnectionState.vala'),
     join_paths('Models', 'Server.vala'),
     join_paths('Models', 'InvalidCertificatePolicy.vala'),
+    
+    join_paths('Models', 'IRCURI.vala'),
+    join_paths('Models', 'IRCURIModifier.vala'),
     join_paths('Models', 'Nickname.vala'),
     join_paths('Models', 'ServerIdentity.vala'),
     join_paths('Models', 'ServerSupports.vala'),
@@ -84,7 +87,8 @@ executable(
         dependency('granite', version: '>= 0.5.1'),
         dependency('libsecret-1', version: '>= 0.18.6'),
         dependency('sqlite3', version: '>= 3.22.0'),
-        dependency('gtksourceview-3.0')
+        dependency('gtksourceview-3.0'),
+        dependency('libsoup-2.4')
     ],
     vala_args: vala_args,
     install: true

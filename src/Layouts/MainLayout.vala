@@ -35,7 +35,8 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
 
     private Iridium.Widgets.NetworkInfoBar network_info_bar;
     private Gtk.Overlay overlay;
-    private Granite.Widgets.OverlayBar? overlay_bar;
+    private Granite.Widgets.OverlayBar? restore_connections_overlay_bar;
+    private Granite.Widgets.OverlayBar? handle_uris_overlay_bar;
     private Gtk.Stack main_stack;
 
     public MainLayout (Iridium.MainWindow window) {
@@ -392,20 +393,39 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         return chat_views;
     }
 
-    public void show_initialization_overlay () {
-        if (overlay_bar == null) {
-            overlay_bar = new Granite.Widgets.OverlayBar (overlay);
-            overlay_bar.label = _("Restoring server connections…");
-            overlay_bar.active = true;
+    public void show_connecting_overlay () {
+        if (restore_connections_overlay_bar == null) {
+            restore_connections_overlay_bar = new Granite.Widgets.OverlayBar (overlay);
+            restore_connections_overlay_bar.label = _("Restoring server connections…");
+            restore_connections_overlay_bar.active = true;
             overlay.show_all ();
         }
     }
 
-    public void hide_initialization_overlay () {
+    public void hide_connecting_overlay () {
         Idle.add (() => {
-            if (overlay_bar != null) {
-                overlay_bar.destroy ();
-                overlay_bar = null;
+            if (restore_connections_overlay_bar != null) {
+                restore_connections_overlay_bar.destroy ();
+                restore_connections_overlay_bar = null;
+            }
+            return false;
+        });
+    }
+
+    public void show_handle_uris_overlay () {
+        if (handle_uris_overlay_bar == null) {
+            handle_uris_overlay_bar = new Granite.Widgets.OverlayBar (overlay);
+            handle_uris_overlay_bar.label = _("Opening URI…");
+            handle_uris_overlay_bar.active = true;
+            overlay.show_all ();
+        }
+    }
+
+    public void hide_handle_uris_overlay () {
+        Idle.add (() => {
+            if (handle_uris_overlay_bar != null) {
+                handle_uris_overlay_bar.destroy ();
+                handle_uris_overlay_bar = null;
             }
             return false;
         });
