@@ -332,6 +332,11 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             if (uri.get_network () != null) {
                 // TODO
                 warning ("TODO: Support network names");
+                connection_status.set (uri, false);
+                if (connection_status.size == num_uris) {
+                    main_layout.hide_handle_uris_overlay ();
+                }
+                continue;
             }
 
             var connection_details = Iridium.Services.ServerConnectionManager.create_connection_details (uri);
