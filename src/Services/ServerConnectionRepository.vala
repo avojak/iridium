@@ -43,25 +43,20 @@ public class Iridium.Services.ServerConnectionRepository : GLib.Object {
     }
 
     public void on_server_connection_successful (Iridium.Services.ServerConnectionDetails connection_details) {
-        debug ("Server connection successful");
         if (!should_remember_connections) {
-            debug ("Not remembering connections");
             return;
         }
         lock (sql_client) {
             // Don't add a duplicate server
             if (sql_client.get_server (connection_details.server) != null) {
-                debug ("Skipping duplicate server");
                 return;
             }
 
             // Add the new entry
-            debug ("Adding new entry");
             var server = new Iridium.Services.Server ();
             server.connection_details = connection_details;
             sql_client.insert_server (server);
         }
-        debug ("Done");
     }
 
     public void on_server_row_added (string server_name) {
