@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: com.github.avojak.iridium\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-01-02 13:32-0700\n"
-"PO-Revision-Date: 2021-04-26 19:52-0600\n"
+"PO-Revision-Date: 2021-04-26 19:55-0600\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -458,11 +458,11 @@ msgstr "Menú"
 
 #: src/Widgets/HeaderBar.vala:93
 msgid "Light background"
-msgstr "Fondo claro"
+msgstr "Tema claro"
 
 #: src/Widgets/HeaderBar.vala:94
 msgid "Dark background"
-msgstr "Fondo obscuro"
+msgstr "Tema oscuro"
 
 #: src/Widgets/HeaderBar.vala:103
 msgid "Toggle Sidebar"
