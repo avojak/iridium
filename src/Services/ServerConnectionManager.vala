@@ -204,6 +204,14 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
         return connection.get_users (channel_name);
     }
 
+    public Gee.List<string> get_operators (string server_name, string channel_name) {
+        var connection = open_connections.get (server_name);
+        if (connection == null) {
+            return new Gee.LinkedList<string> ();
+        }
+        return connection.get_operators (channel_name);
+    }
+
     public string get_topic (string server_name, string channel_name) {
         var connection = open_connections.get (server_name);
         if (connection == null) {

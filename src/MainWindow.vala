@@ -1062,19 +1062,23 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     // Simply updates the UI based on changes that were already made to the underlying data model
     private void update_channel_users_list (string server_name, string channel_name) {
         var nicknames = Iridium.Application.connection_manager.get_users (server_name, channel_name);
+        var operators = Iridium.Application.connection_manager.get_operators (server_name, channel_name);
         Idle.add (() => {
             main_layout.update_channel_users (server_name, channel_name, nicknames);
             if (main_layout.get_visible_server () == server_name && main_layout.get_visible_channel () == channel_name) {
-                header_bar.set_channel_users (nicknames);
+                header_bar.set_channel_users (nicknames, operators);
             }
             return false;
         });
     }
 
     private void set_channel_users_button_enabled (string server_name, string channel_name, bool enabled) {
-        if (main_layout.get_visible_server () == server_name && main_layout.get_visible_channel () == channel_name) {
-            header_bar.set_channel_users_button_enabled (enabled);
-        }
+        Idle.add (() => {
+            if (main_layout.get_visible_server () == server_name && main_layout.get_visible_channel () == channel_name) {
+                header_bar.set_channel_users_button_enabled (enabled);
+            }
+            return false;
+        });
     }
 
     private void on_insufficient_privs_received (string server_name, string channel_name, Iridium.Services.Message message) {
