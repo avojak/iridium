@@ -166,7 +166,12 @@ public class Iridium.Services.SQLClient : GLib.Object {
         statement.bind_text (9, server.network_name);
         statement.bind_int (10, server.id);
 
-        statement.step ();
+        string err_msg;
+        int ec = database.exec (statement.expanded_sql (), null, out err_msg);
+        if (ec != Sqlite.OK) {
+            log_database_error (ec, err_msg);
+            debug ("SQL statement: %s", statement.expanded_sql ());
+        }
         statement.reset ();
     }
 
@@ -180,7 +185,12 @@ public class Iridium.Services.SQLClient : GLib.Object {
         statement.bind_int (1, bool_to_int (enabled));
         statement.bind_text (2, hostname);
 
-        statement.step ();
+        string err_msg;
+        int ec = database.exec (statement.expanded_sql (), null, out err_msg);
+        if (ec != Sqlite.OK) {
+            log_database_error (ec, err_msg);
+            debug ("SQL statement: %s", statement.expanded_sql ());
+        }
         statement.reset ();
     }
 
@@ -193,7 +203,12 @@ public class Iridium.Services.SQLClient : GLib.Object {
         }
         statement.bind_text (1, hostname);
 
-        statement.step ();
+        string err_msg;
+        int ec = database.exec (statement.expanded_sql (), null, out err_msg);
+        if (ec != Sqlite.OK) {
+            log_database_error (ec, err_msg);
+            debug ("SQL statement: %s", statement.expanded_sql ());
+        }
         statement.reset ();
     }
 
@@ -204,7 +219,12 @@ public class Iridium.Services.SQLClient : GLib.Object {
             log_database_error (database.errcode (), database.errmsg ());
             return;
         }
-        statement.step ();
+        string err_msg;
+        int ec = database.exec (statement.expanded_sql (), null, out err_msg);
+        if (ec != Sqlite.OK) {
+            log_database_error (ec, err_msg);
+            debug ("SQL statement: %s", statement.expanded_sql ());
+        }
         statement.reset ();
     }
 
@@ -225,7 +245,12 @@ public class Iridium.Services.SQLClient : GLib.Object {
         statement.bind_int (3, bool_to_int (channel.enabled));
         statement.bind_int (4, bool_to_int (channel.favorite));
 
-        statement.step ();
+        string err_msg;
+        int ec = database.exec (statement.expanded_sql (), null, out err_msg);
+        if (ec != Sqlite.OK) {
+            log_database_error (ec, err_msg);
+            debug ("SQL statement: %s", statement.expanded_sql ());
+        }
         statement.reset ();
     }
 
@@ -261,7 +286,12 @@ public class Iridium.Services.SQLClient : GLib.Object {
         statement.bind_int (1, bool_to_int (enabled));
         statement.bind_int (2, channel_id);
 
-        statement.step ();
+        string err_msg;
+        int ec = database.exec (statement.expanded_sql (), null, out err_msg);
+        if (ec != Sqlite.OK) {
+            log_database_error (ec, err_msg);
+            debug ("SQL statement: %s", statement.expanded_sql ());
+        }
         statement.reset ();
     }
 
@@ -274,7 +304,12 @@ public class Iridium.Services.SQLClient : GLib.Object {
         }
         statement.bind_int (1, channel_id);
 
-        statement.step ();
+        string err_msg;
+        int ec = database.exec (statement.expanded_sql (), null, out err_msg);
+        if (ec != Sqlite.OK) {
+            log_database_error (ec, err_msg);
+            debug ("SQL statement: %s", statement.expanded_sql ());
+        }
         statement.reset ();
     }
 
@@ -287,7 +322,12 @@ public class Iridium.Services.SQLClient : GLib.Object {
         }
         statement.bind_int (1, server_id);
 
-        statement.step ();
+        string err_msg;
+        int ec = database.exec (statement.expanded_sql (), null, out err_msg);
+        if (ec != Sqlite.OK) {
+            log_database_error (ec, err_msg);
+            debug ("SQL statement: %s", statement.expanded_sql ());
+        }
         statement.reset ();
     }
 
@@ -298,7 +338,12 @@ public class Iridium.Services.SQLClient : GLib.Object {
             log_database_error (database.errcode (), database.errmsg ());
             return;
         }
-        statement.step ();
+        string err_msg;
+        int ec = database.exec (statement.expanded_sql (), null, out err_msg);
+        if (ec != Sqlite.OK) {
+            log_database_error (ec, err_msg);
+            debug ("SQL statement: %s", statement.expanded_sql ());
+        }
         statement.reset ();
     }
 
@@ -350,7 +395,12 @@ public class Iridium.Services.SQLClient : GLib.Object {
         statement.bind_int (1, bool_to_int (favorite));
         statement.bind_int (2, channel_id);
 
-        statement.step ();
+        string err_msg;
+        int ec = database.exec (statement.expanded_sql (), null, out err_msg);
+        if (ec != Sqlite.OK) {
+            log_database_error (ec, err_msg);
+            debug ("SQL statement: %s", statement.expanded_sql ());
+        }
         statement.reset ();
     }
 
@@ -447,7 +497,12 @@ public class Iridium.Services.SQLClient : GLib.Object {
         statement.bind_text (2, identity.certificate_pem);
         statement.bind_int (3, bool_to_int (identity.is_accepted));
 
-        statement.step ();
+        string err_msg;
+        int ec = database.exec (statement.expanded_sql (), null, out err_msg);
+        if (ec != Sqlite.OK) {
+            log_database_error (ec, err_msg);
+            debug ("SQL statement: %s", statement.expanded_sql ());
+        }
         statement.reset ();
     }
 
@@ -460,7 +515,12 @@ public class Iridium.Services.SQLClient : GLib.Object {
         }
         statement.bind_text (1, host);
 
-        statement.step ();
+        string err_msg;
+        int ec = database.exec (statement.expanded_sql (), null, out err_msg);
+        if (ec != Sqlite.OK) {
+            log_database_error (ec, err_msg);
+            debug ("SQL statement: %s", statement.expanded_sql ());
+        }
         statement.reset ();
     }
 
@@ -471,7 +531,12 @@ public class Iridium.Services.SQLClient : GLib.Object {
             log_database_error (database.errcode (), database.errmsg ());
             return;
         }
-        statement.step ();
+        string err_msg;
+        int ec = database.exec (statement.expanded_sql (), null, out err_msg);
+        if (ec != Sqlite.OK) {
+            log_database_error (ec, err_msg);
+            debug ("SQL statement: %s", statement.expanded_sql ());
+        }
         statement.reset ();
     }
 
