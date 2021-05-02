@@ -43,7 +43,7 @@ public class Iridium.Widgets.UsersPopover.UserListBoxRow : Gtk.ListBoxRow {
             event_box.set_state_flags (Gtk.StateFlags.NORMAL, true);
             return false;
         });
-        
+
         var label = new Gtk.Label (nickname);
         label.single_line_mode = true;
         label.xalign = 0;
