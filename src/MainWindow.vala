@@ -1140,11 +1140,11 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             // Display a message in the channel chat view
             if (mode_chars == "+o") {
                 var message = new Iridium.Services.Message ();
-                message.message = "%s gives channel operator status to %s".printf(nickname, target_nickname);
+                message.message = "%s gives channel operator status to %s".printf (nickname, target_nickname);
                 main_layout.display_server_message (server_name, channel_name, message);
             } else if (mode_chars == "-o") {
                 var message = new Iridium.Services.Message ();
-                message.message = "%s revokes channel operator status from %s".printf(nickname, target_nickname);
+                message.message = "%s revokes channel operator status from %s".printf (nickname, target_nickname);
                 main_layout.display_server_message (server_name, channel_name, message);
             }
             return false;
