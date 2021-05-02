@@ -412,7 +412,9 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 on_channel_topic_received (message.params[1], message.message);
                 break;
             case Iridium.Services.NumericCodes.RPL_TOPICWHOTIME:
-                channel_topic_whotime_received (message.params[1], message.params[2].split ("!")[0], int64.parse (message.params[3]));
+                // Some servers send the setat time string as the message, not a param
+                string time_str = message.params[3] != null ? message.params[3] : message.message;
+                channel_topic_whotime_received (message.params[1], message.params[2].split ("!")[0], int64.parse (time_str));
                 break;
             case Iridium.Services.NumericCodes.RPL_NOTOPIC:
                 on_channel_topic_received (message.params[1], "");
