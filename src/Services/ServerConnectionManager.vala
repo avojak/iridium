@@ -68,6 +68,7 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
         server_connection.nickname_changed.connect (on_nickname_changed);
         server_connection.user_changed_nickname.connect (on_user_changed_nickname);
         server_connection.network_name_received.connect (on_network_name_received);
+        server_connection.user_channel_mode_changed.connect (on_user_channel_mode_changed);
 
         //  server_connection.open_successful.connect (() => {
         open_connections.set (server, server_connection);
@@ -204,6 +205,14 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
         return connection.get_users (channel_name);
     }
 
+    public Gee.List<string> get_operators (string server_name, string channel_name) {
+        var connection = open_connections.get (server_name);
+        if (connection == null) {
+            return new Gee.LinkedList<string> ();
+        }
+        return connection.get_operators (channel_name);
+    }
+
     public string get_topic (string server_name, string channel_name) {
         var connection = open_connections.get (server_name);
         if (connection == null) {
@@ -329,6 +338,10 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
         network_name_received (source.connection_details.server, network_name);
     }
 
+    private void on_user_channel_mode_changed (Iridium.Services.ServerConnection source, string channel_name, string mode_chars, string nickname, string target_nickname) {
+        user_channel_mode_changed (source.connection_details.server, channel_name, mode_chars, nickname, target_nickname);
+    }
+
     //
     // Signals
     //
@@ -357,5 +370,6 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
     public signal void nickname_changed (string server_name, string old_nickname, string new_nickname);
     public signal void user_changed_nickname (string server_name, string old_nickname, string new_nickname);
     public signal void network_name_received (string server_name, string network_name);
+    public signal void user_channel_mode_changed (string server_name, string channel_name, string mode_chars, string nickname, string target_nickname);
 
 }

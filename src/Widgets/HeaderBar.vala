@@ -184,8 +184,8 @@ public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
         channel_users_button.sensitive = enabled;
     }
 
-    public void set_channel_users (Gee.List<string> nicknames) {
-        channel_users_popover.set_users (nicknames);
+    public void set_channel_users (Gee.List<string> nicknames, Gee.List<string> operators) {
+        channel_users_popover.set_users (nicknames, operators);
     }
 
     private void on_nickname_selected (string nickname) {

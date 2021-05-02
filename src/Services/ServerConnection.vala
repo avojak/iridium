@@ -35,6 +35,8 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     private Gee.List<string> joined_channels = new Gee.ArrayList<string> ();
     private Gee.Map<string, Gee.List<string>> channel_users = new Gee.HashMap<string, Gee.List<string>> ();
     private Gee.Map<string, Gee.List<string>> nickname_buffer = new Gee.HashMap<string, Gee.List<string>> ();
+    private Gee.Map<string, Gee.List<string>> channel_operators = new Gee.HashMap<string, Gee.List<string>> ();
+    private Gee.Map<string, Gee.List<string>> operators_buffer = new Gee.HashMap<string, Gee.List<string>> ();
 
     private Gee.Map<string, string> channel_topics = new Gee.HashMap<string, string> ();
 
@@ -423,9 +425,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 server_message_received (display_message);
                 break;
             case Iridium.Services.MessageCommands.MODE:
-                // TODO: This may affect the nickname displayed in the channel
-                // user list
-
                 // If the first param is our nickname, this is being set on the server rather than for a channel
                 if (message.params[0] == connection_details.nickname) {
                     char modifier = message.message[0];
@@ -434,7 +433,32 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                         display_message.message = "%s sets mode %c%c on %s".printf (message.prefix, modifier, message.message[i], message.params[0]);
                         server_message_received (display_message);
                     }
+                    break;
                 }
+
+                // params[0] = channel
+                // params[1] = mode chars
+                // params[2] = params
+                string channel = message.params[0];
+                string mode_chars = message.params[1];
+
+                if (message.params[2] != null) {
+                    string nickname = message.prefix.split ("!")[0];
+                    string target_nickname = message.params[2];
+                    if (mode_chars == "+o") {
+                        // Only add the nickname to the operators list if not already present
+                        if (channel_operators.has_key (channel) && !channel_operators.get (channel).contains (target_nickname)) {
+                            channel_operators.get (channel).add (target_nickname);
+                        }
+                    } else if (mode_chars == "-o") {
+                        // Only remove the nickname from the operators list if present
+                        if (channel_operators.has_key (channel) && channel_operators.get (channel).contains (target_nickname)) {
+                            channel_operators.get (channel).remove (target_nickname);
+                        }
+                    }
+                    user_channel_mode_changed (channel, mode_chars, nickname, target_nickname);
+                }
+
                 break;
             case Iridium.Services.NumericCodes.RPL_ENDOFMOTD:
                 // Do nothing
@@ -554,6 +578,13 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         return channel_users.get (channel_name);
     }
 
+    public Gee.List<string> get_operators (string channel_name) {
+        if (!channel_operators.has_key (channel_name)) {
+            return new Gee.LinkedList<string> ();
+        }
+        return channel_operators.get (channel_name);
+    }
+
     public Gee.List<string> get_joined_channels () {
         return joined_channels;
     }
@@ -618,13 +649,19 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     }
 
     private void nicknames_received (string channel_name, string[] nicknames) {
-        // Initialize the buffer to an empty list
+        // Initialize the buffers to an empty list
         if (!nickname_buffer.has_key (channel_name) || nickname_buffer.get (channel_name) == null) {
             nickname_buffer.set (channel_name, new Gee.LinkedList<string> ());
+        }
+        if (!operators_buffer.has_key (channel_name) || operators_buffer.get (channel_name) == null) {
+            operators_buffer.set (channel_name, new Gee.LinkedList<string> ());
         }
         // Add each new nickname to the buffer
         foreach (string nickname in nicknames) {
             nickname_buffer.get (channel_name).add (nickname);
+            if (nickname.has_prefix ("@")) {
+                operators_buffer.get (channel_name).add (nickname);
+            }
         }
     }
 
@@ -632,12 +669,15 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         // Copy the buffered nicknames over to the master map of users by channel
         channel_users.unset (channel_name);
         channel_users.set (channel_name, nickname_buffer.get (channel_name));
+        channel_operators.unset (channel_name);
+        channel_operators.set (channel_name, operators_buffer.get (channel_name));
         //  foreach (var user in channel_users.get (channel_name)) {
         //      print (user + ", ");
         //  }
         //  print ("\n");
         // Clear the buffered nicknames
         nickname_buffer.unset (channel_name);
+        operators_buffer.unset (channel_name);
         // Send the signal
         channel_users_received (channel_name);
     }
@@ -725,5 +765,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     public signal void nickname_changed (string old_nickname, string new_nickname);
     public signal void user_changed_nickname (string old_nickname, string new_nickname);
     public signal void network_name_received (string network_name);
+    public signal void user_channel_mode_changed (string channel_name, string mode_chars, string nickname, string target_nickname);
 
 }

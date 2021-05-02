@@ -22,12 +22,14 @@
 public class Iridium.Widgets.UsersPopover.UserListBoxRow : Gtk.ListBoxRow {
 
     public string nickname { get; construct; }
+    public bool is_op { get; construct; }
 
     private Gtk.EventBox event_box;
 
-    public UserListBoxRow (string nickname) {
+    public UserListBoxRow (string nickname, bool is_op) {
         Object (
-            nickname: nickname
+            nickname: nickname,
+            is_op: is_op
         );
     }
 
@@ -43,10 +45,22 @@ public class Iridium.Widgets.UsersPopover.UserListBoxRow : Gtk.ListBoxRow {
         });
 
         var label = new Gtk.Label (nickname);
+        label.single_line_mode = true;
+        label.xalign = 0;
         label.margin_top = 4;
         label.margin_bottom = 4;
 
-        event_box.add (label);
+        var icon = new Gtk.Image ();
+        icon.icon_size = Gtk.IconSize.MENU;
+        if (is_op) {
+            icon = new Gtk.Image.from_icon_name ("user-available", Gtk.IconSize.MENU);
+            icon.tooltip_text = _("Operator");
+        }
+
+        Gtk.Box box = new Gtk.Box (Gtk.Orientation.HORIZONTAL, 0);
+        box.pack_start (icon, false, false, 8);
+        box.pack_start (label, true, true);
+        event_box.add (box);
         this.add (event_box);
     }
 
