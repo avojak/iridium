@@ -108,6 +108,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         Iridium.Application.connection_manager.user_changed_nickname.connect (on_user_changed_nickname);
         Iridium.Application.connection_manager.network_name_received.connect (on_network_name_received);
         Iridium.Application.connection_manager.network_name_received.connect (Iridium.Application.connection_repository.on_network_name_received);
+        Iridium.Application.connection_manager.user_channel_mode_changed.connect (on_user_channel_mode_changed);
 
         // Connect to the connection handler signal to make settings changes for new connections
         Iridium.Application.connection_manager.server_connection_successful.connect ((server_name, message) => {
@@ -1129,6 +1130,23 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 header_bar.update_title (network_name, null);
             }
             main_layout.update_network_name (server_name, network_name);
+            return false;
+        });
+    }
+
+    private void on_user_channel_mode_changed (string server_name, string channel_name, string mode_chars, string nickname, string target_nickname) {
+        update_channel_users_list (server_name, channel_name);
+        Idle.add (() => {
+            // Display a message in the channel chat view
+            if (mode_chars == "+o") {
+                var message = new Iridium.Services.Message ();
+                message.message = "%s gives channel operator status to %s".printf(nickname, target_nickname);
+                main_layout.display_server_message (server_name, channel_name, message);
+            } else if (mode_chars == "-o") {
+                var message = new Iridium.Services.Message ();
+                message.message = "%s revokes channel operator status from %s".printf(nickname, target_nickname);
+                main_layout.display_server_message (server_name, channel_name, message);
+            }
             return false;
         });
     }

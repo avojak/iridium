@@ -425,14 +425,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 server_message_received (display_message);
                 break;
             case Iridium.Services.MessageCommands.MODE:
-                // TODO: This may affect the nickname displayed in the channel
-                // user list
-
-                debug (message.prefix);
-                debug (message.params[0]);
-                debug (message.params[1]);
-                debug (message.params[2]);
-
                 // If the first param is our nickname, this is being set on the server rather than for a channel
                 if (message.params[0] == connection_details.nickname) {
                     char modifier = message.message[0];
@@ -441,9 +433,31 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                         display_message.message = "%s sets mode %c%c on %s".printf (message.prefix, modifier, message.message[i], message.params[0]);
                         server_message_received (display_message);
                     }
+                    break;
                 }
 
-                // TODO: Update operator list if needed
+                // params[0] = channel
+                // params[1] = mode chars
+                // params[2] = params
+                string channel = message.params[0];
+                string mode_chars = message.params[1];
+
+                if (message.params[2] != null) {
+                    string nickname = message.prefix.split ("!")[0];
+                    string target_nickname = message.params[2];
+                    if (mode_chars == "+o") {
+                        // Only add the nickname to the operators list if not already present
+                        if (channel_operators.has_key (channel) && !channel_operators.get (channel).contains (target_nickname)) {
+                            channel_operators.get (channel).add (target_nickname);
+                        }
+                    } else if (mode_chars == "-o") {
+                        // Only remove the nickname from the operators list if present
+                        if (channel_operators.has_key (channel) && channel_operators.get (channel).contains (target_nickname)) {
+                            channel_operators.get (channel).remove (target_nickname);
+                        }
+                    }
+                    user_channel_mode_changed (channel, mode_chars, nickname, target_nickname);
+                }
 
                 break;
             case Iridium.Services.NumericCodes.RPL_ENDOFMOTD:
@@ -751,5 +765,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     public signal void nickname_changed (string old_nickname, string new_nickname);
     public signal void user_changed_nickname (string old_nickname, string new_nickname);
     public signal void network_name_received (string network_name);
+    public signal void user_channel_mode_changed (string channel_name, string mode_chars, string nickname, string target_nickname);
 
 }

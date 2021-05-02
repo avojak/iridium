@@ -43,11 +43,9 @@ public class Iridium.Widgets.UsersPopover.UserListBoxRow : Gtk.ListBoxRow {
             event_box.set_state_flags (Gtk.StateFlags.NORMAL, true);
             return false;
         });
-
         
         var label = new Gtk.Label (nickname);
         label.single_line_mode = true;
-        //  label.justify = Gtk.Justification.LEFT;
         label.xalign = 0;
         label.margin_top = 4;
         label.margin_bottom = 4;
@@ -55,7 +53,7 @@ public class Iridium.Widgets.UsersPopover.UserListBoxRow : Gtk.ListBoxRow {
         var icon = new Gtk.Image ();
         icon.icon_size = Gtk.IconSize.MENU;
         if (is_op) {
-            icon = new Gtk.Image.from_icon_name ("mail-unread", Gtk.IconSize.MENU);
+            icon = new Gtk.Image.from_icon_name ("user-available", Gtk.IconSize.MENU);
             icon.tooltip_text = _("Operator");
         }
 
