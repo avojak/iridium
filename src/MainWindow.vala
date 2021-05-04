@@ -1030,24 +1030,28 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     private void on_user_joined_channel (string server_name, string channel_name, string nickname) {
-        Idle.add (() => {
-            // Display a message in the channel chat view
-            var message = new Iridium.Services.Message ();
-            message.message = nickname + _(" has joined");
-            main_layout.display_server_message (server_name, channel_name, message);
-            return false;
-        });
+        if (!Iridium.Application.settings.get_boolean ("suppress-join-part-messages")) {
+            Idle.add (() => {
+                // Display a message in the channel chat view
+                var message = new Iridium.Services.Message ();
+                message.message = nickname + _(" has joined");
+                main_layout.display_server_message (server_name, channel_name, message);
+                return false;
+            });
+        }
         update_channel_users_list (server_name, channel_name);
     }
 
     private void on_user_left_channel (string server_name, string channel_name, string nickname) {
-        Idle.add (() => {
-            // Display a message in the channel chat view
-            var message = new Iridium.Services.Message ();
-            message.message = nickname + _(" has left");
-            main_layout.display_server_message (server_name, channel_name, message);
-            return false;
-        });
+        if (!Iridium.Application.settings.get_boolean ("suppress-join-part-messages")) {
+            Idle.add (() => {
+                // Display a message in the channel chat view
+                var message = new Iridium.Services.Message ();
+                message.message = nickname + _(" has left");
+                main_layout.display_server_message (server_name, channel_name, message);
+                return false;
+            });
+        }
         update_channel_users_list (server_name, channel_name);
     }
 
