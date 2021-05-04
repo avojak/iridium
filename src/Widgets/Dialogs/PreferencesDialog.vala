@@ -99,6 +99,13 @@ public class Iridium.Widgets.PreferencesDialog : Gtk.Dialog {
             Iridium.Application.settings.set_string ("default-realname", default_realname_entry.text.chomp ().chug ());
         });
 
+        var suppress_join_part_label = new Gtk.Label (_("Suppress join/part messages:"));
+        suppress_join_part_label.halign = Gtk.Align.END;
+        var suppress_join_part_switch = new Gtk.Switch ();
+        suppress_join_part_switch.halign = Gtk.Align.START;
+        suppress_join_part_switch.valign = Gtk.Align.CENTER;
+        Iridium.Application.settings.bind ("suppress-join-part-messages", suppress_join_part_switch, "active", SettingsBindFlags.DEFAULT);
+
         var security_header_label = new Granite.HeaderLabel (_("Security and Privacy"));
 
         var cert_validation_policy_label = new Gtk.Label (_("Unacceptable SSL/TLS Certificates:"));
@@ -196,6 +203,7 @@ public class Iridium.Widgets.PreferencesDialog : Gtk.Dialog {
         security_posture_stack.show_all (); // Required in order to set the visible child from preferences
 
         var remember_connections_label = new Gtk.Label (_("Remember connections between sessions:"));
+        remember_connections_label.halign = Gtk.Align.END;
         var remember_connections_switch = new Gtk.Switch ();
         remember_connections_switch.halign = Gtk.Align.START;
         remember_connections_switch.valign = Gtk.Align.CENTER;
@@ -222,12 +230,14 @@ public class Iridium.Widgets.PreferencesDialog : Gtk.Dialog {
         form_grid.attach (default_nickname_entry, 1, 1, 1);
         form_grid.attach (default_realname_label, 0, 2, 1);
         form_grid.attach (default_realname_entry, 1, 2, 1);
-        form_grid.attach (security_header_label, 0, 3, 1);
-        form_grid.attach (cert_validation_policy_label, 0, 4, 1);
-        form_grid.attach (cert_validation_policy_combo, 1, 4, 1);
-        form_grid.attach (security_posture_stack, 0, 5, 2);
-        form_grid.attach (remember_connections_label, 0, 6, 1);
-        form_grid.attach (remember_connections_switch, 1, 6, 1);
+        form_grid.attach (suppress_join_part_label, 0, 3, 1);
+        form_grid.attach (suppress_join_part_switch, 1, 3, 1);
+        form_grid.attach (security_header_label, 0, 4, 1);
+        form_grid.attach (cert_validation_policy_label, 0, 5, 1);
+        form_grid.attach (cert_validation_policy_combo, 1, 5, 1);
+        form_grid.attach (security_posture_stack, 0, 6, 2);
+        form_grid.attach (remember_connections_label, 0, 7, 1);
+        form_grid.attach (remember_connections_switch, 1, 7, 1);
 
         body.add (header_grid);
         body.add (form_grid);

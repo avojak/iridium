@@ -31,6 +31,11 @@
       <summary>If server connections should be remembered between sessions</summary>
       <description>If server connections should be remembered between sessions</description>
     </key>
+    <key name="suppress-join-part-messages" type="b">
+      <default>false</default>
+      <summary>If channel join and part messages should be suppressed</summary>
+      <description>If channel join and part messages should be suppressed</description>
+    </key>
     <key name="pos-x" type="i">
 			<default>360</default>
 			<summary>The saved horizontal position of the window.</summary>
