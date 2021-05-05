@@ -19,7 +19,7 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
+public class Iridium.Widgets.ServerConnectionDialog : Gtk.Dialog {
 
     private Gtk.Entry server_entry;
     private Gtk.Entry nickname_entry;

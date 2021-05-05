@@ -19,7 +19,7 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Widgets.PreferencesDialog : Granite.Dialog {
+public class Iridium.Widgets.PreferencesDialog : Gtk.Dialog {
 
     private static Gtk.CssProvider provider;
 

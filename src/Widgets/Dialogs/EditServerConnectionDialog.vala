@@ -19,7 +19,7 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Widgets.EditServerConnectionDialog : Granite.Dialog {
+public class Iridium.Widgets.EditServerConnectionDialog : Gtk.Dialog {
 
     // TODO: Could refactor this with the shared elements of the ServerConnectionDialog
 
