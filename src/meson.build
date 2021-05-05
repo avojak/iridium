@@ -20,7 +20,6 @@ iridium_files = files(
     join_paths('Models', 'ConnectionState.vala'),
     join_paths('Models', 'Server.vala'),
     join_paths('Models', 'InvalidCertificatePolicy.vala'),
-    
     join_paths('Models', 'IRCURI.vala'),
     join_paths('Models', 'IRCURIModifier.vala'),
     join_paths('Models', 'Nickname.vala'),
@@ -52,6 +51,7 @@ iridium_files = files(
     join_paths('Views', 'PrivateMessageChatView.vala'),
     join_paths('Views', 'ServerChatView.vala'),
     join_paths('Views', 'Welcome.vala'),
+    join_paths('Widgets', 'FontUtils.vala'),
     join_paths('Widgets', 'HeaderBar.vala'),
     join_paths('Widgets', 'NetworkInfoBar.vala'),
     join_paths('Widgets', 'StatusBar.vala'),

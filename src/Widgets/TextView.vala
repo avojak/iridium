@@ -40,6 +40,23 @@ public class Iridium.Widgets.TextView : Gtk.SourceView {
         );
     }
 
+    construct {
+        Gtk.CssProvider font_css_provider = new Gtk.CssProvider ();
+        get_style_context ().add_provider (font_css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+        string font = Iridium.Application.settings.get_string ("font");
+        /* Convert font description to css equivalent and apply to the .view node */
+        var font_css = string.join (" ",
+            ".view {",
+            Iridium.Widgets.FontUtils.pango_font_description_to_css (Pango.FontDescription.from_string (font)),
+            "}"
+        );
+        try {
+            font_css_provider.load_from_data (font_css);
+        } catch (Error e) {
+            critical (e.message);
+        }
+    }
+
     public bool is_marker_onscreen () {
          if (buffer.get_mark ("last-read-message") == null) {
             return false;
