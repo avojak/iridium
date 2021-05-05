@@ -19,7 +19,7 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Widgets.NicknameEditDialog : Granite.Dialog {
+public class Iridium.Widgets.NicknameEditDialog : Gtk.Dialog {
 
     public unowned Iridium.MainWindow main_window { get; construct; }
     public string current_nickname { get; construct; }
