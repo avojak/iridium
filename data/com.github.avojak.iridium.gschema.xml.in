@@ -36,6 +36,11 @@
       <summary>If channel join and part messages should be suppressed</summary>
       <description>If channel join and part messages should be suppressed</description>
     </key>
+    <key name="font" type="s">
+      <default>'Monospace Regular 9'</default>
+      <summary>Preferred Font</summary>
+      <description>Set the preferred font.</description>
+    </key>
     <key name="pos-x" type="i">
 			<default>360</default>
 			<summary>The saved horizontal position of the window.</summary>
