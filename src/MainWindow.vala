@@ -109,6 +109,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         Iridium.Application.connection_manager.network_name_received.connect (on_network_name_received);
         Iridium.Application.connection_manager.network_name_received.connect (Iridium.Application.connection_repository.on_network_name_received);
         Iridium.Application.connection_manager.user_channel_mode_changed.connect (on_user_channel_mode_changed);
+        Iridium.Application.connection_manager.action_message_received.connect (on_action_message_received);
 
         // Connect to the connection handler signal to make settings changes for new connections
         Iridium.Application.connection_manager.server_connection_successful.connect ((server_name, message) => {
@@ -654,10 +655,10 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         var message_text = "PRIVMSG " + channel_name + " :" + text;
         Iridium.Application.connection_manager.send_user_message (server_name, message_text);
 
-         // Display the message in the chat view
-         var message = new Iridium.Services.Message (message_text);
-         message.nickname = Iridium.Application.connection_manager.get_nickname (server_name);
-         main_layout.display_self_channel_message (server_name, channel_name, message);
+        // Display the message in the chat view
+        var message = new Iridium.Services.Message (message_text);
+        message.nickname = Iridium.Application.connection_manager.get_nickname (server_name);
+        main_layout.display_self_channel_message (server_name, channel_name, message);
     }
 
     private void on_private_message_to_send (string server_name, string nickname, string text) {
@@ -695,9 +696,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     private void send_server_command (string server_name, string text, string? referring_channel) {
-        // TODO: Check for actions (eg. /me, etc.)
         string[] tokens = text.split (" ");
-        if (tokens.length > 0 && (tokens[0] == "msg" || tokens[0] == "MSG")) {
+        if (tokens.length > 0 && tokens[0].down () == "msg") {
             if (tokens.length == 1) {
                 var message = new Iridium.Services.Message ();
                 message.message = _("No recipient nickname specified (Usage: /msg <nickname> <message>)");
@@ -712,8 +712,30 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 send_privmsg (server_name, recipient, message);
             }
             return;
+        } else if (tokens.length > 0 && tokens[0].down () == "me" && referring_channel != null) {
+            if (tokens.length == 1) {
+                var message = new Iridium.Services.Message ();
+                message.message = _("No action specified (Usage: /me <action>)");
+                main_layout.display_server_error_message (server_name, referring_channel, message);
+            } else {
+                // Send the message
+                string message_text = construct_action_message (referring_channel, text.substring (tokens[0].length).strip ());
+                Iridium.Application.connection_manager.send_user_message (server_name, message_text);
+
+                // Display the message in the chat view
+                string nickname = Iridium.Application.connection_manager.get_nickname (server_name);
+                var message = new Iridium.Services.Message ();
+                message.message = nickname + " " + text.substring(tokens[0].length).strip();
+                message.nickname = nickname;
+                main_layout.display_server_message (server_name, referring_channel, message);
+            }
+            return;
         }
         Iridium.Application.connection_manager.send_user_message (server_name, text);
+    }
+
+    private string construct_action_message (string recipient, string action) {
+        return "PRIVMSG %s :%sACTION %s%s".printf (recipient, "\x01", action, "\x01");
     }
 
     public void toggle_sidebar () {
@@ -1151,6 +1173,18 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 message.message = "%s revokes channel operator status from %s".printf (nickname, target_nickname);
                 main_layout.display_server_message (server_name, channel_name, message);
             }
+            return false;
+        });
+    }
+
+    private void on_action_message_received (string server_name, string channel_name, string nickname, string self_nickname, string action) {
+        Idle.add (() => {
+            main_layout.add_private_message_chat_view (server_name, nickname, self_nickname);
+            main_layout.enable_chat_view (server_name, nickname);
+
+            var message = new Iridium.Services.Message ();
+            message.message = "%s %s".printf (nickname, action);
+            main_layout.display_server_message (server_name, channel_name, message);
             return false;
         });
     }

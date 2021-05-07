@@ -69,6 +69,7 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
         server_connection.user_changed_nickname.connect (on_user_changed_nickname);
         server_connection.network_name_received.connect (on_network_name_received);
         server_connection.user_channel_mode_changed.connect (on_user_channel_mode_changed);
+        server_connection.action_message_received.connect (on_action_message_received);
 
         //  server_connection.open_successful.connect (() => {
         open_connections.set (server, server_connection);
@@ -342,6 +343,10 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
         user_channel_mode_changed (source.connection_details.server, channel_name, mode_chars, nickname, target_nickname);
     }
 
+    private void on_action_message_received (Iridium.Services.ServerConnection source, string channel_name, string nickname, string self_nickname, string action) {
+        action_message_received (source.connection_details.server, channel_name, nickname, self_nickname, action);
+    }
+
     //
     // Signals
     //
@@ -371,5 +376,6 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
     public signal void user_changed_nickname (string server_name, string old_nickname, string new_nickname);
     public signal void network_name_received (string server_name, string network_name);
     public signal void user_channel_mode_changed (string server_name, string channel_name, string mode_chars, string nickname, string target_nickname);
+    public signal void action_message_received (string server_name, string channel_name, string nickname, string self_nickname, string action);
 
 }

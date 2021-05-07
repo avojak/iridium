@@ -376,8 +376,20 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 break;
             case Iridium.Services.MessageCommands.PRIVMSG:
                 // CTCP VERSION
-                if (Iridium.Services.MessageCommands.VERSION == message.message) {
+                if ("\x01%s\x01".printf (Iridium.Services.MessageCommands.VERSION) == message.message) {
                     ctcp_version_query_received (message);
+                    break;
+                }
+                // Action message
+                debug (message.nickname);
+                debug (message.params[0]);
+                debug (message.message);
+                if (message.message[0] == '\x01' && message.message[message.message.length - 1] == '\x01' && message.message.substring (1).has_prefix ("ACTION")) {
+                    debug (message.nickname);
+                    debug (message.message);
+                    // If the first param is our nickname, it's an action in a private message not a channel
+                    string channel = message.params[0] == connection_details.nickname ? message.nickname : message.params[0];
+                    action_message_received (channel, message.nickname, connection_details.nickname, message.message.substring (8, message.message.length - 9));
                     break;
                 }
                 // If the first param is our nickname, it's a PM. Otherwise, it's
@@ -768,5 +780,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     public signal void user_changed_nickname (string old_nickname, string new_nickname);
     public signal void network_name_received (string network_name);
     public signal void user_channel_mode_changed (string channel_name, string mode_chars, string nickname, string target_nickname);
+    public signal void action_message_received (string channel_name, string nickname, string self_nickname, string action);
 
 }
