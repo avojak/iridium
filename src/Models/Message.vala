@@ -75,7 +75,8 @@ public class Iridium.Services.Message : GLib.Object {
                 message = match_info.fetch_named ("trail");
                 if (message != null) {
                     message.replace ("\t", "");
-                    strip_non_printable_chars ();
+                    // Need to reference these characters (e.g. VERSION, ACTION messages)
+                    //  strip_non_printable_chars ();
                 }
                 if ((prefix != null) && (command in USER_COMMANDS)) {  // vala-lint=naming-convention
                     nickname = prefix.split ("!")[0];
