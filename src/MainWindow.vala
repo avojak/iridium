@@ -725,7 +725,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 // Display the message in the chat view
                 string nickname = Iridium.Application.connection_manager.get_nickname (server_name);
                 var message = new Iridium.Services.Message ();
-                message.message = nickname + " " + text.substring(tokens[0].length).strip();
+                message.message = nickname + " " + text.substring (tokens[0].length).strip ();
                 message.nickname = nickname;
                 main_layout.display_server_message (server_name, referring_channel, message);
             }
