@@ -381,12 +381,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                     break;
                 }
                 // Action message
-                debug (message.nickname);
-                debug (message.params[0]);
-                debug (message.message);
                 if (message.message[0] == '\x01' && message.message[message.message.length - 1] == '\x01' && message.message.substring (1).has_prefix ("ACTION")) {
-                    debug (message.nickname);
-                    debug (message.message);
                     // If the first param is our nickname, it's an action in a private message not a channel
                     string channel = message.params[0] == connection_details.nickname ? message.nickname : message.params[0];
                     action_message_received (channel, message.nickname, connection_details.nickname, message.message.substring (8, message.message.length - 9));
