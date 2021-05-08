@@ -33,6 +33,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     //  private Iridium.Widgets.ManageConnectionsDialog? manage_connections_dialog = null;
     private Iridium.Widgets.PreferencesDialog? preferences_dialog = null;
     private Iridium.Widgets.NicknameEditDialog? nickname_edit_dialog = null;
+    private Iridium.Widgets.BrowseChannelsDialog? browse_channels_dialog = null;
 
     private Iridium.Widgets.HeaderBar header_bar;
     private Iridium.Layouts.MainLayout main_layout;
@@ -110,6 +111,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         Iridium.Application.connection_manager.network_name_received.connect (Iridium.Application.connection_repository.on_network_name_received);
         Iridium.Application.connection_manager.user_channel_mode_changed.connect (on_user_channel_mode_changed);
         Iridium.Application.connection_manager.action_message_received.connect (on_action_message_received);
+        Iridium.Application.connection_manager.channel_list_received.connect (on_channel_list_received);
 
         // Connect to the connection handler signal to make settings changes for new connections
         Iridium.Application.connection_manager.server_connection_successful.connect ((server_name, message) => {
@@ -529,6 +531,12 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             channel_join_dialog.join_button_clicked.connect ((server_name, channel_name) => {
                 join_channel (server_name, channel_name);
             });
+            channel_join_dialog.browse_button_clicked.connect ((server_name) => {
+                channel_join_dialog.destroy.connect (() => {
+                    show_browse_channels_dialog (server_name);
+                });
+                channel_join_dialog.dismiss ();
+            });
             channel_join_dialog.destroy.connect (() => {
                 channel_join_dialog = null;
             });
@@ -589,21 +597,39 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         nickname_edit_dialog.present ();
     }
 
+    private void show_browse_channels_dialog (string server_name) {
+        if (browse_channels_dialog == null) {
+            browse_channels_dialog = new Iridium.Widgets.BrowseChannelsDialog (this, server_name);
+            browse_channels_dialog.show_all ();
+            browse_channels_dialog.join_button_clicked.connect ((channel_name) => {
+                join_channel (server_name, channel_name);
+            });
+            browse_channels_dialog.destroy.connect (() => {
+                browse_channels_dialog = null;
+            });
+        }
+        browse_channels_dialog.present ();
+    }
+
     private void join_channel (string server_name, string channel_name) {
         // Check if we're already in this channel
         if (Iridium.Application.connection_manager.get_channels (server_name).index_of (channel_name) != -1) {
-            channel_join_dialog.display_error (_("You've already joined this channel"));
+            if (channel_join_dialog != null) {
+                channel_join_dialog.display_error (_("You've already joined this channel"));
+            } else if (browse_channels_dialog != null) {
+                browse_channels_dialog.display_error (_("You've already joined this channel"));
+            }
             return;
         }
 
         // Validate channel name
         // TODO: Look into what other restrictions exist (https://tools.ietf.org/html/rfc1459#section-1.3)
-        if (!channel_name.has_prefix ("#") && !channel_name.has_prefix ("&")) {
+        if (!channel_name.has_prefix ("#") && !channel_name.has_prefix ("&") && channel_join_dialog != null) {
             // TODO: Eventually validate that the dialog is non-null, and handle accordingly
-            channel_join_dialog.display_error (_("Channel must begin with '#' or '&'"));
+            channel_join_dialog.display_error (_("Channel must begin with '#' or '&'"));  
             return;
         }
-        if (channel_name.length < 2) {
+        if (channel_name.length < 2 && channel_join_dialog != null) {
             channel_join_dialog.display_error (_("Enter a channel name"));
             return;
         }
@@ -1029,7 +1055,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 }
                 main_layout.show_chat_view (server_name, channel_name);
             }
-
+            if (browse_channels_dialog != null && browse_channels_dialog.get_server () == server_name) {
+                browse_channels_dialog.dismiss ();
+            }
             set_channel_users_button_enabled (server_name, channel_name, true);
             return false;
         });
@@ -1187,6 +1215,13 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             main_layout.display_server_message (server_name, channel_name, message);
             return false;
         });
+    }
+
+    private void on_channel_list_received (string server_name, Gee.List<Iridium.Models.ChannelListEntry> channel_list) {
+        // TODO: Also check which channel was clicked in the dialog
+        if (browse_channels_dialog != null && browse_channels_dialog.get_server () == server_name) {
+            browse_channels_dialog.set_channels (channel_list);
+        }
     }
 
     //

@@ -70,6 +70,7 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
         server_connection.network_name_received.connect (on_network_name_received);
         server_connection.user_channel_mode_changed.connect (on_user_channel_mode_changed);
         server_connection.action_message_received.connect (on_action_message_received);
+        server_connection.channel_list_received.connect (on_channel_list_received);
 
         //  server_connection.open_successful.connect (() => {
         open_connections.set (server, server_connection);
@@ -347,6 +348,10 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
         action_message_received (source.connection_details.server, channel_name, nickname, self_nickname, action);
     }
 
+    private void on_channel_list_received (Iridium.Services.ServerConnection source, Gee.List<Iridium.Models.ChannelListEntry> channel_list) {
+        channel_list_received (source.connection_details.server, channel_list);
+    }
+
     //
     // Signals
     //
@@ -377,5 +382,6 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
     public signal void network_name_received (string server_name, string network_name);
     public signal void user_channel_mode_changed (string server_name, string channel_name, string mode_chars, string nickname, string target_nickname);
     public signal void action_message_received (string server_name, string channel_name, string nickname, string self_nickname, string action);
+    public signal void channel_list_received (string server_name, Gee.List<Iridium.Models.ChannelListEntry> channel_list);
 
 }

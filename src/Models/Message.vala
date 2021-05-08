@@ -89,14 +89,14 @@ public class Iridium.Services.Message : GLib.Object {
         }
     }
 
-    private void strip_non_printable_chars () {
-        // TODO: Probably a better way to do this
-        if (NON_PRINT_REGEX.match (message[0].to_string ())) {
-            message = message.substring (1);
-        }
-        if (NON_PRINT_REGEX.match (message[message.length - 1].to_string ())) {
-            message = message.substring (0, message.length - 1);
-        }
-    }
+    //  private void strip_non_printable_chars () {
+    //      // TODO: Probably a better way to do this
+    //      if (NON_PRINT_REGEX.match (message[0].to_string ())) {
+    //          message = message.substring (1);
+    //      }
+    //      if (NON_PRINT_REGEX.match (message[message.length - 1].to_string ())) {
+    //          message = message.substring (0, message.length - 1);
+    //      }
+    //  }
 
 }
