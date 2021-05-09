@@ -163,7 +163,7 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
         return connection.server_supports.network;
     }
 
-    public Gee.List<string> get_channels (string server_name) {
+    public Gee.List<string> get_joined_channels (string server_name) {
         var connection = open_connections.get (server_name);
         if (connection == null) {
             return new Gee.ArrayList<string> ();
@@ -238,6 +238,14 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
             return;
         }
         connection.set_nickname (new_nickname);
+    }
+
+    public void request_channel_list (string server_name) {
+        var connection = open_connections.get (server_name);
+        if (connection == null) {
+            return;
+        }
+        connection.request_channel_list ();
     }
 
     //

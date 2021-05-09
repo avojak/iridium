@@ -486,7 +486,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                     debug ("Server connection details changed, attempting to reconnect");
                     // Grab the currently joined channels so that they can be re-joined after re-connecting
                     Gee.List<string> channels_to_rejoin = new Gee.ArrayList<string> ();
-                    channels_to_rejoin.add_all (Iridium.Application.connection_manager.get_channels (existing_connection_details.server));
+                    channels_to_rejoin.add_all (Iridium.Application.connection_manager.get_joined_channels (existing_connection_details.server));
                     // Disconnect and update the settings
                     Iridium.Application.connection_manager.disconnect_from_server (existing_connection_details.server);
                     Iridium.Application.connection_repository.update_server_connection_details (existing_connection_details.server, updated_connection_details);
@@ -604,16 +604,35 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             browse_channels_dialog.join_button_clicked.connect ((channel_name) => {
                 join_channel (server_name, channel_name);
             });
+            browse_channels_dialog.response.connect ((response_id) => {
+                // If the user hits cancel, show the join channel dialog again
+                if (response_id == 0) {
+                    Idle.add (() => {
+                        show_channel_join_dialog (server_name);
+                        return false;
+                    });
+                }
+            });
             browse_channels_dialog.destroy.connect (() => {
                 browse_channels_dialog = null;
             });
         }
         browse_channels_dialog.present ();
+        //  Gee.List<Iridium.Models.ChannelListEntry> channels = Iridium.Application.connection_manager.request_channel_list (server_name);
+        //  if (channels.is_empty ()) {
+        browse_channels_dialog.show_loading ();
+        Iridium.Application.connection_manager.request_channel_list (server_name);
+        //  } else {
+            //  Idle.add (() => {
+                //  browse_channels_dialog.set_channels (channels);
+                //  return false;
+            //  });
+        //  }
     }
 
     private void join_channel (string server_name, string channel_name) {
         // Check if we're already in this channel
-        if (Iridium.Application.connection_manager.get_channels (server_name).index_of (channel_name) != -1) {
+        if (Iridium.Application.connection_manager.get_joined_channels (server_name).index_of (channel_name) != -1) {
             if (channel_join_dialog != null) {
                 channel_join_dialog.display_error (_("You've already joined this channel"));
             } else if (browse_channels_dialog != null) {
@@ -1160,7 +1179,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         main_layout.update_nickname (server_name, old_nickname, new_nickname);
 
         // Update channel user lists
-        foreach (var channel_name in Iridium.Application.connection_manager.get_channels (server_name)) {
+        foreach (var channel_name in Iridium.Application.connection_manager.get_joined_channels (server_name)) {
             update_channel_users_list (server_name, channel_name);
         }
     }
@@ -1173,7 +1192,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         }
 
         // Update channel user lists
-        foreach (var channel_name in Iridium.Application.connection_manager.get_channels (server_name)) {
+        foreach (var channel_name in Iridium.Application.connection_manager.get_joined_channels (server_name)) {
             update_channel_users_list (server_name, channel_name);
         }
     }

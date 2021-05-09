@@ -483,11 +483,16 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 channel_buffer.clear ();
                 break;
             case Iridium.Services.NumericCodes.RPL_LIST:
-                //  debug (message.params[0] + " " + message.params[1] + ": " + message.message);
+                if (message.params[1] == null) {
+                    break;
+                }
+                var channel_name = message.params[1];
+                var num_visible_users = message.params[2] == null ? "0" : message.params[2];
+                var topic = message.message == null ? "" : message.message.strip ();
                 Iridium.Models.ChannelListEntry entry = new Iridium.Models.ChannelListEntry ();
-                entry.channel_name = message.params[0];
-                entry.num_visible_users = int.parse (message.params[1]);
-                entry.topic = message.message != null ? message.message.strip () : "";
+                entry.channel_name = channel_name;
+                entry.num_visible_users = num_visible_users;
+                entry.topic = topic;
                 channel_buffer.add (entry);
                 break;
             case Iridium.Services.NumericCodes.RPL_LISTEND:
@@ -773,6 +778,8 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     }
 
     public void request_channel_list () {
+        // TODO: Add a parameter to force? This should be cached ideally, it's a large list that we don't want to re-fetch
+        // ever time the dialog is opened.
         send_output (Iridium.Services.MessageCommands.LIST);
     }
 

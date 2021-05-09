@@ -24,8 +24,16 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
     public unowned Iridium.MainWindow main_window { get; construct; }
     public string server_name { get; construct; }
 
+    private Gtk.ScrolledWindow scrolled_window;
+    private Gtk.ListStore list_store;
     private Gtk.Spinner spinner;
     private Gtk.Label status_label;
+
+    enum Column {
+		NAME,
+		USERS,
+		TOPIC
+	}
 
     public BrowseChannelsDialog (Iridium.MainWindow main_window, string server_name) {
         Object (
@@ -63,43 +71,28 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
 
         body.add (header_grid);
 
-        // Create the form
-        var form_grid = new Gtk.Grid ();
-        form_grid.margin = 30;
-        form_grid.row_spacing = 12;
-        form_grid.column_spacing = 20;
+        scrolled_window = new Gtk.ScrolledWindow (null, null);
+        scrolled_window.margin = 30;
+        scrolled_window.max_content_height = 250;
+        scrolled_window.max_content_width = 250;
+        scrolled_window.height_request = 250;
+        scrolled_window.width_request = 500;
+        scrolled_window.propagate_natural_height = true;
 
-        //  var list_store = new Gtk.ListStore (1, typeof (string));
-        //  var active_index = -1;
-        //  for (int i = 0; i < servers.length; i++) {
-        //      Gtk.TreeIter iter;
-        //      list_store.append (out iter);
-        //      var display_string = network_names[i] == null ? servers[i] : network_names[i];
-        //      list_store.set (iter, 0, display_string);
-        //      if (current_server != null && servers[i] == current_server) {
-        //          active_index = i;
-        //      }
-        //  }
-        //  server_combo = new Gtk.ComboBox.with_model (list_store);
-        //  var server_cell = new Gtk.CellRendererText ();
-        //  server_combo.pack_start (server_cell, false);
-        //  server_combo.set_attributes (server_cell, "text", 0);
-        //  server_combo.set_active (active_index);
+        Gtk.TreeView tree = new Gtk.TreeView ();
+        tree.expand = true;
+        tree.headers_visible = true;
+        tree.enable_tree_lines = true;
+        //  tree.vscroll_policy = Gtk.ScrollablePolicy.MINIMUM; // NATURAL
+        list_store = new Gtk.ListStore (3, typeof (string), typeof (string), typeof (string));
+        tree.set_model (list_store);
 
-        //  var channel_label = new Gtk.Label (_("Channel:"));
-        //  channel_label.halign = Gtk.Align.END;
+        tree.insert_column_with_attributes (-1, _("Name"), new Gtk.CellRendererText (), "text", Column.NAME);
+        tree.insert_column_with_attributes (-1, _("Users"), new Gtk.CellRendererText (), "text", Column.USERS);
+        tree.insert_column_with_attributes (-1, _("Topic"), new Gtk.CellRendererText (), "text", Column.TOPIC);
 
-        //  channel_entry = new Gtk.Entry ();
-        //  channel_entry.hexpand = true;
-        //  /* channel_entry.placeholder_text = "#"; */
-        //  channel_entry.text = "#";
-        //  channel_entry.sensitive = server_combo.get_active () != -1;
-
-        //  form_grid.attach (server_combo, 0, 0, 2, 1);
-        //  form_grid.attach (channel_label, 0, 1, 1, 1);
-        //  form_grid.attach (channel_entry, 1, 1, 1, 1);
-
-        body.add (form_grid);
+        scrolled_window.add (tree);
+        body.add (scrolled_window);
 
         spinner = new Gtk.Spinner ();
 
@@ -147,7 +140,20 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
     }
 
     public void set_channels (Gee.List<Iridium.Models.ChannelListEntry> channels) {
-
+        list_store.clear ();
+        Gtk.TreeIter iter;
+        foreach (var entry in channels) {
+            if (entry.channel_name == null || entry.num_visible_users == null || entry.topic == null) {
+                continue;
+            }
+            list_store.append (out iter);
+			list_store.set (iter, Column.NAME, entry.channel_name,
+                                 Column.USERS, entry.num_visible_users,
+                                 Column.TOPIC, entry.topic);
+        }
+        scrolled_window.check_resize ();
+        spinner.stop ();
+        status_label.label = "%s channels found".printf (channels.size.to_string ());
     }
 
     public void dismiss () {
@@ -159,6 +165,11 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
         // TODO: We can make the error messaging better
         spinner.stop ();
         status_label.label = message;
+    }
+
+    public void show_loading () {
+        spinner.start ();
+        status_label.label = _("Retrieving channels, this may take a minute…");
     }
 
     public signal void join_button_clicked (string channel);

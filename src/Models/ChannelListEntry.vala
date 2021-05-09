@@ -22,7 +22,7 @@
 public class Iridium.Models.ChannelListEntry : GLib.Object {
 
     public string channel_name { get; set; }
-    public int num_visible_users { get; set; }
+    public string num_visible_users { get; set; }
     public string topic { get; set; }
 
 }
