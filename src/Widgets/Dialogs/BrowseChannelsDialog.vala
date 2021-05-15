@@ -24,11 +24,12 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
     public unowned Iridium.MainWindow main_window { get; construct; }
     public string server_name { get; construct; }
 
-    private Gtk.ScrolledWindow scrolled_window;
     private Gtk.TreeView tree_view;
-    //  private Gtk.ListStore list_store;
+    private Gtk.ListStore list_store;
+    private Gtk.TreeModelFilter filter;
     private Gtk.Spinner spinner;
     private Gtk.Label status_label;
+    private Gtk.Entry search_entry;
 
     enum Column {
 		NAME,
@@ -72,8 +73,37 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
 
         body.add (header_grid);
 
-        scrolled_window = new Gtk.ScrolledWindow (null, null);
-        scrolled_window.margin = 30;
+        var main_grid = new Gtk.Grid ();
+        main_grid.margin = 30;
+        main_grid.row_spacing = 12;
+        main_grid.column_spacing = 10;
+
+        var search_label = new Gtk.Label (_("Search:"));
+        search_label.halign = Gtk.Align.START;
+
+        search_entry = new Gtk.Entry ();
+        search_entry.sensitive = false;
+        search_entry.hexpand = true;
+        search_entry.secondary_icon_tooltip_text = _("Clear");
+        //  search_entry.activate.connect (() => {
+        //      message_to_send (search_entry.get_text ());
+        //      search_entry.set_text ("");
+        //  });
+        search_entry.changed.connect (filter.refilter);
+        search_entry.changed.connect (() => {
+            if (search_entry.text != "") {
+                search_entry.secondary_icon_name = "edit-clear-symbolic";
+            } else {
+                search_entry.secondary_icon_name = null;
+            }
+        });
+        search_entry.icon_release.connect ((icon_pos, event) => {
+            if (icon_pos == Gtk.EntryIconPosition.SECONDARY) {
+                search_entry.set_text ("");
+            }
+        });
+
+        Gtk.ScrolledWindow scrolled_window = new Gtk.ScrolledWindow (null, null);
         scrolled_window.max_content_height = 250;
         scrolled_window.max_content_width = 250;
         scrolled_window.height_request = 250;
@@ -85,16 +115,30 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
         tree_view.headers_visible = true;
         tree_view.enable_tree_lines = true;
         tree_view.fixed_height_mode = true;
-        //  tree_view.vscroll_policy = Gtk.ScrollablePolicy.MINIMUM; // NATURAL
-        //  list_store = new Gtk.ListStore (3, typeof (string), typeof (string), typeof (string));
-        //  tree_view.set_model (list_store);
 
-        tree_view.insert_column_with_attributes (-1, _("Name"), new Gtk.CellRendererText (), "text", Column.NAME);
+        list_store = new Gtk.ListStore (3, typeof (string), typeof (string), typeof (string));
+        filter = new Gtk.TreeModelFilter (list_store, null);
+        filter.set_visible_func ((Gtk.TreeModelFilterVisibleFunc) filter_func);
+
+        Gtk.CellRendererText name_column_renderer = new Gtk.CellRendererText ();
+        name_column_renderer.ellipsize = Pango.EllipsizeMode.END;
+
+        tree_view.insert_column_with_attributes (-1, _("Name"), name_column_renderer, "text", Column.NAME);
         tree_view.insert_column_with_attributes (-1, _("Users"), new Gtk.CellRendererText (), "text", Column.USERS);
         tree_view.insert_column_with_attributes (-1, _("Topic"), new Gtk.CellRendererText (), "text", Column.TOPIC);
 
+        foreach (var column in tree_view.get_columns ()) {
+            column.resizable = true;
+        }
+        tree_view.get_column (Column.NAME).min_width = 150;
+
         scrolled_window.add (tree_view);
-        body.add (scrolled_window);
+
+        main_grid.attach (search_label, 0, 0, 1, 1);
+        main_grid.attach (search_entry, 1, 0, 1, 1);
+        main_grid.attach (scrolled_window, 0, 1, 2, 1);
+
+        body.add (main_grid);
 
         spinner = new Gtk.Spinner ();
 
@@ -137,39 +181,63 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
         add_action_widget (join_button, 1);
     }
 
-    //  private Gtk.ListStore create_list_store () {
-    //      return new Gtk.ListStore (3, typeof (string), typeof (string), typeof (string));
-    //  }
-
     public string get_server () {
         return server_name;
     }
 
     public void set_channels (Gee.List<Iridium.Models.ChannelListEntry> channels) {
-        debug ("Setting %d channels...", channels.size);
+        // For performance reasons, unset the data model before populating it, then re-add to the tree view once fully populated
         tree_view.set_model (null);
-        //  list_store.clear ();
-        Gtk.ListStore list_store = new Gtk.ListStore (3, typeof (string), typeof (string), typeof (string));
+        search_entry.sensitive = false;
+        list_store.clear ();
         foreach (var entry in channels) {
-            if (entry == null || entry.channel_name == null || entry.num_visible_users == null || entry.topic == null) {
-                continue;
-            }
+            //  if (entry == null || entry.channel_name == null || entry.num_visible_users == null || entry.topic == null) {
+            //      continue;
+            //  }
             Gtk.TreeIter iter;
             list_store.append (out iter);
 			list_store.set (iter, Column.NAME, entry.channel_name,
                                  Column.USERS, entry.num_visible_users,
                                  Column.TOPIC, entry.topic);
         }
-        debug ("Added entries to the list store");
-        Gtk.TreeModelFilter filter = new Gtk.TreeModelFilter (list_store, null);
-        filter.set_visible_func ((model, iter) => {
-            // TODO
-            return true;
-        });
+        
+        //  Gtk.TreeModelFilterVisibleFunc tree_view_filter_func = filter_func;
         tree_view.set_model (filter);
-        //  scrolled_window.check_resize ();
         spinner.stop ();
         status_label.label = "%s channels found".printf (channels.size.to_string ());
+        search_entry.sensitive = true;
+    }
+
+    private bool filter_func (Gtk.TreeModel model, Gtk.TreeIter iter) {
+        debug ("filter func");
+        if (search_entry == null) {
+            debug ("null entry");
+            return true;
+        }
+        string search_string = search_entry.get_text () == null ? "" : search_entry.get_text ().strip ().down ();
+        debug ("search string: %s", search_string);
+        if (search_string == "") {
+            return true;
+        }
+        string name = "";
+        string topic = "";
+        //  model.get (iter, Column.NAME, &name, -1);
+        //  model.get (iter, Column.TOPIC, &topic, -1);
+        if (name == null || topic == null) {
+            return true;
+        }
+        //  if (name == null) {
+        //      debug ("name is null");
+        //      return false;
+        //  }
+        //  if (topic == null) {
+        //      debug ("topic is null");
+        //      return false;
+        //  }
+        if (name.down ().contains (search_string) || topic.down ().contains (search_string)) {
+            return true;
+        }
+        return false;
     }
 
     public void dismiss () {
