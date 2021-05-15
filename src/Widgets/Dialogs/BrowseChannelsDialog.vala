@@ -25,7 +25,8 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
     public string server_name { get; construct; }
 
     private Gtk.ScrolledWindow scrolled_window;
-    private Gtk.ListStore list_store;
+    private Gtk.TreeView tree_view;
+    //  private Gtk.ListStore list_store;
     private Gtk.Spinner spinner;
     private Gtk.Label status_label;
 
@@ -79,19 +80,20 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
         scrolled_window.width_request = 500;
         scrolled_window.propagate_natural_height = true;
 
-        Gtk.TreeView tree = new Gtk.TreeView ();
-        tree.expand = true;
-        tree.headers_visible = true;
-        tree.enable_tree_lines = true;
-        //  tree.vscroll_policy = Gtk.ScrollablePolicy.MINIMUM; // NATURAL
-        list_store = new Gtk.ListStore (3, typeof (string), typeof (string), typeof (string));
-        tree.set_model (list_store);
+        tree_view = new Gtk.TreeView ();
+        tree_view.expand = true;
+        tree_view.headers_visible = true;
+        tree_view.enable_tree_lines = true;
+        tree_view.fixed_height_mode = true;
+        //  tree_view.vscroll_policy = Gtk.ScrollablePolicy.MINIMUM; // NATURAL
+        //  list_store = new Gtk.ListStore (3, typeof (string), typeof (string), typeof (string));
+        //  tree_view.set_model (list_store);
 
-        tree.insert_column_with_attributes (-1, _("Name"), new Gtk.CellRendererText (), "text", Column.NAME);
-        tree.insert_column_with_attributes (-1, _("Users"), new Gtk.CellRendererText (), "text", Column.USERS);
-        tree.insert_column_with_attributes (-1, _("Topic"), new Gtk.CellRendererText (), "text", Column.TOPIC);
+        tree_view.insert_column_with_attributes (-1, _("Name"), new Gtk.CellRendererText (), "text", Column.NAME);
+        tree_view.insert_column_with_attributes (-1, _("Users"), new Gtk.CellRendererText (), "text", Column.USERS);
+        tree_view.insert_column_with_attributes (-1, _("Topic"), new Gtk.CellRendererText (), "text", Column.TOPIC);
 
-        scrolled_window.add (tree);
+        scrolled_window.add (tree_view);
         body.add (scrolled_window);
 
         spinner = new Gtk.Spinner ();
@@ -135,23 +137,37 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
         add_action_widget (join_button, 1);
     }
 
+    //  private Gtk.ListStore create_list_store () {
+    //      return new Gtk.ListStore (3, typeof (string), typeof (string), typeof (string));
+    //  }
+
     public string get_server () {
         return server_name;
     }
 
     public void set_channels (Gee.List<Iridium.Models.ChannelListEntry> channels) {
-        list_store.clear ();
-        Gtk.TreeIter iter;
+        debug ("Setting %d channels...", channels.size);
+        tree_view.set_model (null);
+        //  list_store.clear ();
+        Gtk.ListStore list_store = new Gtk.ListStore (3, typeof (string), typeof (string), typeof (string));
         foreach (var entry in channels) {
-            if (entry.channel_name == null || entry.num_visible_users == null || entry.topic == null) {
+            if (entry == null || entry.channel_name == null || entry.num_visible_users == null || entry.topic == null) {
                 continue;
             }
+            Gtk.TreeIter iter;
             list_store.append (out iter);
 			list_store.set (iter, Column.NAME, entry.channel_name,
                                  Column.USERS, entry.num_visible_users,
                                  Column.TOPIC, entry.topic);
         }
-        scrolled_window.check_resize ();
+        debug ("Added entries to the list store");
+        Gtk.TreeModelFilter filter = new Gtk.TreeModelFilter (list_store, null);
+        filter.set_visible_func ((model, iter) => {
+            // TODO
+            return true;
+        });
+        tree_view.set_model (filter);
+        //  scrolled_window.check_resize ();
         spinner.stop ();
         status_label.label = "%s channels found".printf (channels.size.to_string ());
     }
