@@ -33,6 +33,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     //  private Iridium.Widgets.ManageConnectionsDialog? manage_connections_dialog = null;
     private Iridium.Widgets.PreferencesDialog? preferences_dialog = null;
     private Iridium.Widgets.NicknameEditDialog? nickname_edit_dialog = null;
+    private Iridium.Widgets.BrowseChannelsDialog? browse_channels_dialog = null;
 
     private Iridium.Widgets.HeaderBar header_bar;
     private Iridium.Layouts.MainLayout main_layout;
@@ -59,7 +60,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         main_layout = new Iridium.Layouts.MainLayout (this);
         add (main_layout);
 
-        resize (1000, 600);
+        move (Iridium.Application.settings.get_int ("pos-x"), Iridium.Application.settings.get_int ("pos-y"));
+        resize (Iridium.Application.settings.get_int ("window-width"), Iridium.Application.settings.get_int ("window-height"));
 
         // Connect to main layout signals
         main_layout.welcome_view_shown.connect (on_welcome_view_shown);
@@ -107,6 +109,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         Iridium.Application.connection_manager.user_changed_nickname.connect (on_user_changed_nickname);
         Iridium.Application.connection_manager.network_name_received.connect (on_network_name_received);
         Iridium.Application.connection_manager.network_name_received.connect (Iridium.Application.connection_repository.on_network_name_received);
+        Iridium.Application.connection_manager.user_channel_mode_changed.connect (on_user_channel_mode_changed);
+        Iridium.Application.connection_manager.action_message_received.connect (on_action_message_received);
+        Iridium.Application.connection_manager.channel_list_received.connect (on_channel_list_received);
 
         // Connect to the connection handler signal to make settings changes for new connections
         Iridium.Application.connection_manager.server_connection_successful.connect ((server_name, message) => {
@@ -142,6 +147,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             GLib.Process.exit (0);
         });
 
+        this.delete_event.connect (before_destroy);
+
         show_app ();
     }
 
@@ -149,6 +156,24 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         show_all ();
         show ();
         present ();
+    }
+
+    public bool before_destroy () {
+        update_position_settings ();
+        destroy ();
+        return true;
+    }
+
+    private void update_position_settings () {
+        int width, height, x, y;
+
+        get_size (out width, out height);
+        get_position (out x, out y);
+
+        Iridium.Application.settings.set_int ("pos-x", x);
+        Iridium.Application.settings.set_int ("pos-y", y);
+        Iridium.Application.settings.set_int ("window-width", width);
+        Iridium.Application.settings.set_int ("window-height", height);
     }
 
     private Iridium.Services.ServerConnectionDetails? get_connection_details_for_server (string server_name) {
@@ -161,7 +186,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     // TODO: Restore private messages from the side panel
-    public void initialize (Gee.List<Iridium.Services.Server> servers, Gee.List<Iridium.Services.Channel> channels, bool is_reconnecting) {
+    public void initialize_ui (Gee.List<Iridium.Services.Server> servers, Gee.List<Iridium.Services.Channel> channels, bool is_reconnecting) {
         // Initialize the UI with disabled rows and chat views for everything
         if (!is_reconnecting) {
             debug ("Initializing side panel and chat views…");
@@ -191,15 +216,16 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             }
         }
 
-        initialized (servers, channels, is_reconnecting);
+        ui_initialized (servers, channels, is_reconnecting);
     }
 
     public void open_connections (Gee.List<Iridium.Services.Server> servers, Gee.List<Iridium.Services.Channel> channels, bool is_reconnecting) {
-        main_layout.show_initialization_overlay ();
+        main_layout.show_connecting_overlay ();
 
         // Handle case were there's nothing to initialize!
         if (servers.size == 0) {
-            main_layout.hide_initialization_overlay ();
+            main_layout.hide_connecting_overlay ();
+            connections_opened ();
             return;
         }
 
@@ -223,7 +249,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
     private void do_open_connections (Gee.List<Iridium.Services.Server> servers, Gee.List<Iridium.Services.Channel> channels, bool is_reconnecting) {
         // Map the server names to their initialization status (success or fail)
-        Gee.Map<string, bool> initialization_status = new Gee.HashMap<string, bool> ();
+        Gee.Map<string, bool> connection_status = new Gee.HashMap<string, bool> ();
         var num_enabled_servers = 0;
         foreach (Iridium.Services.Server server in servers) {
             if (server.enabled) {
@@ -266,26 +292,111 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
 
             });
             server_connection.open_successful.connect (() => {
-                initialization_status.set (server_name, true);
-                if (initialization_status.size == num_enabled_servers) {
-                    main_layout.hide_initialization_overlay ();
+                connection_status.set (server_name, true);
+                if (connection_status.size == num_enabled_servers) {
+                    completed_opening_connections ();
                 }
             });
             server_connection.open_failed.connect (() => {
                 // TODO: Give some user feedback, maybe a toast? Don't want the UI to get too busy though
-                initialization_status.set (server_name, false);
-                if (initialization_status.size == num_enabled_servers) {
-                    debug ("Initialization complete");
-                    main_layout.hide_initialization_overlay ();
+                connection_status.set (server_name, false);
+                if (connection_status.size == num_enabled_servers) {
+                    completed_opening_connections ();
                 }
             });
         }
 
         // We've initialized the UI, but if there aren't any connections to wait on, we're done
         if (num_enabled_servers == 0) {
-            debug ("Initialization complete");
-            main_layout.hide_initialization_overlay ();
+            completed_opening_connections ();
             return;
+        }
+    }
+
+    private void completed_opening_connections () {
+        debug ("Done opening connections");
+        main_layout.hide_connecting_overlay ();
+        connections_opened ();
+    }
+
+    public void handle_uris (GLib.List<Iridium.Models.IRCURI> uris) {
+        int num_uris = (int) uris.length ();
+        if (num_uris > 0) {
+            main_layout.show_handle_uris_overlay ();
+        }
+        Gee.Map<Iridium.Models.IRCURI, bool> connection_status = new Gee.HashMap<Iridium.Models.IRCURI, bool> ();
+        foreach (var uri in uris) {
+            debug ("Handling uri: %s", uri.uri_string);
+            debug ("Target user: %s", uri.get_target_user ());
+            debug ("Target channel: %s", uri.get_target_channel ());
+            debug ("Network: %s", uri.get_network ());
+            debug ("Server: %s", uri.get_server ());
+            debug ("Connection port: %s", uri.get_connection_port ().to_string ());
+
+            if (uri.get_network () != null) {
+                // TODO
+                warning ("TODO: Support network names");
+                connection_status.set (uri, false);
+                if (connection_status.size == num_uris) {
+                    main_layout.hide_handle_uris_overlay ();
+                }
+                continue;
+            }
+
+            var connection_details = Iridium.Services.ServerConnectionManager.create_connection_details (uri);
+
+            // Make sure we don't already have a connection!
+            if (Iridium.Application.connection_manager.has_connection (uri.get_server ())) {
+                connection_status.set (uri, false);
+                if (connection_status.size == num_uris) {
+                    main_layout.hide_handle_uris_overlay ();
+                }
+                // Even though the server connection is open, check if there's a channel to join
+                if (uri.get_target_channel () != null) {
+                    main_layout.add_channel_chat_view (connection_details.server, uri.get_target_channel (), connection_details.nickname);
+                    Iridium.Application.connection_manager.join_channel (connection_details.server, uri.get_target_channel ());
+                    main_layout.updating_channel (connection_details.server, uri.get_target_channel ());
+                }
+                continue;
+            }
+
+            // If we have connection details in the repository, use them instead (this allows us to use saved auth tokens, etc.)
+            var stored_server = Iridium.Application.connection_repository.get_server (uri.get_server ());
+            if (stored_server != null) {
+                connection_details = stored_server.connection_details;
+            }
+
+            Idle.add (() => {
+                // Update the UI
+                main_layout.add_server_chat_view (connection_details.server, connection_details.nickname, uri.get_network () != null ? uri.get_network () : null);
+                if (uri.get_target_channel () != null) {
+                    main_layout.add_channel_chat_view (connection_details.server, uri.get_target_channel (), connection_details.nickname);
+                }
+                main_layout.updating_server (connection_details.server);
+
+                // Attempt to open connections (Do this here so that the visual status in the side panel is accurate - otherwise it keeps showing the connecting status)
+                var server_connection = Iridium.Application.connection_manager.connect_to_server (connection_details);
+                server_connection.open_successful.connect (() => {
+                    connection_status.set (uri, true);
+                    if (connection_status.size == num_uris) {
+                        main_layout.hide_handle_uris_overlay ();
+                    }
+                    // Join the target channel if present
+                    if (uri.get_target_channel () != null) {
+                        Iridium.Application.connection_manager.join_channel (connection_details.server, uri.get_target_channel ());
+                        main_layout.updating_channel (connection_details.server, uri.get_target_channel ());
+                    }
+                });
+                server_connection.open_failed.connect (() => {
+                    connection_status.set (uri, false);
+                    if (connection_status.size == num_uris) {
+                        main_layout.hide_handle_uris_overlay ();
+                    }
+                });
+
+                return false;
+            });
+
         }
     }
 
@@ -375,7 +486,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                     debug ("Server connection details changed, attempting to reconnect");
                     // Grab the currently joined channels so that they can be re-joined after re-connecting
                     Gee.List<string> channels_to_rejoin = new Gee.ArrayList<string> ();
-                    channels_to_rejoin.add_all (Iridium.Application.connection_manager.get_channels (existing_connection_details.server));
+                    channels_to_rejoin.add_all (Iridium.Application.connection_manager.get_joined_channels (existing_connection_details.server));
                     // Disconnect and update the settings
                     Iridium.Application.connection_manager.disconnect_from_server (existing_connection_details.server);
                     Iridium.Application.connection_repository.update_server_connection_details (existing_connection_details.server, updated_connection_details);
@@ -419,6 +530,12 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             channel_join_dialog.show_all ();
             channel_join_dialog.join_button_clicked.connect ((server_name, channel_name) => {
                 join_channel (server_name, channel_name);
+            });
+            channel_join_dialog.browse_button_clicked.connect ((server_name) => {
+                channel_join_dialog.destroy.connect (() => {
+                    show_browse_channels_dialog (server_name);
+                });
+                channel_join_dialog.dismiss ();
             });
             channel_join_dialog.destroy.connect (() => {
                 channel_join_dialog = null;
@@ -480,21 +597,50 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         nickname_edit_dialog.present ();
     }
 
+    private void show_browse_channels_dialog (string server_name) {
+        if (browse_channels_dialog == null) {
+            browse_channels_dialog = new Iridium.Widgets.BrowseChannelsDialog (this, server_name);
+            browse_channels_dialog.show_all ();
+            browse_channels_dialog.join_button_clicked.connect ((channel_name) => {
+                join_channel (server_name, channel_name);
+            });
+            browse_channels_dialog.response.connect ((response_id) => {
+                // If the user hits cancel, show the join channel dialog again
+                if (response_id == 0) {
+                    Idle.add (() => {
+                        show_channel_join_dialog (server_name);
+                        return false;
+                    });
+                }
+            });
+            browse_channels_dialog.destroy.connect (() => {
+                browse_channels_dialog = null;
+            });
+        }
+        browse_channels_dialog.present ();
+        browse_channels_dialog.show_loading ();
+        Iridium.Application.connection_manager.request_channel_list (server_name);
+    }
+
     private void join_channel (string server_name, string channel_name) {
         // Check if we're already in this channel
-        if (Iridium.Application.connection_manager.get_channels (server_name).index_of (channel_name) != -1) {
-            channel_join_dialog.display_error (_("You've already joined this channel"));
+        if (Iridium.Application.connection_manager.get_joined_channels (server_name).index_of (channel_name) != -1) {
+            if (channel_join_dialog != null) {
+                channel_join_dialog.display_error (_("You've already joined this channel"));
+            } else if (browse_channels_dialog != null) {
+                browse_channels_dialog.display_error (_("You've already joined this channel"));
+            }
             return;
         }
 
         // Validate channel name
         // TODO: Look into what other restrictions exist (https://tools.ietf.org/html/rfc1459#section-1.3)
-        if (!channel_name.has_prefix ("#") && !channel_name.has_prefix ("&")) {
+        if (!channel_name.has_prefix ("#") && !channel_name.has_prefix ("&") && channel_join_dialog != null) {
             // TODO: Eventually validate that the dialog is non-null, and handle accordingly
             channel_join_dialog.display_error (_("Channel must begin with '#' or '&'"));
             return;
         }
-        if (channel_name.length < 2) {
+        if (channel_name.length < 2 && channel_join_dialog != null) {
             channel_join_dialog.display_error (_("Enter a channel name"));
             return;
         }
@@ -546,10 +692,10 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         var message_text = "PRIVMSG " + channel_name + " :" + text;
         Iridium.Application.connection_manager.send_user_message (server_name, message_text);
 
-         // Display the message in the chat view
-         var message = new Iridium.Services.Message (message_text);
-         message.nickname = Iridium.Application.connection_manager.get_nickname (server_name);
-         main_layout.display_self_channel_message (server_name, channel_name, message);
+        // Display the message in the chat view
+        var message = new Iridium.Services.Message (message_text);
+        message.nickname = Iridium.Application.connection_manager.get_nickname (server_name);
+        main_layout.display_self_channel_message (server_name, channel_name, message);
     }
 
     private void on_private_message_to_send (string server_name, string nickname, string text) {
@@ -587,9 +733,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     private void send_server_command (string server_name, string text, string? referring_channel) {
-        // TODO: Check for actions (eg. /me, etc.)
         string[] tokens = text.split (" ");
-        if (tokens.length > 0 && (tokens[0] == "msg" || tokens[0] == "MSG")) {
+        if (tokens.length > 0 && tokens[0].down () == "msg") {
             if (tokens.length == 1) {
                 var message = new Iridium.Services.Message ();
                 message.message = _("No recipient nickname specified (Usage: /msg <nickname> <message>)");
@@ -604,8 +749,30 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 send_privmsg (server_name, recipient, message);
             }
             return;
+        } else if (tokens.length > 0 && tokens[0].down () == "me" && referring_channel != null) {
+            if (tokens.length == 1) {
+                var message = new Iridium.Services.Message ();
+                message.message = _("No action specified (Usage: /me <action>)");
+                main_layout.display_server_error_message (server_name, referring_channel, message);
+            } else {
+                // Send the message
+                string message_text = construct_action_message (referring_channel, text.substring (tokens[0].length).strip ());
+                Iridium.Application.connection_manager.send_user_message (server_name, message_text);
+
+                // Display the message in the chat view
+                string nickname = Iridium.Application.connection_manager.get_nickname (server_name);
+                var message = new Iridium.Services.Message ();
+                message.message = nickname + " " + text.substring (tokens[0].length).strip ();
+                message.nickname = nickname;
+                main_layout.display_server_message (server_name, referring_channel, message);
+            }
+            return;
         }
         Iridium.Application.connection_manager.send_user_message (server_name, text);
+    }
+
+    private string construct_action_message (string recipient, string action) {
+        return "PRIVMSG %s :%sACTION %s%s".printf (recipient, "\x01", action, "\x01");
     }
 
     public void toggle_sidebar () {
@@ -899,7 +1066,10 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 }
                 main_layout.show_chat_view (server_name, channel_name);
             }
-
+            if (browse_channels_dialog != null && browse_channels_dialog.get_server () == server_name && browse_channels_dialog.get_channel () == channel_name) {
+                browse_channels_dialog.dismiss ();
+                main_layout.show_chat_view (server_name, channel_name);
+            }
             set_channel_users_button_enabled (server_name, channel_name, true);
             return false;
         });
@@ -922,24 +1092,28 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     private void on_user_joined_channel (string server_name, string channel_name, string nickname) {
-        Idle.add (() => {
-            // Display a message in the channel chat view
-            var message = new Iridium.Services.Message ();
-            message.message = nickname + _(" has joined");
-            main_layout.display_server_message (server_name, channel_name, message);
-            return false;
-        });
+        if (!Iridium.Application.settings.get_boolean ("suppress-join-part-messages")) {
+            Idle.add (() => {
+                // Display a message in the channel chat view
+                var message = new Iridium.Services.Message ();
+                message.message = nickname + _(" has joined");
+                main_layout.display_server_message (server_name, channel_name, message);
+                return false;
+            });
+        }
         update_channel_users_list (server_name, channel_name);
     }
 
     private void on_user_left_channel (string server_name, string channel_name, string nickname) {
-        Idle.add (() => {
-            // Display a message in the channel chat view
-            var message = new Iridium.Services.Message ();
-            message.message = nickname + _(" has left");
-            main_layout.display_server_message (server_name, channel_name, message);
-            return false;
-        });
+        if (!Iridium.Application.settings.get_boolean ("suppress-join-part-messages")) {
+            Idle.add (() => {
+                // Display a message in the channel chat view
+                var message = new Iridium.Services.Message ();
+                message.message = nickname + _(" has left");
+                main_layout.display_server_message (server_name, channel_name, message);
+                return false;
+            });
+        }
         update_channel_users_list (server_name, channel_name);
     }
 
@@ -955,19 +1129,23 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     // Simply updates the UI based on changes that were already made to the underlying data model
     private void update_channel_users_list (string server_name, string channel_name) {
         var nicknames = Iridium.Application.connection_manager.get_users (server_name, channel_name);
+        var operators = Iridium.Application.connection_manager.get_operators (server_name, channel_name);
         Idle.add (() => {
             main_layout.update_channel_users (server_name, channel_name, nicknames);
             if (main_layout.get_visible_server () == server_name && main_layout.get_visible_channel () == channel_name) {
-                header_bar.set_channel_users (nicknames);
+                header_bar.set_channel_users (nicknames, operators);
             }
             return false;
         });
     }
 
     private void set_channel_users_button_enabled (string server_name, string channel_name, bool enabled) {
-        if (main_layout.get_visible_server () == server_name && main_layout.get_visible_channel () == channel_name) {
-            header_bar.set_channel_users_button_enabled (enabled);
-        }
+        Idle.add (() => {
+            if (main_layout.get_visible_server () == server_name && main_layout.get_visible_channel () == channel_name) {
+                header_bar.set_channel_users_button_enabled (enabled);
+            }
+            return false;
+        });
     }
 
     private void on_insufficient_privs_received (string server_name, string channel_name, Iridium.Services.Message message) {
@@ -994,7 +1172,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         main_layout.update_nickname (server_name, old_nickname, new_nickname);
 
         // Update channel user lists
-        foreach (var channel_name in Iridium.Application.connection_manager.get_channels (server_name)) {
+        foreach (var channel_name in Iridium.Application.connection_manager.get_joined_channels (server_name)) {
             update_channel_users_list (server_name, channel_name);
         }
     }
@@ -1007,7 +1185,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         }
 
         // Update channel user lists
-        foreach (var channel_name in Iridium.Application.connection_manager.get_channels (server_name)) {
+        foreach (var channel_name in Iridium.Application.connection_manager.get_joined_channels (server_name)) {
             update_channel_users_list (server_name, channel_name);
         }
     }
@@ -1020,6 +1198,44 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             main_layout.update_network_name (server_name, network_name);
             return false;
         });
+    }
+
+    private void on_user_channel_mode_changed (string server_name, string channel_name, string mode_chars, string nickname, string target_nickname) {
+        update_channel_users_list (server_name, channel_name);
+        Idle.add (() => {
+            // Display a message in the channel chat view
+            if (mode_chars == "+o") {
+                var message = new Iridium.Services.Message ();
+                message.message = "%s gives channel operator status to %s".printf (nickname, target_nickname);
+                main_layout.display_server_message (server_name, channel_name, message);
+            } else if (mode_chars == "-o") {
+                var message = new Iridium.Services.Message ();
+                message.message = "%s revokes channel operator status from %s".printf (nickname, target_nickname);
+                main_layout.display_server_message (server_name, channel_name, message);
+            }
+            return false;
+        });
+    }
+
+    private void on_action_message_received (string server_name, string channel_name, string nickname, string self_nickname, string action) {
+        Idle.add (() => {
+            main_layout.add_private_message_chat_view (server_name, nickname, self_nickname);
+            main_layout.enable_chat_view (server_name, nickname);
+
+            var message = new Iridium.Services.Message ();
+            message.message = "%s %s".printf (nickname, action);
+            main_layout.display_server_message (server_name, channel_name, message);
+            return false;
+        });
+    }
+
+    private void on_channel_list_received (string server_name, Gee.List<Iridium.Models.ChannelListEntry> channel_list) {
+        if (browse_channels_dialog != null && browse_channels_dialog.get_server () == server_name) {
+            Idle.add (() => {
+                browse_channels_dialog.set_channels (channel_list);
+                return false;
+            });
+        }
     }
 
     //
@@ -1115,6 +1331,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         return network_name;
     }
 
-    public signal void initialized (Gee.List<Iridium.Services.Server> servers, Gee.List<Iridium.Services.Channel> channels, bool is_reconnecting);
+    public signal void ui_initialized (Gee.List<Iridium.Services.Server> servers, Gee.List<Iridium.Services.Channel> channels, bool is_reconnecting);
+    public signal void connections_opened ();
 
 }

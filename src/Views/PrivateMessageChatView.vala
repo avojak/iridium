@@ -23,8 +23,6 @@ public class Iridium.Views.PrivateMessageChatView : Iridium.Views.ChatView {
 
     public string other_nickname { get; set; }
 
-    private string? last_sender = null;
-
     public PrivateMessageChatView (Iridium.MainWindow window, string self_nickname, string other_nickname) {
         Object (
             window: window,
@@ -65,6 +63,10 @@ public class Iridium.Views.PrivateMessageChatView : Iridium.Views.ChatView {
         rich_text.suppress_sender_nickname = is_repeat_sender (message);
         rich_text.display (text_view.get_buffer ());
         last_sender = message.nickname;
+    }
+
+    public override bool does_display_datetime () {
+        return true;
     }
 
     private bool is_repeat_sender (Iridium.Services.Message message) {

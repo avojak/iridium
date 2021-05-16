@@ -68,6 +68,9 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
         server_connection.nickname_changed.connect (on_nickname_changed);
         server_connection.user_changed_nickname.connect (on_user_changed_nickname);
         server_connection.network_name_received.connect (on_network_name_received);
+        server_connection.user_channel_mode_changed.connect (on_user_channel_mode_changed);
+        server_connection.action_message_received.connect (on_action_message_received);
+        server_connection.channel_list_received.connect (on_channel_list_received);
 
         //  server_connection.open_successful.connect (() => {
         open_connections.set (server, server_connection);
@@ -78,6 +81,18 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
 
         server_connection.open ();
         return server_connection;
+    }
+
+    public static Iridium.Services.ServerConnectionDetails create_connection_details (Iridium.Models.IRCURI uri) {
+        var connection_details = new Iridium.Services.ServerConnectionDetails ();
+        connection_details.server = uri.get_server ();
+        connection_details.nickname = Iridium.Application.settings.get_string ("default-nickname");
+        connection_details.username = connection_details.nickname; // Keep these the same for now
+        connection_details.realname = Iridium.Application.settings.get_string ("default-realname");
+        connection_details.auth_method = Iridium.Models.AuthenticationMethod.NONE;
+        connection_details.tls = false;
+        connection_details.port = Iridium.Services.ServerConnectionDetails.DEFAULT_INSECURE_PORT;
+        return connection_details;
     }
 
     public void disconnect_from_server (string server) {
@@ -148,7 +163,7 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
         return connection.server_supports.network;
     }
 
-    public Gee.List<string> get_channels (string server_name) {
+    public Gee.List<string> get_joined_channels (string server_name) {
         var connection = open_connections.get (server_name);
         if (connection == null) {
             return new Gee.ArrayList<string> ();
@@ -192,6 +207,14 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
         return connection.get_users (channel_name);
     }
 
+    public Gee.List<string> get_operators (string server_name, string channel_name) {
+        var connection = open_connections.get (server_name);
+        if (connection == null) {
+            return new Gee.LinkedList<string> ();
+        }
+        return connection.get_operators (channel_name);
+    }
+
     public string get_topic (string server_name, string channel_name) {
         var connection = open_connections.get (server_name);
         if (connection == null) {
@@ -215,6 +238,14 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
             return;
         }
         connection.set_nickname (new_nickname);
+    }
+
+    public void request_channel_list (string server_name) {
+        var connection = open_connections.get (server_name);
+        if (connection == null) {
+            return;
+        }
+        connection.request_channel_list ();
     }
 
     //
@@ -317,6 +348,18 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
         network_name_received (source.connection_details.server, network_name);
     }
 
+    private void on_user_channel_mode_changed (Iridium.Services.ServerConnection source, string channel_name, string mode_chars, string nickname, string target_nickname) {
+        user_channel_mode_changed (source.connection_details.server, channel_name, mode_chars, nickname, target_nickname);
+    }
+
+    private void on_action_message_received (Iridium.Services.ServerConnection source, string channel_name, string nickname, string self_nickname, string action) {
+        action_message_received (source.connection_details.server, channel_name, nickname, self_nickname, action);
+    }
+
+    private void on_channel_list_received (Iridium.Services.ServerConnection source, Gee.List<Iridium.Models.ChannelListEntry> channel_list) {
+        channel_list_received (source.connection_details.server, channel_list);
+    }
+
     //
     // Signals
     //
@@ -345,5 +388,8 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
     public signal void nickname_changed (string server_name, string old_nickname, string new_nickname);
     public signal void user_changed_nickname (string server_name, string old_nickname, string new_nickname);
     public signal void network_name_received (string server_name, string network_name);
+    public signal void user_channel_mode_changed (string server_name, string channel_name, string mode_chars, string nickname, string target_nickname);
+    public signal void action_message_received (string server_name, string channel_name, string nickname, string self_nickname, string action);
+    public signal void channel_list_received (string server_name, Gee.List<Iridium.Models.ChannelListEntry> channel_list);
 
 }

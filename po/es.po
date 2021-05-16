@@ -3,23 +3,24 @@
 # This file is distributed under the same license as the com.github.avojak.iridium package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: com.github.avojak.iridium\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-05-16 17:19-0600\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"PO-Revision-Date: 2021-04-26 20:09-0600\n"
+"Last-Translator: Jeyson Antonio Flores Deras <jeyson.flores@protonmail.com>\n"
+"Language-Team: \n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.4.3\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: src/Layouts/MainLayout.vala:399
 msgid "Restoring server connections…"
-msgstr ""
+msgstr "Restaurando conexiones a servidores..."
 
 #: src/Layouts/MainLayout.vala:418
 msgid "Opening URI…"
@@ -27,126 +28,132 @@ msgstr ""
 
 #: src/Models/AuthenticationMethod.vala:31
 msgid "None"
-msgstr ""
+msgstr "Ninguno"
 
 #: src/Models/AuthenticationMethod.vala:33
 msgid "Server Password"
-msgstr ""
+msgstr "Contraseña del Servidor"
 
 #: src/Models/AuthenticationMethod.vala:35
 msgid "NickServ"
-msgstr ""
+msgstr "NickServ"
 
 #: src/Models/CertificateErrorMapping.vala:27
 msgid "An error has occurred processing the server's certificate"
-msgstr ""
+msgstr "Se ha producido un error al procesar el certificado del servidor"
 
 #: src/Models/CertificateErrorMapping.vala:29
 msgid "The server's certificate is considered insecure"
-msgstr ""
+msgstr "El certificado del servidor se considera inseguro"
 
 #: src/Models/CertificateErrorMapping.vala:31
 msgid "The server's certificate has been revoked and is now invalid"
-msgstr ""
+msgstr "El certificado del servidor ha sido revocado y ahora es inválido"
 
 #: src/Models/CertificateErrorMapping.vala:33
 msgid "The server's certificate has expired"
-msgstr ""
+msgstr "El certificado del servidor ha caducado"
 
 #: src/Models/CertificateErrorMapping.vala:35
 msgid "The server's certificate has not been activated"
-msgstr ""
+msgstr "El certificado del servidor no ha sido activado"
 
 #: src/Models/CertificateErrorMapping.vala:37
 msgid "The server's identity does not match the identity in the certificate"
 msgstr ""
+"La identidad del servidor no corresponde con la identidad del certificado"
 
 #: src/Models/CertificateErrorMapping.vala:39
 msgid "The server's certificate is not signed by a known authority"
-msgstr ""
+msgstr "El certificado del servidor no está firmado por una autoridad conocida"
 
 #: src/Models/InvalidCertificatePolicy.vala:31
 msgid "Reject"
-msgstr ""
+msgstr "Rechazar"
 
 #: src/Models/InvalidCertificatePolicy.vala:33
 msgid "Warn"
-msgstr ""
+msgstr "Advertir"
 
 #: src/Models/InvalidCertificatePolicy.vala:35
 msgid "Allow"
-msgstr ""
+msgstr "Permitir"
 
 #: src/Services/ServerConnection.vala:87
 msgid "Error while connecting"
-msgstr ""
+msgstr "Error al conectar"
 
 #: src/Services/ServerConnection.vala:183
 msgid "Certificate rejected:"
-msgstr ""
+msgstr "Certificado rechazado:"
 
 #: src/Services/ServerConnection.vala:183
 msgid ""
 "See the application preferences to configure the certificate validation "
 "policy."
 msgstr ""
+"Consulte las preferencias de la aplicación para configurar la política de "
+"validación de certificados."
 
 #: src/Services/ServerConnection.vala:200
 msgid "Certificate was rejected by the user."
-msgstr ""
+msgstr "El certificado fue rechazado por el usuario."
 
 #: src/Views/ChannelChatView.vala:38
 msgid "You must join this channel to begin chatting"
-msgstr ""
+msgstr "Necesitar unirte a este canal para empezar a chatear"
 
 #: src/Views/ChatView.vala:74
 msgid "You have unread messages!"
-msgstr ""
+msgstr "Tienes mensajes no leídos!"
 
 #: src/Views/ChatView.vala:75
 msgid "Take me there"
-msgstr ""
+msgstr "Llévame allí"
 
 #: src/Views/ChatView.vala:95 src/Widgets/Dialogs/BrowseChannelsDialog.vala:96
 msgid "Clear"
-msgstr ""
+msgstr "Limpiar"
 
 #: src/Views/PrivateMessageChatView.vala:39 src/Views/ServerChatView.vala:36
 msgid "You are not connected to this server"
-msgstr ""
+msgstr "No estás conectado a este servidor"
 
 #: src/Views/Welcome.vala:29
 msgid "Welcome to Iridium"
-msgstr ""
+msgstr "Bienvenido a Iridium"
 
 #: src/Views/Welcome.vala:30
 msgid "Connect to Any IRC Server"
-msgstr ""
+msgstr "Conéctate a Cualquier Servidor IRC"
 
 #: src/Views/Welcome.vala:42
 msgid "Add a New Server"
-msgstr ""
+msgstr "Añadir Nuevo Servidor"
 
 #: src/Views/Welcome.vala:42
 msgid "Connect to a server and save it in the server list"
-msgstr ""
+msgstr "Conéctate a un servidor y añádelo en la lista de servidores"
 
 #: src/Widgets/Dialogs/BrowseChannelsDialog.vala:53
 #: src/Widgets/Dialogs/BrowseChannelsDialog.vala:73
+#, fuzzy
 msgid "Browse Channels"
-msgstr ""
+msgstr "Canales Favoritos"
 
 #: src/Widgets/Dialogs/BrowseChannelsDialog.vala:90
 msgid "Search:"
 msgstr ""
 
 #: src/Widgets/Dialogs/BrowseChannelsDialog.vala:133
+#, fuzzy
 msgid "Name"
-msgstr ""
+msgstr "Nombre Real"
 
 #: src/Widgets/Dialogs/BrowseChannelsDialog.vala:134
+#, fuzzy
 msgid "Users"
-msgstr ""
+msgstr "Nombre de Usuario"
 
 #: src/Widgets/Dialogs/BrowseChannelsDialog.vala:135
 msgid "Topic"
@@ -158,12 +165,12 @@ msgstr ""
 #: src/Widgets/Dialogs/NicknameEditDialog.vala:92
 #: src/Widgets/Dialogs/ServerConnectionDialog.vala:124
 msgid "Cancel"
-msgstr ""
+msgstr "Cancelar"
 
 #: src/Widgets/Dialogs/BrowseChannelsDialog.vala:173
 #: src/Widgets/Dialogs/ChannelJoinDialog.vala:154 src/Widgets/HeaderBar.vala:38
 msgid "Join"
-msgstr ""
+msgstr "Unirte"
 
 #: src/Widgets/Dialogs/BrowseChannelsDialog.vala:286
 msgid "Retrieving channels, this may take a minute…"
@@ -171,32 +178,32 @@ msgstr ""
 
 #: src/Widgets/Dialogs/CertificateWarningDialog.vala:51
 msgid "Untrusted Connection"
-msgstr ""
+msgstr "Conexión no confiable"
 
 #: src/Widgets/Dialogs/CertificateWarningDialog.vala:55
 msgid "Don't Connect"
-msgstr ""
+msgstr "No Conectar"
 
 #: src/Widgets/Dialogs/CertificateWarningDialog.vala:56
 msgid "Connect Anyway"
-msgstr ""
+msgstr "Conectar Igualmente"
 
 #: src/Widgets/Dialogs/CertificateWarningDialog.vala:99
 msgid "View certificate"
-msgstr ""
+msgstr "Ver certificado"
 
 #: src/Widgets/Dialogs/CertificateWarningDialog.vala:102
 msgid "Remember my decision"
-msgstr ""
+msgstr "Recordar mi decisión"
 
 #: src/Widgets/Dialogs/ChannelJoinDialog.vala:41
 #: src/Widgets/Dialogs/ChannelJoinDialog.vala:63
 msgid "Join a Channel"
-msgstr ""
+msgstr "Unirte a un Canal"
 
 #: src/Widgets/Dialogs/ChannelJoinDialog.vala:112
 msgid "Channel:"
-msgstr ""
+msgstr "Canal:"
 
 #: src/Widgets/Dialogs/ChannelJoinDialog.vala:121
 msgid "Browse…"
@@ -204,86 +211,89 @@ msgstr ""
 
 #: src/Widgets/Dialogs/ChannelJoinDialog.vala:149
 msgid "Not Now"
-msgstr ""
+msgstr "No Ahora"
 
 #: src/Widgets/Dialogs/ChannelTopicEditDialog.vala:37
 #: src/Widgets/Dialogs/ChannelTopicEditDialog.vala:57
 msgid "Edit Channel Topic"
-msgstr ""
+msgstr "Editar Asunto del Canal"
 
 #: src/Widgets/Dialogs/ChannelTopicEditDialog.vala:117
 #: src/Widgets/Dialogs/ChannelTopicEditDialog.vala:134
 #: src/Widgets/Dialogs/NicknameEditDialog.vala:97
 msgid "Submit"
-msgstr ""
+msgstr "Subir"
 
 #: src/Widgets/Dialogs/ChannelTopicEditDialog.vala:132
 msgid "Clear topic"
-msgstr ""
+msgstr "Limpiar Asunto"
 
 #: src/Widgets/Dialogs/ForgetConnectionsWarningDialog.vala:35
 msgid "Remove all saved connections?"
-msgstr ""
+msgstr "¿Remover todas las conexiones guardadas?"
 
 #: src/Widgets/Dialogs/ForgetConnectionsWarningDialog.vala:36
 msgid ""
 "All connection information will be deleted. Active connections will remain "
 "open until the application is closed, but they will not be restored."
 msgstr ""
+"Todas la información de las conexiones será eliminada. Las conexiones "
+"activas seguirán abiertas hasta que la aplicación se cierre, pero no serán "
+"restablecidas."
 
 #: src/Widgets/Dialogs/ForgetConnectionsWarningDialog.vala:39
 msgid "Yes, Remove"
-msgstr ""
+msgstr "Sí, Remover"
 
 #: src/Widgets/Dialogs/ManageConnectionsDialog.vala:34
 #: src/Widgets/Dialogs/ManageConnectionsDialog.vala:54
 msgid "Manage Connections"
-msgstr ""
+msgstr "Gestionar Conexiones"
 
 #: src/Widgets/Dialogs/ManageConnectionsDialog.vala:85
 msgid "Nickname"
-msgstr ""
+msgstr "Apodo"
 
 #: src/Widgets/Dialogs/ManageConnectionsDialog.vala:91
 msgid "Username"
-msgstr ""
+msgstr "Nombre de Usuario"
 
 #: src/Widgets/Dialogs/ManageConnectionsDialog.vala:97
 msgid "Real Name"
-msgstr ""
+msgstr "Nombre Real"
 
 #: src/Widgets/Dialogs/ManageConnectionsDialog.vala:126
 #: src/Widgets/Dialogs/PreferencesDialog.vala:245
 #: src/Widgets/SidePanel/ChannelRow.vala:121
 #: src/Widgets/SidePanel/PrivateMessageRow.vala:84
 msgid "Close"
-msgstr ""
+msgstr "Cerrar"
 
 #: src/Widgets/Dialogs/ManageConnectionsDialog.vala:131
 msgid "Save"
-msgstr ""
+msgstr "Guardar"
 
 #: src/Widgets/Dialogs/NicknameEditDialog.vala:35
 #: src/Widgets/Dialogs/NicknameEditDialog.vala:55
 msgid "Edit Nickname"
-msgstr ""
+msgstr "Editar Apodo"
 
 #: src/Widgets/Dialogs/PreferencesDialog.vala:42
 #: src/Widgets/Dialogs/PreferencesDialog.vala:66
 msgid "Preferences"
-msgstr ""
+msgstr "Preferencias"
 
 #: src/Widgets/Dialogs/PreferencesDialog.vala:82
 msgid "General"
-msgstr ""
+msgstr "General"
 
 #: src/Widgets/Dialogs/PreferencesDialog.vala:84
 msgid "Default Nickname:"
-msgstr ""
+msgstr "Apodo por Defecto:"
 
 #: src/Widgets/Dialogs/PreferencesDialog.vala:93
 msgid "Default Real Name:"
-msgstr ""
+msgstr "Nombre Real por Defecto:"
 
 #: src/Widgets/Dialogs/PreferencesDialog.vala:102
 msgid "Suppress join/part messages:"
@@ -291,158 +301,169 @@ msgstr ""
 
 #: src/Widgets/Dialogs/PreferencesDialog.vala:109
 msgid "Security and Privacy"
-msgstr ""
+msgstr "Seguridad y Privacidad"
 
 #: src/Widgets/Dialogs/PreferencesDialog.vala:111
 msgid "Unacceptable SSL/TLS Certificates:"
-msgstr ""
+msgstr "Certificados SSL/TLS Inaceptables:"
 
 #: src/Widgets/Dialogs/PreferencesDialog.vala:157
 msgid ""
 "<i>If a server presents an unacceptable SSL/TLS certificate, no connection "
 "will be made.</i> <b>(Recommended)</b>"
 msgstr ""
+"<i>Si un servidor presenta un certificado SSL/TLS inaceptable, la conexión "
+"no se efectuará.</i> <b>(Recomendado)</b>"
 
 #: src/Widgets/Dialogs/PreferencesDialog.vala:174
 msgid ""
 "<i>If a server presents an unacceptable SSL/TLS certificate, the user will "
 "be warned and can choose whether or not to proceed.</i>"
 msgstr ""
+"<i>Si un servidor presenta un certificado SSL/TLS inaceptable, el usuario "
+"será advertido y podrá elegir si proceder o no.</i>"
 
 #: src/Widgets/Dialogs/PreferencesDialog.vala:191
 msgid ""
 "<i>If a server presents an unacceptable SSL/TLS certificate, the connection "
 "will still be made.</i> <b>(Not recommended)</b>"
 msgstr ""
+"<i>Si un servidor presenta un certificado SSL/TLS inaceptable, la conexión "
+"se efectuará igualmente.</i> <b>(No recomendado)</b>"
 
 #: src/Widgets/Dialogs/PreferencesDialog.vala:205
 msgid "Remember connections between sessions:"
-msgstr ""
+msgstr "Recordar conexiones entre sesiones:"
 
 #: src/Widgets/Dialogs/ServerConnectionDialog.vala:48
 msgid "Connect to a Server"
-msgstr ""
+msgstr "Conectar a un Servidor"
 
 #: src/Widgets/Dialogs/ServerConnectionDialog.vala:66
 msgid "Connection secure"
-msgstr ""
+msgstr "Conexión segura"
 
 #: src/Widgets/Dialogs/ServerConnectionDialog.vala:68
 msgid ""
 "Connection secure, provided only trusted certificates are accepted when "
 "prompted"
 msgstr ""
+"Conexión segura, siempre que solo se acepten certificados de confianza "
+"cuando sea solicitado."
 
 #: src/Widgets/Dialogs/ServerConnectionDialog.vala:70
 msgid ""
 "Connection may be insecure. Consider rejecting unacceptable certificates "
 "from the application preferences."
 msgstr ""
+"La conexión puede ser insegura. Considere rechazar certificados inaceptables "
+"desde las preferencias de la aplicación."
 
 #: src/Widgets/Dialogs/ServerConnectionDialog.vala:72
 msgid "Connection insecure. Consider enabling SSL/TLS from the Advanced tab."
-msgstr ""
+msgstr "Conexión insegura. Considere activar SSL/TLS desde la pestaña Avazado."
 
 #: src/Widgets/Dialogs/ServerConnectionDialog.vala:80
 msgid "New Connection"
-msgstr ""
+msgstr "Nueva Conexión"
 
 #: src/Widgets/Dialogs/ServerConnectionDialog.vala:104
 msgid "Basic"
-msgstr ""
+msgstr "Básico"
 
 #: src/Widgets/Dialogs/ServerConnectionDialog.vala:105
 msgid "Advanced"
-msgstr ""
+msgstr "Avanzado"
 
 #: src/Widgets/Dialogs/ServerConnectionDialog.vala:129
 #: src/Widgets/SidePanel/ServerRow.vala:163
 msgid "Connect"
-msgstr ""
+msgstr "Conectar"
 
 #: src/Widgets/Dialogs/ServerConnectionDialog.vala:166
 msgid "Server:"
-msgstr ""
+msgstr "Servidor:"
 
 #: src/Widgets/Dialogs/ServerConnectionDialog.vala:173
 msgid "Nickname:"
-msgstr ""
+msgstr "Apodo:"
 
 #: src/Widgets/Dialogs/ServerConnectionDialog.vala:187
 msgid "Real Name:"
-msgstr ""
+msgstr "Nombre Real:"
 
 #: src/Widgets/Dialogs/ServerConnectionDialog.vala:192
 msgid "Iridium IRC Client"
-msgstr ""
+msgstr "Iridium Cliente IRC"
 
 #: src/Widgets/Dialogs/ServerConnectionDialog.vala:194
 msgid "Authentication Method:"
-msgstr ""
+msgstr "Método de Autenticación:"
 
 #: src/Widgets/Dialogs/ServerConnectionDialog.vala:222
 msgid "Password:"
-msgstr ""
+msgstr "Contraseña:"
 
 #: src/Widgets/Dialogs/ServerConnectionDialog.vala:263
 msgid "Use SSL/TLS:"
-msgstr ""
+msgstr "Usar SSL/TLS:"
 
 #: src/Widgets/Dialogs/ServerConnectionDialog.vala:279
 msgid "Port:"
-msgstr ""
+msgstr "Puerto:"
 
 #: src/Widgets/SidePanel/ChannelRow.vala:96
 msgid "Edit topic…"
-msgstr ""
+msgstr "Editar asunto..."
 
 #: src/Widgets/SidePanel/ChannelRow.vala:101
 msgid "Add to favorites"
-msgstr ""
+msgstr "Añadir a favoritos"
 
 #: src/Widgets/SidePanel/ChannelRow.vala:106
 msgid "Remove from favorites"
-msgstr ""
+msgstr "Remover de favoritos"
 
 #: src/Widgets/SidePanel/ChannelRow.vala:111
 msgid "Join channel"
-msgstr ""
+msgstr "Unirte al canal"
 
 #: src/Widgets/SidePanel/ChannelRow.vala:116
 msgid "Leave channel"
-msgstr ""
+msgstr "Dejar el canal"
 
 #: src/Widgets/SidePanel/Panel.vala:58
 msgid "Favorite Channels"
-msgstr ""
+msgstr "Canales Favoritos"
 
 #: src/Widgets/SidePanel/Panel.vala:73
 msgid "Servers"
-msgstr ""
+msgstr "Servidores"
 
 #: src/Widgets/SidePanel/ServerRow.vala:56
 msgid "Dismiss"
-msgstr ""
+msgstr "Ocultar"
 
 #: src/Widgets/SidePanel/ServerRow.vala:153 src/Widgets/StatusBar.vala:28
 msgid "Join a Channel…"
-msgstr ""
+msgstr "Unirte a un Canal...."
 
 #: src/Widgets/SidePanel/ServerRow.vala:158
+#, fuzzy
 msgid "Edit Connection…"
-msgstr ""
+msgstr "Nueva Conexión"
 
 #: src/Widgets/SidePanel/ServerRow.vala:168
 msgid "Disconnect"
-msgstr ""
+msgstr "Desconectar"
 
 #: src/Widgets/SidePanel/ServerRow.vala:173
 msgid "Remove"
-msgstr ""
+msgstr "Remover"
 
 #: src/Widgets/SidePanel/ServerRow.vala:207
 msgid "Are you sure you want to proceed?"
-msgstr ""
+msgstr "¿Estás seguro que quieres proceder?"
 
 #: src/Widgets/SidePanel/ServerRow.vala:208
 msgid ""
@@ -450,122 +471,130 @@ msgid ""
 "to recover the connection settings. If you wish to join this server again in "
 "the future, you will need to re-enter the connection settings."
 msgstr ""
+"Al remover esta conexión serás desconectado y no serás capaz de recuperar "
+"los ajustes de la conexión. Si quieres unirte a este servidor de nuevo en el "
+"futuro, tendrás que volver a ingresar los ajustes de la conexión."
 
 #: src/Widgets/SidePanel/ServerRow.vala:213
 msgid "Yes, remove"
-msgstr ""
+msgstr "Si, remover"
 
 #: src/Widgets/SidePanel/ServerRow.vala:217
 msgid "Don't warn me again"
-msgstr ""
+msgstr "No advertirme de nuevo"
 
 #: src/Widgets/UsersPopover/ChannelUsersPopover.vala:38
 msgid "No users"
-msgstr ""
+msgstr "Sin usuarios"
 
 #: src/Widgets/HeaderBar.vala:43
+#, fuzzy
 msgid "New Server Connection…"
-msgstr ""
+msgstr "Nueva Conexión de Servidor"
 
 #: src/Widgets/HeaderBar.vala:53
+#, fuzzy
 msgid "Join Channel…"
-msgstr ""
+msgstr "Unirte a un Canal...."
 
 #: src/Widgets/HeaderBar.vala:78
 msgid "Channel users"
-msgstr ""
+msgstr "Usuarios del Canal"
 
 #: src/Widgets/HeaderBar.vala:88
 msgid "Menu"
-msgstr ""
+msgstr "Menú"
 
 #: src/Widgets/HeaderBar.vala:93
 msgid "Light background"
-msgstr ""
+msgstr "Tema claro"
 
 #: src/Widgets/HeaderBar.vala:94
 msgid "Dark background"
-msgstr ""
+msgstr "Tema oscuro"
 
 #: src/Widgets/HeaderBar.vala:103
 msgid "Toggle Sidebar"
-msgstr ""
+msgstr "Alternar Barra Lateral"
 
 #: src/Widgets/HeaderBar.vala:113
 msgid "Reset Marker Line"
-msgstr ""
+msgstr "Reiniciar Línea del Marcador"
 
 #: src/Widgets/HeaderBar.vala:123
+#, fuzzy
 msgid "Preferences…"
-msgstr ""
+msgstr "Preferencias"
 
 #: src/Widgets/HeaderBar.vala:133
 msgid "Quit"
-msgstr ""
+msgstr "Salir"
 
 #: src/Widgets/NetworkInfoBar.vala:35
 msgid "Network Not Available."
-msgstr ""
+msgstr "Red no disponible."
 
 #: src/Widgets/NetworkInfoBar.vala:36
 msgid "Connect to the Internet to join servers."
-msgstr ""
+msgstr "Conéctate a la internet para unirte a servidores."
 
 #: src/Widgets/NetworkInfoBar.vala:42
 msgid "Network Settings…"
-msgstr ""
+msgstr "Ajustes de Red..."
 
 #: src/Widgets/StatusBar.vala:27
 msgid "Connect to a Server…"
-msgstr ""
+msgstr "Conectar a Servidor..."
 
 #: src/Widgets/StatusBar.vala:38
 msgid "Join a Server or Channel"
-msgstr ""
+msgstr "Únete a un Servidor o Canal"
 
 #: src/Widgets/StatusBar.vala:43
 msgid "Manage connections…"
-msgstr ""
+msgstr "Gestionar conexiones..."
 
 #: src/MainWindow.vala:410 src/MainWindow.vala:456
 msgid "Already connected to this server!"
-msgstr ""
+msgstr "¡Ya estás conectado a este servidor!"
 
 #: src/MainWindow.vala:629 src/MainWindow.vala:631
 msgid "You've already joined this channel"
-msgstr ""
+msgstr "¡Ya te has unido a este canal!"
 
 #: src/MainWindow.vala:640
 msgid "Channel must begin with '#' or '&'"
-msgstr ""
+msgstr "El canal debe de empezar con '#' o '&'"
 
 #: src/MainWindow.vala:644
 msgid "Enter a channel name"
-msgstr ""
+msgstr "Ingresa un nombre de canal"
 
 #: src/MainWindow.vala:674
 msgid "Start your message with a /"
-msgstr ""
+msgstr "Empieza tu mensaje con un /"
 
 #: src/MainWindow.vala:740
 msgid "No recipient nickname specified (Usage: /msg <nickname> <message>)"
-msgstr ""
+msgstr "Apodo del destinatario no especificado (Uso: /msg <apodo> <mensaje>)"
 
 #: src/MainWindow.vala:744
 msgid "No message specified (Usage: /msg <nickname> <message>)"
-msgstr ""
+msgstr "Mensaje no especificado (Uso: /msg <apodo> <mensaje>)"
 
 #: src/MainWindow.vala:755
+#, fuzzy
 msgid "No action specified (Usage: /me <action>)"
-msgstr ""
+msgstr "Mensaje no especificado (Uso: /msg <apodo> <mensaje>)"
 
 #: src/MainWindow.vala:944 src/MainWindow.vala:958
 msgid " has quit"
-msgstr ""
+msgstr " ha salido"
 
 #: src/MainWindow.vala:993
+#, fuzzy
 msgid " has cleared the topic"
-msgstr ""
+msgstr "Limpiar Asunto"
 
 #: src/MainWindow.vala:995
 msgid " has changed the topic to: "
@@ -585,11 +614,12 @@ msgstr ""
 
 #: src/MainWindow.vala:1024 src/MainWindow.vala:1027
 msgid "Nickname already in use."
-msgstr ""
+msgstr "Apodo en uso."
 
 #: src/MainWindow.vala:1033
+#, fuzzy
 msgid "Nickname already in use"
-msgstr ""
+msgstr "Apodo en uso."
 
 #: src/MainWindow.vala:1033
 msgid "Choose a new nickname and retry the connection."
@@ -597,12 +627,15 @@ msgstr ""
 
 #: src/MainWindow.vala:1038
 msgid " is not a valid nickname."
-msgstr ""
+msgstr " no es un apodo válido."
 
 #: src/MainWindow.vala:1099
 msgid " has joined"
-msgstr ""
+msgstr " se ha unido"
 
 #: src/MainWindow.vala:1112
 msgid " has left"
-msgstr ""
+msgstr " se ha ido"
+
+#~ msgid "Join Channel"
+#~ msgstr "Unirte al Canal"
