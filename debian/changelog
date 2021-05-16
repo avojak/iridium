@@ -1,21 +1,3 @@
-com.github.avojak.iridium (1.1.0) bionic; urgency=medium
-
-  * Release 1.1.0
-  * Spanish translations by JeysonFlores
-  * Dutch translations by Vistaus
-  * Display available channel list (#18)
-  * Allow suppressing join/part messages (#20)
-  * Display date/time in chat views when message received after some time (#21)
-  * Support opening irc:// links (#28)
-  * Remember window size and position (#42)
-  * Support /me actions (#47)
-  * Add visual indicator for channel operator status (#52)
-  * Use Sqlite.Database.exec instead of Sqlite.Statement.step (#122)
-  * Fix in64_parse error on RPL_TOPICWHOTIME messages (#132)
-  * Force monospace font in chat views in preparation for elementary OS 6
-
- -- Andrew Vojak <andrew.vojak@gmail.com>  Sun, 16 May 2021 18:00:00 -0700
-
 com.github.avojak.iridium (1.0.0) bionic; urgency=medium
 
   * Initial Release.

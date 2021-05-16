@@ -98,7 +98,7 @@ public class Iridium.Widgets.UsersPopover.ChannelUsersPopover : Gtk.Popover {
         return user_row1.nickname.collate (user_row2.nickname);
     }
 
-    public void set_users (Gee.List<string> nicknames, Gee.List<string> operators) {
+    public void set_users (Gee.List<string> nicknames) {
         list_box.foreach ((widget) => {
             widget.destroy ();
         });
@@ -106,8 +106,7 @@ public class Iridium.Widgets.UsersPopover.ChannelUsersPopover : Gtk.Popover {
             if (nickname == null || nickname.chomp ().length == 0) {
                 continue;
             }
-            bool is_op = operators.contains (nickname);
-            var row = new Iridium.Widgets.UsersPopover.UserListBoxRow (nickname, is_op);
+            var row = new Iridium.Widgets.UsersPopover.UserListBoxRow (nickname);
             list_box.insert (row, -1);
         }
         list_box.show_all ();

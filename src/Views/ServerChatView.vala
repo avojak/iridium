@@ -55,8 +55,4 @@ public class Iridium.Views.ServerChatView : Iridium.Views.ChatView {
         // Do nothing
     }
 
-    public override bool does_display_datetime () {
-        return false;
-    }
-
 }

@@ -126,7 +126,7 @@ public class Iridium.Services.ActionManager : GLib.Object {
     }
 
     private void action_quit () {
-        window.before_destroy ();
+        window.destroy ();
     }
 
     private void action_zoom_in () {

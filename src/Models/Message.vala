@@ -75,8 +75,7 @@ public class Iridium.Services.Message : GLib.Object {
                 message = match_info.fetch_named ("trail");
                 if (message != null) {
                     message.replace ("\t", "");
-                    // Need to reference these characters (e.g. VERSION, ACTION messages)
-                    //  strip_non_printable_chars ();
+                    strip_non_printable_chars ();
                 }
                 if ((prefix != null) && (command in USER_COMMANDS)) {  // vala-lint=naming-convention
                     nickname = prefix.split ("!")[0];
@@ -89,14 +88,14 @@ public class Iridium.Services.Message : GLib.Object {
         }
     }
 
-    //  private void strip_non_printable_chars () {
-    //      // TODO: Probably a better way to do this
-    //      if (NON_PRINT_REGEX.match (message[0].to_string ())) {
-    //          message = message.substring (1);
-    //      }
-    //      if (NON_PRINT_REGEX.match (message[message.length - 1].to_string ())) {
-    //          message = message.substring (0, message.length - 1);
-    //      }
-    //  }
+    private void strip_non_printable_chars () {
+        // TODO: Probably a better way to do this
+        if (NON_PRINT_REGEX.match (message[0].to_string ())) {
+            message = message.substring (1);
+        }
+        if (NON_PRINT_REGEX.match (message[message.length - 1].to_string ())) {
+            message = message.substring (0, message.length - 1);
+        }
+    }
 
 }

@@ -31,35 +31,5 @@
       <summary>If server connections should be remembered between sessions</summary>
       <description>If server connections should be remembered between sessions</description>
     </key>
-    <key name="suppress-join-part-messages" type="b">
-      <default>false</default>
-      <summary>If channel join and part messages should be suppressed</summary>
-      <description>If channel join and part messages should be suppressed</description>
-    </key>
-    <key name="font" type="s">
-      <default>'Monospace Regular 9'</default>
-      <summary>Preferred Font</summary>
-      <description>Set the preferred font.</description>
-    </key>
-    <key name="pos-x" type="i">
-			<default>360</default>
-			<summary>The saved horizontal position of the window.</summary>
-			<description>The saved horizontal position of the window.</description>
-		</key>
-		<key name="pos-y" type="i">
-			<default>360</default>
-			<summary>The saved vertical position width of the window.</summary>
-			<description>The saved vertical position of the window.</description>
-		</key>
-		<key name="window-width" type="i">
-			<default>1000</default>
-			<summary>The saved width of the window.</summary>
-			<description>The saved width of the window.</description>
-		</key>
-		<key name="window-height" type="i">
-			<default>600</default>
-			<summary>The saved height of the window.</summary>
-			<description>The saved height of the window.</description>
-		</key>
   </schema>
 </schemalist>

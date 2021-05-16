@@ -8,4 +8,3 @@ Icon=@icon@
 Terminal=false
 Type=Application
 Keywords=IRC;IM;Chat;
-MimeType=x-scheme-handler/irc;
