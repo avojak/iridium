@@ -14,6 +14,7 @@ src/Views/PrivateMessageChatView.vala
 src/Views/ServerChatView.vala
 src/Views/Welcome.vala
 
+src/Widgets/Dialogs/BrowseChannelsDialog.vala
 src/Widgets/Dialogs/CertificateWarningDialog.vala
 src/Widgets/Dialogs/ChannelJoinDialog.vala
 src/Widgets/Dialogs/ChannelTopicEditDialog.vala
