@@ -35,10 +35,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     private Gee.List<string> joined_channels = new Gee.ArrayList<string> ();
     private Gee.Map<string, Gee.List<string>> channel_users = new Gee.HashMap<string, Gee.List<string>> ();
     private Gee.Map<string, Gee.List<string>> nickname_buffer = new Gee.HashMap<string, Gee.List<string>> ();
-    private Gee.Map<string, Gee.List<string>> channel_operators = new Gee.HashMap<string, Gee.List<string>> ();
-    private Gee.Map<string, Gee.List<string>> operators_buffer = new Gee.HashMap<string, Gee.List<string>> ();
-    private Gee.List<Iridium.Models.ChannelListEntry> channel_list = new Gee.ArrayList<Iridium.Models.ChannelListEntry> ();
-    private Gee.List<Iridium.Models.ChannelListEntry> channel_buffer = new Gee.ArrayList<Iridium.Models.ChannelListEntry> ();
 
     private Gee.Map<string, string> channel_topics = new Gee.HashMap<string, string> ();
 
@@ -378,15 +374,8 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 break;
             case Iridium.Services.MessageCommands.PRIVMSG:
                 // CTCP VERSION
-                if ("\x01%s\x01".printf (Iridium.Services.MessageCommands.VERSION) == message.message) {
+                if (Iridium.Services.MessageCommands.VERSION == message.message) {
                     ctcp_version_query_received (message);
-                    break;
-                }
-                // Action message
-                if (message.message[0] == '\x01' && message.message[message.message.length - 1] == '\x01' && message.message.substring (1).has_prefix ("ACTION")) {
-                    // If the first param is our nickname, it's an action in a private message not a channel
-                    string channel = message.params[0] == connection_details.nickname ? message.nickname : message.params[0];
-                    action_message_received (channel, message.nickname, connection_details.nickname, message.message.substring (8, message.message.length - 9));
                     break;
                 }
                 // If the first param is our nickname, it's a PM. Otherwise, it's
@@ -421,9 +410,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 on_channel_topic_received (message.params[1], message.message);
                 break;
             case Iridium.Services.NumericCodes.RPL_TOPICWHOTIME:
-                // Some servers send the setat time string as the message, not a param
-                string time_str = message.params[3] != null ? message.params[3] : message.message;
-                channel_topic_whotime_received (message.params[1], message.params[2].split ("!")[0], int64.parse (time_str));
+                channel_topic_whotime_received (message.params[1], message.params[2].split ("!")[0], int64.parse (message.params[3]));
                 break;
             case Iridium.Services.NumericCodes.RPL_NOTOPIC:
                 on_channel_topic_received (message.params[1], "");
@@ -436,6 +423,9 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 server_message_received (display_message);
                 break;
             case Iridium.Services.MessageCommands.MODE:
+                // TODO: This may affect the nickname displayed in the channel
+                // user list
+
                 // If the first param is our nickname, this is being set on the server rather than for a channel
                 if (message.params[0] == connection_details.nickname) {
                     char modifier = message.message[0];
@@ -444,32 +434,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                         display_message.message = "%s sets mode %c%c on %s".printf (message.prefix, modifier, message.message[i], message.params[0]);
                         server_message_received (display_message);
                     }
-                    break;
                 }
-
-                // params[0] = channel
-                // params[1] = mode chars
-                // params[2] = params
-                string channel = message.params[0];
-                string mode_chars = message.params[1];
-
-                if (message.params[2] != null) {
-                    string nickname = message.prefix.split ("!")[0];
-                    string target_nickname = message.params[2];
-                    if (mode_chars == "+o") {
-                        // Only add the nickname to the operators list if not already present
-                        if (channel_operators.has_key (channel) && !channel_operators.get (channel).contains (target_nickname)) {
-                            channel_operators.get (channel).add (target_nickname);
-                        }
-                    } else if (mode_chars == "-o") {
-                        // Only remove the nickname from the operators list if present
-                        if (channel_operators.has_key (channel) && channel_operators.get (channel).contains (target_nickname)) {
-                            channel_operators.get (channel).remove (target_nickname);
-                        }
-                    }
-                    user_channel_mode_changed (channel, mode_chars, nickname, target_nickname);
-                }
-
                 break;
             case Iridium.Services.NumericCodes.RPL_ENDOFMOTD:
                 // Do nothing
@@ -478,31 +443,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 var display_message = new Iridium.Services.Message ();
                 display_message.message = message.params[0] + " has modes: " + message.params[1];
                 server_message_received (display_message);
-                break;
-            case Iridium.Services.NumericCodes.RPL_LISTSTART:
-                channel_buffer.clear ();
-                break;
-            case Iridium.Services.NumericCodes.RPL_LIST:
-                if (message.params[1] == null) {
-                    break;
-                }
-                var channel_name = message.params[1];
-                var num_visible_users = message.params[2] == null ? "0" : message.params[2];
-                var topic = message.message == null ? "" : message.message.strip ();
-                Iridium.Models.ChannelListEntry entry = new Iridium.Models.ChannelListEntry ();
-                entry.channel_name = channel_name;
-                entry.num_visible_users = num_visible_users;
-                entry.topic = topic;
-                channel_buffer.add (entry);
-                break;
-            case Iridium.Services.NumericCodes.RPL_LISTEND:
-                channel_list.clear ();
-                channel_list.add_all (channel_buffer);
-                channel_buffer.clear ();
-                channel_list_received (channel_list);
-                break;
-            case Iridium.Services.NumericCodes.RPL_TRYAGAIN:
-                server_error_received (message);
                 break;
 
             // Errors
@@ -614,13 +554,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         return channel_users.get (channel_name);
     }
 
-    public Gee.List<string> get_operators (string channel_name) {
-        if (!channel_operators.has_key (channel_name)) {
-            return new Gee.LinkedList<string> ();
-        }
-        return channel_operators.get (channel_name);
-    }
-
     public Gee.List<string> get_joined_channels () {
         return joined_channels;
     }
@@ -685,19 +618,13 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     }
 
     private void nicknames_received (string channel_name, string[] nicknames) {
-        // Initialize the buffers to an empty list
+        // Initialize the buffer to an empty list
         if (!nickname_buffer.has_key (channel_name) || nickname_buffer.get (channel_name) == null) {
             nickname_buffer.set (channel_name, new Gee.LinkedList<string> ());
-        }
-        if (!operators_buffer.has_key (channel_name) || operators_buffer.get (channel_name) == null) {
-            operators_buffer.set (channel_name, new Gee.LinkedList<string> ());
         }
         // Add each new nickname to the buffer
         foreach (string nickname in nicknames) {
             nickname_buffer.get (channel_name).add (nickname);
-            if (nickname.has_prefix ("@")) {
-                operators_buffer.get (channel_name).add (nickname);
-            }
         }
     }
 
@@ -705,15 +632,12 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         // Copy the buffered nicknames over to the master map of users by channel
         channel_users.unset (channel_name);
         channel_users.set (channel_name, nickname_buffer.get (channel_name));
-        channel_operators.unset (channel_name);
-        channel_operators.set (channel_name, operators_buffer.get (channel_name));
         //  foreach (var user in channel_users.get (channel_name)) {
         //      print (user + ", ");
         //  }
         //  print ("\n");
         // Clear the buffered nicknames
         nickname_buffer.unset (channel_name);
-        operators_buffer.unset (channel_name);
         // Send the signal
         channel_users_received (channel_name);
     }
@@ -776,16 +700,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         send_output (Iridium.Services.MessageCommands.TOPIC + " " + channel_name + " :" + topic);
     }
 
-    public Gee.List<Iridium.Models.ChannelListEntry> get_channel_list () {
-        return channel_list;
-    }
-
-    public void request_channel_list () {
-        // TODO: Add a parameter to force? This should be cached ideally, it's a large list that we don't want to re-fetch
-        // ever time the dialog is opened.
-        send_output (Iridium.Services.MessageCommands.LIST);
-    }
-
     public signal bool unacceptable_certificate (TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors, SocketConnectable connectable);
     public signal void open_successful (string nickname, Iridium.Services.Message message);
     public signal void open_failed (string error_message, string? error_details = null);
@@ -811,8 +725,5 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     public signal void nickname_changed (string old_nickname, string new_nickname);
     public signal void user_changed_nickname (string old_nickname, string new_nickname);
     public signal void network_name_received (string network_name);
-    public signal void user_channel_mode_changed (string channel_name, string mode_chars, string nickname, string target_nickname);
-    public signal void action_message_received (string channel_name, string nickname, string self_nickname, string action);
-    public signal void channel_list_received (Gee.List<Iridium.Models.ChannelListEntry> channel_list);
 
 }

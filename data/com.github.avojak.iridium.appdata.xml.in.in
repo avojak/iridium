@@ -21,26 +21,7 @@
     <binary>@appid@</binary>
   </provides>
   <releases>
-    <release version="1.1.0" date="2021-05-16">
-      <description>
-        <p>1.1.0 Release</p>
-        <ul>
-          <li>Spanish translations by JeysonFlores</li>
-          <li>Dutch translations by Vistaus</li>
-          <li>Display available channel list (#18)</li>
-          <li>Allow suppressing join/part messages (#20)</li>
-          <li>Display date/time in chat views when message received after some time (#21)</li>
-          <li>Support opening irc:// links (#28)</li>
-          <li>Remember window size and position (#42)</li>
-          <li>Support /me actions (#47)</li>
-          <li>Add visual indicator for channel operator status (#52)</li>
-          <li>Use Sqlite.Database.exec instead of Sqlite.Statement.step (#122)</li>
-          <li>Fix in64_parse error on RPL_TOPICWHOTIME messages (#132)</li>
-          <li>Force monospace font in chat views in preparation for elementary OS 6</li>
-        </ul>
-      </description>
-    </release>
-    <release version="1.0.0" date="2021-01-21">
+    <release version="1.0.0" date="2020-01-21">
       <description>
         <p>Initial Release</p>
       </description>

@@ -1,16 +1,11 @@
-[![Build Status](https://travis-ci.com/avojak/iridium.svg?branch=develop)](https://travis-ci.com/avojak/iridium)
+[![Build Status](https://travis-ci.com/avojak/iridium.svg?branch=master)](https://travis-ci.com/avojak/iridium)
 ![Lint](https://github.com/avojak/iridium/workflows/Lint/badge.svg)
 ![GitHub](https://img.shields.io/github/license/avojak/iridium.svg?color=blue)
-![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/avojak/iridium?sort=semver)
-[![Mentioned in Awesome IRC](https://awesome.re/mentioned-badge.svg)](https://github.com/davisonio/awesome-irc)
 
 <p align="center">
   <img src="data/assets/iridium.svg" alt="Icon" />
 </p>
 <h1 align="center">Iridium</h1>
-<p align="center">
-  <a href="https://appcenter.elementary.io/com.github.avojak.iridium"><img src="https://appcenter.elementary.io/badge.svg" alt="Get it on AppCenter" /></a>
-</p>
 
 | ![Screenshot](data/assets/screenshots/iridium-screenshot-01.png) | ![Screenshot](data/assets/screenshots/iridium-screenshot-02.png) |
 |------------------------------------------------------------------|------------------------------------------------------------------|
