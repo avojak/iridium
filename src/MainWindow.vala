@@ -618,16 +618,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
             });
         }
         browse_channels_dialog.present ();
-        //  Gee.List<Iridium.Models.ChannelListEntry> channels = Iridium.Application.connection_manager.request_channel_list (server_name);
-        //  if (channels.is_empty ()) {
         browse_channels_dialog.show_loading ();
         Iridium.Application.connection_manager.request_channel_list (server_name);
-        //  } else {
-            //  Idle.add (() => {
-                //  browse_channels_dialog.set_channels (channels);
-                //  return false;
-            //  });
-        //  }
     }
 
     private void join_channel (string server_name, string channel_name) {
@@ -1238,7 +1230,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     }
 
     private void on_channel_list_received (string server_name, Gee.List<Iridium.Models.ChannelListEntry> channel_list) {
-        // TODO: Also check which channel was clicked in the dialog
         if (browse_channels_dialog != null && browse_channels_dialog.get_server () == server_name) {
             Idle.add (() => {
                 browse_channels_dialog.set_channels (channel_list);
