@@ -32,6 +32,7 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
     private static Gtk.Entry search_entry;
 
     private Gtk.TreeView tree_view;
+    private Gtk.ListStore placeholder_list_store;
     private Gtk.ListStore list_store;
     private Gtk.TreeModelFilter filter;
     private Gtk.Spinner spinner;
@@ -93,10 +94,6 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
         search_entry.sensitive = false;
         search_entry.hexpand = true;
         search_entry.secondary_icon_tooltip_text = _("Clear");
-        //  search_entry.activate.connect (() => {
-        //      message_to_send (search_entry.get_text ());
-        //      search_entry.set_text ("");
-        //  });
         search_entry.changed.connect (() => {
             if (search_entry.text != "") {
                 search_entry.secondary_icon_name = "edit-clear-symbolic";
@@ -124,6 +121,7 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
         tree_view.enable_tree_lines = true;
         tree_view.fixed_height_mode = true;
 
+        placeholder_list_store = new Gtk.ListStore (3, typeof (string), typeof (string), typeof (string));
         list_store = new Gtk.ListStore (3, typeof (string), typeof (string), typeof (string));
         filter = new Gtk.TreeModelFilter (list_store, null);
         filter.set_visible_func ((Gtk.TreeModelFilterVisibleFunc) filter_func);
@@ -139,12 +137,10 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
             column.resizable = true;
         }
         tree_view.get_column (Column.NAME).min_width = 150;
-        //  tree_view.get_column (Column.NAME).reorderable = true;
-        //  tree_view.get_column (Column.NAME).clickable = true;
-        //  tree_view.get_column (Column.NAME).sort_order = Gtk.SortType.ASCENDING;
-        //  tree_view.get_column (Column.NAME).sort_indicator = true;
-        //  tree_view.get_column (Column.USERS).reorderable = true;
-        //  tree_view.get_column (Column.USERS).clickable = true;
+
+        // Use a placeholder list store with no data to ensure that the tree view will render the column
+        // headers and the proper size while the real data is being loaded in the background.
+        tree_view.set_model (placeholder_list_store);
 
         scrolled_window.add (tree_view);
 
@@ -181,22 +177,16 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
             if (channel_name == null) {
                 return;
             }
-            // TODO: Validate entries first!
-            spinner.start ();
+            
+            // Hold onto the channel that we're trying to join so that we can better
+            // respond to successful channel joins in the MainWindow
             joining_channel = channel_name;
+
+            spinner.start ();
             status_label.label = "";
-            //  var server_name = servers[server_combo.get_active ()];
-            //  var channel_name = channel_entry.get_text ().chug ().chomp ();
             
             join_button_clicked (channel_name);
         });
-
-        //  join_button.sensitive = server_combo.get_active () != -1;
-        //  server_combo.changed.connect (() => {
-        //      join_button.sensitive = server_combo.get_active () != -1;
-        //      browse_button.sensitive = server_combo.get_active () != -1;
-        //      channel_entry.sensitive = server_combo.get_active () != -1;
-        //  });
 
         tree_view.get_selection ().changed.connect (() => {
             join_button.sensitive = tree_view.get_selection ().count_selected_rows () > 0;
@@ -237,25 +227,18 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
 
     public void set_channels (Gee.List<Iridium.Models.ChannelListEntry> channels) {
         // For performance reasons, unset the data model before populating it, then re-add to the tree view once fully populated
-        tree_view.set_model (null);
+        tree_view.set_model (placeholder_list_store);
         search_entry.sensitive = false;
         list_store.clear ();
-        //  debug ("setting channels");
         foreach (var entry in channels) {
-            //  if (entry == null || entry.channel_name == null || entry.num_visible_users == null || entry.topic == null) {
-            //      continue;
-            //  }
             Gtk.TreeIter iter;
             list_store.append (out iter);
 			list_store.set (iter, Column.NAME, entry.channel_name,
                                  Column.USERS, entry.num_visible_users,
                                  Column.TOPIC, entry.topic);
         }
-        
-        //  Gtk.TreeModelFilterVisibleFunc tree_view_filter_func = filter_func;
-        //  debug ("setting model to filter");
+        // With the model fully populated, we can now update the view
         tree_view.set_model (filter);
-        //  debug ("stopping spinner");
         spinner.stop ();
         status_label.label = "%s channels found".printf (channels.size.to_string ());
         search_entry.sensitive = true;
@@ -265,13 +248,10 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
     // here: https://github.com/xfce-mirror/xfmpc/blob/921fa89585d61b7462e30bac5caa9b2f583dd491/src/playlist.vala
     // And it doesn't work otherwise...
     private static bool filter_func (Gtk.TreeModel model, Gtk.TreeIter iter) {
-        //  debug ("filter func");
         if (search_entry == null) {
-            //  debug ("null entry");
             return true;
         }
         string search_string = search_entry.get_text () == null ? "" : search_entry.get_text ().strip ().down ();
-        //  debug ("search string: %s", search_string);
         if (search_string == "") {
             return true;
         }
@@ -280,17 +260,8 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
         model.get (iter, Column.NAME, out name, -1);
         model.get (iter, Column.TOPIC, out topic, -1);
         if (name == null || topic == null) {
-            //  debug ("name: %s, topic: %s", name, topic);
             return true;
         }
-        //  if (name == null) {
-        //      debug ("name is null");
-        //      return false;
-        //  }
-        //  if (topic == null) {
-        //      debug ("topic is null");
-        //      return false;
-        //  }
         if (name.down ().contains (search_string) || topic.down ().contains (search_string)) {
             return true;
         }
