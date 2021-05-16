@@ -109,6 +109,7 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
         });
 
         Gtk.ScrolledWindow scrolled_window = new Gtk.ScrolledWindow (null, null);
+        scrolled_window.set_shadow_type (Gtk.ShadowType.ETCHED_IN);
         scrolled_window.max_content_height = 250;
         scrolled_window.max_content_width = 250;
         scrolled_window.height_request = 250;
