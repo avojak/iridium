@@ -645,7 +645,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         // TODO: Look into what other restrictions exist (https://tools.ietf.org/html/rfc1459#section-1.3)
         if (!channel_name.has_prefix ("#") && !channel_name.has_prefix ("&") && channel_join_dialog != null) {
             // TODO: Eventually validate that the dialog is non-null, and handle accordingly
-            channel_join_dialog.display_error (_("Channel must begin with '#' or '&'"));  
+            channel_join_dialog.display_error (_("Channel must begin with '#' or '&'"));
             return;
         }
         if (channel_name.length < 2 && channel_join_dialog != null) {

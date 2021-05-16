@@ -41,10 +41,10 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
     private string? joining_channel;
 
     enum Column {
-		NAME,
-		USERS,
-		TOPIC
-	}
+        NAME,
+        USERS,
+        TOPIC
+    }
 
     public BrowseChannelsDialog (Iridium.MainWindow main_window, string server_name) {
         Object (
@@ -177,14 +177,14 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
             if (channel_name == null) {
                 return;
             }
-            
+
             // Hold onto the channel that we're trying to join so that we can better
             // respond to successful channel joins in the MainWindow
             joining_channel = channel_name;
 
             spinner.start ();
             status_label.label = "";
-            
+
             join_button_clicked (channel_name);
         });
 
@@ -233,7 +233,7 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
         foreach (var entry in channels) {
             Gtk.TreeIter iter;
             list_store.append (out iter);
-			list_store.set (iter, Column.NAME, entry.channel_name,
+            list_store.set (iter, Column.NAME, entry.channel_name,
                                  Column.USERS, entry.num_visible_users,
                                  Column.TOPIC, entry.topic);
         }
