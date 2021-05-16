@@ -501,6 +501,9 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 channel_buffer.clear ();
                 channel_list_received (channel_list);
                 break;
+            case Iridium.Services.NumericCodes.RPL_TRYAGAIN:
+                server_error_received (message);
+                break;
 
             // Errors
             case Iridium.Services.NumericCodes.ERR_ERRONEOUSNICKNAME:

@@ -1074,8 +1074,9 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
                 }
                 main_layout.show_chat_view (server_name, channel_name);
             }
-            if (browse_channels_dialog != null && browse_channels_dialog.get_server () == server_name) {
+            if (browse_channels_dialog != null && browse_channels_dialog.get_server () == server_name && browse_channels_dialog.get_channel () == channel_name) {
                 browse_channels_dialog.dismiss ();
+                main_layout.show_chat_view (server_name, channel_name);
             }
             set_channel_users_button_enabled (server_name, channel_name, true);
             return false;
@@ -1239,7 +1240,10 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     private void on_channel_list_received (string server_name, Gee.List<Iridium.Models.ChannelListEntry> channel_list) {
         // TODO: Also check which channel was clicked in the dialog
         if (browse_channels_dialog != null && browse_channels_dialog.get_server () == server_name) {
-            browse_channels_dialog.set_channels (channel_list);
+            Idle.add (() => {
+                browse_channels_dialog.set_channels (channel_list);
+                return false;
+            });
         }
     }
 

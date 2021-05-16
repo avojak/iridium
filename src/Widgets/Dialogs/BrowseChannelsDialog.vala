@@ -21,15 +21,23 @@
 
 public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
 
+    // TODO: At some point it might be nice to add the ability to sort the columns
+
     public unowned Iridium.MainWindow main_window { get; construct; }
     public string server_name { get; construct; }
+
+    // I'm not 100% sure why this needs to be static - but they did it over
+    // here: https://github.com/xfce-mirror/xfmpc/blob/921fa89585d61b7462e30bac5caa9b2f583dd491/src/playlist.vala
+    // And it doesn't work otherwise...
+    private static Gtk.Entry search_entry;
 
     private Gtk.TreeView tree_view;
     private Gtk.ListStore list_store;
     private Gtk.TreeModelFilter filter;
     private Gtk.Spinner spinner;
     private Gtk.Label status_label;
-    private Gtk.Entry search_entry;
+
+    private string? joining_channel;
 
     enum Column {
 		NAME,
@@ -89,13 +97,13 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
         //      message_to_send (search_entry.get_text ());
         //      search_entry.set_text ("");
         //  });
-        search_entry.changed.connect (filter.refilter);
         search_entry.changed.connect (() => {
             if (search_entry.text != "") {
                 search_entry.secondary_icon_name = "edit-clear-symbolic";
             } else {
                 search_entry.secondary_icon_name = null;
             }
+            filter.refilter ();
         });
         search_entry.icon_release.connect ((icon_pos, event) => {
             if (icon_pos == Gtk.EntryIconPosition.SECONDARY) {
@@ -131,6 +139,12 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
             column.resizable = true;
         }
         tree_view.get_column (Column.NAME).min_width = 150;
+        //  tree_view.get_column (Column.NAME).reorderable = true;
+        //  tree_view.get_column (Column.NAME).clickable = true;
+        //  tree_view.get_column (Column.NAME).sort_order = Gtk.SortType.ASCENDING;
+        //  tree_view.get_column (Column.NAME).sort_indicator = true;
+        //  tree_view.get_column (Column.USERS).reorderable = true;
+        //  tree_view.get_column (Column.USERS).clickable = true;
 
         scrolled_window.add (tree_view);
 
@@ -160,14 +174,21 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
         });
 
         var join_button = new Gtk.Button.with_label (_("Join"));
+        join_button.sensitive = false;
         join_button.get_style_context ().add_class ("suggested-action");
         join_button.clicked.connect (() => {
+            string? channel_name = get_selection ();
+            if (channel_name == null) {
+                return;
+            }
             // TODO: Validate entries first!
             spinner.start ();
+            joining_channel = channel_name;
             status_label.label = "";
             //  var server_name = servers[server_combo.get_active ()];
             //  var channel_name = channel_entry.get_text ().chug ().chomp ();
-            //  join_button_clicked (server_name, channel_name);
+            
+            join_button_clicked (channel_name);
         });
 
         //  join_button.sensitive = server_combo.get_active () != -1;
@@ -177,12 +198,41 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
         //      channel_entry.sensitive = server_combo.get_active () != -1;
         //  });
 
+        tree_view.get_selection ().changed.connect (() => {
+            join_button.sensitive = tree_view.get_selection ().count_selected_rows () > 0;
+        });
+
         add_action_widget (cancel_button, 0);
         add_action_widget (join_button, 1);
     }
 
+    private string? get_selection () {
+        var selection = tree_view.get_selection ();
+        if (selection.count_selected_rows () > 1) {
+            // This should never happen
+            return null;
+        }
+        Gtk.TreeModel model = filter;
+        var list = selection.get_selected_rows (out model);
+        if (list.length () == 0) {
+            return null;
+        }
+        Gtk.TreeIter iter;
+        var path = list.nth_data (0);
+        if (filter.get_iter (out iter, path)) {
+            string channel_name = "";
+            filter.get (iter, Column.NAME, out channel_name, -1);
+            return channel_name;
+        }
+        return null;
+    }
+
     public string get_server () {
         return server_name;
+    }
+
+    public string? get_channel () {
+        return joining_channel;
     }
 
     public void set_channels (Gee.List<Iridium.Models.ChannelListEntry> channels) {
@@ -190,6 +240,7 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
         tree_view.set_model (null);
         search_entry.sensitive = false;
         list_store.clear ();
+        //  debug ("setting channels");
         foreach (var entry in channels) {
             //  if (entry == null || entry.channel_name == null || entry.num_visible_users == null || entry.topic == null) {
             //      continue;
@@ -202,28 +253,34 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
         }
         
         //  Gtk.TreeModelFilterVisibleFunc tree_view_filter_func = filter_func;
+        //  debug ("setting model to filter");
         tree_view.set_model (filter);
+        //  debug ("stopping spinner");
         spinner.stop ();
         status_label.label = "%s channels found".printf (channels.size.to_string ());
         search_entry.sensitive = true;
     }
 
-    private bool filter_func (Gtk.TreeModel model, Gtk.TreeIter iter) {
-        debug ("filter func");
+    // I'm not 100% sure why this needs to be static - but they did it over
+    // here: https://github.com/xfce-mirror/xfmpc/blob/921fa89585d61b7462e30bac5caa9b2f583dd491/src/playlist.vala
+    // And it doesn't work otherwise...
+    private static bool filter_func (Gtk.TreeModel model, Gtk.TreeIter iter) {
+        //  debug ("filter func");
         if (search_entry == null) {
-            debug ("null entry");
+            //  debug ("null entry");
             return true;
         }
         string search_string = search_entry.get_text () == null ? "" : search_entry.get_text ().strip ().down ();
-        debug ("search string: %s", search_string);
+        //  debug ("search string: %s", search_string);
         if (search_string == "") {
             return true;
         }
         string name = "";
         string topic = "";
-        //  model.get (iter, Column.NAME, &name, -1);
-        //  model.get (iter, Column.TOPIC, &topic, -1);
+        model.get (iter, Column.NAME, out name, -1);
+        model.get (iter, Column.TOPIC, out topic, -1);
         if (name == null || topic == null) {
+            //  debug ("name: %s, topic: %s", name, topic);
             return true;
         }
         //  if (name == null) {
@@ -249,6 +306,7 @@ public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
         // TODO: We can make the error messaging better
         spinner.stop ();
         status_label.label = message;
+        joining_channel = null;
     }
 
     public void show_loading () {
