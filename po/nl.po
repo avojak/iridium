@@ -7,20 +7,24 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.avojak.iridium\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-02 13:32-0700\n"
+"POT-Creation-Date: 2021-05-16 17:19-0600\n"
 "PO-Revision-Date: 2021-03-27 14:10+0100\n"
+"Last-Translator: Heimen Stoffels <vistausss@outlook.com>\n"
 "Language-Team: \n"
+"Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 2.4.2\n"
-"Last-Translator: Heimen Stoffels <vistausss@outlook.com>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Language: nl\n"
 
-#: src/Layouts/MainLayout.vala:395
+#: src/Layouts/MainLayout.vala:399
 msgid "Restoring server connections…"
 msgstr "Bezig met herstellen van serververbindingen…"
+
+#: src/Layouts/MainLayout.vala:418
+msgid "Opening URI…"
+msgstr ""
 
 #: src/Models/AuthenticationMethod.vala:31
 msgid "None"
@@ -76,42 +80,42 @@ msgstr "Waarschuwen"
 msgid "Allow"
 msgstr "Toestaan"
 
-#: src/Services/ServerConnection.vala:83
+#: src/Services/ServerConnection.vala:87
 msgid "Error while connecting"
 msgstr "Fout bij verbinden"
 
-#: src/Services/ServerConnection.vala:179
+#: src/Services/ServerConnection.vala:183
 msgid "Certificate rejected:"
 msgstr "Certificaat geweigerd:"
 
-#: src/Services/ServerConnection.vala:179
+#: src/Services/ServerConnection.vala:183
 msgid ""
 "See the application preferences to configure the certificate validation "
 "policy."
 msgstr ""
 "Ga naar de toepassingsvoorkeuren om het certificaatbeleid in te stellen."
 
-#: src/Services/ServerConnection.vala:196
+#: src/Services/ServerConnection.vala:200
 msgid "Certificate was rejected by the user."
 msgstr "Het certificaat is geweigerd door de gebruiker."
 
-#: src/Views/ChannelChatView.vala:39
+#: src/Views/ChannelChatView.vala:38
 msgid "You must join this channel to begin chatting"
 msgstr "Neem deel aan het kanaal om te chatten"
 
-#: src/Views/ChatView.vala:69
+#: src/Views/ChatView.vala:74
 msgid "You have unread messages!"
 msgstr "Je hebt ongelezen berichten!"
 
-#: src/Views/ChatView.vala:70
+#: src/Views/ChatView.vala:75
 msgid "Take me there"
 msgstr "Ga ernaartoe"
 
-#: src/Views/ChatView.vala:90
+#: src/Views/ChatView.vala:95 src/Widgets/Dialogs/BrowseChannelsDialog.vala:96
 msgid "Clear"
 msgstr "Wissen"
 
-#: src/Views/PrivateMessageChatView.vala:41 src/Views/ServerChatView.vala:36
+#: src/Views/PrivateMessageChatView.vala:39 src/Views/ServerChatView.vala:36
 msgid "You are not connected to this server"
 msgstr "Je bent niet verbonden met deze server"
 
@@ -130,6 +134,47 @@ msgstr "Server toevoegen"
 #: src/Views/Welcome.vala:42
 msgid "Connect to a server and save it in the server list"
 msgstr "Maak verbinding met een server en sla deze op op de serverlijst"
+
+#: src/Widgets/Dialogs/BrowseChannelsDialog.vala:53
+#: src/Widgets/Dialogs/BrowseChannelsDialog.vala:73
+#, fuzzy
+msgid "Browse Channels"
+msgstr "Favoriete kanalen"
+
+#: src/Widgets/Dialogs/BrowseChannelsDialog.vala:90
+msgid "Search:"
+msgstr ""
+
+#: src/Widgets/Dialogs/BrowseChannelsDialog.vala:133
+#, fuzzy
+msgid "Name"
+msgstr "Echte naam"
+
+#: src/Widgets/Dialogs/BrowseChannelsDialog.vala:134
+#, fuzzy
+msgid "Users"
+msgstr "Gebruikersnaam"
+
+#: src/Widgets/Dialogs/BrowseChannelsDialog.vala:135
+msgid "Topic"
+msgstr ""
+
+#: src/Widgets/Dialogs/BrowseChannelsDialog.vala:168
+#: src/Widgets/Dialogs/ChannelTopicEditDialog.vala:112
+#: src/Widgets/Dialogs/ForgetConnectionsWarningDialog.vala:38
+#: src/Widgets/Dialogs/NicknameEditDialog.vala:92
+#: src/Widgets/Dialogs/ServerConnectionDialog.vala:124
+msgid "Cancel"
+msgstr "Annuleren"
+
+#: src/Widgets/Dialogs/BrowseChannelsDialog.vala:173
+#: src/Widgets/Dialogs/ChannelJoinDialog.vala:154 src/Widgets/HeaderBar.vala:38
+msgid "Join"
+msgstr "Deelnemen"
+
+#: src/Widgets/Dialogs/BrowseChannelsDialog.vala:286
+msgid "Retrieving channels, this may take a minute…"
+msgstr ""
 
 #: src/Widgets/Dialogs/CertificateWarningDialog.vala:51
 msgid "Untrusted Connection"
@@ -160,25 +205,18 @@ msgstr "Deelnemen aan kanaal"
 msgid "Channel:"
 msgstr "Kanaal:"
 
-#: src/Widgets/Dialogs/ChannelJoinDialog.vala:140
+#: src/Widgets/Dialogs/ChannelJoinDialog.vala:121
+msgid "Browse…"
+msgstr ""
+
+#: src/Widgets/Dialogs/ChannelJoinDialog.vala:149
 msgid "Not Now"
 msgstr "Niet nu"
-
-#: src/Widgets/Dialogs/ChannelJoinDialog.vala:145 src/Widgets/HeaderBar.vala:38
-msgid "Join"
-msgstr "Deelnemen"
 
 #: src/Widgets/Dialogs/ChannelTopicEditDialog.vala:37
 #: src/Widgets/Dialogs/ChannelTopicEditDialog.vala:57
 msgid "Edit Channel Topic"
 msgstr "Kanaalonderwerp aanpassen"
-
-#: src/Widgets/Dialogs/ChannelTopicEditDialog.vala:112
-#: src/Widgets/Dialogs/ForgetConnectionsWarningDialog.vala:38
-#: src/Widgets/Dialogs/NicknameEditDialog.vala:92
-#: src/Widgets/Dialogs/ServerConnectionDialog.vala:123
-msgid "Cancel"
-msgstr "Annuleren"
 
 #: src/Widgets/Dialogs/ChannelTopicEditDialog.vala:117
 #: src/Widgets/Dialogs/ChannelTopicEditDialog.vala:134
@@ -225,7 +263,7 @@ msgid "Real Name"
 msgstr "Echte naam"
 
 #: src/Widgets/Dialogs/ManageConnectionsDialog.vala:126
-#: src/Widgets/Dialogs/PreferencesDialog.vala:235
+#: src/Widgets/Dialogs/PreferencesDialog.vala:245
 #: src/Widgets/SidePanel/ChannelRow.vala:121
 #: src/Widgets/SidePanel/PrivateMessageRow.vala:84
 msgid "Close"
@@ -241,7 +279,7 @@ msgid "Edit Nickname"
 msgstr "Bijnaam wijzigen"
 
 #: src/Widgets/Dialogs/PreferencesDialog.vala:42
-#: src/Widgets/Dialogs/PreferencesDialog.vala:66 src/Widgets/HeaderBar.vala:123
+#: src/Widgets/Dialogs/PreferencesDialog.vala:66
 msgid "Preferences"
 msgstr "Voorkeuren"
 
@@ -258,14 +296,18 @@ msgid "Default Real Name:"
 msgstr "Standaard echte naam:"
 
 #: src/Widgets/Dialogs/PreferencesDialog.vala:102
+msgid "Suppress join/part messages:"
+msgstr ""
+
+#: src/Widgets/Dialogs/PreferencesDialog.vala:109
 msgid "Security and Privacy"
 msgstr "Beveiliging en privacy"
 
-#: src/Widgets/Dialogs/PreferencesDialog.vala:104
+#: src/Widgets/Dialogs/PreferencesDialog.vala:111
 msgid "Unacceptable SSL/TLS Certificates:"
 msgstr "Onacceptabele ssl- en tls-certificaten:"
 
-#: src/Widgets/Dialogs/PreferencesDialog.vala:150
+#: src/Widgets/Dialogs/PreferencesDialog.vala:157
 msgid ""
 "<i>If a server presents an unacceptable SSL/TLS certificate, no connection "
 "will be made.</i> <b>(Recommended)</b>"
@@ -273,7 +315,7 @@ msgstr ""
 "<i>Als een server een onacceptabel ssl- of tls-certificaat aanbiedt, dan "
 "wordt er geen verbinding gemaakt.</i> <b>(aanbevolen)</b>"
 
-#: src/Widgets/Dialogs/PreferencesDialog.vala:167
+#: src/Widgets/Dialogs/PreferencesDialog.vala:174
 msgid ""
 "<i>If a server presents an unacceptable SSL/TLS certificate, the user will "
 "be warned and can choose whether or not to proceed.</i>"
@@ -281,7 +323,7 @@ msgstr ""
 "<i>Als een server een onacceptabel ssl- of tls-certificaat aanbiedt, dan "
 "wordt er een waarschuwing getoond.</i>"
 
-#: src/Widgets/Dialogs/PreferencesDialog.vala:184
+#: src/Widgets/Dialogs/PreferencesDialog.vala:191
 msgid ""
 "<i>If a server presents an unacceptable SSL/TLS certificate, the connection "
 "will still be made.</i> <b>(Not recommended)</b>"
@@ -289,19 +331,19 @@ msgstr ""
 "<i>Als een server een onacceptabel ssl- of tls-certificaat aanbiedt, dan "
 "wordt er tóch verbinding gemaakt.</i> <b>(niet aanbevolen)</b>"
 
-#: src/Widgets/Dialogs/PreferencesDialog.vala:198
+#: src/Widgets/Dialogs/PreferencesDialog.vala:205
 msgid "Remember connections between sessions:"
 msgstr "Verbindingen onthouden tussen sessies:"
 
-#: src/Widgets/Dialogs/ServerConnectionDialog.vala:47
+#: src/Widgets/Dialogs/ServerConnectionDialog.vala:48
 msgid "Connect to a Server"
 msgstr "Verbinden met server"
 
-#: src/Widgets/Dialogs/ServerConnectionDialog.vala:65
+#: src/Widgets/Dialogs/ServerConnectionDialog.vala:66
 msgid "Connection secure"
 msgstr "Beveiligde verbinding"
 
-#: src/Widgets/Dialogs/ServerConnectionDialog.vala:67
+#: src/Widgets/Dialogs/ServerConnectionDialog.vala:68
 msgid ""
 "Connection secure, provided only trusted certificates are accepted when "
 "prompted"
@@ -309,7 +351,7 @@ msgstr ""
 "Beveiligde verbinding, maar alleen vertrouwde certificaten worden "
 "geaccepteerd"
 
-#: src/Widgets/Dialogs/ServerConnectionDialog.vala:69
+#: src/Widgets/Dialogs/ServerConnectionDialog.vala:70
 msgid ""
 "Connection may be insecure. Consider rejecting unacceptable certificates "
 "from the application preferences."
@@ -317,58 +359,58 @@ msgstr ""
 "Mogelijk onbeveiligde verbinding. Overweeg onacceptabele certificaten te "
 "weigeren in de voorkeuren."
 
-#: src/Widgets/Dialogs/ServerConnectionDialog.vala:71
+#: src/Widgets/Dialogs/ServerConnectionDialog.vala:72
 msgid "Connection insecure. Consider enabling SSL/TLS from the Advanced tab."
 msgstr ""
 "Onbeveiligde verbinding. Overweeg ssl/tls in te schakelen op het tabblad "
 "'Geavanceerd'."
 
-#: src/Widgets/Dialogs/ServerConnectionDialog.vala:79
+#: src/Widgets/Dialogs/ServerConnectionDialog.vala:80
 msgid "New Connection"
 msgstr "Nieuwe verbinding"
 
-#: src/Widgets/Dialogs/ServerConnectionDialog.vala:103
+#: src/Widgets/Dialogs/ServerConnectionDialog.vala:104
 msgid "Basic"
 msgstr "Algemeen"
 
-#: src/Widgets/Dialogs/ServerConnectionDialog.vala:104
+#: src/Widgets/Dialogs/ServerConnectionDialog.vala:105
 msgid "Advanced"
 msgstr "Geavanceerd"
 
 #: src/Widgets/Dialogs/ServerConnectionDialog.vala:129
-#: src/Widgets/SidePanel/ServerRow.vala:158
+#: src/Widgets/SidePanel/ServerRow.vala:163
 msgid "Connect"
 msgstr "Verbinden"
 
-#: src/Widgets/Dialogs/ServerConnectionDialog.vala:147
+#: src/Widgets/Dialogs/ServerConnectionDialog.vala:166
 msgid "Server:"
 msgstr "Server:"
 
-#: src/Widgets/Dialogs/ServerConnectionDialog.vala:154
+#: src/Widgets/Dialogs/ServerConnectionDialog.vala:173
 msgid "Nickname:"
 msgstr "Bijnaam:"
 
-#: src/Widgets/Dialogs/ServerConnectionDialog.vala:168
+#: src/Widgets/Dialogs/ServerConnectionDialog.vala:187
 msgid "Real Name:"
 msgstr "Echte naam:"
 
-#: src/Widgets/Dialogs/ServerConnectionDialog.vala:173
+#: src/Widgets/Dialogs/ServerConnectionDialog.vala:192
 msgid "Iridium IRC Client"
 msgstr "Iridium irc-client"
 
-#: src/Widgets/Dialogs/ServerConnectionDialog.vala:175
+#: src/Widgets/Dialogs/ServerConnectionDialog.vala:194
 msgid "Authentication Method:"
 msgstr "Verificatiemethode:"
 
-#: src/Widgets/Dialogs/ServerConnectionDialog.vala:203
+#: src/Widgets/Dialogs/ServerConnectionDialog.vala:222
 msgid "Password:"
 msgstr "Wachtwoord:"
 
-#: src/Widgets/Dialogs/ServerConnectionDialog.vala:244
+#: src/Widgets/Dialogs/ServerConnectionDialog.vala:263
 msgid "Use SSL/TLS:"
 msgstr "SSL/TLS gebruiken:"
 
-#: src/Widgets/Dialogs/ServerConnectionDialog.vala:260
+#: src/Widgets/Dialogs/ServerConnectionDialog.vala:279
 msgid "Port:"
 msgstr "Poort:"
 
@@ -408,19 +450,24 @@ msgstr "Verwerpen"
 msgid "Join a Channel…"
 msgstr "Deelnemen aan kanaal…"
 
-#: src/Widgets/SidePanel/ServerRow.vala:163
+#: src/Widgets/SidePanel/ServerRow.vala:158
+#, fuzzy
+msgid "Edit Connection…"
+msgstr "Nieuwe verbinding"
+
+#: src/Widgets/SidePanel/ServerRow.vala:168
 msgid "Disconnect"
 msgstr "Verbinding verbreken"
 
-#: src/Widgets/SidePanel/ServerRow.vala:168
+#: src/Widgets/SidePanel/ServerRow.vala:173
 msgid "Remove"
 msgstr "Verwijderen"
 
-#: src/Widgets/SidePanel/ServerRow.vala:200
+#: src/Widgets/SidePanel/ServerRow.vala:207
 msgid "Are you sure you want to proceed?"
 msgstr "Weet je zeker dat je wilt doorgaan?"
 
-#: src/Widgets/SidePanel/ServerRow.vala:201
+#: src/Widgets/SidePanel/ServerRow.vala:208
 msgid ""
 "By removing this connection you will be disconnected, and will not be able "
 "to recover the connection settings. If you wish to join this server again in "
@@ -430,11 +477,11 @@ msgstr ""
 "onomkeerbaar. Als je weer verbinding wilt maken met deze server, dan moet je "
 "de verbindingsinstellingen opnieuw opgeven."
 
-#: src/Widgets/SidePanel/ServerRow.vala:206
+#: src/Widgets/SidePanel/ServerRow.vala:213
 msgid "Yes, remove"
 msgstr "Ja, verwijderen"
 
-#: src/Widgets/SidePanel/ServerRow.vala:210
+#: src/Widgets/SidePanel/ServerRow.vala:217
 msgid "Don't warn me again"
 msgstr "Niet meer tonen"
 
@@ -443,12 +490,14 @@ msgid "No users"
 msgstr "Geen gebruikers"
 
 #: src/Widgets/HeaderBar.vala:43
-msgid "New Server Connection"
+#, fuzzy
+msgid "New Server Connection…"
 msgstr "Nieuwe serververbinding"
 
 #: src/Widgets/HeaderBar.vala:53
-msgid "Join Channel"
-msgstr "Deelnemen aan kanaal"
+#, fuzzy
+msgid "Join Channel…"
+msgstr "Deelnemen aan kanaal…"
 
 #: src/Widgets/HeaderBar.vala:78
 msgid "Channel users"
@@ -473,6 +522,11 @@ msgstr "Zijpaneel tonen/verbergen"
 #: src/Widgets/HeaderBar.vala:113
 msgid "Reset Marker Line"
 msgstr "Markering terugzetten"
+
+#: src/Widgets/HeaderBar.vala:123
+#, fuzzy
+msgid "Preferences…"
+msgstr "Voorkeuren"
 
 #: src/Widgets/HeaderBar.vala:133
 msgid "Quit"
@@ -502,53 +556,92 @@ msgstr "Deelnemen aan server of kanaal"
 msgid "Manage connections…"
 msgstr "Verbindingen beheren…"
 
-#: src/MainWindow.vala:273
+#: src/MainWindow.vala:410 src/MainWindow.vala:456
 msgid "Already connected to this server!"
 msgstr "Je bent al verbonden met deze server!"
 
-#: src/MainWindow.vala:370
+#: src/MainWindow.vala:629 src/MainWindow.vala:631
 msgid "You've already joined this channel"
 msgstr "Je neemt al deel aan dit kanaal!"
 
-#: src/MainWindow.vala:378
+#: src/MainWindow.vala:640
 msgid "Channel must begin with '#' or '&'"
 msgstr "De kanaalnaam moet beginnen met '#' of '&'"
 
-#: src/MainWindow.vala:382
+#: src/MainWindow.vala:644
 msgid "Enter a channel name"
 msgstr "Voer een kanaalnaam in"
 
-#: src/MainWindow.vala:412
+#: src/MainWindow.vala:674
 msgid "Start your message with a /"
 msgstr "Begin je bericht met een /"
 
-#: src/MainWindow.vala:471
+#: src/MainWindow.vala:740
 msgid "No recipient nickname specified (Usage: /msg <nickname> <message>)"
 msgstr ""
 "Je hebt geen ontvanger opgegeven (gebruiksvoorbeeld: /msg <bijnaam> "
 "<bericht>)"
 
-#: src/MainWindow.vala:475
+#: src/MainWindow.vala:744
 msgid "No message specified (Usage: /msg <nickname> <message>)"
 msgstr ""
 "Je hebt geen bericht ingevoerd (gebruiksvoorbeeld: /msg <bijnaam> <bericht>)"
 
-#: src/MainWindow.vala:646 src/MainWindow.vala:660
+#: src/MainWindow.vala:755
+#, fuzzy
+msgid "No action specified (Usage: /me <action>)"
+msgstr ""
+"Je hebt geen bericht ingevoerd (gebruiksvoorbeeld: /msg <bijnaam> <bericht>)"
+
+#: src/MainWindow.vala:944 src/MainWindow.vala:958
 msgid " has quit"
 msgstr " is weggegaan"
 
-#: src/MainWindow.vala:691
+#: src/MainWindow.vala:993
+#, fuzzy
+msgid " has cleared the topic"
+msgstr "Onderwerp verwijderen"
+
+#: src/MainWindow.vala:995
+msgid " has changed the topic to: "
+msgstr ""
+
+#: src/MainWindow.vala:1010
+msgid "Topic for "
+msgstr ""
+
+#: src/MainWindow.vala:1010
+msgid " is: "
+msgstr ""
+
+#: src/MainWindow.vala:1012
+msgid "Topic set by "
+msgstr ""
+
+#: src/MainWindow.vala:1024 src/MainWindow.vala:1027
 msgid "Nickname already in use."
 msgstr "Deze bijnaam is al in gebruik."
 
-#: src/MainWindow.vala:701
+#: src/MainWindow.vala:1033
+#, fuzzy
+msgid "Nickname already in use"
+msgstr "Deze bijnaam is al in gebruik."
+
+#: src/MainWindow.vala:1033
+msgid "Choose a new nickname and retry the connection."
+msgstr ""
+
+#: src/MainWindow.vala:1038
 msgid " is not a valid nickname."
 msgstr " is geen geldige bijnaam."
 
-#: src/MainWindow.vala:754
+#: src/MainWindow.vala:1099
 msgid " has joined"
 msgstr " neemt nu deel aan het kanaal"
 
-#: src/MainWindow.vala:765
+#: src/MainWindow.vala:1112
 msgid " has left"
 msgstr " heeft het kanaal verlaten"
+
+#~ msgid "Join Channel"
+#~ msgstr "Deelnemen aan kanaal"
