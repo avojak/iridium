@@ -37,6 +37,8 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     private Gee.Map<string, Gee.List<string>> nickname_buffer = new Gee.HashMap<string, Gee.List<string>> ();
     private Gee.Map<string, Gee.List<string>> channel_operators = new Gee.HashMap<string, Gee.List<string>> ();
     private Gee.Map<string, Gee.List<string>> operators_buffer = new Gee.HashMap<string, Gee.List<string>> ();
+    private Gee.List<Iridium.Models.ChannelListEntry> channel_list = new Gee.ArrayList<Iridium.Models.ChannelListEntry> ();
+    private Gee.List<Iridium.Models.ChannelListEntry> channel_buffer = new Gee.ArrayList<Iridium.Models.ChannelListEntry> ();
 
     private Gee.Map<string, string> channel_topics = new Gee.HashMap<string, string> ();
 
@@ -477,6 +479,31 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 display_message.message = message.params[0] + " has modes: " + message.params[1];
                 server_message_received (display_message);
                 break;
+            case Iridium.Services.NumericCodes.RPL_LISTSTART:
+                channel_buffer.clear ();
+                break;
+            case Iridium.Services.NumericCodes.RPL_LIST:
+                if (message.params[1] == null) {
+                    break;
+                }
+                var channel_name = message.params[1];
+                var num_visible_users = message.params[2] == null ? "0" : message.params[2];
+                var topic = message.message == null ? "" : message.message.strip ();
+                Iridium.Models.ChannelListEntry entry = new Iridium.Models.ChannelListEntry ();
+                entry.channel_name = channel_name;
+                entry.num_visible_users = num_visible_users;
+                entry.topic = topic;
+                channel_buffer.add (entry);
+                break;
+            case Iridium.Services.NumericCodes.RPL_LISTEND:
+                channel_list.clear ();
+                channel_list.add_all (channel_buffer);
+                channel_buffer.clear ();
+                channel_list_received (channel_list);
+                break;
+            case Iridium.Services.NumericCodes.RPL_TRYAGAIN:
+                server_error_received (message);
+                break;
 
             // Errors
             case Iridium.Services.NumericCodes.ERR_ERRONEOUSNICKNAME:
@@ -749,6 +776,16 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         send_output (Iridium.Services.MessageCommands.TOPIC + " " + channel_name + " :" + topic);
     }
 
+    public Gee.List<Iridium.Models.ChannelListEntry> get_channel_list () {
+        return channel_list;
+    }
+
+    public void request_channel_list () {
+        // TODO: Add a parameter to force? This should be cached ideally, it's a large list that we don't want to re-fetch
+        // ever time the dialog is opened.
+        send_output (Iridium.Services.MessageCommands.LIST);
+    }
+
     public signal bool unacceptable_certificate (TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors, SocketConnectable connectable);
     public signal void open_successful (string nickname, Iridium.Services.Message message);
     public signal void open_failed (string error_message, string? error_details = null);
@@ -776,5 +813,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     public signal void network_name_received (string network_name);
     public signal void user_channel_mode_changed (string channel_name, string mode_chars, string nickname, string target_nickname);
     public signal void action_message_received (string channel_name, string nickname, string self_nickname, string action);
+    public signal void channel_list_received (Gee.List<Iridium.Models.ChannelListEntry> channel_list);
 
 }

@@ -116,10 +116,19 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
         channel_entry.hexpand = true;
         /* channel_entry.placeholder_text = "#"; */
         channel_entry.text = "#";
+        channel_entry.sensitive = server_combo.get_active () != -1;
 
-        form_grid.attach (server_combo, 0, 0, 2, 1);
+        var browse_button = new Gtk.Button.with_label (_("Browse…"));
+        browse_button.sensitive = server_combo.get_active () != -1;
+        browse_button.clicked.connect (() => {
+            var server_name = servers[server_combo.get_active ()];
+            browse_button_clicked (server_name);
+        });
+
+        form_grid.attach (server_combo, 0, 0, 3, 1);
         form_grid.attach (channel_label, 0, 1, 1, 1);
         form_grid.attach (channel_entry, 1, 1, 1, 1);
+        form_grid.attach (browse_button, 2, 1, 1, 1);
 
         body.add (form_grid);
 
@@ -156,6 +165,8 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
         join_button.sensitive = server_combo.get_active () != -1;
         server_combo.changed.connect (() => {
             join_button.sensitive = server_combo.get_active () != -1;
+            browse_button.sensitive = server_combo.get_active () != -1;
+            channel_entry.sensitive = server_combo.get_active () != -1;
         });
 
         add_action_widget (not_now_button, 0);
@@ -192,5 +203,6 @@ public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
     }
 
     public signal void join_button_clicked (string server, string channel);
+    public signal void browse_button_clicked (string server);
 
 }
