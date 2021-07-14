@@ -53,6 +53,7 @@ To test the Flatpak build with Flatpak Builder:
 
 ```bash
 $ flatpak-builder build  com.github.avojak.iridium.yml --user --install --force-clean
+$ flatpak run com.github.avojak.iridium
 ```
 
 ### Development Build
