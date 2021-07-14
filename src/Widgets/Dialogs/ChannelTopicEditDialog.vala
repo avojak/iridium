@@ -19,7 +19,7 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Widgets.ChannelTopicEditDialog : Gtk.Dialog {
+public class Iridium.Widgets.ChannelTopicEditDialog : Granite.Dialog {
 
     // TODO: Query for the topic length limit and show it in the dialog
 

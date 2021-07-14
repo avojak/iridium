@@ -19,7 +19,7 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Widgets.ManageConnectionsDialog : Gtk.Dialog {
+public class Iridium.Widgets.ManageConnectionsDialog : Granite.Dialog {
 
     public unowned Iridium.MainWindow main_window { get; construct; }
     public Gee.List<Iridium.Services.Server> servers { get; construct; }
