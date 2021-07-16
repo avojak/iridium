@@ -19,7 +19,7 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Widgets.ChannelJoinDialog : Gtk.Dialog {
+public class Iridium.Widgets.ChannelJoinDialog : Granite.Dialog {
 
     public unowned Iridium.MainWindow main_window { get; construct; }
     public string[] servers { get; construct; }

@@ -35,23 +35,32 @@ dependencies required:
 - `meson`
 - `valac (>= 0.28.0)`
 - `libsqlite3-dev`
-- `libgtksourceview-3.0-dev`
+- `libgtksourceview-4-dev`
 
 An `install-dev-dependencies.sh` script is available to help developers get up and running.
 
 ## Building and Running
 
-```
+```bash
 $ meson build --prefix=/usr
 $ sudo ninja -C build install
 $ com.github.avojak.iridium
+```
+
+### Flatpak
+
+To test the Flatpak build with Flatpak Builder:
+
+```bash
+$ flatpak-builder build  com.github.avojak.iridium.yml --user --install --force-clean
+$ flatpak run com.github.avojak.iridium
 ```
 
 ### Development Build
 
 You can also install a development build alongside a stable version by specifying the dev profile:
 
-```
+```bash
 $ meson build --prefix=/usr -Dprofile=dev
 $ sudo ninja -C build install
 $ com.github.avojak.iridium-dev
@@ -64,13 +73,13 @@ reference to the file with the translatable string.
 
 Update the `.pot` file which contains the translatable strings:
 
-```
+```bash
 $ ninja -C build com.github.avojak.iridium-pot
 ```
 
 Generate translations for the languages listed in the `po/LINGUAS` files:
 
-```
+```bash
 $ ninja -C build com.github.avojak.iridium-update-po
 ```
 
