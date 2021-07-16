@@ -31,8 +31,8 @@ public class Iridium.Application : Gtk.Application {
     private GLib.List<Iridium.MainWindow> windows;
     private bool is_network_available;
 
-    private Gee.List<Iridium.Services.Server> restore_state_servers;
-    private Gee.List<Iridium.Services.Channel> restore_state_channels;
+    private Gee.List<Iridium.Services.Server> restore_state_servers = new Gee.ArrayList<Iridium.Services.Server> ();
+    private Gee.List<Iridium.Services.Channel> restore_state_channels = new Gee.ArrayList<Iridium.Services.Channel> ();
 
     private string[]? queued_command_line_arguments;
 
