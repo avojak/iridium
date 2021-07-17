@@ -21,6 +21,17 @@
     <binary>@appid@</binary>
   </provides>
   <releases>
+    <release version="1.2.0" date="2021-07-17">
+      <description>
+        <p>1.2.0 Release</p>
+        <ul>
+          <li>Support for elementary OS 6!</li>
+          <li>Include Flatpak manifest (#127, #147)</li>
+          <li>Updated Dutch translations by Vistaus</li>
+          <li>Fixed 'servers != NULL' error on startup (#118)</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.1.0" date="2021-05-16">
       <description>
         <p>1.1.0 Release</p>
