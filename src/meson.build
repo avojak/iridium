@@ -86,7 +86,7 @@ executable(
         dependency('gtk+-3.0', version: '>= 3.6.4'),
         dependency('gee-0.8', version: '>= 0.8.5'),
         dependency('glib-2.0', version: '>= 2.30.0'),
-        dependency('granite', version: '>= 0.5.1'),
+        dependency('granite', version: '>= 0.6.0'),
         dependency('libsecret-1', version: '>= 0.18.6'),
         dependency('sqlite3', version: '>= 3.22.0'),
         dependency('gtksourceview-4'),

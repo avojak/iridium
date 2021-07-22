@@ -25,7 +25,7 @@ Iridium is a native Linux IRC client built in Vala and Gtk for [elementary OS](h
 You can install Iridium by compiling from source. Here's the list of
 dependencies required:
 
-- `granite (>= 0.5.1)`
+- `granite (>= 0.6.0)`
 - `debhelper (>= 10.5.1)`
 - `gettext`
 - `libgtk-3-dev (>= 3.10)`
