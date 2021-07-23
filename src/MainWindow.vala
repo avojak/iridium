@@ -933,28 +933,32 @@ public class Iridium.MainWindow : Hdy.Window {
         // Display a message in any channel that the user was in
         Idle.add (() => {
             foreach (string channel in channels) {
-                var message_to_display = new Iridium.Services.Message ();
-                message_to_display.message = nickname + _(" has quit");
-                if (message.message != null && message.message.strip () != "") {
-                    message_to_display.message += " (" + message.message + ")";
+                if (!Iridium.Application.settings.get_boolean ("suppress-join-part-messages")) {
+                    var message_to_display = new Iridium.Services.Message ();
+                    message_to_display.message = nickname + _(" has quit");
+                    if (message.message != null && message.message.strip () != "") {
+                        message_to_display.message += " (" + message.message + ")";
+                    }
+                    main_layout.display_server_message (server_name, channel, message_to_display);
                 }
-                main_layout.display_server_message (server_name, channel, message_to_display);
                 update_channel_users_list (server_name, channel);
             }
             return false;
         });
 
         // If the user was in a private message chat view, display the message there
-        Idle.add (() => {
-            // Display a message in the channel chat view
-            var message_to_display = new Iridium.Services.Message ();
-            message_to_display.message = nickname + _(" has quit");
-            if (message.message != null && message.message.strip () != "") {
-                message_to_display.message += " (" + message.message + ")";
-            }
-            main_layout.display_server_message (server_name, nickname, message_to_display);
-            return false;
-        });
+        if (!Iridium.Application.settings.get_boolean ("suppress-join-part-messages")) {
+            Idle.add (() => {
+                // Display a message in the channel chat view
+                var message_to_display = new Iridium.Services.Message ();
+                message_to_display.message = nickname + _(" has quit");
+                if (message.message != null && message.message.strip () != "") {
+                    message_to_display.message += " (" + message.message + ")";
+                }
+                main_layout.display_server_message (server_name, nickname, message_to_display);
+                return false;
+            });
+        }
     }
 
     private void on_channel_users_received (string server_name, string channel_name) {
