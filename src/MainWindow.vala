@@ -19,7 +19,7 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.MainWindow : Gtk.ApplicationWindow {
+public class Iridium.MainWindow : Hdy.Window {
 
     public unowned Iridium.Application app { get; construct; }
 
@@ -35,7 +35,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     private Iridium.Widgets.NicknameEditDialog? nickname_edit_dialog = null;
     private Iridium.Widgets.BrowseChannelsDialog? browse_channels_dialog = null;
 
-    private Iridium.Widgets.HeaderBar header_bar;
     private Iridium.Layouts.MainLayout main_layout;
 
     public MainWindow (Iridium.Application application) {
@@ -52,10 +51,6 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         accel_group = new Gtk.AccelGroup ();
         add_accel_group (accel_group);
         action_manager = new Iridium.Services.ActionManager (app, this);
-
-        header_bar = new Iridium.Widgets.HeaderBar ();
-        header_bar.set_channel_users_button_visible (false);
-        set_titlebar (header_bar);
 
         main_layout = new Iridium.Layouts.MainLayout (this);
         add (main_layout);
@@ -78,9 +73,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         main_layout.disconnect_from_server_button_clicked.connect (on_disconnect_from_server_button_clicked);
         main_layout.edit_channel_topic_button_clicked.connect (on_edit_channel_topic_button_clicked);
         main_layout.edit_connection_button_clicked.connect (on_edit_connection_button_clicked);
-
-        // Connect to header signals
-        header_bar.nickname_selected.connect (on_nickname_selected);
+        main_layout.nickname_selected.connect (on_nickname_selected);
 
         // Connect to connection handler signals
         Iridium.Application.connection_manager.unacceptable_certificate.connect (on_unacceptable_certificate);
@@ -973,8 +966,8 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         var network_name = Iridium.Application.connection_manager.get_network_name (server_name);
         if (main_layout.get_visible_server () == server_name && main_layout.get_visible_channel () == channel_name) {
             Idle.add (() => {
-                header_bar.update_title (channel_name, (topic == null || topic.length == 0) ? (network_name == null || network_name.length == 0 ? server_name : network_name) : topic);
-                header_bar.set_tooltip_text ((topic == null || topic.length == 0) ? null : channel_name + ": " + topic);
+                main_layout.update_title (channel_name, (topic == null || topic.length == 0) ? (network_name == null || network_name.length == 0 ? server_name : network_name) : topic);
+                main_layout.set_header_tooltip ((topic == null || topic.length == 0) ? null : channel_name + ": " + topic);
                 return false;
             });
         }
@@ -1133,7 +1126,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         Idle.add (() => {
             main_layout.update_channel_users (server_name, channel_name, nicknames);
             if (main_layout.get_visible_server () == server_name && main_layout.get_visible_channel () == channel_name) {
-                header_bar.set_channel_users (nicknames, operators);
+                main_layout.set_channel_users (nicknames, operators);
             }
             return false;
         });
@@ -1142,7 +1135,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     private void set_channel_users_button_enabled (string server_name, string channel_name, bool enabled) {
         Idle.add (() => {
             if (main_layout.get_visible_server () == server_name && main_layout.get_visible_channel () == channel_name) {
-                header_bar.set_channel_users_button_enabled (enabled);
+                main_layout.set_channel_users_button_enabled (enabled);
             }
             return false;
         });
@@ -1181,7 +1174,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
         main_layout.update_user_nickname (server_name, old_nickname, new_nickname);
 
         if (main_layout.get_visible_server () == server_name && main_layout.get_visible_channel () == new_nickname) {
-            header_bar.update_title (new_nickname, server_name);
+            main_layout.update_title (new_nickname, server_name);
         }
 
         // Update channel user lists
@@ -1193,7 +1186,7 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     private void on_network_name_received (string server_name, string network_name) {
         Idle.add (() => {
             if (main_layout.get_visible_server () == server_name) {
-                header_bar.update_title (network_name, null);
+                main_layout.update_title (network_name, null);
             }
             main_layout.update_network_name (server_name, network_name);
             return false;
@@ -1243,32 +1236,32 @@ public class Iridium.MainWindow : Gtk.ApplicationWindow {
     //
 
     private void on_welcome_view_shown () {
-        header_bar.update_title (Constants.APP_NAME, null);
-        header_bar.set_channel_users_button_visible (false);
-        header_bar.set_tooltip_text (null);
+        main_layout.update_title (Constants.APP_NAME, null);
+        main_layout.set_channel_users_button_visible (false);
+        main_layout.set_header_tooltip (null);
     }
 
     private void on_server_chat_view_shown (string server_name) {
         string? network_name = get_network_name (server_name);
-        header_bar.update_title (network_name != null ? network_name : server_name, null);
-        header_bar.set_channel_users_button_visible (false);
-        header_bar.set_tooltip_text (null);
+        main_layout.update_title (network_name != null ? network_name : server_name, null);
+        main_layout.set_channel_users_button_visible (false);
+        main_layout.set_header_tooltip (null);
     }
 
     private void on_channel_chat_view_shown (string server_name, string channel_name) {
         string? network_name = get_network_name (server_name);
         var topic = Iridium.Application.connection_manager.get_topic (server_name, channel_name);
-        header_bar.update_title (channel_name, (topic == null || topic.length == 0) ? (network_name == null || network_name.length == 0 ? server_name : network_name) : topic);
-        header_bar.set_channel_users_button_visible (true);
-        header_bar.set_channel_users_button_enabled (main_layout.is_view_enabled (server_name, channel_name));
+        main_layout.update_title (channel_name, (topic == null || topic.length == 0) ? (network_name == null || network_name.length == 0 ? server_name : network_name) : topic);
+        main_layout.set_channel_users_button_visible (true);
+        main_layout.set_channel_users_button_enabled (main_layout.is_view_enabled (server_name, channel_name));
         update_channel_users_list (server_name, channel_name);
     }
 
     private void on_private_message_chat_view_shown (string server_name, string nickname) {
         string? network_name = get_network_name (server_name);
-        header_bar.update_title (nickname, network_name != null ? network_name : server_name);
-        header_bar.set_channel_users_button_visible (false);
-        header_bar.set_tooltip_text (null);
+        main_layout.update_title (nickname, network_name != null ? network_name : server_name);
+        main_layout.set_channel_users_button_visible (false);
+        main_layout.set_header_tooltip (null);
     }
 
     private void on_nickname_button_clicked (string server_name) {

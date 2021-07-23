@@ -90,7 +90,8 @@ executable(
         dependency('libsecret-1', version: '>= 0.18.6'),
         dependency('sqlite3', version: '>= 3.22.0'),
         dependency('gtksourceview-4'),
-        dependency('libsoup-2.4')
+        dependency('libsoup-2.4'),
+        dependency('libhandy-1', version: '>=1.0.0')
     ],
     vala_args: vala_args,
     install: true

@@ -67,6 +67,10 @@ public class Iridium.Application : Gtk.Application {
         network_monitor.network_changed.connect (() => {
             warning ("Network availability changed: %s", network_monitor.get_network_available ().to_string ());
         });
+
+        startup.connect ((handler) => {
+            Hdy.init ();
+        });
     }
 
     public static bool is_dev_mode () {
