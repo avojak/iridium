@@ -19,7 +19,7 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Widgets.HeaderBar : Gtk.HeaderBar {
+public class Iridium.Widgets.HeaderBar : Hdy.HeaderBar {
 
     private Gtk.MenuButton channel_users_button;
 

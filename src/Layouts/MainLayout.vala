@@ -33,6 +33,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
 
     private Gtk.Paned paned;
 
+    private Iridium.Widgets.HeaderBar header_bar;
     private Iridium.Widgets.NetworkInfoBar network_info_bar;
     private Gtk.Overlay overlay;
     private Granite.Widgets.OverlayBar? restore_connections_overlay_bar;
@@ -46,6 +47,12 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
     }
 
     construct {
+        header_bar = new Iridium.Widgets.HeaderBar ();
+        header_bar.set_channel_users_button_visible (false);
+        header_bar.nickname_selected.connect ((nickname) => {
+            nickname_selected (nickname);
+        });
+
         side_panel = new Iridium.Widgets.SidePanel.Panel (window);
         welcome_view = new Iridium.Views.Welcome (window);
         main_stack = new Gtk.Stack ();
@@ -61,8 +68,9 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         overlay = new Gtk.Overlay ();
         overlay.add (paned);
 
-        attach (network_info_bar, 0, 0, 1, 1);
-        attach (overlay, 0, 1, 1, 1);
+        attach (header_bar, 0, 0);
+        attach (network_info_bar, 0, 1);
+        attach (overlay, 0, 2);
 
         nickname_mapping = new Gee.HashMap<string, Gee.Map<string, string>> ();
         server_child_views = new Gee.HashMap<string, Gee.List<Iridium.Views.ChatView>> ();
@@ -623,6 +631,26 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         }
     }
 
+    public void update_title (string title, string? subtitle) {
+        header_bar.update_title (title, subtitle);
+    }
+
+    public void set_header_tooltip (string? tooltip) {
+        header_bar.set_tooltip_text (tooltip);
+    }
+
+    public void set_channel_users_button_visible (bool visible) {
+        header_bar.set_channel_users_button_visible (visible);
+    }
+
+    public void set_channel_users_button_enabled (bool enabled) {
+        header_bar.set_channel_users_button_enabled (enabled);
+    }
+
+    public void set_channel_users (Gee.List<string> nicknames, Gee.List<string> operators) {
+        header_bar.set_channel_users (nicknames, operators);
+    }
+
     /*
      * Handlers for the side panel signals
      */
@@ -653,7 +681,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
     public signal void server_message_to_send (string server_name, string message);
     public signal void channel_message_to_send (string server_name, string channel_name, string message);
     public signal void private_message_to_send (string server_name, string nickname, string message);
-    public signal void nickname_button_clicked (string server_name);
+    public signal void nickname_button_clicked (string server_name); // TODO: Rename this - for inline username in ChatView
 
     public signal void join_channel_button_clicked (string server_name, string? channel_name);
     public signal void leave_channel_button_clicked (string server_name, string channel_name);
@@ -661,4 +689,6 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
     public signal void disconnect_from_server_button_clicked (string server_name);
     public signal void edit_channel_topic_button_clicked (string server_name, string channel_name);
     public signal void edit_connection_button_clicked (string server_name);
+
+    public signal void nickname_selected (string nickname); // TODO: Rename this - for selecting nickname from channel list
 }

@@ -36,6 +36,7 @@ dependencies required:
 - `valac (>= 0.28.0)`
 - `libsqlite3-dev`
 - `libgtksourceview-4-dev`
+- `libhandy-1-dev (>=1.0.0)`
 
 An `install-dev-dependencies.sh` script is available to help developers get up and running.
 
