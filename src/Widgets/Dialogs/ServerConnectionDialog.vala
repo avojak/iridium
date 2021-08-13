@@ -17,9 +17,10 @@
  * Boston, MA 02110-1301 USA
  *
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
+ * Authored by: Rajdeep Singha <singharajdeep97@gmail.com>
  */
 
-public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
+public class Iridium.Widgets.ServerConnectionDialog : Hdy.Window {
 
     private Gtk.Entry server_entry;
     private Gtk.Entry nickname_entry;
@@ -45,14 +46,17 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
         Object (
             deletable: false,
             resizable: false,
-            title: _("Connect to a Server"),
             transient_for: main_window,
+            window_position: Gtk.WindowPosition.CENTER_ON_PARENT,
+            type_hint: Gdk.WindowTypeHint.DIALOG,
             modal: true
         );
     }
 
     construct {
-        var body = get_content_area ();
+        var body = new Gtk.Box (Gtk.Orientation.VERTICAL, 0) {
+            margin = 24
+        };
 
         // Create the header
         var header_grid = new Gtk.Grid ();
@@ -77,11 +81,12 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
         header_image_stack.show_all (); // Required in order to set the visible child from preferences
 
 
-        var header_title = new Gtk.Label (_("New Connection"));
+        var header_title = new Gtk.Label (_("New Connection")) {
+            margin_start = 12
+        };
         header_title.get_style_context ().add_class (Granite.STYLE_CLASS_H2_LABEL);
         header_title.halign = Gtk.Align.START;
         header_title.hexpand = true;
-        //  header_title.margin_end = 10;
         header_title.set_line_wrap (true);
 
         header_grid.attach (header_image_stack, 0, 0, 1, 1);
@@ -91,23 +96,14 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
 
         var stack_grid = new Gtk.Grid ();
         stack_grid.expand = true;
-        stack_grid.margin_top = 20;
 
-        var stack_switcher = new Gtk.StackSwitcher ();
-        stack_switcher.halign = Gtk.Align.CENTER;
-        stack_grid.attach (stack_switcher, 0, 0, 1, 1);
-
-        var stack = new Gtk.Stack ();
-        stack.expand = true;
-        stack_switcher.stack = stack;
-
-        stack.add_titled (create_basic_form (), "basic", _("Basic"));
-        stack.add_titled (create_advanced_form (), "advanced", _("Advanced"));
-        stack_grid.attach (stack, 0, 1, 1, 1);
+        stack_grid.attach  (create_form (), 0, 1);
 
         body.add (stack_grid);
 
-        spinner = new Gtk.Spinner ();
+        spinner = new Gtk.Spinner () {
+            margin_top = 10
+        };
 
         status_label = new Gtk.Label ("");
         status_label.get_style_context ().add_class ("h4");
@@ -115,7 +111,6 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
         status_label.valign = Gtk.Align.CENTER;
         status_label.justify = Gtk.Justification.CENTER;
         status_label.set_line_wrap (true);
-        status_label.margin_bottom = 10;
 
         body.add (spinner);
         body.add (status_label);
@@ -139,9 +134,20 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
         realname_entry.changed.connect (update_connect_button);
         port_entry.changed.connect (update_connect_button);
 
+        var button_box = new Gtk.ButtonBox (Gtk.Orientation.HORIZONTAL) {
+            hexpand = true,
+            layout_style = Gtk.ButtonBoxStyle.END,
+            spacing = 6,
+        };
+        button_box.add (cancel_button);
+        button_box.add (connect_button);
 
-        add_action_widget (cancel_button, 0);
-        add_action_widget (connect_button, 1);
+        body.add (button_box);
+
+        var handle = new Hdy.WindowHandle ();
+        handle.add (body);
+
+        add (handle);
 
         load_settings ();
     }
@@ -157,11 +163,13 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
         }
     }
 
-    private Gtk.Grid create_basic_form () {
+    private Gtk.Grid create_form () {
         var basic_form_grid = new Gtk.Grid ();
-        basic_form_grid.margin = 30;
         basic_form_grid.row_spacing = 12;
         basic_form_grid.column_spacing = 20;
+
+        var basic_header = new Granite.HeaderLabel ("Basic");
+        var advanced_header = new Granite.HeaderLabel ("Advanced");
 
         var server_label = new Gtk.Label (_("Server:"));
         server_label.halign = Gtk.Align.END;
@@ -238,58 +246,50 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
             }
         });
 
-        basic_form_grid.attach (server_label, 0, 0, 1, 1);
-        basic_form_grid.attach (server_entry, 1, 0, 1, 1);
-        basic_form_grid.attach (nickname_label, 0, 1, 1, 1);
-        basic_form_grid.attach (nickname_entry, 1, 1, 1, 1);
+        var ssl_tls_label = new Gtk.Label (_("Use SSL/TLS:"));
+            ssl_tls_label.halign = Gtk.Align.END;
+
+            ssl_tls_switch = new Gtk.Switch ();
+            var ssl_tls_switch_container = new Gtk.Grid ();
+            ssl_tls_switch_container.add (ssl_tls_switch);
+            ssl_tls_switch.state = true;
+            ssl_tls_switch.active = true;
+
+            ssl_tls_switch.notify["active"].connect (() => {
+                port_entry.text = ssl_tls_switch.get_active ()
+                    ? Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT.to_string ()
+                    : Iridium.Services.ServerConnectionDetails.DEFAULT_INSECURE_PORT.to_string ();
+            });
+            ssl_tls_switch.notify["active"].connect (on_security_posture_changed);
+
+            var port_label = new Gtk.Label (_("Port:"));
+            port_label.halign = Gtk.Align.END;
+
+            // TODO: Force numeric input
+            port_entry = new Gtk.Entry ();
+            port_entry.hexpand = true;
+            port_entry.text = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT.to_string ();
+
+        basic_form_grid.attach (basic_header, 0, 0, 1, 1);
+        basic_form_grid.attach (server_label, 0, 1, 1, 1);
+        basic_form_grid.attach (server_entry, 1, 1, 1, 1);
+        basic_form_grid.attach (nickname_label, 0, 2, 1, 1);
+        basic_form_grid.attach (nickname_entry, 1, 2, 1, 1);
         //  basic_form_grid.attach (username_label, 0, 2, 1, 1);
         //  basic_form_grid.attach (username_entry, 1, 2, 1, 1);
-        basic_form_grid.attach (realname_label, 0, 2, 1, 1);
-        basic_form_grid.attach (realname_entry, 1, 2, 1, 1);
-        basic_form_grid.attach (auth_method_label, 0, 3, 1, 1);
-        basic_form_grid.attach (auth_method_combo, 1, 3, 1, 1);
-        basic_form_grid.attach (password_label, 0, 4, 1, 1);
-        basic_form_grid.attach (password_entry, 1, 4, 1, 1);
+        basic_form_grid.attach (realname_label, 0, 3, 1, 1);
+        basic_form_grid.attach (realname_entry, 1, 3, 1, 1);
+        basic_form_grid.attach (auth_method_label, 0, 4, 1, 1);
+        basic_form_grid.attach (auth_method_combo, 1, 4, 1, 1);
+        basic_form_grid.attach (password_label, 0, 5, 1, 1);
+        basic_form_grid.attach (password_entry, 1, 5, 1, 1);
+        basic_form_grid.attach (advanced_header, 0, 6, 1, 1);
+        basic_form_grid.attach (ssl_tls_label, 0, 7, 1, 1);
+        basic_form_grid.attach (ssl_tls_switch_container, 1, 7, 1, 1);
+        basic_form_grid.attach (port_label, 0, 8, 1, 1);
+        basic_form_grid.attach (port_entry, 1, 8, 1, 1);
 
         return basic_form_grid;
-    }
-
-    private Gtk.Grid create_advanced_form () {
-        var advanced_form_grid = new Gtk.Grid ();
-        advanced_form_grid.margin = 30;
-        advanced_form_grid.row_spacing = 12;
-        advanced_form_grid.column_spacing = 20;
-
-        var ssl_tls_label = new Gtk.Label (_("Use SSL/TLS:"));
-        ssl_tls_label.halign = Gtk.Align.END;
-
-        ssl_tls_switch = new Gtk.Switch ();
-        var ssl_tls_switch_container = new Gtk.Grid ();
-        ssl_tls_switch_container.add (ssl_tls_switch);
-        ssl_tls_switch.state = true;
-        ssl_tls_switch.active = true;
-
-        ssl_tls_switch.notify["active"].connect (() => {
-            port_entry.text = ssl_tls_switch.get_active ()
-                ? Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT.to_string ()
-                : Iridium.Services.ServerConnectionDetails.DEFAULT_INSECURE_PORT.to_string ();
-        });
-        ssl_tls_switch.notify["active"].connect (on_security_posture_changed);
-
-        var port_label = new Gtk.Label (_("Port:"));
-        port_label.halign = Gtk.Align.END;
-
-        // TODO: Force numeric input
-        port_entry = new Gtk.Entry ();
-        port_entry.hexpand = true;
-        port_entry.text = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT.to_string ();
-
-        advanced_form_grid.attach (ssl_tls_label, 0, 0, 1, 1);
-        advanced_form_grid.attach (ssl_tls_switch_container, 1, 0, 1, 1);
-        advanced_form_grid.attach (port_label, 0, 1, 1, 1);
-        advanced_form_grid.attach (port_entry, 1, 1, 1, 1);
-
-        return advanced_form_grid;
     }
 
     private void on_security_posture_changed () {
