@@ -147,8 +147,6 @@ public class Iridium.Application : Gtk.Application {
         connection_repository.sql_client = Iridium.Services.SQLClient.instance;
         certificate_manager.sql_client = Iridium.Services.SQLClient.instance;
 
-        // TODO: Connect to signals to save window size and position in settings
-
         // Handle changes to network connectivity (eg. losing internet connection)
         network_monitor.network_changed.connect (() => {
             // Don't react to duplicate signals
@@ -172,6 +170,13 @@ public class Iridium.Application : Gtk.Application {
             }
         });
 
+        // Respect the system style preference
+        var granite_settings = Granite.Settings.get_default ();
+        var gtk_settings = Gtk.Settings.get_default ();
+        gtk_settings.gtk_application_prefer_dark_theme = granite_settings.prefers_color_scheme == Granite.Settings.ColorScheme.DARK;
+        granite_settings.notify["prefers-color-scheme"].connect (() => {
+            gtk_settings.gtk_application_prefer_dark_theme = granite_settings.prefers_color_scheme == Granite.Settings.ColorScheme.DARK;
+        });
 
         var window = this.add_new_window ();
 
