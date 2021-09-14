@@ -139,6 +139,7 @@ public class Iridium.Widgets.ChannelJoinDialog : Granite.Dialog {
         status_label.halign = Gtk.Align.CENTER;
         status_label.valign = Gtk.Align.CENTER;
         status_label.justify = Gtk.Justification.CENTER;
+        status_label.set_max_width_chars (50);
         status_label.set_line_wrap (true);
         status_label.margin_bottom = 10;
 

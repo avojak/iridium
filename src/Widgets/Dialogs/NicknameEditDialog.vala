@@ -84,7 +84,8 @@ public class Iridium.Widgets.NicknameEditDialog : Granite.Dialog {
         status_label.halign = Gtk.Align.CENTER;
         status_label.valign = Gtk.Align.CENTER;
         status_label.justify = Gtk.Justification.CENTER;
-        status_label.set_line_wrap (true); // TODO: Fix this - it's not working as expected for long error messages
+        status_label.set_max_width_chars (50);
+        status_label.set_line_wrap (true);
         status_label.margin_bottom = 10;
         body.add (status_label);
 
