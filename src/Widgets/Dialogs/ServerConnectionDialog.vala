@@ -117,6 +117,8 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
         status_label.set_max_width_chars (50);
         status_label.set_line_wrap (true);
         status_label.margin_bottom = 10;
+        status_label.margin_start = 8;
+        status_label.margin_end = 8;
 
         body.add (spinner);
         body.add (status_label);
@@ -205,6 +207,8 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
         auth_method_display_strings.set (1, Iridium.Models.AuthenticationMethod.SERVER_PASSWORD.get_display_string ());
         auth_methods.set (2, Iridium.Models.AuthenticationMethod.NICKSERV_MSG);
         auth_method_display_strings.set (2, Iridium.Models.AuthenticationMethod.NICKSERV_MSG.get_display_string ());
+        auth_methods.set (3, Iridium.Models.AuthenticationMethod.SASL_PLAIN);
+        auth_method_display_strings.set (3, Iridium.Models.AuthenticationMethod.SASL_PLAIN.get_display_string ());
         for (int i = 0; i < auth_method_display_strings.size; i++) {
             Gtk.TreeIter iter;
             list_store.append (out iter);

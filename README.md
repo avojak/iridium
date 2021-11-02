@@ -54,7 +54,7 @@ To test the Flatpak build with Flatpak Builder:
 
 ```bash
 $ flatpak-builder build  com.github.avojak.iridium.yml --user --install --force-clean
-$ flatpak run com.github.avojak.iridium
+$ flatpak run --env=G_MESSAGES_DEBUG=all com.github.avojak.iridium
 ```
 
 ### Development Build
@@ -64,7 +64,7 @@ You can also install a development build alongside a stable version by specifyin
 ```bash
 $ meson build --prefix=/usr -Dprofile=dev
 $ sudo ninja -C build install
-$ com.github.avojak.iridium-dev
+$ G_MESSAGES_DEBUG=all com.github.avojak.iridium-dev
 ```
 
 ### Updating Translations
