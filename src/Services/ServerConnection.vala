@@ -606,6 +606,8 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 server_error_received (message);
                 break;
             case Iridium.Services.NumericCodes.ERR_SASLFAIL:
+                // TODO: Need to work out whether or not this truly means that the opening of the connections failed!
+
                 //  if (!is_registered) {
                     //  open_failed (message.message);
                     send_output ("AUTHENTICATE *");
