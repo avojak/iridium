@@ -102,6 +102,8 @@ You should now be able to connect to the server from Iridium using the Server `l
 
 ### Troubleshooting and Debugging
 
+#### Logging
+
 Log messages can be found using the `journalctl` command. For example, the following will show journal messages for the current boot of the OS:
 
 ```bash
@@ -118,6 +120,10 @@ Jan 01 11:13:24 avojak-eOS plank.desktop[1992]: [INFO 11:13:24.850977] SQLClient
 ```
 
 This can also be useful to locate where the application started amidst all of the journal entries.
+
+#### Config Files
+
+With Flatpak, application config files can be found in: `~/.var/app/com.github.avojak.iridium/`
 
 ## Project Status
 

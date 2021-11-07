@@ -28,7 +28,12 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
     private Gee.Map<int, Iridium.Models.AuthenticationMethod> auth_methods;
     private Gee.Map<int, string> auth_method_display_strings;
     private Gtk.ComboBox auth_method_combo;
+    private Gtk.Label password_label;
+    private Gtk.Label certificate_file_label;
+    private Gtk.Stack auth_token_label_stack;
+    private Gtk.Stack auth_token_entry_stack;
     private Gtk.Entry password_entry;
+    private Gtk.FileChooserButton certificate_file_entry;
     private Gtk.Switch ssl_tls_switch;
     private Gtk.Entry port_entry;
     private Gtk.Button connect_button;
@@ -209,6 +214,8 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
         auth_method_display_strings.set (2, Iridium.Models.AuthenticationMethod.NICKSERV_MSG.get_display_string ());
         auth_methods.set (3, Iridium.Models.AuthenticationMethod.SASL_PLAIN);
         auth_method_display_strings.set (3, Iridium.Models.AuthenticationMethod.SASL_PLAIN.get_display_string ());
+        auth_methods.set (4, Iridium.Models.AuthenticationMethod.SASL_EXTERNAL);
+        auth_method_display_strings.set (4, Iridium.Models.AuthenticationMethod.SASL_EXTERNAL.get_display_string ());
         for (int i = 0; i < auth_method_display_strings.size; i++) {
             Gtk.TreeIter iter;
             list_store.append (out iter);
@@ -221,10 +228,32 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
         auth_method_combo.set_active (0);
 
         auth_method_combo.changed.connect (() => {
-            password_entry.set_sensitive (auth_methods.get (auth_method_combo.get_active ()) != Iridium.Models.AuthenticationMethod.NONE);
+            var auth_method = auth_methods.get (auth_method_combo.get_active ());
+            if (!ssl_tls_switch.get_active () && (auth_method == Iridium.Models.AuthenticationMethod.SASL_EXTERNAL)) {
+                // Alert user to the SSL/TLS requirement for SASL External
+                var message_dialog = new Granite.MessageDialog.with_image_from_icon_name (_("SASL External requires SSL/TLS"), _("To use SASL External authentication, you must enable SSL/TLS for this server connection."), "dialog-information", Gtk.ButtonsType.CLOSE);
+                message_dialog.run ();
+                message_dialog.destroy ();
+                // Fall back to SASL Plain in the dialog
+                auth_method_combo.set_active (auth_method_combo.get_active () - 1);
+                return;
+            }
+            // Update auth token entry sensitivity
+            password_entry.set_sensitive ((auth_method != Iridium.Models.AuthenticationMethod.NONE) && (auth_method != Iridium.Models.AuthenticationMethod.SASL_EXTERNAL));
+            certificate_file_entry.set_sensitive (auth_method == Iridium.Models.AuthenticationMethod.SASL_EXTERNAL);
+            // Update the visible auth token label and entry
+            if (auth_method == Iridium.Models.AuthenticationMethod.SASL_EXTERNAL) {
+                auth_token_label_stack.set_visible_child (certificate_file_label);
+                auth_token_entry_stack.set_visible_child (certificate_file_entry);
+                password_entry.set_text ("");
+            } else {
+                auth_token_label_stack.set_visible_child (password_label);
+                auth_token_entry_stack.set_visible_child (password_entry);
+                certificate_file_entry.set_uri ("");
+            }
         });
 
-        var password_label = new Gtk.Label (_("Password:"));
+        password_label = new Gtk.Label (_("Password:"));
         password_label.halign = Gtk.Align.END;
 
         password_entry = new Gtk.Entry ();
@@ -243,6 +272,26 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
             }
         });
 
+        certificate_file_label = new Gtk.Label (_("Identity File:"));
+        certificate_file_label.halign = Gtk.Align.END;
+
+        certificate_file_entry = new Gtk.FileChooserButton (_("Select Your Identity File\u2026"), Gtk.FileChooserAction.OPEN);
+        certificate_file_entry.hexpand = true;
+        certificate_file_entry.sensitive = false;
+        certificate_file_entry.set_uri (GLib.Environment.get_home_dir ());
+        
+        certificate_file_entry.file_set.connect (verify_certificate_file);
+
+        auth_token_label_stack = new Gtk.Stack ();
+        auth_token_label_stack.add (password_label);
+        auth_token_label_stack.add (certificate_file_label);
+        auth_token_label_stack.set_visible_child (password_label);
+
+        auth_token_entry_stack = new Gtk.Stack ();
+        auth_token_entry_stack.add (password_entry);
+        auth_token_entry_stack.add (certificate_file_entry);
+        auth_token_entry_stack.set_visible_child (password_entry);
+
         basic_form_grid.attach (server_label, 0, 0, 1, 1);
         basic_form_grid.attach (server_entry, 1, 0, 1, 1);
         basic_form_grid.attach (nickname_label, 0, 1, 1, 1);
@@ -253,8 +302,8 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
         basic_form_grid.attach (realname_entry, 1, 2, 1, 1);
         basic_form_grid.attach (auth_method_label, 0, 3, 1, 1);
         basic_form_grid.attach (auth_method_combo, 1, 3, 1, 1);
-        basic_form_grid.attach (password_label, 0, 4, 1, 1);
-        basic_form_grid.attach (password_entry, 1, 4, 1, 1);
+        basic_form_grid.attach (auth_token_label_stack, 0, 4, 1, 1);
+        basic_form_grid.attach (auth_token_entry_stack, 1, 4, 1, 1);
 
         return basic_form_grid;
     }
@@ -279,6 +328,13 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
                 ? Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT.to_string ()
                 : Iridium.Services.ServerConnectionDetails.DEFAULT_INSECURE_PORT.to_string ();
         });
+        ssl_tls_switch.notify["active"].connect (() => {
+            // If the user has selected SASL External, fall back to SASL Plain
+            var auth_method = auth_methods.get (auth_method_combo.get_active ());
+            if (!ssl_tls_switch.get_active () && (auth_method == Iridium.Models.AuthenticationMethod.SASL_EXTERNAL)) {
+                auth_method_combo.set_active (auth_method_combo.get_active () - 1);
+            }
+        });
         ssl_tls_switch.notify["active"].connect (on_security_posture_changed);
 
         var port_label = new Gtk.Label (_("Port:"));
@@ -295,6 +351,10 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
         advanced_form_grid.attach (port_entry, 1, 1, 1, 1);
 
         return advanced_form_grid;
+    }
+
+    private void verify_certificate_file (Gtk.FileChooserButton certificate_file_entry) {
+        // TODO
     }
 
     private void on_security_posture_changed () {
@@ -338,7 +398,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
             port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT;
         }
         var auth_method = auth_methods.get (auth_method_combo.get_active ());
-        var auth_token = password_entry.get_text ();
+        var auth_token = (auth_method == Iridium.Models.AuthenticationMethod.SASL_EXTERNAL) ? certificate_file_entry.get_uri () : password_entry.get_text ();
         var tls = ssl_tls_switch.get_active ();
         connect_button_clicked (server_name, nickname, realname, port, auth_method, tls, auth_token);
     }
