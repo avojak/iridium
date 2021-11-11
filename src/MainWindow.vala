@@ -427,7 +427,6 @@ public class Iridium.MainWindow : Hdy.Window {
 
     public void show_edit_server_connection_dialog (string server_name) {
         if (edit_connection_dialog == null) {
-            //  edit_connection_dialog = new Iridium.Widgets.EditServerConnectionDialog (this);
             Iridium.Services.ServerConnectionDetails? existing_connection_details = Iridium.Application.connection_manager.get_connection_details (server_name);
             if (existing_connection_details == null) {
                 Iridium.Services.Server? server = Iridium.Application.connection_repository.get_server (server_name);
@@ -442,7 +441,6 @@ public class Iridium.MainWindow : Hdy.Window {
                 existing_connection_details.auth_token = Iridium.Application.secret_manager.retrieve_secret (existing_connection_details.server, existing_connection_details.port, existing_connection_details.nickname);
             }
             edit_connection_dialog = new Iridium.Widgets.EditServerConnectionDialog.from_connection_details (this, existing_connection_details);
-            //  edit_connection_dialog.populate (existing_connection_details);
             edit_connection_dialog.show_all ();
             edit_connection_dialog.primary_button_clicked.connect ((server, nickname, realname, port, auth_method, tls, auth_token) => {
                 // Prevent duplicate connections
