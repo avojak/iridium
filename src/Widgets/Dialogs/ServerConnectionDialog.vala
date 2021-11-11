@@ -21,8 +21,8 @@
 
 public abstract class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
 
-    private static GLib.Regex SERVER_REGEX;
-    private static GLib.Regex NICKNAME_REGEX;
+    private static GLib.Regex SERVER_REGEX; // vala-lint=naming-convention
+    private static GLib.Regex NICKNAME_REGEX; // vala-lint=naming-convention
 
     protected Gee.Map<int, Iridium.Models.AuthenticationMethod> auth_methods;
     protected Gee.Map<int, string> auth_method_display_strings;
@@ -183,8 +183,8 @@ public abstract class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
             default:
                 assert_not_reached ();
         }
-        primary_button.sensitive = server_entry.is_valid && 
-                nickname_entry.is_valid && 
+        primary_button.sensitive = server_entry.is_valid &&
+                nickname_entry.is_valid &&
                 realname_entry.is_valid &&
                 port_entry.is_valid &&
                 is_auth_token_valid;
@@ -299,7 +299,7 @@ public abstract class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
         certificate_file_entry.hexpand = true;
         certificate_file_entry.sensitive = false;
         certificate_file_entry.set_uri (GLib.Environment.get_home_dir ());
-        
+
         auth_token_label_stack = new Gtk.Stack ();
         auth_token_label_stack.add (password_label);
         auth_token_label_stack.add (certificate_file_label);

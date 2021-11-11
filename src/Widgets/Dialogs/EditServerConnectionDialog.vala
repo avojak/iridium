@@ -74,7 +74,7 @@ public class Iridium.Widgets.EditServerConnectionDialog : Iridium.Widgets.Server
                 password_entry.sensitive = true;
                 show_password_stack ();
             }
-        }   
+        }
     }
 
     private int get_auth_method_index (Iridium.Models.AuthenticationMethod auth_method) {

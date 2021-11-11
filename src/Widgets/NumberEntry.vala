@@ -21,7 +21,7 @@
 
 public class Iridium.Widgets.NumberEntry : Granite.ValidatedEntry {
 
-    private static GLib.Regex? NUMBER_REGEX = null;
+    private static GLib.Regex? NUMBER_REGEX = null; // vala-lint=naming-convention
 
     static construct {
         try {
