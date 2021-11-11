@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Andrew Vojak (https://avojak.com)
+ * Copyright (c) 2019 Andrew Vojak (https://avojak.com)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
@@ -19,17 +19,29 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Services.FileUtils : GLib.Object {
+public class Iridium.Widgets.NumberEntry : Granite.ValidatedEntry {
 
-    public static string? read_file (string uri, GLib.Cancellable? cancellable = null) throws GLib.Error {
-        GLib.FileInputStream fis = GLib.File.new_for_uri (uri).read (cancellable);
-        GLib.DataInputStream dis = new GLib.DataInputStream (fis);
-        GLib.StringBuilder sb = new GLib.StringBuilder ();
-        string? line = null;
-        while ((line = dis.read_line (null, cancellable)) != null) {
-            sb.append (line);
+    private static GLib.Regex? NUMBER_REGEX = null;
+
+    static construct {
+        try {
+            NUMBER_REGEX = new GLib.Regex ("^[0-9]*$", GLib.RegexCompileFlags.OPTIMIZE);
+        } catch (GLib.Error e) {
+            critical (e.message);
         }
-        return (string) sb.data;
+    }
+
+    construct {
+        // Force input to be strictly numeric
+        this.insert_text.connect ((new_text, new_text_length, ref position) => {
+            try {
+                if (!NUMBER_REGEX.match_full (new_text)) {
+                    GLib.Signal.stop_emission_by_name (this, "insert-text");
+                }
+            } catch (GLib.Error e) {
+                warning (e.message);
+            }
+        });
     }
 
 }

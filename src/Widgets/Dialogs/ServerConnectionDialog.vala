@@ -19,25 +19,35 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
+public abstract class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
 
-    private Gtk.Entry server_entry;
-    private Gtk.Entry nickname_entry;
-    //  private Gtk.Entry username_entry;
-    private Gtk.Entry realname_entry;
-    private Gee.Map<int, Iridium.Models.AuthenticationMethod> auth_methods;
-    private Gee.Map<int, string> auth_method_display_strings;
-    private Gtk.ComboBox auth_method_combo;
-    private Gtk.Label password_label;
-    private Gtk.Label certificate_file_label;
-    private Gtk.Stack auth_token_label_stack;
-    private Gtk.Stack auth_token_entry_stack;
-    private Gtk.Entry password_entry;
-    private Gtk.FileChooserButton certificate_file_entry;
-    private Gtk.Switch ssl_tls_switch;
-    private Gtk.Entry port_entry;
-    private Gtk.Button connect_button;
+    private static GLib.Regex SERVER_REGEX;
+    private static GLib.Regex NICKNAME_REGEX;
 
+    protected Gee.Map<int, Iridium.Models.AuthenticationMethod> auth_methods;
+    protected Gee.Map<int, string> auth_method_display_strings;
+
+    protected Gtk.Label password_label;
+    protected Gtk.Label certificate_file_label;
+
+    protected Granite.ValidatedEntry server_entry;
+    protected Granite.ValidatedEntry nickname_entry;
+    protected Granite.ValidatedEntry realname_entry;
+    protected Granite.ValidatedEntry password_entry;
+    protected Iridium.Widgets.NumberEntry port_entry;
+    protected Gtk.FileChooserButton certificate_file_entry;
+
+    protected Gtk.Stack auth_token_label_stack;
+    protected Gtk.Stack auth_token_entry_stack;
+
+    protected Gtk.ComboBox auth_method_combo;
+
+    protected Gtk.Switch ssl_tls_switch;
+
+    public string primary_button_text { get; construct; }
+    private Gtk.Button primary_button;
+
+    public string header { get; construct; }
     private Gtk.Stack header_image_stack;
     private Gtk.Spinner spinner;
     private Gtk.Label status_label;
@@ -46,14 +56,14 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
         AUTH_METHOD
     }
 
-    public ServerConnectionDialog (Iridium.MainWindow main_window) {
-        Object (
-            deletable: false,
-            resizable: false,
-            title: _("Connect to a Server"),
-            transient_for: main_window,
-            modal: true
-        );
+    static construct {
+        try {
+            SERVER_REGEX = new GLib.Regex ("""^[a-zA-Z0-9\.]+$""", GLib.RegexCompileFlags.OPTIMIZE);
+            // See RFC 2812 Section 2.3.1
+            NICKNAME_REGEX = new GLib.Regex ("""^[a-zA-Z\[\]\\\`\_\^\{\|\}][a-zA-Z0-9\[\]\\\`\_\^\{\|\}]{0,8}$""", GLib.RegexCompileFlags.OPTIMIZE);
+        } catch (GLib.Error e) {
+            critical (e.message);
+        }
     }
 
     construct {
@@ -81,12 +91,10 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
         header_image_stack.add_named (no_tls_header_image, "no-tls");
         header_image_stack.show_all (); // Required in order to set the visible child from preferences
 
-
-        var header_title = new Gtk.Label (_("New Connection"));
+        var header_title = new Gtk.Label (header);
         header_title.get_style_context ().add_class (Granite.STYLE_CLASS_H2_LABEL);
         header_title.halign = Gtk.Align.START;
         header_title.hexpand = true;
-        //  header_title.margin_end = 10;
         header_title.set_line_wrap (true);
 
         header_grid.attach (header_image_stack, 0, 0, 1, 1);
@@ -134,35 +142,52 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
             close ();
         });
 
-        connect_button = new Gtk.Button.with_label (_("Connect"));
-        connect_button.get_style_context ().add_class ("suggested-action");
-        connect_button.sensitive = false;
-        connect_button.clicked.connect (() => {
-            do_connect ();
-        });
+        primary_button = new Gtk.Button.with_label (primary_button_text);
+        primary_button.get_style_context ().add_class ("suggested-action");
+        primary_button.sensitive = false;
+        primary_button.clicked.connect (do_primary_action);
 
         // Connect to signals to determine whether the connect button should be sensitive
-        server_entry.changed.connect (update_connect_button);
-        nickname_entry.changed.connect (update_connect_button);
-        realname_entry.changed.connect (update_connect_button);
-        port_entry.changed.connect (update_connect_button);
-
+        // Note: Can't use the preferred Granite.ValidatedEntry way, because that seems to limit
+        //       one widget per button, not a set of widgets like in this case.
+        server_entry.changed.connect (update_primary_button);
+        nickname_entry.changed.connect (update_primary_button);
+        realname_entry.changed.connect (update_primary_button);
+        port_entry.changed.connect (update_primary_button);
+        auth_method_combo.changed.connect (update_primary_button);
+        password_entry.changed.connect (update_primary_button);
+        certificate_file_entry.file_set.connect (update_primary_button);
 
         add_action_widget (cancel_button, 0);
-        add_action_widget (connect_button, 1);
+        add_action_widget (primary_button, 1);
 
         load_settings ();
     }
 
-    private void update_connect_button () {
-        if (server_entry.get_text ().chomp ().chug () != "" &&
-                nickname_entry.get_text ().chomp ().chug () != "" &&
-                realname_entry.get_text ().chomp ().chug () != "" &&
-                port_entry.get_text ().chomp ().chug () != "") {
-            connect_button.sensitive = true;
-        } else {
-            connect_button.sensitive = false;
+    private void update_primary_button () {
+        // Set the update button as sensitive only when all fields are marked as valid
+        bool is_auth_token_valid = false;
+        var auth_method = auth_methods.get (auth_method_combo.get_active ());
+        switch (auth_method) {
+            case Iridium.Models.AuthenticationMethod.NONE:
+                is_auth_token_valid = true;
+                break;
+            case Iridium.Models.AuthenticationMethod.SERVER_PASSWORD:
+            case Iridium.Models.AuthenticationMethod.NICKSERV_MSG:
+            case Iridium.Models.AuthenticationMethod.SASL_PLAIN:
+                is_auth_token_valid = password_entry.is_valid;
+                break;
+            case Iridium.Models.AuthenticationMethod.SASL_EXTERNAL:
+                is_auth_token_valid = verify_certificate_file (certificate_file_entry.get_uri ());
+                break;
+            default:
+                assert_not_reached ();
         }
+        primary_button.sensitive = server_entry.is_valid && 
+                nickname_entry.is_valid && 
+                realname_entry.is_valid &&
+                port_entry.is_valid &&
+                is_auth_token_valid;
     }
 
     private Gtk.Grid create_basic_form () {
@@ -174,30 +199,26 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
         var server_label = new Gtk.Label (_("Server:"));
         server_label.halign = Gtk.Align.END;
 
-        server_entry = new Gtk.Entry ();
+        server_entry = new Granite.ValidatedEntry.from_regex (SERVER_REGEX);
         server_entry.hexpand = true;
         server_entry.placeholder_text = "irc.example.com";
 
         var nickname_label = new Gtk.Label (_("Nickname:"));
         nickname_label.halign = Gtk.Align.END;
 
-        nickname_entry = new Gtk.Entry ();
+        nickname_entry = new Granite.ValidatedEntry.from_regex (NICKNAME_REGEX);
         nickname_entry.hexpand = true;
         nickname_entry.placeholder_text = "iridium";
-
-        //  var username_label = new Gtk.Label (_("Username:"));
-        //  username_label.halign = Gtk.Align.END;
-
-        //  username_entry = new Gtk.Entry ();
-        //  username_entry.hexpand = true;
-        //  username_entry.placeholder_text = "iridium";
 
         var realname_label = new Gtk.Label (_("Real Name:"));
         realname_label.halign = Gtk.Align.END;
 
-        realname_entry = new Gtk.Entry ();
+        realname_entry = new Granite.ValidatedEntry ();
         realname_entry.hexpand = true;
         realname_entry.placeholder_text = _("Iridium IRC Client");
+        realname_entry.changed.connect (() => {
+            realname_entry.is_valid = realname_entry.get_text ().strip ().length > 0;
+        });
 
         var auth_method_label = new Gtk.Label (_("Authentication Method:"));
         auth_method_label.halign = Gtk.Align.END;
@@ -243,20 +264,16 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
             certificate_file_entry.set_sensitive (auth_method == Iridium.Models.AuthenticationMethod.SASL_EXTERNAL);
             // Update the visible auth token label and entry
             if (auth_method == Iridium.Models.AuthenticationMethod.SASL_EXTERNAL) {
-                auth_token_label_stack.set_visible_child (certificate_file_label);
-                auth_token_entry_stack.set_visible_child (certificate_file_entry);
-                password_entry.set_text ("");
+                show_certificate_stack ();
             } else {
-                auth_token_label_stack.set_visible_child (password_label);
-                auth_token_entry_stack.set_visible_child (password_entry);
-                certificate_file_entry.set_uri ("");
+                show_password_stack ();
             }
         });
 
         password_label = new Gtk.Label (_("Password:"));
         password_label.halign = Gtk.Align.END;
 
-        password_entry = new Gtk.Entry ();
+        password_entry = new Granite.ValidatedEntry ();
         password_entry.hexpand = true;
         password_entry.visibility = false;
         password_entry.sensitive = false;
@@ -271,6 +288,9 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
                 password_entry.set_icon_from_icon_name (Gtk.EntryIconPosition.SECONDARY, "changes-prevent-symbolic");
             }
         });
+        password_entry.changed.connect (() => {
+            password_entry.is_valid = password_entry.get_text ().strip ().length > 0;
+        });
 
         certificate_file_label = new Gtk.Label (_("Identity File:"));
         certificate_file_label.halign = Gtk.Align.END;
@@ -280,24 +300,20 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
         certificate_file_entry.sensitive = false;
         certificate_file_entry.set_uri (GLib.Environment.get_home_dir ());
         
-        certificate_file_entry.file_set.connect (verify_certificate_file);
-
         auth_token_label_stack = new Gtk.Stack ();
         auth_token_label_stack.add (password_label);
         auth_token_label_stack.add (certificate_file_label);
-        auth_token_label_stack.set_visible_child (password_label);
 
         auth_token_entry_stack = new Gtk.Stack ();
         auth_token_entry_stack.add (password_entry);
         auth_token_entry_stack.add (certificate_file_entry);
-        auth_token_entry_stack.set_visible_child (password_entry);
+
+        show_password_stack ();
 
         basic_form_grid.attach (server_label, 0, 0, 1, 1);
         basic_form_grid.attach (server_entry, 1, 0, 1, 1);
         basic_form_grid.attach (nickname_label, 0, 1, 1, 1);
         basic_form_grid.attach (nickname_entry, 1, 1, 1, 1);
-        //  basic_form_grid.attach (username_label, 0, 2, 1, 1);
-        //  basic_form_grid.attach (username_entry, 1, 2, 1, 1);
         basic_form_grid.attach (realname_label, 0, 2, 1, 1);
         basic_form_grid.attach (realname_entry, 1, 2, 1, 1);
         basic_form_grid.attach (auth_method_label, 0, 3, 1, 1);
@@ -306,6 +322,22 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
         basic_form_grid.attach (auth_token_entry_stack, 1, 4, 1, 1);
 
         return basic_form_grid;
+    }
+
+    protected void show_password_stack () {
+        Idle.add (() => {
+            auth_token_label_stack.set_visible_child (password_label);
+            auth_token_entry_stack.set_visible_child (password_entry);
+            return false;
+        });
+    }
+
+    protected void show_certificate_stack () {
+        Idle.add (() => {
+            auth_token_label_stack.set_visible_child (certificate_file_label);
+            auth_token_entry_stack.set_visible_child (certificate_file_entry);
+            return false;
+        });
     }
 
     private Gtk.Grid create_advanced_form () {
@@ -340,10 +372,14 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
         var port_label = new Gtk.Label (_("Port:"));
         port_label.halign = Gtk.Align.END;
 
-        // TODO: Force numeric input
-        port_entry = new Gtk.Entry ();
+        port_entry = new Iridium.Widgets.NumberEntry ();
+        port_entry.is_valid = true;
         port_entry.hexpand = true;
         port_entry.text = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT.to_string ();
+        port_entry.changed.connect (() => {
+            int port = int.parse (port_entry.get_text ().strip ());
+            port_entry.is_valid = port >= 1 && port <= 65535;
+        });
 
         advanced_form_grid.attach (ssl_tls_label, 0, 0, 1, 1);
         advanced_form_grid.attach (ssl_tls_switch_container, 1, 0, 1, 1);
@@ -353,8 +389,18 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
         return advanced_form_grid;
     }
 
-    private void verify_certificate_file (Gtk.FileChooserButton certificate_file_entry) {
-        // TODO
+    protected bool verify_certificate_file (string? uri) {
+        if (uri == null) {
+            return false;
+        }
+        display_error ("");
+        try {
+            new GLib.TlsCertificate.from_file (GLib.File.new_for_uri (uri).get_path ());
+            return true;
+        } catch (GLib.Error e) {
+            display_error (_("Invalid identity file"), e.message);
+            return false;
+        }
     }
 
     private void on_security_posture_changed () {
@@ -381,30 +427,27 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
     private void load_settings () {
         on_security_posture_changed ();
         nickname_entry.text = Iridium.Application.settings.get_string ("default-nickname");
-        //  username_entry.text = Iridium.Application.settings.get_string ("default-nickname");
         realname_entry.text = Iridium.Application.settings.get_string ("default-realname");
     }
 
-    private void do_connect () {
-        // TODO: Validate entries first!
+    private void do_primary_action () {
         spinner.start ();
         status_label.label = "";
-        var server_name = server_entry.get_text ().chomp ().chug ();
-        var nickname = nickname_entry.get_text ().chomp ().chug ();
-        //  var username = username_entry.get_text ().chomp ().chug ();
-        var realname = realname_entry.get_text ().chomp ().chug ();
-        var port = (uint16) int.parse (port_entry.get_text ().chomp ().chug ());
+        var server_name = server_entry.get_text ().strip ();
+        var nickname = nickname_entry.get_text ().strip ();
+        var realname = realname_entry.get_text ().strip ();
+        var port = (uint16) int.parse (port_entry.get_text ().strip ());
         if (port == 0) {
             port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT;
         }
         var auth_method = auth_methods.get (auth_method_combo.get_active ());
         var auth_token = (auth_method == Iridium.Models.AuthenticationMethod.SASL_EXTERNAL) ? certificate_file_entry.get_uri () : password_entry.get_text ();
         var tls = ssl_tls_switch.get_active ();
-        connect_button_clicked (server_name, nickname, realname, port, auth_method, tls, auth_token);
+        primary_button_clicked (server_name, nickname, realname, port, auth_method, tls, auth_token);
     }
 
     public string get_server () {
-        return server_entry.get_text ().chomp ().chug ();
+        return server_entry.get_text ().strip ();
     }
 
     public void dismiss () {
@@ -422,7 +465,7 @@ public class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
         }
     }
 
-    public signal void connect_button_clicked (string server, string nickname, string realname,
+    public signal void primary_button_clicked (string server, string nickname, string realname,
         uint16 port, Iridium.Models.AuthenticationMethod auth_method, bool tls, string auth_token);
 
 }

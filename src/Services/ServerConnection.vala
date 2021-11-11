@@ -145,7 +145,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 if (connection_details.auth_method == Iridium.Models.AuthenticationMethod.SASL_EXTERNAL) {
                     try {
                         debug ("Providing certificate to connection for SASL external authentication");
-                        var certificate = new GLib.TlsCertificate.from_file (get_auth_token ());
+                        var certificate = new GLib.TlsCertificate.from_file (GLib.File.new_for_uri (get_auth_token ()).get_path ());
                         var fingerprint = GLib.Checksum.compute_for_data (GLib.ChecksumType.SHA512, certificate.certificate.data);
                         debug (@"Certificate fingerprint: $fingerprint");
                         ((TlsClientConnection) connection).set_certificate (certificate);
@@ -284,16 +284,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 return null;
             }
         }
-        //  // SASL External stores the file path to the identify file as the token, so read the file and return the content
-        //  if (connection_details.auth_method == Iridium.Models.AuthenticationMethod.SASL_EXTERNAL) {
-        //      try {
-        //          password = Iridium.Services.FileUtils.read_file (password);
-        //      } catch (GLib.Error e) {
-        //          warning ("Error while reading certificate file [%s]: %s", password, e.message);
-        //          open_failed (e.message);
-        //          return null;
-        //      }
-        //  }
         return password;
     }
 
@@ -614,7 +604,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                     send_output ("CAP END");
                 //  }
                 server_error_received (message);
-                // Technically the connection could continue and a 001 welcome message received
+                // Technically the connection *could* continue and a 001 welcome message received, but does that make sense?
                 //  lock (should_exit) {
                 //      should_exit = true;
                 //  }
