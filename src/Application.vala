@@ -44,12 +44,12 @@ public class Iridium.Application : Gtk.Application {
     }
 
     static construct {
-        Granite.Services.Logger.initialize (Constants.APP_ID);
-        if (is_dev_mode ()) {
-            Granite.Services.Logger.DisplayLevel = Granite.Services.LogLevel.DEBUG;
-        } else {
-            Granite.Services.Logger.DisplayLevel = Granite.Services.LogLevel.WARN;
-        }
+        //  Granite.Services.Logger.initialize (Constants.APP_ID);
+        //  if (is_dev_mode ()) {
+        //      Granite.Services.Logger.DisplayLevel = Granite.Services.LogLevel.DEBUG;
+        //  } else {
+        //      Granite.Services.Logger.DisplayLevel = Granite.Services.LogLevel.WARN;
+        //  }
         info ("%s version: %s", Constants.APP_ID, Constants.VERSION);
         info ("Kernel version: %s", Posix.utsname ().release);
     }

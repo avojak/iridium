@@ -54,7 +54,7 @@ To test the Flatpak build with Flatpak Builder:
 
 ```bash
 $ flatpak-builder build  com.github.avojak.iridium.yml --user --install --force-clean
-$ flatpak run com.github.avojak.iridium
+$ flatpak run --env=G_MESSAGES_DEBUG=all com.github.avojak.iridium
 ```
 
 ### Development Build
@@ -64,7 +64,7 @@ You can also install a development build alongside a stable version by specifyin
 ```bash
 $ meson build --prefix=/usr -Dprofile=dev
 $ sudo ninja -C build install
-$ com.github.avojak.iridium-dev
+$ G_MESSAGES_DEBUG=all com.github.avojak.iridium-dev
 ```
 
 ### Updating Translations
@@ -102,6 +102,8 @@ You should now be able to connect to the server from Iridium using the Server `l
 
 ### Troubleshooting and Debugging
 
+#### Logging
+
 Log messages can be found using the `journalctl` command. For example, the following will show journal messages for the current boot of the OS:
 
 ```bash
@@ -118,6 +120,10 @@ Jan 01 11:13:24 avojak-eOS plank.desktop[1992]: [INFO 11:13:24.850977] SQLClient
 ```
 
 This can also be useful to locate where the application started amidst all of the journal entries.
+
+#### Config Files
+
+With Flatpak, application config files can be found in: `~/.var/app/com.github.avojak.iridium/`
 
 ## Project Status
 

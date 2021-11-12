@@ -69,7 +69,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             input_stream = new DataInputStream (connection.input_stream);
             output_stream = new DataOutputStream (connection.output_stream);
 
-            register (connection_details);
+            register ();
 
             string line = "";
             do {
@@ -142,9 +142,21 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 break;
             case SocketClientEvent.TLS_HANDSHAKING:
                 debug ("[SocketClientEvent] %s TLS_HANDSHAKING", connectable.to_string ());
-                ((TlsClientConnection) connection).accept_certificate.connect ((peer_cert, errors) => {
-                    return on_invalid_certificate (peer_cert, errors, connectable);
-                });
+                if (connection_details.auth_method == Iridium.Models.AuthenticationMethod.SASL_EXTERNAL) {
+                    try {
+                        debug ("Providing certificate to connection for SASL external authentication");
+                        var certificate = new GLib.TlsCertificate.from_file (GLib.File.new_for_uri (get_auth_token ()).get_path ());
+                        var fingerprint = GLib.Checksum.compute_for_data (GLib.ChecksumType.SHA512, certificate.certificate.data);
+                        debug (@"Certificate fingerprint: $fingerprint");
+                        ((TlsClientConnection) connection).set_certificate (certificate);
+                    } catch (GLib.Error e) {
+                        warning ("Error setting certificate: %s", e.message);
+                        connection_error_details = e.message;
+                    }
+                    ((TlsClientConnection) connection).accept_certificate.connect ((peer_cert, errors) => {
+                        return on_invalid_certificate (peer_cert, errors, connectable);
+                    });
+                }
                 break;
             default:
                 // Do nothing - per documentation, unrecognized events should be ignored as there may be
@@ -171,7 +183,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             if (flag in errors) {
                 encountered_errors.add (flag);
                 error_string += @"$(flag), ";
-                formatted_error_string += " • " + Iridium.Models.CertificateErrorMapping.get_description (flag) + "\n";
+                formatted_error_string += " \u2022 " + Iridium.Models.CertificateErrorMapping.get_description (flag) + "\n";
             }
         }
         warning (@"TLS certificate errors: $(error_string)");
@@ -213,68 +225,66 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
     }
 
-    private void register (Iridium.Services.ServerConnectionDetails connection_details) {
+    private void register () {
         var nickname = connection_details.nickname;
         var username = connection_details.nickname; // Use nickname for both
         var realname = connection_details.realname;
         var mode = "+i";
 
         // Handle the various auth methods
+        debug ("AuthenticationMethod is %s", connection_details.auth_method.to_string ());
         switch (connection_details.auth_method) {
             case Iridium.Models.AuthenticationMethod.NONE:
-                debug ("AuthenticationMethod is NONE");
                 send_output (@"NICK $nickname");
                 send_output (@"USER $username 0 * :$realname");
                 send_output (@"MODE $nickname $mode");
                 break;
             case Iridium.Models.AuthenticationMethod.SERVER_PASSWORD:
-                debug ("AuthenticationMethod is SERVER_PASSWORD");
-                string password = null;
-                // Check if we're passed an auth token
-                if (connection_details.auth_token != null) {
-                    debug ("Server password passed with request to open connection");
-                    password = connection_details.auth_token;
-                } else {
-                    debug ("Retrieving server password from secret manager");
-                    var server = connection_details.server;
-                    var port = connection_details.port;
-                    password = Iridium.Application.secret_manager.retrieve_secret (server, port, nickname);
-                    if (password == null) {
-                        // TODO: Handle this better!
-                        warning ("No password found for server: " + server);
-                    }
-                }
+                string? password = get_auth_token ();
                 send_output (@"PASS $password");
                 send_output (@"NICK $nickname");
                 send_output (@"USER $username 0 * :$realname");
                 send_output (@"MODE $nickname $mode");
-
                 break;
             case Iridium.Models.AuthenticationMethod.NICKSERV_MSG:
-                debug ("AuthenticationMethod is NICKSERV_MSG");
-                string password = null;
-                // Check if we're passed an auth token
-                if (connection_details.auth_token != null) {
-                    debug ("NickServ password passed with request to open connection");
-                    password = connection_details.auth_token;
-                } else {
-                    debug ("Retrieving NickServ password from secret manager");
-                    var server = connection_details.server;
-                    var port = connection_details.port;
-                    password = Iridium.Application.secret_manager.retrieve_secret (server, port, nickname);
-                    if (password == null) {
-                        // TODO: Handle this better!
-                        warning ("No password found for server: " + server + ", port: " + port.to_string () + ", nickname: " + nickname + "\n");
-                    }
-                }
+                string? password = get_auth_token ();
                 send_output (@"NICK $nickname");
                 send_output (@"USER $username 0 * :$realname");
                 send_output (@"MODE $nickname $mode");
                 send_output (@"NickServ identify $password");
                 break;
+            case Iridium.Models.AuthenticationMethod.SASL_PLAIN:
+            case Iridium.Models.AuthenticationMethod.SASL_EXTERNAL:
+                send_output ("CAP REQ :sasl");
+                send_output (@"NICK $nickname");
+                send_output (@"USER $username 0 * :$realname");
+                break;
             default:
                 assert_not_reached ();
         }
+    }
+
+    private string? get_auth_token () {
+        string? password = null;
+        if (connection_details.auth_token != null) {
+            debug ("Password passed with request to open connection");
+            password = connection_details.auth_token;
+        } else if (!connection_details.auth_method.stores_secret ()) {
+            debug ("Authentication type %s does not store a secret", connection_details.auth_method.get_display_string ());
+            return null;
+        } else {
+            debug ("Retrieving password from secret manager");
+            var server = connection_details.server;
+            var port = connection_details.port;
+            var nickname = connection_details.nickname;
+            password = Iridium.Application.secret_manager.retrieve_secret (server, port, nickname);
+            if (password == null) {
+                // TODO: Handle this better!
+                warning ("No auth token found for server: " + server + ", port: " + port.to_string () + ", nickname: " + nickname + "\n");
+                return null;
+            }
+        }
+        return password;
     }
 
     private void handle_line (string? line) {
@@ -296,6 +306,79 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 }
                 server_error_received (message);
                 break;
+            case Iridium.Services.MessageCommands.CAP:
+                string subcommand = message.params[1];
+                switch (subcommand) {
+                    case Iridium.Services.MessageCommands.CAPSubcommands.LS:
+                    case Iridium.Services.MessageCommands.CAPSubcommands.LIST:
+                    case Iridium.Services.MessageCommands.CAPSubcommands.NEW:
+                    case Iridium.Services.MessageCommands.CAPSubcommands.DEL:
+                        warning (@"Unhandled CAP subcommand response from the server: $subcommand");
+                        break;
+                    case Iridium.Services.MessageCommands.CAPSubcommands.ACK:
+                        string capability = message.message;
+                        debug (@"Capability accepted by the server: $capability");
+                        if (!is_registered && (capability == "sasl")) {
+                            if (connection_details.auth_method == Iridium.Models.AuthenticationMethod.SASL_PLAIN) {
+                                string mechanism = "PLAIN";
+                                send_output (@"AUTHENTICATE $mechanism");
+                            } else if (connection_details.auth_method == Iridium.Models.AuthenticationMethod.SASL_EXTERNAL) {
+                                string mechanism = "EXTERNAL";
+                                send_output (@"AUTHENTICATE $mechanism");
+                            } else {
+                                warning ("Unsupported auth method for response to SASL CAP ACK");
+                            }
+                        }
+                        break;
+                    case Iridium.Services.MessageCommands.CAPSubcommands.NAK:
+                        if (!is_registered) {
+                            string capability = message.message;
+                            open_failed (_(@"Capability was rejected by the server: $capability"));
+                        }
+                        server_error_received (message);
+                        break;
+                    default:
+                        warning ("Unexpected CAP subcommand from server: " + subcommand);
+                        break;
+                }
+                break;
+            case Iridium.Services.MessageCommands.AUTHENTICATE:
+                if (is_registered) {
+                    warning ("Received AUTHENTICATE command while in a registered state");
+                    break;
+                }
+                // Some servers send the + as a param rather than the message
+                if (message.message == "+" || (message.params.length > 0 && message.params[0] == "+")) {
+                    if (connection_details.auth_method == Iridium.Models.AuthenticationMethod.SASL_PLAIN) {
+                        string nickname = connection_details.nickname;
+                        string? auth_token = get_auth_token ();
+                        if (auth_token == null) {
+                            // Abort the SASL exchange
+                            send_output ("AUTHENTICATE *");
+                            send_output ("CAP END");
+                            break;
+                        }
+                        // Create an unencoded array with separators, because we can't use \0 with the string without breaking things
+                        var sep = 0x0;
+                        uint8[] unencoded = @"$nickname$sep$nickname$sep$auth_token".data;
+                        // Now fill in the \0 separators in the data array
+                        unencoded[nickname.length] = '\0';
+                        unencoded[2 * nickname.length + 1] = '\0';
+                        // Base64 encode the data
+                        string encoded = GLib.Base64.encode (unencoded);
+                        // Prevent free() errors
+                        unencoded = null;
+                        send_output (@"AUTHENTICATE $encoded");
+                    } else if (connection_details.auth_method == Iridium.Models.AuthenticationMethod.SASL_EXTERNAL) {
+                        send_output ("AUTHENTICATE +");
+                    } else {
+                        warning ("Unhandled AUTHENTICATE from server for auth method %s", connection_details.auth_method.to_string ());
+                    }
+                }
+                break;
+            case Iridium.Services.NumericCodes.RPL_SASLSUCCESS:
+                send_output ("CAP END");
+                break;
             case Iridium.Services.MessageCommands.NOTICE:
             case Iridium.Services.NumericCodes.RPL_CREATED:
             case Iridium.Services.NumericCodes.RPL_MOTD:
@@ -305,6 +388,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             case Iridium.Services.NumericCodes.RPL_SERVLIST:
             case Iridium.Services.NumericCodes.RPL_ENDOFSTATS:
             case Iridium.Services.NumericCodes.RPL_STATSLINKINFO:
+            case Iridium.Services.NumericCodes.RPL_LOGGEDIN:
                 server_message_received (message);
                 break;
             case Iridium.Services.NumericCodes.RPL_WELCOME:
@@ -506,6 +590,28 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 break;
 
             // Errors
+            case Iridium.Services.NumericCodes.ERR_SASLABORTED:
+                // This is received when we (the client) abort the SASL authentication attempt, typically
+                // after receiving an ERR_SASLFAIL message. At this point, if we're attempting to establish
+                // a new server connection, we should terminate the connection.
+                server_error_received (message);
+                if (!is_registered) {
+                    do_close ();
+                }
+                break;
+            case Iridium.Services.NumericCodes.ERR_SASLFAIL:
+                // The pair of 904 and 906 (ERR_SASLFAIL and ERR_SASLABORTED respectively) is delicate. When
+                // an attempt to use SASL auth fails, first we (the client) receive ERR_SASLFAIL. Because the
+                // authentication attempt has failed, this means our new server connection attempt has failed,
+                // so we send the open_failed signal with the appropriate message. At this point, we should 
+                // terminate the SASL authentication attempt by sending "AUTHENTICATE *" and "CAP END".
+                if (!is_registered) {
+                    open_failed (message.message, connection_error_details);
+                }
+                send_output ("AUTHENTICATE *");
+                send_output ("CAP END");
+                server_error_received (message);
+                break;
             case Iridium.Services.NumericCodes.ERR_ERRONEOUSNICKNAME:
                 // If this error occurs during the initial connection, the current
                 // nickname will be an asterisk (*)
@@ -567,31 +673,36 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
     public void close () {
         debug ("Closing connection for server: " + connection_details.server);
+        // Do this first to ensure we don't have a race condition of new messages coming in while trying to close
         lock (should_exit) {
             should_exit = true;
         }
         send_output (Iridium.Services.MessageCommands.QUIT + " :Iridium IRC Client");
         channel_users.clear ();
+        leave_channels ();
         do_close ();
+        connection_closed ();
+    }
+
+    private void leave_channels () {
+        foreach (var channel in joined_channels) {
+            channel_left (channel);
+        }
+        joined_channels.clear ();
     }
 
     private void do_close () {
+        // Stop reading
         lock (should_exit) {
             should_exit = true;
         }
-
+        // Close the socket connection
         try {
             connection.close ();
         } catch (GLib.IOError e) {
             warning ("Error while closing connection: %s", e.message);
         }
         cancellable.cancel ();
-
-        foreach (var channel in joined_channels) {
-            channel_left (channel);
-        }
-        joined_channels.clear ();
-        connection_closed ();
     }
 
     public void send_user_message (string text) {

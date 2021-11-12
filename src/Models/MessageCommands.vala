@@ -21,6 +21,17 @@
 
 public class Iridium.Services.MessageCommands : GLib.Object {
 
+    public class CAPSubcommands {
+        public const string LS = "LS";
+        public const string LIST = "LIST";
+        public const string REQ = "REQ";
+        public const string ACK = "ACK";
+        public const string NAK = "NAK";
+        public const string END = "END";
+        public const string NEW = "NEW";
+        public const string DEL = "DEL";
+    }
+
     // Connection messages
     public const string CAP = "CAP";
     public const string AUTHENTICATE = "AUTHENTICATE";
