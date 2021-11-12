@@ -835,33 +835,30 @@ public class Iridium.MainWindow : Hdy.Window {
     // ServerConnectionManager Callbacks
     //
 
-    private bool on_unacceptable_certificate (TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors, SocketConnectable connectable) {
-        int result = -1;
-        bool remember_decision = false;
+    private void on_unacceptable_certificate (string server_name, TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors, SocketConnectable connectable) {
         Idle.add (() => {
+            bool remember_decision = false;
             var dialog = new Iridium.Widgets.CertificateWarningDialog (this, peer_cert, errors, connectable);
             dialog.remember_decision_toggled.connect ((remember) => {
                 remember_decision = remember;
             });
-            result = dialog.run ();
-            debug ("Result: %d", result);
+            int result = dialog.run ();
             dialog.dismiss ();
+            var is_accepted = (result == Gtk.ResponseType.OK);
+            if (is_accepted) {
+                Iridium.Application.connection_manager.accept_certificate (server_name);
+            } else {
+                Iridium.Application.connection_manager.reject_certificate (server_name);
+            }
+            if (remember_decision) {
+                var server_identity = new Iridium.Models.ServerIdentity ();
+                server_identity.host = Iridium.Services.CertificateManager.parse_host (connectable);
+                server_identity.certificate_pem = peer_cert.certificate_pem;
+                server_identity.is_accepted = is_accepted;
+                Iridium.Application.certificate_manager.store_identity (server_identity);
+            }
             return false;
         });
-        //  while (result == -1) {
-            // Block until a selection is made
-            //  debug ("waiting...");
-        //  }
-        debug ("Result: %d", result);
-        var is_accepted = (result == Gtk.ResponseType.OK);
-        if (remember_decision) {
-            var server_identity = new Iridium.Models.ServerIdentity ();
-            server_identity.host = Iridium.Services.CertificateManager.parse_host (connectable);
-            server_identity.certificate_pem = peer_cert.certificate_pem;
-            server_identity.is_accepted = is_accepted;
-            Iridium.Application.certificate_manager.store_identity (server_identity);
-        }
-        return is_accepted;
     }
 
     private void on_server_connection_successful (string server_name, string nickname, Iridium.Services.Message message) {

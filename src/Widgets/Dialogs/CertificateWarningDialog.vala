@@ -21,6 +21,8 @@
 
 public class Iridium.Widgets.CertificateWarningDialog : Granite.MessageDialog {
 
+    // TODO: It would be helpful to provide more user-friendly feedback here rather than just the raw cert
+
     private static Gtk.CssProvider provider;
 
     public unowned Iridium.MainWindow main_window { get; construct; }

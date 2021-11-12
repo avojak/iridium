@@ -248,12 +248,28 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
         connection.request_channel_list ();
     }
 
+    public void accept_certificate (string server_name) {
+        var connection = open_connections.get (server_name);
+        if (connection == null) {
+            return;
+        }
+        connection.accept_certificate ();
+    }
+
+    public void reject_certificate (string server_name) {
+        var connection = open_connections.get (server_name);
+        if (connection == null) {
+            return;
+        }
+        connection.reject_certificate ();
+    }
+
     //
     // ServerConnection Callbacks
     //
 
-    private bool on_unacceptable_certificate (TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors, SocketConnectable connectable) {
-        return unacceptable_certificate (peer_cert, errors, connectable);
+    private void on_unacceptable_certificate (Iridium.Services.ServerConnection source, TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors, SocketConnectable connectable) {
+        unacceptable_certificate (source.connection_details.server, peer_cert, errors, connectable);
     }
 
     private void on_server_connection_successful (Iridium.Services.ServerConnection source, string nickname, Iridium.Services.Message message) {
@@ -364,7 +380,7 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
     // Signals
     //
 
-    public signal bool unacceptable_certificate (TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors, SocketConnectable connectable);
+    public signal void unacceptable_certificate (string server_name, TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors, SocketConnectable connectable);
     public signal void server_connection_successful (string server_name, string nickname, Iridium.Services.Message message);
     public signal void server_connection_failed (string server_name, string error_message, string? error_details);
     public signal void server_connection_closed (string server_name);
