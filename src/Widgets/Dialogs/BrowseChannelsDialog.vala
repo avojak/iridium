@@ -19,7 +19,7 @@
  * Authored by: Andrew Vojak <andrew.vojak@gmail.com>
  */
 
-public class Iridium.Widgets.BrowseChannelsDialog : Gtk.Dialog {
+public class Iridium.Widgets.BrowseChannelsDialog : Granite.Dialog {
 
     // TODO: At some point it might be nice to add the ability to sort the columns
 
