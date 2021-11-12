@@ -151,7 +151,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                         ((TlsClientConnection) connection).set_certificate (certificate);
                     } catch (GLib.Error e) {
                         warning ("Error setting certificate: %s", e.message);
-                        //  open_failed (e.message);
+                        connection_error_details = e.message;
                     }
                     ((TlsClientConnection) connection).accept_certificate.connect ((peer_cert, errors) => {
                         return on_invalid_certificate (peer_cert, errors, connectable);
@@ -591,23 +591,26 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
             // Errors
             case Iridium.Services.NumericCodes.ERR_SASLABORTED:
-                //  send_output ("AUTHENTICATE *");
-                //  send_output ("CAP END");
+                // This is received when we (the client) abort the SASL authentication attempt, typically
+                // after receiving an ERR_SASLFAIL message. At this point, if we're attempting to establish
+                // a new server connection, we should terminate the connection.
                 server_error_received (message);
+                if (!is_registered) {
+                    do_close ();
+                }
                 break;
             case Iridium.Services.NumericCodes.ERR_SASLFAIL:
-                // TODO: Need to work out whether or not this truly means that the opening of the connections failed!
-
-                //  if (!is_registered) {
-                    //  open_failed (message.message);
-                    send_output ("AUTHENTICATE *");
-                    send_output ("CAP END");
-                //  }
+                // The pair of 904 and 906 (ERR_SASLFAIL and ERR_SASLABORTED respectively) is delicate. When
+                // an attempt to use SASL auth fails, first we (the client) receive ERR_SASLFAIL. Because the
+                // authentication attempt has failed, this means our new server connection attempt has failed,
+                // so we send the open_failed signal with the appropriate message. At this point, we should 
+                // terminate the SASL authentication attempt by sending "AUTHENTICATE *" and "CAP END".
+                if (!is_registered) {
+                    open_failed (message.message, connection_error_details);
+                }
+                send_output ("AUTHENTICATE *");
+                send_output ("CAP END");
                 server_error_received (message);
-                // Technically the connection *could* continue and a 001 welcome message received, but does that make sense?
-                //  lock (should_exit) {
-                //      should_exit = true;
-                //  }
                 break;
             case Iridium.Services.NumericCodes.ERR_ERRONEOUSNICKNAME:
                 // If this error occurs during the initial connection, the current
@@ -670,31 +673,36 @@ public class Iridium.Services.ServerConnection : GLib.Object {
 
     public void close () {
         debug ("Closing connection for server: " + connection_details.server);
+        // Do this first to ensure we don't have a race condition of new messages coming in while trying to close
         lock (should_exit) {
             should_exit = true;
         }
         send_output (Iridium.Services.MessageCommands.QUIT + " :Iridium IRC Client");
         channel_users.clear ();
+        leave_channels ();
         do_close ();
+        connection_closed ();
+    }
+
+    private void leave_channels () {
+        foreach (var channel in joined_channels) {
+            channel_left (channel);
+        }
+        joined_channels.clear ();
     }
 
     private void do_close () {
+        // Stop reading
         lock (should_exit) {
             should_exit = true;
         }
-
+        // Close the socket connection
         try {
             connection.close ();
         } catch (GLib.IOError e) {
             warning ("Error while closing connection: %s", e.message);
         }
         cancellable.cancel ();
-
-        foreach (var channel in joined_channels) {
-            channel_left (channel);
-        }
-        joined_channels.clear ();
-        connection_closed ();
     }
 
     public void send_user_message (string text) {
