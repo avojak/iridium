@@ -48,6 +48,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     private string? connection_error_details = null;
 
     private bool has_sasl_failed = false;
+    private bool? should_accept_certificate = null;
 
     public ServerConnection (Iridium.Services.ServerConnectionDetails connection_details) {
         Object (
@@ -155,10 +156,10 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                         warning ("Error setting certificate: %s", e.message);
                         connection_error_details = e.message;
                     }
-                    ((TlsClientConnection) connection).accept_certificate.connect ((peer_cert, errors) => {
-                        return on_invalid_certificate (peer_cert, errors, connectable);
-                    });
                 }
+                ((TlsClientConnection) connection).accept_certificate.connect ((peer_cert, errors) => {
+                    return on_invalid_certificate (peer_cert, errors, connectable);
+                });
                 break;
             default:
                 // Do nothing - per documentation, unrecognized events should be ignored as there may be
@@ -191,6 +192,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         warning (@"TLS certificate errors: $(error_string)");
 
         var cert_policy = Iridium.Application.settings.get_string ("certificate-validation-policy");
+        debug (cert_policy.to_string ());
         switch (Iridium.Models.InvalidCertificatePolicy.get_value_by_short_name (cert_policy)) {
             case REJECT:
                 debug ("Rejecting certificate per policy");
@@ -207,8 +209,14 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                     return identity.is_accepted;
                 }
 
+                // Prompt the user to accept/reject the certificate
+                unacceptable_certificate (peer_cert, encountered_errors, connectable);
+                while (should_keeping_waiting_on_user_certificate_verification ()) {
+                    // Do nothing
+                }
+
                 // Identity is not known, so prompt the user
-                if (unacceptable_certificate (peer_cert, encountered_errors, connectable)) {
+                if (should_accept_certificate) {
                     return true;
                 } else {
                     connection_error_details = _("Certificate was rejected by the user.");
@@ -225,6 +233,24 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 assert_not_reached ();
         }
 
+    }
+
+    private bool should_keeping_waiting_on_user_certificate_verification () {
+        lock (should_accept_certificate) {
+            return should_accept_certificate == null;
+        }
+    }
+
+    public void accept_certificate () {
+        lock (should_accept_certificate) {
+            should_accept_certificate = true;
+        }
+    }
+
+    public void reject_certificate () {
+        lock (should_accept_certificate) {
+            should_accept_certificate = false;
+        }
     }
 
     private void register () {
@@ -905,7 +931,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         send_output (Iridium.Services.MessageCommands.LIST);
     }
 
-    public signal bool unacceptable_certificate (TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors, SocketConnectable connectable);
+    public signal void unacceptable_certificate (TlsCertificate peer_cert, Gee.List<TlsCertificateFlags> errors, SocketConnectable connectable);
     public signal void open_successful (string nickname, Iridium.Services.Message message);
     public signal void open_failed (string error_message, string? error_details = null);
     public signal void connection_closed ();
