@@ -42,8 +42,7 @@ public class Iridium.MainWindow : Hdy.Window {
             application: application,
             app: application,
             border_width: 0,
-            resizable: true,
-            window_position: Gtk.WindowPosition.CENTER
+            resizable: true
         );
     }
 
@@ -55,8 +54,7 @@ public class Iridium.MainWindow : Hdy.Window {
         main_layout = new Iridium.Layouts.MainLayout (this);
         add (main_layout);
 
-        move (Iridium.Application.settings.get_int ("pos-x"), Iridium.Application.settings.get_int ("pos-y"));
-        resize (Iridium.Application.settings.get_int ("window-width"), Iridium.Application.settings.get_int ("window-height"));
+        restore_window_position ();
 
         // Connect to main layout signals
         main_layout.welcome_view_shown.connect (on_welcome_view_shown);
@@ -143,6 +141,15 @@ public class Iridium.MainWindow : Hdy.Window {
         this.delete_event.connect (before_destroy);
 
         show_app ();
+    }
+
+    private void restore_window_position () {
+        var x = Iridium.Application.settings.get_int ("pos-x");
+        var y = Iridium.Application.settings.get_int ("pos-y");
+        if (x != -1 && y != -1) {
+            move (x, y);
+        }
+        resize (Iridium.Application.settings.get_int ("window-width"), Iridium.Application.settings.get_int ("window-height"));
     }
 
     public void show_app () {
