@@ -55,8 +55,6 @@ public class Iridium.Widgets.EditServerConnectionDialog : Iridium.Widgets.Server
             realname_entry.set_text (connection_details.realname);
             port_entry.set_text (connection_details.port.to_string ());
             auth_method_combo.set_active (get_auth_method_index (connection_details.auth_method));
-            debug (connection_details.auth_method.to_string ());
-            debug (connection_details.auth_token);
             ssl_tls_switch.set_active (connection_details.tls);
             if (connection_details.auth_method == Iridium.Models.AuthenticationMethod.SASL_EXTERNAL) {
                 if (connection_details.auth_token != null) {
