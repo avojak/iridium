@@ -155,10 +155,10 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                         warning ("Error setting certificate: %s", e.message);
                         connection_error_details = e.message;
                     }
-                    ((TlsClientConnection) connection).accept_certificate.connect ((peer_cert, errors) => {
-                        return on_invalid_certificate (peer_cert, errors, connectable);
-                    });
                 }
+                ((TlsClientConnection) connection).accept_certificate.connect ((peer_cert, errors) => {
+                    return on_invalid_certificate (peer_cert, errors, connectable);
+                });
                 break;
             default:
                 // Do nothing - per documentation, unrecognized events should be ignored as there may be
@@ -191,6 +191,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         warning (@"TLS certificate errors: $(error_string)");
 
         var cert_policy = Iridium.Application.settings.get_string ("certificate-validation-policy");
+        debug (cert_policy.to_string ());
         switch (Iridium.Models.InvalidCertificatePolicy.get_value_by_short_name (cert_policy)) {
             case REJECT:
                 debug ("Rejecting certificate per policy");

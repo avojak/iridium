@@ -844,12 +844,15 @@ public class Iridium.MainWindow : Hdy.Window {
                 remember_decision = remember;
             });
             result = dialog.run ();
+            debug ("Result: %d", result);
             dialog.dismiss ();
             return false;
         });
-        while (result == -1) {
+        //  while (result == -1) {
             // Block until a selection is made
-        }
+            //  debug ("waiting...");
+        //  }
+        debug ("Result: %d", result);
         var is_accepted = (result == Gtk.ResponseType.OK);
         if (remember_decision) {
             var server_identity = new Iridium.Models.ServerIdentity ();
