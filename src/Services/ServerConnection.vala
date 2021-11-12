@@ -47,6 +47,8 @@ public class Iridium.Services.ServerConnection : GLib.Object {
     private string? connection_error_message = null;
     private string? connection_error_details = null;
 
+    private bool has_sasl_failed = false;
+
     public ServerConnection (Iridium.Services.ServerConnectionDetails connection_details) {
         Object (
             connection_details: connection_details
@@ -281,6 +283,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             if (password == null) {
                 // TODO: Handle this better!
                 warning ("No auth token found for server: " + server + ", port: " + port.to_string () + ", nickname: " + nickname + "\n");
+                connection_error_details = _("No stored secret found for this server.");
                 return null;
             }
         }
@@ -596,6 +599,10 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 // a new server connection, we should terminate the connection.
                 server_error_received (message);
                 if (!is_registered) {
+                    // If we didn't receive an ERR_SASLFAIL message, ensure that we still send the open_failed signal
+                    if (!has_sasl_failed) {
+                        open_failed (message.message, connection_error_details);
+                    }
                     do_close ();
                 }
                 break;
@@ -605,6 +612,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 // authentication attempt has failed, this means our new server connection attempt has failed,
                 // so we send the open_failed signal with the appropriate message. At this point, we should 
                 // terminate the SASL authentication attempt by sending "AUTHENTICATE *" and "CAP END".
+                has_sasl_failed = true;
                 if (!is_registered) {
                     open_failed (message.message, connection_error_details);
                 }
