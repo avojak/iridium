@@ -144,11 +144,7 @@ public class Iridium.MainWindow : Hdy.Window {
     }
 
     private void restore_window_position () {
-        var x = Iridium.Application.settings.get_int ("pos-x");
-        var y = Iridium.Application.settings.get_int ("pos-y");
-        if (x != -1 && y != -1) {
-            move (x, y);
-        }
+        move (Iridium.Application.settings.get_int ("pos-x"), Iridium.Application.settings.get_int ("pos-y"));
         resize (Iridium.Application.settings.get_int ("window-width"), Iridium.Application.settings.get_int ("window-height"));
     }
 
