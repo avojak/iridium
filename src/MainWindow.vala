@@ -937,6 +937,7 @@ public class Iridium.MainWindow : Hdy.Window {
             foreach (string channel in channels) {
                 if (!Iridium.Application.settings.get_boolean ("suppress-join-part-messages")) {
                     var message_to_display = new Iridium.Services.Message ();
+                    message_to_display.command = Iridium.Services.MessageCommands.QUIT;
                     message_to_display.message = nickname + _(" has quit");
                     if (message.message != null && message.message.strip () != "") {
                         message_to_display.message += " (" + message.message + ")";
@@ -953,6 +954,7 @@ public class Iridium.MainWindow : Hdy.Window {
             Idle.add (() => {
                 // Display a message in the channel chat view
                 var message_to_display = new Iridium.Services.Message ();
+                message_to_display.command = Iridium.Services.MessageCommands.QUIT;
                 message_to_display.message = nickname + _(" has quit");
                 if (message.message != null && message.message.strip () != "") {
                     message_to_display.message += " (" + message.message + ")";
@@ -1096,6 +1098,7 @@ public class Iridium.MainWindow : Hdy.Window {
                 // Display a message in the channel chat view
                 var message = new Iridium.Services.Message ();
                 message.message = nickname + _(" has joined");
+                message.command = Iridium.Services.MessageCommands.JOIN;
                 main_layout.display_server_message (server_name, channel_name, message);
                 return false;
             });
@@ -1109,6 +1112,7 @@ public class Iridium.MainWindow : Hdy.Window {
                 // Display a message in the channel chat view
                 var message = new Iridium.Services.Message ();
                 message.message = nickname + _(" has left");
+                message.command = Iridium.Services.MessageCommands.PART;
                 main_layout.display_server_message (server_name, channel_name, message);
                 return false;
             });

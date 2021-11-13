@@ -380,8 +380,12 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         last_message_time = new DateTime.now_utc ();
         do_display_server_msg (message);
         // Always auto-scroll server messages (The large number of messages received upon connecting
-        // break the auto-scrolling's ability to keep up)
-        do_autoscroll ();
+        // break the auto-scrolling's ability to keep up), unless this is a JOIN, PART or QUIT message
+        if (message.command != Iridium.Services.MessageCommands.JOIN &&
+                message.command != Iridium.Services.MessageCommands.PART &&
+                message.command != Iridium.Services.MessageCommands.QUIT) {
+            do_autoscroll ();
+        }
     }
 
     public void display_server_error_msg (Iridium.Services.Message message) {
