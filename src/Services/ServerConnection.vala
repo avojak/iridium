@@ -148,7 +148,19 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 if (connection_details.auth_method == Iridium.Models.AuthenticationMethod.SASL_EXTERNAL) {
                     try {
                         debug ("Providing certificate to connection for SASL external authentication");
-                        var certificate = new GLib.TlsCertificate.from_file (GLib.File.new_for_uri (get_auth_token ()).get_path ());
+                        string? uri = get_auth_token ();
+                        if (uri == null) {
+                            warning ("Null certificate file URI");
+                            // connection_error_details already set for null token
+                            break;
+                        }
+                        string? file_path = GLib.File.new_for_uri (uri).get_path ();
+                        if (file_path == null) {
+                            warning ("Certificate file no longer present");
+                            connection_error_details = _("Certificate file not found");
+                            break;
+                        }
+                        var certificate = new GLib.TlsCertificate.from_file (file_path);
                         var fingerprint = GLib.Checksum.compute_for_data (GLib.ChecksumType.SHA512, certificate.certificate.data);
                         debug (@"Certificate fingerprint: $fingerprint");
                         ((TlsClientConnection) connection).set_certificate (certificate);
