@@ -187,7 +187,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
             return false;
         });
 
-        Iridium.Application.settings.changed["prefer-dark-style"].connect (update_tag_colors);
+        Granite.Settings.get_default ().notify["prefers-color-scheme"].connect (update_tag_colors);
 
         show_all ();
     }

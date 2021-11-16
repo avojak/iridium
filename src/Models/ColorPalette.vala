@@ -27,7 +27,7 @@ public enum Iridium.Models.ColorPalette {
     COLOR_BLUEBERRY;
 
     public string get_value () {
-        var prefer_dark_style = Iridium.Application.settings.get_boolean ("prefer-dark-style");
+        var prefer_dark_style = Gtk.Settings.get_default ().gtk_application_prefer_dark_theme;
         // Colors defined by the elementary OS Human Interface Guidelines
         // When in the "dark style", use shades that are one step lighter than the "middle" value
         switch (this) {
