@@ -157,7 +157,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                         string? file_path = GLib.File.new_for_uri (uri).get_path ();
                         if (file_path == null) {
                             warning ("Certificate file no longer present");
-                            connection_error_details = _(@"Certificate file not found");
+                            connection_error_details = _("Certificate file not found");
                             break;
                         }
                         var certificate = new GLib.TlsCertificate.from_file (file_path);
