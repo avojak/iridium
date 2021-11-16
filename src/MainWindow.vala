@@ -485,6 +485,11 @@ public class Iridium.MainWindow : Hdy.Window {
                     // Disconnect and update the settings
                     Iridium.Application.connection_manager.disconnect_from_server (existing_connection_details.server);
                     Iridium.Application.connection_repository.update_server_connection_details (existing_connection_details.server, updated_connection_details);
+                    try {
+                        Iridium.Application.secret_manager.store_secret (server, port, nickname, auth_token);
+                    } catch (GLib.Error e) {
+                        warning ("Error while storing secret: %s", e.message);
+                    }
                     // Re-connect
                     var new_server_connection = Iridium.Application.connection_manager.connect_to_server (updated_connection_details);
                     new_server_connection.open_successful.connect (() => {
@@ -503,6 +508,11 @@ public class Iridium.MainWindow : Hdy.Window {
                     // Otherwise just write the changes straight to the repository
                     debug ("Server connection details changed, updating details in repository");
                     Iridium.Application.connection_repository.update_server_connection_details (existing_connection_details.server, updated_connection_details);
+                    try {
+                        Iridium.Application.secret_manager.store_secret (server, port, nickname, auth_token);
+                    } catch (GLib.Error e) {
+                        warning ("Error while storing secret: %s", e.message);
+                    }
                     edit_connection_dialog.dismiss ();
                     // In case the nickname changed, update the views
                     if (existing_connection_details.nickname != nickname) {
