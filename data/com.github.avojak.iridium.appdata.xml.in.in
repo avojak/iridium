@@ -21,6 +21,22 @@
     <binary>@appid@</binary>
   </provides>
   <releases>
+    <release version="1.4.0" date="2021-11-16">
+      <description>
+        <p>1.4.0 Release</p>
+        <ul>
+          <li>Respect the system light/dark style preference (#150)</li>
+          <li>Support SASL (plain and external) authentication (#16)</li>
+          <li>Fix autoscrolling when receving QUIT messages (#152)</li>
+          <li>Fix text not wrapping for errors on server connection (#167)</li>
+          <li>Fix window size and position not saving (#170)</li>
+          <li>Fix certificate warning dialog not appearing (#172)</li>
+          <li>Fix secrets not saving when using the Flatpak installation (#173)</li>
+          <li>Fix BrowseChannelsDialog not using Granite.Dialog (#176)</li>
+          <li>Fix new auth tokens not saving when editing a connection (#179)</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.3.2" date="2021-08-11">
       <description>
         <p>1.3.2 Release</p>
