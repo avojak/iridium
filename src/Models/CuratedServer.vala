@@ -514,7 +514,7 @@ public class Iridium.Models.CuratedServer : GLib.Object {
         }
 
         public static Servers[] all () {
-            return { 
+            return {
                 2600NET,
                 ACN,
                 AFTERNET,
