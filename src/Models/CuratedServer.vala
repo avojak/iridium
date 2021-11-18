@@ -64,12 +64,41 @@ public class Iridium.Models.CuratedServer : GLib.Object {
         IRC4FUN,
         IRCHIGHWAY,
         IRCNET,
+        IRCTOO,
+        KEYBOARD_FAILURE,
         LIBERA_CHAT,
+        LIBERTACASA,
+        LIBRAIRC,
+        LINKNET,
+        MINDFORGE,
+        MIXXNET,
+        OCEANIUS,
         OFTC,
+        OTHERNET,
+        OZORG,
+        PIK,
+        PIRC_PL,
+        PTNET,
         QUAKENET,
         RIZON,
+        RUSNET,
+        SERENITY_IRC,
+        SIMOSNAP,
+        SLASHNET,
         SNOONET,
-        UNDERNET;
+        SOHBET_NET,
+        SORCERYNET,
+        SPOTCHAT,
+        STATION51,
+        STORMBIT,
+        SWIFTIRC,
+        SYNIRC,
+        TECHTRONIX,
+        TILDE_CHAT,
+        TURLINET,
+        TRIPSIT,
+        UNDERNET,
+        XERTION;
 
         public CuratedServer get_details () {
             switch (this) {
@@ -77,369 +106,407 @@ public class Iridium.Models.CuratedServer : GLib.Object {
                     return new CuratedServer () {
                         network_name = "2600net",
                         server_host = "irc.2600.net",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
                     };
                 case ACN:
                     return new CuratedServer () {
                         network_name = "ACN",
                         server_host = "global.acn.gr",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
                         auth_method = Iridium.Models.AuthenticationMethod.SASL_PLAIN
                     };
                 case AFTERNET:
                     return new CuratedServer () {
                         network_name = "AfterNET",
                         server_host = "irc.afternet.org",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
                         auth_method = Iridium.Models.AuthenticationMethod.NICKSERV_MSG
                     };
                 case AITVARAS:
                     return new CuratedServer () {
                         network_name = "Aitvaras",
                         server_host = "irc.data.lt",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
                     };
                 case ANTHROCHAT:
                     return new CuratedServer () {
                         network_name = "Anthrochat",
                         server_host = "irc.anthrochat.net",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
                     };
                 case ARCNET:
                     return new CuratedServer () {
                         network_name = "ARCNet",
                         server_host = "arcnet-irc.org",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
                     };
                 case AUSTNET:
                     return new CuratedServer () {
                         network_name = "AustNet",
                         server_host = "irc.austnet.org",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
                     };
                 case AZZURRANET:
                     return new CuratedServer () {
                         network_name = "AzzurraNet",
                         server_host = "irc.azzurra.org",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
                     };
                 case CANTERNET:
                     return new CuratedServer () {
                         network_name = "Canternet",
                         server_host = "irc.canternet.org",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
                         auth_method = Iridium.Models.AuthenticationMethod.SASL_PLAIN
                     };
                 case CHAT4ALL:
                     return new CuratedServer () {
                         network_name = "Chat4all",
                         server_host = "irc.chat4all.org",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
                     };
                 case CHATJUNKIES:
                     return new CuratedServer () {
                         network_name = "ChatJunkies",
                         server_host = "irc.chatjunkies.org",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
                     };
                 case CHATPAT:
                     return new CuratedServer () {
                         network_name = "Chatpat",
                         server_host = "irc.unibg.net",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
                     };
                 case CHATSPIKE:
                     return new CuratedServer () {
                         network_name = "ChatSpike",
                         server_host = "irc.chatspike.net",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
                     };
                 case DAIRC:
                     return new CuratedServer () {
                         network_name = "DaIRC",
                         server_host = "irc.dairc.net",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
                     };
                 case DALNET:
                     return new CuratedServer () {
                         network_name = "DALnet",
                         server_host = "us.dal.net",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
                         auth_method = Iridium.Models.AuthenticationMethod.NICKSERV_MSG
                     };
                 case DARKMYST:
                     return new CuratedServer () {
                         network_name = "DarkMyst",
                         server_host = "irc.darkmyst.org",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
                         auth_method = Iridium.Models.AuthenticationMethod.SASL_PLAIN
                     };
                 case DARKSCIENCE:
                     return new CuratedServer () {
                         network_name = "darkscience",
                         server_host = "irc.darkscience.net",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
                         auth_method = Iridium.Models.AuthenticationMethod.SASL_PLAIN
                     };
                 case DARK_TOU_NET:
                     return new CuratedServer () {
                         network_name = "Dark-Tou-Net",
                         server_host = "irc.d-t-net.de",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
                     };
                 case DIGITALIRC:
                     return new CuratedServer () {
                         network_name = "DigitalIRC",
                         server_host = "irc.digitalirc.org",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
                         auth_method = Iridium.Models.AuthenticationMethod.SASL_PLAIN
                     };
                 case DOSERSNET:
                     return new CuratedServer () {
                         network_name = "DosersNET",
                         server_host = "irc.dosers.net",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
                         auth_method = Iridium.Models.AuthenticationMethod.SASL_PLAIN
                     };
                 case EFNET:
                     return new CuratedServer () {
                         network_name = "EFnet",
                         server_host = "irc.choopa.net",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
                     };
                 case ENTERTHEGAME:
                     return new CuratedServer () {
                         network_name = "EnterTheGame",
                         server_host = "irc.enterthegame.com",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
                     };
                 case ENTROPYNET:
                     return new CuratedServer () {
                         network_name = "EntropyNet",
                         server_host = "irc.entropynet.net",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
                         auth_method = Iridium.Models.AuthenticationMethod.SASL_PLAIN
                     };
                 case ESPERNET:
                     return new CuratedServer () {
                         network_name = "EsperNet",
                         server_host = "irc.esper.net",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
                         auth_method = Iridium.Models.AuthenticationMethod.SASL_PLAIN
                     };
                 case EUIRC:
                     return new CuratedServer () {
                         network_name = "euIRC",
                         server_host = "irc.euirc.net",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
                     };
                 case EUROPNET:
                     return new CuratedServer () {
                         network_name = "EuropNet",
                         server_host = "irc.europnet.org",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
                     };
                 case FDFNET:
                     return new CuratedServer () {
                         network_name = "FDFNet",
                         server_host = "irc.fdfnet.net",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
                     };
                 case GAMESURGE:
                     return new CuratedServer () {
                         network_name = "GameSurge",
                         server_host = "irc.gamesurge.net",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
                     };
                 case GEEKSHED:
                     return new CuratedServer () {
                         network_name = "GeekShed",
                         server_host = "irc.geekshed.net",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
                     };
                 case GERMAN_ELITE:
                     return new CuratedServer () {
                         network_name = "German-Elite",
                         server_host = "irc.german-elite.net",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
                     };
                 case GIMPNET:
                     return new CuratedServer () {
                         network_name = "GIMPNet",
                         server_host = "irc.gimp.org",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
                     };
                 case GLOBALGAMERS:
                     return new CuratedServer () {
                         network_name = "GlobalGamers",
                         server_host = "irc.globalgamers.net",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
                     };
                 case HACKINT:
                     return new CuratedServer () {
                         network_name = "hackint",
                         server_host = "irc.hackint.org",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
                         auth_method = Iridium.Models.AuthenticationMethod.SASL_PLAIN
                     };
                 case HASHMARK:
                     return new CuratedServer () {
                         network_name = "Hashmark",
                         server_host = "irc.hashmark.net",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
                     };
                 case ICQ_CHAT:
                     return new CuratedServer () {
                         network_name = "ICQ-Chat",
                         server_host = "irc.icq-chat.com",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
                         auth_method = Iridium.Models.AuthenticationMethod.SASL_PLAIN
                     };
                 case INTERLINKED:
                     return new CuratedServer () {
                         network_name = "Interlinked",
                         server_host = "irc.interlinked.me",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
                         auth_method = Iridium.Models.AuthenticationMethod.SASL_PLAIN
                     };
                 case IRC_NERDS:
                     return new CuratedServer () {
                         network_name = "IRC-nERDs",
                         server_host = "irc.irc-nerds.net",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
                         auth_method = Iridium.Models.AuthenticationMethod.SASL_PLAIN
                     };
                 case IRC4FUN:
                     return new CuratedServer () {
                         network_name = "IRC4Fun",
                         server_host = "irc.irc4fun.net",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
                         auth_method = Iridium.Models.AuthenticationMethod.SASL_PLAIN
                     };
                 case IRCHIGHWAY:
                     return new CuratedServer () {
                         network_name = "IRCHighWay",
                         server_host = "irc.irchighway.net",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
                     };
                 case IRCNET:
                     return new CuratedServer () {
                         network_name = "IRCnet",
                         server_host = "open.ircnet.net",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
+                    };
+                case IRCTOO:
+                    return new CuratedServer () {
+                        network_name = "IRCtoo",
+                        server_host = "irc.irctoo.net",
+                    };
+                case KEYBOARD_FAILURE:
+                    return new CuratedServer () {
+                        network_name = "Keyboard-Failure",
+                        server_host = "irc.kbfail.net",
                     };
                 case LIBERA_CHAT:
                     return new CuratedServer () {
                         network_name = "Libera.Chat",
                         server_host = "irc.libera.chat",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
+                        auth_method = Iridium.Models.AuthenticationMethod.SASL_PLAIN
+                    };
+                case LIBERTACASA:
+                    return new CuratedServer () {
+                        network_name = "LibertaCasa",
+                        server_host = "irc.liberta.casa",
+                        auth_method = Iridium.Models.AuthenticationMethod.SASL_PLAIN
+                    };
+                case LIBRAIRC:
+                    return new CuratedServer () {
+                        network_name = "LibraIRC",
+                        server_host = "irc.librairc.net",
+                    };
+                case LINKNET:
+                    return new CuratedServer () {
+                        network_name = "LinkNet",
+                        server_host = "irc.link-net.org",
+                        port = 7000,
+                    };
+                case MINDFORGE:
+                    return new CuratedServer () {
+                        network_name = "MindForge",
+                        server_host = "irc.mindforge.org",
+                        auth_method = Iridium.Models.AuthenticationMethod.SASL_PLAIN
+                    };
+                case MIXXNET:
+                    return new CuratedServer () {
+                        network_name = "MIXXnet",
+                        server_host = "irc.mixxnet.net",
+                    };
+                case OCEANIUS:
+                    return new CuratedServer () {
+                        network_name = "Oceanius",
+                        server_host = "irc.oceanius.com",
                         auth_method = Iridium.Models.AuthenticationMethod.SASL_PLAIN
                     };
                 case OFTC:
                     return new CuratedServer () {
                         network_name = "OFTC",
                         server_host = "irc.oftc.net",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
+                    };
+                case OTHERNET:
+                    return new CuratedServer () {
+                        network_name = "OtherNet",
+                        server_host = "irc.othernet.org",
+                    };
+                case OZORG:
+                    return new CuratedServer () {
+                        network_name = "OzOrg",
+                        server_host = "irc.oz.org",
+                    };
+                case PIK:
+                    return new CuratedServer () {
+                        network_name = "PIK",
+                        server_host = "irc.krstarica.com",
+                    };
+                case PIRC_PL:
+                    return new CuratedServer () {
+                        network_name = "pirc.pl",
+                        server_host = "irc.pirc.pl",
+                    };
+                case PTNET:
+                    return new CuratedServer () {
+                        network_name = "PTnet",
+                        server_host = "irc.ptnet.org",
                     };
                 case QUAKENET:
                     return new CuratedServer () {
                         network_name = "QuakeNet",
                         server_host = "irc.quakenet.org",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
+                        port = 6668,
+                        tls = false,
                     };
                 case RIZON:
                     return new CuratedServer () {
                         network_name = "Rizon",
                         server_host = "irc.rizon.net",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
+                    };
+                case RUSNET:
+                    return new CuratedServer () {
+                        network_name = "RusNet",
+                        server_host = "irc.tomsk.net",
+                    };
+                case SERENITY_IRC:
+                    return new CuratedServer () {
+                        network_name = "Serenity-IRC",
+                        server_host = "irc.serenity-irc.net",
+                    };
+                case SIMOSNAP:
+                    return new CuratedServer () {
+                        network_name = "SimosNap",
+                        server_host = "irc.simosnap.com",
+                        auth_method = Iridium.Models.AuthenticationMethod.SASL_PLAIN
+                    };
+                case SLASHNET:
+                    return new CuratedServer () {
+                        network_name = "SlashNET",
+                        server_host = "irc.slashnet.org",
                     };
                 case SNOONET:
                     return new CuratedServer () {
                         network_name = "Snoonet",
                         server_host = "irc.snoonet.org",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
+                        auth_method = Iridium.Models.AuthenticationMethod.SASL_PLAIN
+                    };
+                case SOHBET_NET:
+                    return new CuratedServer () {
+                        network_name = "Sohbet.net",
+                        server_host = "irc.sohbet.net",
+                    };
+                case SORCERYNET:
+                    return new CuratedServer () {
+                        network_name = "SorceryNet",
+                        server_host = "irc.sorcery.net",
+                        auth_method = Iridium.Models.AuthenticationMethod.SASL_PLAIN
+                    };
+                case SPOTCHAT:
+                    return new CuratedServer () {
+                        network_name = "SpotChat",
+                        server_host = "irc.spotchat.org",
+                        auth_method = Iridium.Models.AuthenticationMethod.SASL_PLAIN
+                    };
+                case STATION51:
+                    return new CuratedServer () {
+                        network_name = "Station51",
+                        server_host = "irc.station51.net",
+                    };
+                case STORMBIT:
+                    return new CuratedServer () {
+                        network_name = "StormBit",
+                        server_host = "irc.stormbit.net",
+                        auth_method = Iridium.Models.AuthenticationMethod.SASL_PLAIN
+                    };
+                case SWIFTIRC:
+                    return new CuratedServer () {
+                        network_name = "SwiftIRC",
+                        server_host = "irc.swiftirc.net",
+                    };
+                case SYNIRC:
+                    return new CuratedServer () {
+                        network_name = "synIRC",
+                        server_host = "irc.synirc.net",
+                    };
+                case TECHTRONIX:
+                    return new CuratedServer () {
+                        network_name = "Techtronix",
+                        server_host = "irc.techtronix.net",
+                        auth_method = Iridium.Models.AuthenticationMethod.SASL_PLAIN
+                    };
+                case TILDE_CHAT:
+                    return new CuratedServer () {
+                        network_name = "tilde.chat",
+                        server_host = "irc.tilde.chat",
+                        auth_method = Iridium.Models.AuthenticationMethod.SASL_PLAIN
+                    };
+                case TURLINET:
+                    return new CuratedServer () {
+                        network_name = "TURLINet",
+                        server_host = "irc.servx.org",
+                    };
+                case TRIPSIT:
+                    return new CuratedServer () {
+                        network_name = "TripSit",
+                        server_host = "irc.tripsit.me",
                         auth_method = Iridium.Models.AuthenticationMethod.SASL_PLAIN
                     };
                 case UNDERNET:
                     return new CuratedServer () {
                         network_name = "UnderNet",
                         server_host = "us.undernet.org",
-                        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT,
-                        tls = true,
-                        auth_method = Iridium.Models.AuthenticationMethod.NONE
+                    };
+                case XERTION:
+                    return new CuratedServer () {
+                        network_name = "Xertion",
+                        server_host = "irc.xertion.org",
+                        auth_method = Iridium.Models.AuthenticationMethod.SASL_PLAIN
                     };
                 default:
                     assert_not_reached ();
@@ -488,12 +555,41 @@ public class Iridium.Models.CuratedServer : GLib.Object {
                 IRC4FUN,
                 IRCHIGHWAY,
                 IRCNET,
+                IRCTOO,
+                KEYBOARD_FAILURE,
                 LIBERA_CHAT,
+                LIBERTACASA,
+                LIBRAIRC,
+                LINKNET,
+                MINDFORGE,
+                MIXXNET,
+                OCEANIUS,
                 OFTC,
+                OTHERNET,
+                OZORG,
+                PIK,
+                PIRC_PL,
+                PTNET,
                 QUAKENET,
                 RIZON,
+                RUSNET,
+                SERENITY_IRC,
+                SIMOSNAP,
+                SLASHNET,
                 SNOONET,
-                UNDERNET
+                SOHBET_NET,
+                SORCERYNET,
+                SPOTCHAT,
+                STATION51,
+                STORMBIT,
+                SWIFTIRC,
+                SYNIRC,
+                TECHTRONIX,
+                TILDE_CHAT,
+                TURLINET,
+                TRIPSIT,
+                UNDERNET,
+                XERTION
             };
         }
 
@@ -513,6 +609,10 @@ public class Iridium.Models.CuratedServer : GLib.Object {
     public bool tls { get; set; }
     public Iridium.Models.AuthenticationMethod auth_method { get; set; }
 
-    private CuratedServer () {}
+    private CuratedServer () {
+        port = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT;
+        tls = true;
+        auth_method = Iridium.Models.AuthenticationMethod.NONE;
+    }
 
 }
