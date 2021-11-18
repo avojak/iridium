@@ -35,6 +35,7 @@ public class Iridium.Services.ActionManager : GLib.Object {
     public const string ACTION_PREFERENCES = "action_preferences";
     public const string ACTION_TOGGLE_SIDEBAR = "action_toggle_sidebar";
     public const string ACTION_RESET_MARKER = "action_reset_marker";
+    public const string ACTION_BROWSE_SERVERS = "action_browse_servers";
 
     private const GLib.ActionEntry[] ACTION_ENTRIES = {
         { ACTION_NEW_WINDOW, action_new_window },
@@ -49,7 +50,8 @@ public class Iridium.Services.ActionManager : GLib.Object {
         { ACTION_FAVORITE_CHANNEL, action_favorite_channel },
         { ACTION_PREFERENCES, action_preferences },
         { ACTION_TOGGLE_SIDEBAR, action_toggle_sidebar },
-        { ACTION_RESET_MARKER, action_reset_marker }
+        { ACTION_RESET_MARKER, action_reset_marker },
+        { ACTION_BROWSE_SERVERS, action_browse_servers }
     };
 
     private static Gee.MultiMap<string, string> accelerators;
@@ -163,6 +165,10 @@ public class Iridium.Services.ActionManager : GLib.Object {
 
     private void action_reset_marker () {
         window.reset_marker_line ();
+    }
+
+    private void action_browse_servers () {
+        window.show_browse_servers_dialog ();
     }
 
 }

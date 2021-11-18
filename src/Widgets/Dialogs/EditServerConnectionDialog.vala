@@ -75,13 +75,4 @@ public class Iridium.Widgets.EditServerConnectionDialog : Iridium.Widgets.Server
         }
     }
 
-    private int get_auth_method_index (Iridium.Models.AuthenticationMethod auth_method) {
-        foreach (Gee.Map.Entry<int, Iridium.Models.AuthenticationMethod> entry in auth_methods.entries) {
-            if (entry.value == auth_method) {
-                return entry.key;
-            }
-        }
-        return -1;
-    }
-
 }

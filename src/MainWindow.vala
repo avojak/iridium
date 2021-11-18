@@ -34,6 +34,7 @@ public class Iridium.MainWindow : Hdy.Window {
     private Iridium.Widgets.PreferencesDialog? preferences_dialog = null;
     private Iridium.Widgets.NicknameEditDialog? nickname_edit_dialog = null;
     private Iridium.Widgets.BrowseChannelsDialog? browse_channels_dialog = null;
+    private Iridium.Widgets.BrowseServersDialog? browse_servers_dialog = null;
 
     private Iridium.Layouts.MainLayout main_layout;
 
@@ -396,9 +397,13 @@ public class Iridium.MainWindow : Hdy.Window {
         }
     }
 
-    public void show_server_connection_dialog () {
+    public void show_server_connection_dialog (Iridium.Models.CuratedServer? curated_server = null) {
         if (connection_dialog == null) {
-            connection_dialog = new Iridium.Widgets.NewServerConnectionDialog (this);
+            if (curated_server == null) {
+                connection_dialog = new Iridium.Widgets.NewServerConnectionDialog (this);
+            } else {
+                connection_dialog = new Iridium.Widgets.NewServerConnectionDialog.from_curated_server (this, curated_server);
+            }
             connection_dialog.show_all ();
             connection_dialog.primary_button_clicked.connect ((server, nickname, realname, port, auth_method, tls, auth_token) => {
                 // Prevent duplicate connections
@@ -420,6 +425,12 @@ public class Iridium.MainWindow : Hdy.Window {
 
                 // Attempt the server connection
                 Iridium.Application.connection_manager.connect_to_server (connection_details);
+            });
+            connection_dialog.browse_button_clicked.connect (() => {
+                connection_dialog.destroy.connect (() => {
+                    show_browse_servers_dialog ();
+                });
+                connection_dialog.dismiss ();
             });
             connection_dialog.destroy.connect (() => {
                 connection_dialog = null;
@@ -625,6 +636,23 @@ public class Iridium.MainWindow : Hdy.Window {
         browse_channels_dialog.present ();
         browse_channels_dialog.show_loading ();
         Iridium.Application.connection_manager.request_channel_list (server_name);
+    }
+
+    public void show_browse_servers_dialog () {
+        if (browse_servers_dialog == null) {
+            browse_servers_dialog = new Iridium.Widgets.BrowseServersDialog (this);
+            browse_servers_dialog.show_all ();
+            browse_servers_dialog.connect_button_clicked.connect ((curated_server) => {
+                browse_servers_dialog.destroy.connect (() => {
+                    show_server_connection_dialog (curated_server);
+                });
+                browse_servers_dialog.dismiss ();
+            });
+            browse_servers_dialog.destroy.connect (() => {
+                browse_servers_dialog = null;
+            });
+        }
+        browse_servers_dialog.present ();
     }
 
     private void join_channel (string server_name, string channel_name) {

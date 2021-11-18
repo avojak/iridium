@@ -38,18 +38,20 @@ public class Iridium.Views.Welcome : Granite.Widgets.Welcome {
 
         // TODO: Instead, simply have an option to connect to a new server. We
         //       can maybe have a separate star icon for favoriting?
-        // TODO: Revisit the wording based on human interface guidelines
         append (Constants.APP_ID + ".network-server-new", _("Add a New Server"), _("Connect to a server and save it in the server list"));
+        append ("folder-remote", _("Browse Servers"), _("Browse a curated list of popular IRC servers"));
         //  append ("document-open-recent", _("Recently Connected"), _("Connect to a recently connected server"));
-
-        // TODO: Have an option for connecting to a server from a list of
-        //       popular/common servers?
 
         activated.connect (index => {
             switch (index) {
                 case 0:
                     Iridium.Services.ActionManager.action_from_group (Iridium.Services.ActionManager.ACTION_NEW_SERVER_CONNECTION, window.get_action_group ("win"));
-                break;
+                    break;
+                case 1:
+                    Iridium.Services.ActionManager.action_from_group (Iridium.Services.ActionManager.ACTION_BROWSE_SERVERS, window.get_action_group ("win"));
+                    break;
+                default:
+                    assert_not_reached ();
             }
         });
     }
