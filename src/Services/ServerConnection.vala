@@ -334,9 +334,7 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             return;
         }
         var message = new Iridium.Services.Message (line);
-        if (Iridium.Application.is_dev_mode ()) {
-            print (@"$line\n");
-        }
+        debug (line);
         switch (message.command) {
             case "PING":
                 send_output ("PONG " + message.message);
@@ -563,18 +561,26 @@ public class Iridium.Services.ServerConnection : GLib.Object {
             case Iridium.Services.MessageCommands.MODE:
                 // If the first param is our nickname, this is being set on the server rather than for a channel
                 if (message.params[0] == connection_details.nickname) {
-                    char modifier = message.message[0];
-                    for (int i = 1; i < message.message.length; i++) {
-                        var display_message = new Iridium.Services.Message ();
-                        display_message.message = "%s sets mode %c%c on %s".printf (message.prefix, modifier, message.message[i], message.params[0]);
-                        server_message_received (display_message);
+                    // The conventional MODE message sends the modifier and mode chars as params, but in some
+                    // cases (such as Libera.chat), they are sent in the message body
+                    if (message.message != null) {
+                        char modifier = message.message[0];
+                        for (int i = 1; i < message.message.length; i++) {
+                            var display_message = new Iridium.Services.Message ();
+                            display_message.message = "%s sets mode %c%c on %s".printf (message.prefix, modifier, message.message[i], message.params[0]);
+                            server_message_received (display_message);
+                        }
+                    } else {
+                        char modifier = message.params[1][0];
+                        for (int i = 1; i < message.params[1].length; i++) {
+                            var display_message = new Iridium.Services.Message ();
+                            display_message.message = "%s sets mode %c%c on %s".printf (message.prefix.split ("!")[0], modifier, message.params[1][i], message.params[0]);
+                            server_message_received (display_message);
+                        }
                     }
                     break;
                 }
 
-                // params[0] = channel
-                // params[1] = mode chars
-                // params[2] = params
                 string channel = message.params[0];
                 string mode_chars = message.params[1];
 
