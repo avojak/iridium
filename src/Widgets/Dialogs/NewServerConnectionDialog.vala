@@ -21,6 +21,8 @@
 
 public class Iridium.Widgets.NewServerConnectionDialog : Iridium.Widgets.ServerConnectionDialog {
 
+    public Iridium.Models.CuratedServer? curated_server { get; construct; }
+
     public NewServerConnectionDialog (Iridium.MainWindow main_window) {
         Object (
             deletable: false,
@@ -33,11 +35,31 @@ public class Iridium.Widgets.NewServerConnectionDialog : Iridium.Widgets.ServerC
         );
     }
 
+    public NewServerConnectionDialog.from_curated_server (Iridium.MainWindow main_window, Iridium.Models.CuratedServer curated_server) {
+        Object (
+            deletable: false,
+            resizable: false,
+            title: _("Connect to a Server"),
+            header: _("Open Connection"),
+            primary_button_text: _("Connect"),
+            transient_for: main_window,
+            curated_server: curated_server,
+            modal: true
+        );
+    }
+
     construct {
         // Set placeholder text
         server_entry.placeholder_text = "irc.example.com";
         nickname_entry.placeholder_text = "iridium";
         realname_entry.placeholder_text = _("Iridium IRC Client");
+
+        if (curated_server != null) {
+            server_entry.set_text (curated_server.server_host);
+            port_entry.set_text (curated_server.port.to_string ());
+            ssl_tls_switch.set_active (curated_server.tls);
+            auth_method_combo.set_active (get_auth_method_index (curated_server.auth_method));
+        }
     }
 
 }

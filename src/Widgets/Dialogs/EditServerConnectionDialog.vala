@@ -53,9 +53,9 @@ public class Iridium.Widgets.EditServerConnectionDialog : Iridium.Widgets.Server
             server_entry.set_text (connection_details.server);
             nickname_entry.set_text (connection_details.nickname);
             realname_entry.set_text (connection_details.realname);
+            ssl_tls_switch.set_active (connection_details.tls); // Set this before port because changing it modifies the port number
             port_entry.set_text (connection_details.port.to_string ());
             auth_method_combo.set_active (get_auth_method_index (connection_details.auth_method));
-            ssl_tls_switch.set_active (connection_details.tls);
             if (connection_details.auth_method == Iridium.Models.AuthenticationMethod.SASL_EXTERNAL) {
                 if (connection_details.auth_token != null) {
                     verify_certificate_file (connection_details.auth_token);
@@ -73,15 +73,6 @@ public class Iridium.Widgets.EditServerConnectionDialog : Iridium.Widgets.Server
                 show_password_stack ();
             }
         }
-    }
-
-    private int get_auth_method_index (Iridium.Models.AuthenticationMethod auth_method) {
-        foreach (Gee.Map.Entry<int, Iridium.Models.AuthenticationMethod> entry in auth_methods.entries) {
-            if (entry.value == auth_method) {
-                return entry.key;
-            }
-        }
-        return -1;
     }
 
 }

@@ -58,7 +58,7 @@ public abstract class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
 
     static construct {
         try {
-            SERVER_REGEX = new GLib.Regex ("""^[a-zA-Z0-9\.]+$""", GLib.RegexCompileFlags.OPTIMIZE);
+            SERVER_REGEX = new GLib.Regex ("""^[a-zA-Z0-9\.-]+$""", GLib.RegexCompileFlags.OPTIMIZE);
             // See RFC 2812 Section 2.3.1
             NICKNAME_REGEX = new GLib.Regex ("""^[a-zA-Z\[\]\\\`\_\^\{\|\}][a-zA-Z0-9\[\]\\\`\_\^\{\|\}]{0,8}$""", GLib.RegexCompileFlags.OPTIMIZE);
         } catch (GLib.Error e) {
@@ -203,6 +203,11 @@ public abstract class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
         server_entry.hexpand = true;
         server_entry.placeholder_text = "irc.example.com";
 
+        var browse_button = new Gtk.Button.with_label (_("Browse…"));
+        browse_button.clicked.connect (() => {
+            browse_button_clicked ();
+        });
+
         var nickname_label = new Gtk.Label (_("Nickname:"));
         nickname_label.halign = Gtk.Align.END;
 
@@ -312,14 +317,15 @@ public abstract class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
 
         basic_form_grid.attach (server_label, 0, 0, 1, 1);
         basic_form_grid.attach (server_entry, 1, 0, 1, 1);
+        basic_form_grid.attach (browse_button, 2, 0, 1, 1);
         basic_form_grid.attach (nickname_label, 0, 1, 1, 1);
-        basic_form_grid.attach (nickname_entry, 1, 1, 1, 1);
+        basic_form_grid.attach (nickname_entry, 1, 1, 2, 1);
         basic_form_grid.attach (realname_label, 0, 2, 1, 1);
-        basic_form_grid.attach (realname_entry, 1, 2, 1, 1);
+        basic_form_grid.attach (realname_entry, 1, 2, 2, 1);
         basic_form_grid.attach (auth_method_label, 0, 3, 1, 1);
-        basic_form_grid.attach (auth_method_combo, 1, 3, 1, 1);
+        basic_form_grid.attach (auth_method_combo, 1, 3, 2, 1);
         basic_form_grid.attach (auth_token_label_stack, 0, 4, 1, 1);
-        basic_form_grid.attach (auth_token_entry_stack, 1, 4, 1, 1);
+        basic_form_grid.attach (auth_token_entry_stack, 1, 4, 2, 1);
 
         return basic_form_grid;
     }
@@ -345,6 +351,7 @@ public abstract class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
         advanced_form_grid.margin = 30;
         advanced_form_grid.row_spacing = 12;
         advanced_form_grid.column_spacing = 20;
+        advanced_form_grid.halign = Gtk.Align.CENTER;
 
         var ssl_tls_label = new Gtk.Label (_("Use SSL/TLS:"));
         ssl_tls_label.halign = Gtk.Align.END;
@@ -374,7 +381,7 @@ public abstract class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
 
         port_entry = new Iridium.Widgets.NumberEntry ();
         port_entry.is_valid = true;
-        port_entry.hexpand = true;
+        port_entry.hexpand = false;
         port_entry.text = Iridium.Services.ServerConnectionDetails.DEFAULT_SECURE_PORT.to_string ();
         port_entry.changed.connect (() => {
             int port = int.parse (port_entry.get_text ().strip ());
@@ -446,6 +453,15 @@ public abstract class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
         primary_button_clicked (server_name, nickname, realname, port, auth_method, tls, auth_token);
     }
 
+    protected int get_auth_method_index (Iridium.Models.AuthenticationMethod auth_method) {
+        foreach (Gee.Map.Entry<int, Iridium.Models.AuthenticationMethod> entry in auth_methods.entries) {
+            if (entry.value == auth_method) {
+                return entry.key;
+            }
+        }
+        return -1;
+    }
+
     public string get_server () {
         return server_entry.get_text ().strip ();
     }
@@ -467,5 +483,6 @@ public abstract class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
 
     public signal void primary_button_clicked (string server, string nickname, string realname,
         uint16 port, Iridium.Models.AuthenticationMethod auth_method, bool tls, string auth_token);
+    public signal void browse_button_clicked ();
 
 }
