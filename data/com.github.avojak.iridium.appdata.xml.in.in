@@ -21,6 +21,15 @@
     <binary>@appid@</binary>
   </provides>
   <releases>
+    <release version="1.5.0" date="2021-11-18">
+      <description>
+        <p>1.5.0 Release</p>
+        <ul>
+          <li>Add ability to browse a curated list of IRC servers (#156)</li>
+          <li>Fix parsing of MODE messages which caused crashes when connecting to certain servers (#184)</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.4.0" date="2021-11-16">
       <description>
         <p>1.4.0 Release</p>
