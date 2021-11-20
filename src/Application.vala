@@ -103,15 +103,28 @@ public class Iridium.Application : Gtk.Application {
     }
 
     protected override int command_line (ApplicationCommandLine command_line) {
+        string[] command_line_arguments = parse_command_line_arguments (command_line.get_arguments ());
         // If the application wasn't already open, activate it now
         if (windows.length () == 0) {
-            debug ("Queueing command line arguments until initialization is complete");
-            queued_command_line_arguments = command_line.get_arguments ();
+            queued_command_line_arguments = command_line_arguments;
             activate ();
         } else {
-            handle_command_line_arguments (command_line.get_arguments ());
+            handle_command_line_arguments (command_line_arguments);
         }
         return 0;
+    }
+
+    private string[] parse_command_line_arguments (string[] command_line_arguments) {
+        if (command_line_arguments.length == 0) {
+            return command_line_arguments;
+        } else {
+            // For Flatpak, the first commandline argument is the app ID, so we need to filter it out
+            if (command_line_arguments[0] == Constants.APP_ID) {
+                return command_line_arguments[1:command_line_arguments.length - 1];
+            } {
+                return command_line_arguments;
+            }
+        }
     }
 
     private void handle_command_line_arguments (string[] argv) {
