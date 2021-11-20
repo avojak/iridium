@@ -64,10 +64,6 @@ public class Iridium.Application : Gtk.Application {
 
         windows = new GLib.List<Iridium.MainWindow> ();
 
-        network_monitor.network_changed.connect (() => {
-            warning ("Network availability changed: %s", network_monitor.get_network_available ().to_string ());
-        });
-
         startup.connect ((handler) => {
             Hdy.init ();
         });
@@ -162,6 +158,7 @@ public class Iridium.Application : Gtk.Application {
 
         // Handle changes to network connectivity (eg. losing internet connection)
         network_monitor.network_changed.connect (() => {
+            warning ("Network availability changed: %s", network_monitor.get_network_available ().to_string ());
             // Don't react to duplicate signals
             bool updated_availability = network_monitor.get_network_available ();
             if (is_network_available == updated_availability) {
@@ -195,6 +192,7 @@ public class Iridium.Application : Gtk.Application {
 
         // Check the initial state of the network connection
         is_network_available = network_monitor.get_network_available ();
+        debug ("Initial network availability: %s", is_network_available.to_string ());
         if (!is_network_available) {
             foreach (var _window in windows) {
                 _window.network_connection_lost ();
