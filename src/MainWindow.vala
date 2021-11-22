@@ -185,33 +185,31 @@ public class Iridium.MainWindow : Hdy.Window {
     // TODO: Restore private messages from the side panel
     public void initialize_ui (Gee.List<Iridium.Services.Server> servers, Gee.List<Iridium.Services.Channel> channels) {
         // Initialize the UI with disabled rows and chat views for everything
-        //  if (!is_reconnecting) {
-            debug ("Initializing side panel and chat views…");
-            foreach (Iridium.Services.Server server in servers) {
-                var server_id = server.id;
-                var server_name = server.connection_details.server;
+        debug ("Initializing side panel and chat views…");
+        foreach (Iridium.Services.Server server in servers) {
+            var server_id = server.id;
+            var server_name = server.connection_details.server;
+            Idle.add (() => {
+                main_layout.add_server_chat_view (server_name, server.connection_details.nickname, server.network_name != null ? server.network_name : null);
+                return false;
+            });
+            foreach (Iridium.Services.Channel channel in channels) {
+                //  var channel_id = channel.id;
+                var channel_server_id = channel.server_id;
+                var channel_name = channel.name;
+                if (channel_server_id != server_id) {
+                    // This channel isn't for the current server
+                    continue;
+                }
                 Idle.add (() => {
-                    main_layout.add_server_chat_view (server_name, server.connection_details.nickname, server.network_name != null ? server.network_name : null);
+                    main_layout.add_channel_chat_view (server_name, channel_name, server.connection_details.nickname);
+                    if (channel.favorite) {
+                        main_layout.favorite_channel (server_name, channel_name);
+                    }
                     return false;
                 });
-                foreach (Iridium.Services.Channel channel in channels) {
-                    //  var channel_id = channel.id;
-                    var channel_server_id = channel.server_id;
-                    var channel_name = channel.name;
-                    if (channel_server_id != server_id) {
-                        // This channel isn't for the current server
-                        continue;
-                    }
-                    Idle.add (() => {
-                        main_layout.add_channel_chat_view (server_name, channel_name, server.connection_details.nickname);
-                        if (channel.favorite) {
-                            main_layout.favorite_channel (server_name, channel_name);
-                        }
-                        return false;
-                    });
-                }
             }
-        //  }
+        }
 
         ui_initialized (servers, channels);
     }
