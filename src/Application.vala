@@ -188,7 +188,7 @@ public class Iridium.Application : Gtk.Application {
                 foreach (var window in windows) {
                     restore_state_servers = connection_repository.get_servers ();
                     restore_state_channels = connection_repository.get_channels ();
-                    Iridium.Application.connection_manager.close_all_connections ();
+                    connection_manager.close_all_connections ();
                     window.network_connection_lost ();
                 }
             }
