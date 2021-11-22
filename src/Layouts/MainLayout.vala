@@ -403,9 +403,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
 
     public void show_connecting_overlay () {
         Idle.add (() => {
-            debug ("show_connecting_overlay");
             if (restore_connections_overlay_bar == null) {
-                debug ("creating overlay...");
                 restore_connections_overlay_bar = new Granite.Widgets.OverlayBar (overlay);
                 restore_connections_overlay_bar.label = _("Restoring server connections…");
                 restore_connections_overlay_bar.active = true;
