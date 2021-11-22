@@ -216,6 +216,9 @@ public class Iridium.Application : Gtk.Application {
             restore_state_servers = connection_repository.get_servers ();
             restore_state_channels = connection_repository.get_channels ();
             window.network_connection_lost ();
+        } else {
+            // If network is available, next `true` value for network availability will be a reconnection
+            is_first_network_availability = false;
         }
     }
 
