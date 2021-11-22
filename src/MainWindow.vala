@@ -183,9 +183,9 @@ public class Iridium.MainWindow : Hdy.Window {
     }
 
     // TODO: Restore private messages from the side panel
-    public void initialize_ui (Gee.List<Iridium.Services.Server> servers, Gee.List<Iridium.Services.Channel> channels, bool is_reconnecting) {
+    public void initialize_ui (Gee.List<Iridium.Services.Server> servers, Gee.List<Iridium.Services.Channel> channels) {
         // Initialize the UI with disabled rows and chat views for everything
-        if (!is_reconnecting) {
+        //  if (!is_reconnecting) {
             debug ("Initializing side panel and chat views…");
             foreach (Iridium.Services.Server server in servers) {
                 var server_id = server.id;
@@ -211,9 +211,9 @@ public class Iridium.MainWindow : Hdy.Window {
                     });
                 }
             }
-        }
+        //  }
 
-        ui_initialized (servers, channels, is_reconnecting);
+        ui_initialized (servers, channels);
     }
 
     public void open_connections (Gee.List<Iridium.Services.Server> servers, Gee.List<Iridium.Services.Channel> channels, bool is_reconnecting) {
@@ -222,7 +222,7 @@ public class Iridium.MainWindow : Hdy.Window {
         // Handle case were there's nothing to initialize!
         if (servers.size == 0) {
             main_layout.hide_connecting_overlay ();
-            connections_opened ();
+            connections_opened (is_reconnecting);
             return;
         }
 
@@ -253,13 +253,15 @@ public class Iridium.MainWindow : Hdy.Window {
                 num_enabled_servers++;
             }
         }
-
-        if (is_reconnecting) {
-            debug ("Attempting reconnection for %d servers…", num_enabled_servers);
+        // No enabled servers to connect to - nothing to do
+        if (num_enabled_servers == 0) {
+            debug ("No enabled servers to connect to");
+            completed_opening_connections (is_reconnecting);
+            return;
         }
 
         // Open connections to enabled servers
-        debug ("Opening server connections…");
+        debug ("Opening %d server connections [reconnecting: %s]", num_enabled_servers, is_reconnecting.to_string ());
         foreach (Iridium.Services.Server server in servers) {
             var server_id = server.id;
             var connection_details = server.connection_details;
@@ -291,29 +293,22 @@ public class Iridium.MainWindow : Hdy.Window {
             server_connection.open_successful.connect (() => {
                 connection_status.set (server_name, true);
                 if (connection_status.size == num_enabled_servers) {
-                    completed_opening_connections ();
+                    completed_opening_connections (is_reconnecting);
                 }
             });
             server_connection.open_failed.connect (() => {
-                // TODO: Give some user feedback, maybe a toast? Don't want the UI to get too busy though
                 connection_status.set (server_name, false);
                 if (connection_status.size == num_enabled_servers) {
-                    completed_opening_connections ();
+                    completed_opening_connections (is_reconnecting);
                 }
             });
         }
-
-        // We've initialized the UI, but if there aren't any connections to wait on, we're done
-        if (num_enabled_servers == 0) {
-            completed_opening_connections ();
-            return;
-        }
     }
 
-    private void completed_opening_connections () {
+    private void completed_opening_connections (bool is_reconnecting) {
         debug ("Done opening connections");
         main_layout.hide_connecting_overlay ();
-        connections_opened ();
+        connections_opened (is_reconnecting);
     }
 
     public void handle_uris (GLib.List<Iridium.Models.IRCURI> uris) {
@@ -823,7 +818,6 @@ public class Iridium.MainWindow : Hdy.Window {
     public void network_connection_lost () {
         main_layout.show_network_info_bar ();
         // TODO: Disable server and channel buttons in header bar
-        Iridium.Application.connection_manager.close_all_connections ();
     }
 
     public void network_connection_gained () {
@@ -1372,7 +1366,7 @@ public class Iridium.MainWindow : Hdy.Window {
         return network_name;
     }
 
-    public signal void ui_initialized (Gee.List<Iridium.Services.Server> servers, Gee.List<Iridium.Services.Channel> channels, bool is_reconnecting);
-    public signal void connections_opened ();
+    public signal void ui_initialized (Gee.List<Iridium.Services.Server> servers, Gee.List<Iridium.Services.Channel> channels);
+    public signal void connections_opened (bool is_reconnecting);
 
 }
