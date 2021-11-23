@@ -204,7 +204,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         warning (@"TLS certificate errors: $(error_string)");
 
         var cert_policy = Iridium.Application.settings.get_string ("certificate-validation-policy");
-        debug (cert_policy.to_string ());
         switch (Iridium.Models.InvalidCertificatePolicy.get_value_by_short_name (cert_policy)) {
             case REJECT:
                 debug ("Rejecting certificate per policy");

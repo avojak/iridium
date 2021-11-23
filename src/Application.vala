@@ -30,6 +30,7 @@ public class Iridium.Application : Gtk.Application {
 
     private GLib.List<Iridium.MainWindow> windows;
     private bool is_network_available;
+    private bool is_first_network_availability = true;
 
     private Gee.List<Iridium.Services.Server> restore_state_servers = new Gee.ArrayList<Iridium.Services.Server> ();
     private Gee.List<Iridium.Services.Channel> restore_state_channels = new Gee.ArrayList<Iridium.Services.Channel> ();
@@ -64,10 +65,6 @@ public class Iridium.Application : Gtk.Application {
 
         windows = new GLib.List<Iridium.MainWindow> ();
 
-        network_monitor.network_changed.connect (() => {
-            warning ("Network availability changed: %s", network_monitor.get_network_available ().to_string ());
-        });
-
         startup.connect ((handler) => {
             Hdy.init ();
         });
@@ -95,9 +92,20 @@ public class Iridium.Application : Gtk.Application {
 
     private Iridium.MainWindow add_new_window () {
         var window = new Iridium.MainWindow (this);
-        window.ui_initialized.connect ((servers, channels, is_reconnecting) => {
-            window.open_connections (servers, channels, is_reconnecting);
+        window.ui_initialized.connect (() => {
+            // If we run into the GLib NetworkMonitor bug, or there really isn't network availability, don't connect yet
+            if (is_network_available) {
+                window.open_connections (connection_repository.get_servers (), connection_repository.get_channels (), false);
+            }
         });
+        window.connections_opened.connect ((is_reconnecting) => {
+            // Don't handle command line arguments if we're just reconnecting
+            if (!is_reconnecting && (queued_command_line_arguments != null)) {
+                debug ("Sending queued command line arguments to window");
+                handle_command_line_arguments (queued_command_line_arguments);
+            }
+        });
+        window.initialize_ui (connection_repository.get_servers (), connection_repository.get_channels ());
         this.add_window (window);
         return window;
     }
@@ -128,9 +136,8 @@ public class Iridium.Application : Gtk.Application {
     }
 
     private void handle_command_line_arguments (string[] argv) {
-        //  string[] argv = command_line.get_arguments ();
         GLib.List<Iridium.Models.IRCURI> uris = new GLib.List<Iridium.Models.IRCURI> ();
-        foreach (var uri_string in argv[1:argv.length]) {
+        foreach (var uri_string in argv) {
             try {
                 Soup.URI uri = new Soup.URI (uri_string);
                 if (uri == null) {
@@ -140,8 +147,6 @@ public class Iridium.Application : Gtk.Application {
                     throw new OptionError.BAD_VALUE ("Cannot open non-irc: URL");
                 }
                 debug ("Received command line URI: %s", uri.to_string (false));
-                //  debug ("host: %s", uri.get_host ());
-                //  debug ("port: %s", uri.get_port ().to_string ());
                 uris.append (new Iridium.Models.IRCURI (uri));
             } catch (OptionError e) {
                 warning ("Argument parsing error: %s", e.message);
@@ -162,6 +167,7 @@ public class Iridium.Application : Gtk.Application {
 
         // Handle changes to network connectivity (eg. losing internet connection)
         network_monitor.network_changed.connect (() => {
+            debug ("Network availability changed: %s", network_monitor.get_network_available ().to_string ());
             // Don't react to duplicate signals
             bool updated_availability = network_monitor.get_network_available ();
             if (is_network_available == updated_availability) {
@@ -172,12 +178,17 @@ public class Iridium.Application : Gtk.Application {
             if (is_network_available) {
                 foreach (var window in windows) {
                     window.network_connection_gained ();
-                    restore_state (window, true);
+                    // If this is the first time that the network has become available, it's not a reconnection,
+                    // it's the first connection. The servers and channels have been stored away in the
+                    // restore_state_* lists.
+                    window.open_connections (restore_state_servers, restore_state_channels, !is_first_network_availability);
                 }
+                is_first_network_availability = false;
             } else {
                 foreach (var window in windows) {
                     restore_state_servers = connection_repository.get_servers ();
                     restore_state_channels = connection_repository.get_channels ();
+                    connection_manager.close_all_connections ();
                     window.network_connection_lost ();
                 }
             }
@@ -194,26 +205,21 @@ public class Iridium.Application : Gtk.Application {
         var window = this.add_new_window ();
 
         // Check the initial state of the network connection
+        // Note: There is a bug in GLib where the initial network availability property may report `false`
+        //       incorrectly due to an asynchronous D-Bus call.
+        //       See: https://gitlab.gnome.org/GNOME/glib/-/issues/1718
         is_network_available = network_monitor.get_network_available ();
+        debug ("Initial network availability: %s", is_network_available.to_string ());
+
+        // If the network isn't initially available, grab the servers and channels for later
         if (!is_network_available) {
-            foreach (var _window in windows) {
-                _window.network_connection_lost ();
-            }
+            restore_state_servers = connection_repository.get_servers ();
+            restore_state_channels = connection_repository.get_channels ();
+            window.network_connection_lost ();
+        } else {
+            // If network is available, next `true` value for network availability will be a reconnection
+            is_first_network_availability = false;
         }
-
-        restore_state (window, false);
-    }
-
-    private void restore_state (Iridium.MainWindow main_window, bool is_reconnecting) {
-        var servers = is_reconnecting ? restore_state_servers : connection_repository.get_servers ();
-        var channels = is_reconnecting ? restore_state_channels : connection_repository.get_channels ();
-        main_window.connections_opened.connect (() => {
-            if (queued_command_line_arguments != null) {
-                debug ("Sending queued command line arguments to main window");
-                handle_command_line_arguments (queued_command_line_arguments);
-            }
-        });
-        main_window.initialize_ui (servers, channels, is_reconnecting);
     }
 
     public static int main (string[] args) {
