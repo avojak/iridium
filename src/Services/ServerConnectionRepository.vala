@@ -120,7 +120,6 @@ public class Iridium.Services.ServerConnectionRepository : GLib.Object {
             channel.name = channel_name;
             channel.enabled = false;
             channel.favorite = false;
-            channel.mute_mentions = false;
 
             sql_client.insert_channel (server.id, channel);
         }
@@ -193,31 +192,6 @@ public class Iridium.Services.ServerConnectionRepository : GLib.Object {
         }
     }
 
-    public void on_channel_mentions_muted (string server_name, string channel_name) {
-        set_channel_mute_mentions (server_name, channel_name, true);
-    }
-
-    public void on_channel_mentions_unmuted (string server_name, string channel_name) {
-        set_channel_mute_mentions (server_name, channel_name, false);
-    }
-
-    private void set_channel_mute_mentions (string server_name, string channel_name, bool mute_mentions) {
-        if (!should_remember_connections) {
-            return;
-        }
-        lock (sql_client) {
-            var server = sql_client.get_server (server_name);
-            if (server == null) {
-                return;
-            }
-            var channel = sql_client.get_channel (server.id, channel_name);
-            if (channel == null) {
-                return;
-            }
-            sql_client.set_channel_mute_mentions (channel.id, mute_mentions);
-        }
-    }
-
     public void on_private_message_row_added (string server_name, string nickname) {
         // TODO: Implement
     }
@@ -249,19 +223,6 @@ public class Iridium.Services.ServerConnectionRepository : GLib.Object {
         }
         lock (sql_client) {
             return sql_client.get_servers ();
-        }
-    }
-
-    public Iridium.Services.Channel? get_channel (string server_name, string channel_name) {
-        if (!should_remember_connections) {
-            return null;
-        }
-        lock (sql_client) {
-            var server = sql_client.get_server (server_name);
-            if (server == null) {
-                return null;
-            }
-            return sql_client.get_channel (server.id, channel_name);
         }
     }
 

@@ -217,9 +217,6 @@ public class Iridium.MainWindow : Hdy.Window {
                     if (channel.favorite) {
                         main_layout.favorite_channel (server_name, channel_name);
                     }
-                    if (channel.mute_mentions) {
-                        main_layout.mute_channel_mentions (server_name, channel_name);
-                    }
                     return false;
                 });
             }
@@ -1152,8 +1149,7 @@ public class Iridium.MainWindow : Hdy.Window {
 
     private void on_user_mentioned (string server_name, string channel_name, string title, string message) {
         // Only send the notification if (1) the application is not in focus, and (2) mentions are not muted
-        Iridium.Services.Channel? channel = Iridium.Application.connection_repository.get_channel (server_name, channel_name);
-        if (((get_window ().get_state () & Gdk.WindowState.FOCUSED) == 0) && (channel != null && !channel.mute_mentions)) {
+        if (((get_window ().get_state () & Gdk.WindowState.FOCUSED) == 0) && !Iridium.Application.settings.get_boolean ("mute-mention-notifications")) {
             var notification = new GLib.Notification (title);
             notification.set_body (message);
             var target = new GLib.Variant.tuple ({new GLib.Variant.string (server_name), new GLib.Variant.string (channel_name)});
@@ -1164,7 +1160,7 @@ public class Iridium.MainWindow : Hdy.Window {
                 notification_ids.set (key, new Gee.ArrayList<string> ());
             }
             notification_ids.get (key).add (id);
-            debug ("sending: id=%s, key=%s", id, key);
+            debug ("Sending notification: id=%s, key=%s", id, key);
             update_app_badge ();
             app.send_notification (id, notification);
         }
@@ -1203,6 +1199,12 @@ public class Iridium.MainWindow : Hdy.Window {
             main_layout.add_private_message_chat_view (server_name, nickname, self_nickname);
             main_layout.enable_chat_view (server_name, nickname);
             main_layout.display_private_message (server_name, nickname, message);
+            var is_user_mentioned = Iridium.Models.Text.TextBufferUtils.search_word_in_string (self_nickname, message.message, () => {
+                return false;
+            });
+            if (is_user_mentioned) {
+                on_user_mentioned (server_name, nickname, _(@"Mentioned by $nickname"), message.message);
+            }
             return false;
         });
     }
@@ -1351,6 +1353,7 @@ public class Iridium.MainWindow : Hdy.Window {
         main_layout.update_title (nickname, network_name != null ? network_name : server_name);
         main_layout.set_channel_users_button_visible (false);
         main_layout.set_header_tooltip (null);
+        update_os_notifications (server_name, nickname);
     }
 
     private void update_os_notifications (string server_name, string channel_name) {
@@ -1359,7 +1362,7 @@ public class Iridium.MainWindow : Hdy.Window {
             return;
         }
         foreach (var id in notification_ids.get (key)) {
-            debug ("withdrawing: id=%s, key=%s", id, key);
+            debug ("Withdrawing notification: id=%s, key=%s", id, key);
             app.withdraw_notification (id);
         }
         notification_ids.get (key).clear ();

@@ -26,6 +26,5 @@ public class Iridium.Services.Channel : GLib.Object {
     public string name { get; set; }
     public bool enabled { get; set; }
     public bool favorite { get; set; }
-    public bool mute_mentions { get; set; }
 
 }
