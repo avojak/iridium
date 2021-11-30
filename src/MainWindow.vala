@@ -217,6 +217,9 @@ public class Iridium.MainWindow : Hdy.Window {
                     if (channel.favorite) {
                         main_layout.favorite_channel (server_name, channel_name);
                     }
+                    if (channel.mute_mentions) {
+                        main_layout.mute_channel_mentions (server_name, channel_name);
+                    }
                     return false;
                 });
             }
@@ -1148,8 +1151,9 @@ public class Iridium.MainWindow : Hdy.Window {
     }
 
     private void on_user_mentioned (string server_name, string channel_name, string title, string message) {
-        // Only send the notification if the application is not in focus
-        if ((get_window ().get_state () & Gdk.WindowState.FOCUSED) == 0) {
+        // Only send the notification if (1) the application is not in focus, and (2) mentions are not muted
+        Iridium.Services.Channel? channel = Iridium.Application.connection_repository.get_channel (server_name, channel_name);
+        if (((get_window ().get_state () & Gdk.WindowState.FOCUSED) == 0) && (channel != null && !channel.mute_mentions)) {
             var notification = new GLib.Notification (title);
             notification.set_body (message);
             var target = new GLib.Variant.tuple ({new GLib.Variant.string (server_name), new GLib.Variant.string (channel_name)});

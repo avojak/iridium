@@ -109,6 +109,8 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         side_panel.channel_row_disabled.connect (Iridium.Application.connection_repository.on_channel_row_disabled);
         side_panel.channel_favorite_added.connect (Iridium.Application.connection_repository.on_channel_favorite_added);
         side_panel.channel_favorite_removed.connect (Iridium.Application.connection_repository.on_channel_favorite_removed);
+        side_panel.channel_row_muted.connect (Iridium.Application.connection_repository.on_channel_mentions_muted);
+        side_panel.channel_row_unmuted.connect (Iridium.Application.connection_repository.on_channel_mentions_unmuted);
 
         this.destroy.connect (() => {
             // Disconnect this signal so that we don't modify the setting to
@@ -582,6 +584,10 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
 
     public void favorite_channel (string server_name, string channel_name) {
         side_panel.favorite_channel (server_name, channel_name);
+    }
+
+    public void mute_channel_mentions (string server_name, string channel_name) {
+        side_panel.mute_channel_mentions (server_name, channel_name);
     }
 
     public void update_channel_users (string server_name, string channel_name, Gee.List<string> nicknames) {

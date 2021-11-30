@@ -175,6 +175,12 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
         channel_item.remove_favorite_channel.connect (() => {
             remove_favorite_channel (server_name, channel_name);
         });
+        channel_item.mute_mentions.connect (() => {
+            channel_row_muted (server_name, channel_name);
+        });
+        channel_item.unmute_mentions.connect (() => {
+            channel_row_unmuted (server_name, channel_name);
+        });
         channel_item.join_channel.connect (() => {
             join_channel (server_name, channel_name);
         });
@@ -230,6 +236,15 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
             }
         }
         channel_favorite_removed (server_name, channel_name);
+    }
+
+    public void mute_channel_mentions (string server_name, string channel_name) {
+        foreach (var channel_item in channel_items.get (server_name)) {
+            if (channel_item.get_channel_name () == channel_name) {
+                channel_item.set_muted (true);
+                break;
+            }
+        }
     }
 
     public void remove_channel_row (string server_name, string channel_name) {
@@ -552,6 +567,8 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
     public signal void leave_channel (string server_name, string channel_name);
     public signal void channel_favorite_added (string server_name, string channel_name);
     public signal void channel_favorite_removed (string server_name, string channel_name);
+    public signal void channel_row_muted (string server_name, string channel_name);
+    public signal void channel_row_unmuted (string server_name, string channel_name);
     public signal void connect_to_server (string server_name);
     public signal void disconnect_from_server (string server_name);
     public signal void edit_channel_topic (string server_name, string channel_name);

@@ -21,6 +21,8 @@
 
 public class Iridium.Services.SQLClient : GLib.Object {
 
+    // The 01 suffix was originall intended to be a versioning scheme for the database schema, however
+    // we will instead use the user_version pragma to check for necessary updates.
     private const string DATABASE_FILE = "iridium01.db";
 
     private Sqlite.Database database;
@@ -82,7 +84,8 @@ public class Iridium.Services.SQLClient : GLib.Object {
                 "server_id" INTEGER,
                 "channel" TEXT,
                 "enabled" BOOL,
-                "favorite" BOOL
+                "favorite" BOOL,
+                "mute_mentions" BOOL
             );
             CREATE TABLE IF NOT EXISTS "server_identities" (
                 "id" INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -92,6 +95,82 @@ public class Iridium.Services.SQLClient : GLib.Object {
             );
             """;
         database.exec (sql);
+
+        do_upgrades ();
+    }
+
+    private void do_upgrades () {
+        int? user_version = get_user_version ();
+        if (user_version == null) {
+            warning ("Null user_version, skipping upgrades");
+            return;
+        }
+
+        // Upgrading from 0 -> 1 adds the mute_mentions column in the channels table
+        if (user_version == 0) {
+            debug ("SQLite user_version: %d, upgrading to 1", user_version);
+            var sql = "ALTER TABLE channels ADD COLUMN mute_mentions BOOL DEFAULT FALSE;";
+            Sqlite.Statement statement;
+            if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
+                log_database_error (database.errcode (), database.errmsg ());
+                return;
+            }
+            string err_msg;
+            int ec = database.exec (statement.expanded_sql (), null, out err_msg);
+            if (ec != Sqlite.OK) {
+                log_database_error (ec, err_msg);
+                debug ("SQL statement: %s", statement.expanded_sql ());
+            }
+            statement.reset ();
+            set_user_version (1);
+        }
+
+        user_version = get_user_version ();
+        if (user_version == 1) {
+            debug ("SQLite user_version: %d, no upgrades to perform", user_version);
+        }
+    }
+
+    private int? get_user_version () {
+        var sql = "PRAGMA user_version";
+        Sqlite.Statement statement;
+        if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
+            log_database_error (database.errcode (), database.errmsg ());
+            return null;
+        }
+
+        if (statement.step () != Sqlite.ROW) {
+            return null;
+        }
+        var num_columns = statement.column_count ();
+        int? user_version = null;
+        for (int i = 0; i < num_columns; i++) {
+            switch (statement.column_name (i)) {
+                case "user_version":
+                    user_version = statement.column_int (i);
+                    break;
+                default:
+                    break;
+            }
+        }
+        statement.reset ();
+        return user_version;
+    }
+
+    private void set_user_version (int user_version) {
+        var sql = @"PRAGMA user_version = $user_version";
+        Sqlite.Statement statement;
+        if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
+            log_database_error (database.errcode (), database.errmsg ());
+            return;
+        }
+        string err_msg;
+        int ec = database.exec (statement.expanded_sql (), null, out err_msg);
+        if (ec != Sqlite.OK) {
+            log_database_error (ec, err_msg);
+            debug ("SQL statement: %s", statement.expanded_sql ());
+        }
+        statement.reset ();
     }
 
     public void insert_server (Iridium.Services.Server server) {
@@ -230,8 +309,8 @@ public class Iridium.Services.SQLClient : GLib.Object {
 
     public void insert_channel (int server_id, Iridium.Services.Channel channel) {
         var sql = """
-            INSERT INTO channels (server_id, channel, enabled, favorite) 
-            VALUES ($SERVER_ID, $CHANNEL, $ENABLED, $FAVORITE);
+            INSERT INTO channels (server_id, channel, enabled, favorite, mute_mentions) 
+            VALUES ($SERVER_ID, $CHANNEL, $ENABLED, $FAVORITE, $MUTE_MENTIONS);
             """;
 
         Sqlite.Statement statement;
@@ -244,6 +323,7 @@ public class Iridium.Services.SQLClient : GLib.Object {
         statement.bind_text (2, channel.name);
         statement.bind_int (3, bool_to_int (channel.enabled));
         statement.bind_int (4, bool_to_int (channel.favorite));
+        statement.bind_int (5, bool_to_int (channel.mute_mentions));
 
         string err_msg;
         int ec = database.exec (statement.expanded_sql (), null, out err_msg);
@@ -404,6 +484,25 @@ public class Iridium.Services.SQLClient : GLib.Object {
         statement.reset ();
     }
 
+    public void set_channel_mute_mentions (int channel_id, bool mute_mentions) {
+        var sql = "UPDATE channels SET mute_mentions = $MUTE_MENTIONS WHERE id = $ID;";
+        Sqlite.Statement statement;
+        if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
+            log_database_error (database.errcode (), database.errmsg ());
+            return;
+        }
+        statement.bind_int (1, bool_to_int (mute_mentions));
+        statement.bind_int (2, channel_id);
+
+        string err_msg;
+        int ec = database.exec (statement.expanded_sql (), null, out err_msg);
+        if (ec != Sqlite.OK) {
+            log_database_error (ec, err_msg);
+            debug ("SQL statement: %s", statement.expanded_sql ());
+        }
+        statement.reset ();
+    }
+
     private Iridium.Services.Server parse_server_row (Sqlite.Statement statement) {
         var num_columns = statement.column_count ();
         var server = new Iridium.Services.Server ();
@@ -473,6 +572,9 @@ public class Iridium.Services.SQLClient : GLib.Object {
                     break;
                 case "favorite":
                     channel.favorite = int_to_bool (statement.column_int (i));
+                    break;
+                case "mute_mentions":
+                    channel.mute_mentions = int_to_bool (statement.column_int (i));
                     break;
                 default:
                     break;

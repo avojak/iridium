@@ -28,6 +28,7 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
 
     private bool is_enabled = true;
     private bool is_favorite = false;
+    private bool is_muted = false;
 
     public ChannelRow (string channel_name, string server_name) {
         Object (
@@ -90,6 +91,11 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
         update_markup ();
     }
 
+    public void set_muted (bool mute_mentions) {
+        is_muted = mute_mentions;
+        update_muted_icon ();
+    }
+
     public override Gtk.Menu? get_context_menu () {
         var menu = new Gtk.Menu ();
 
@@ -106,6 +112,18 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
         var remove_favorite_item = new Gtk.MenuItem.with_label (_("Remove from favorites"));
         remove_favorite_item.activate.connect (() => {
             remove_favorite_channel ();
+        });
+
+        var mute_mentions_item = new Gtk.MenuItem.with_label (_("Mute mentions"));
+        mute_mentions_item.activate.connect (() => {
+            mute_mentions ();
+            set_muted (true);
+        });
+
+        var unmute_mentions_item = new Gtk.MenuItem.with_label (_("Unmute mentions"));
+        unmute_mentions_item.activate.connect (() => {
+            unmute_mentions ();
+            set_muted (false);
         });
 
         var join_item = new Gtk.MenuItem.with_label (_("Join channel"));
@@ -134,6 +152,11 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
             menu.append (remove_favorite_item);
         } else {
             menu.append (favorite_item);
+        }
+        if (is_muted) {
+            menu.append (unmute_mentions_item);
+        } else {
+            menu.append (mute_mentions_item);
         }
         menu.append (new Gtk.SeparatorMenuItem ());
         if (is_enabled) {
@@ -170,9 +193,15 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
         }
     }
 
+    private void update_muted_icon () {
+        activatable = is_muted ? new GLib.ThemedIcon ("notification-disabled-symbolic") : null;
+    }
+
     public signal void edit_topic ();
     public signal void favorite_channel ();
     public signal void remove_favorite_channel ();
+    public signal void mute_mentions ();
+    public signal void unmute_mentions ();
     public signal void join_channel ();
     public signal void leave_channel ();
     public signal void remove_channel ();
