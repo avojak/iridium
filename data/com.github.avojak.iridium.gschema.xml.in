@@ -36,6 +36,11 @@
       <summary>If channel join and part messages should be suppressed</summary>
       <description>If channel join and part messages should be suppressed</description>
     </key>
+    <key name="mute-mention-notifications" type="b">
+      <default>false</default>
+      <summary>If notifications for mentioning the user should be muted</summary>
+      <description>If notifications for mentioning the user should be muted</description>
+    </key>
     <key name="font" type="s">
       <default>'Monospace Regular 9'</default>
       <summary>Preferred Font</summary>

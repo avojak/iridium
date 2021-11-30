@@ -21,6 +21,8 @@
 
 public class Iridium.Services.SQLClient : GLib.Object {
 
+    // The 01 suffix was originall intended to be a versioning scheme for the database schema, however
+    // we will instead use the user_version pragma to check for necessary updates.
     private const string DATABASE_FILE = "iridium01.db";
 
     private Sqlite.Database database;
@@ -92,7 +94,62 @@ public class Iridium.Services.SQLClient : GLib.Object {
             );
             """;
         database.exec (sql);
+
+        do_upgrades ();
     }
+
+    private void do_upgrades () {
+        int? user_version = get_user_version ();
+        if (user_version == null) {
+            warning ("Null user_version, skipping upgrades");
+            return;
+        }
+        if (user_version == 0) {
+            debug ("SQLite user_version: %d, no upgrades to perform", user_version);
+        }
+    }
+
+    private int? get_user_version () {
+        var sql = "PRAGMA user_version";
+        Sqlite.Statement statement;
+        if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
+            log_database_error (database.errcode (), database.errmsg ());
+            return null;
+        }
+
+        if (statement.step () != Sqlite.ROW) {
+            return null;
+        }
+        var num_columns = statement.column_count ();
+        int? user_version = null;
+        for (int i = 0; i < num_columns; i++) {
+            switch (statement.column_name (i)) {
+                case "user_version":
+                    user_version = statement.column_int (i);
+                    break;
+                default:
+                    break;
+            }
+        }
+        statement.reset ();
+        return user_version;
+    }
+
+    //  private void set_user_version (int user_version) {
+    //      var sql = @"PRAGMA user_version = $user_version";
+    //      Sqlite.Statement statement;
+    //      if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
+    //          log_database_error (database.errcode (), database.errmsg ());
+    //          return;
+    //      }
+    //      string err_msg;
+    //      int ec = database.exec (statement.expanded_sql (), null, out err_msg);
+    //      if (ec != Sqlite.OK) {
+    //          log_database_error (ec, err_msg);
+    //          debug ("SQL statement: %s", statement.expanded_sql ());
+    //      }
+    //      statement.reset ();
+    //  }
 
     public void insert_server (Iridium.Services.Server server) {
         var sql = """
@@ -393,6 +450,25 @@ public class Iridium.Services.SQLClient : GLib.Object {
             return;
         }
         statement.bind_int (1, bool_to_int (favorite));
+        statement.bind_int (2, channel_id);
+
+        string err_msg;
+        int ec = database.exec (statement.expanded_sql (), null, out err_msg);
+        if (ec != Sqlite.OK) {
+            log_database_error (ec, err_msg);
+            debug ("SQL statement: %s", statement.expanded_sql ());
+        }
+        statement.reset ();
+    }
+
+    public void set_channel_mute_mentions (int channel_id, bool mute_mentions) {
+        var sql = "UPDATE channels SET mute_mentions = $MUTE_MENTIONS WHERE id = $ID;";
+        Sqlite.Statement statement;
+        if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
+            log_database_error (database.errcode (), database.errmsg ());
+            return;
+        }
+        statement.bind_int (1, bool_to_int (mute_mentions));
         statement.bind_int (2, channel_id);
 
         string err_msg;

@@ -514,7 +514,6 @@ public class Iridium.Services.ServerConnection : GLib.Object {
                 // If the first param is our nickname, it's a PM. Otherwise, it's
                 // a general message on a channel
                 if (message.params[0] == connection_details.nickname) {
-                    //  print ("received message from %s to %s\n", message.nickname, connection_details.nickname);
                     private_message_received (message.nickname, connection_details.nickname, message);
                 } else {
                     channel_message_received (message.params[0], message);

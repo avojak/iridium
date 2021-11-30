@@ -114,24 +114,20 @@ public abstract class Iridium.Models.Text.RichText : GLib.Object {
     }
 
     private void apply_nickname_tags (Gtk.TextBuffer buffer) {
-        Gtk.TextIter search_start;
-        Gtk.TextIter search_end;
-        Gtk.TextIter match_start;
-        Gtk.TextIter match_end;
         foreach (var nickname in nicknames) {
+            Gtk.TextIter search_start;
+            Gtk.TextIter search_end;
             // Set start_iter and end_iter for the portion of the buffer with the new message
             buffer.get_end_iter (out search_start);
             search_start.backward_chars (message.message.length + 1); // +1 for newline char
             buffer.get_end_iter (out search_end);
             search_end.backward_chars (1);
 
-            while (search_start.forward_search (nickname, Gtk.TextSearchFlags.CASE_INSENSITIVE, out match_start, out match_end, search_end)) {
-                if (match_start.starts_word () && match_end.ends_word ()) {
-                    buffer.apply_tag_by_name ("inline-nickname", match_start, match_end);
-                    buffer.apply_tag_by_name ("selectable", match_start, match_end);
-                }
-                search_start = match_end;
-            }
+            Iridium.Models.Text.TextBufferUtils.search_word_in_buffer (nickname, buffer, search_start, search_end, (match_start, match_end) => {
+                buffer.apply_tag_by_name ("inline-nickname", match_start, match_end);
+                buffer.apply_tag_by_name ("selectable", match_start, match_end);
+                return true;
+            });
         }
 
         // TODO: Check for our nickname and style the whole message

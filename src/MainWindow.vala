@@ -21,7 +21,7 @@
 
 public class Iridium.MainWindow : Hdy.Window {
 
-    public unowned Iridium.Application app { get; construct; }
+    public weak Iridium.Application app { get; construct; }
 
     private Iridium.Services.ActionManager action_manager;
     private Gtk.AccelGroup accel_group;
@@ -37,6 +37,8 @@ public class Iridium.MainWindow : Hdy.Window {
     private Iridium.Widgets.BrowseServersDialog? browse_servers_dialog = null;
 
     private Iridium.Layouts.MainLayout main_layout;
+
+    private Gee.Map<string, Gee.List<string>> notification_ids = new Gee.HashMap<string, Gee.List<string>> ();
 
     public MainWindow (Iridium.Application application) {
         Object (
@@ -124,6 +126,15 @@ public class Iridium.MainWindow : Hdy.Window {
                 Iridium.Application.secret_manager.store_secret (connection_details.server, connection_details.port, connection_details.nickname, connection_details.auth_token);
             } catch (GLib.Error e) {
                 warning ("Error while storing secret: %s", e.message);
+            }
+        });
+
+        // Handles the case where the application gains focus again, but no change in visible chat view
+        this.focus_in_event.connect (() => {
+            string? server_name = main_layout.get_visible_server ();
+            string? channel_name = main_layout.get_visible_channel ();
+            if (server_name != null && channel_name != null) {
+                update_os_notifications (server_name, channel_name);
             }
         });
 
@@ -809,6 +820,13 @@ public class Iridium.MainWindow : Hdy.Window {
         main_layout.reset_marker_line ();
     }
 
+    public void show_chat_view (string server_name, string? channel_name) {
+        Idle.add (() => {
+            main_layout.show_chat_view (server_name, channel_name);
+            return false;
+        });
+    }
+
     //
     // Respond to network connection changes
     //
@@ -1118,8 +1136,34 @@ public class Iridium.MainWindow : Hdy.Window {
     private void on_channel_message_received (string server_name, string channel_name, Iridium.Services.Message message) {
         Idle.add (() => {
             main_layout.display_channel_message (server_name, channel_name, message);
+            var nickname = Iridium.Application.connection_manager.get_connection_details (server_name).nickname;
+            var is_user_mentioned = Iridium.Models.Text.TextBufferUtils.search_word_in_string (nickname, message.message, () => {
+                return false;
+            });
+            if (is_user_mentioned) {
+                on_user_mentioned (server_name, channel_name, _(@"Mentioned in $channel_name"), message.message);
+            }
             return false;
         });
+    }
+
+    private void on_user_mentioned (string server_name, string channel_name, string title, string message) {
+        // Only send the notification if (1) the application is not in focus, and (2) mentions are not muted
+        if (((get_window ().get_state () & Gdk.WindowState.FOCUSED) == 0) && !Iridium.Application.settings.get_boolean ("mute-mention-notifications")) {
+            var notification = new GLib.Notification (title);
+            notification.set_body (message);
+            var target = new GLib.Variant.tuple ({new GLib.Variant.string (server_name), new GLib.Variant.string (channel_name)});
+            notification.set_default_action_and_target_value ("app.action-show-chat-view", target);
+            var id = GLib.Uuid.string_random ();
+            var key = @"$server_name|$channel_name";
+            if (!notification_ids.has_key (key)) {
+                notification_ids.set (key, new Gee.ArrayList<string> ());
+            }
+            notification_ids.get (key).add (id);
+            debug ("Sending notification: id=%s, key=%s", id, key);
+            update_app_badge ();
+            app.send_notification (id, notification);
+        }
     }
 
     private void on_user_joined_channel (string server_name, string channel_name, string nickname) {
@@ -1155,6 +1199,12 @@ public class Iridium.MainWindow : Hdy.Window {
             main_layout.add_private_message_chat_view (server_name, nickname, self_nickname);
             main_layout.enable_chat_view (server_name, nickname);
             main_layout.display_private_message (server_name, nickname, message);
+            var is_user_mentioned = Iridium.Models.Text.TextBufferUtils.search_word_in_string (self_nickname, message.message, () => {
+                return false;
+            });
+            if (is_user_mentioned) {
+                on_user_mentioned (server_name, nickname, _(@"Mentioned by $nickname"), message.message);
+            }
             return false;
         });
     }
@@ -1295,6 +1345,7 @@ public class Iridium.MainWindow : Hdy.Window {
         main_layout.set_channel_users_button_visible (true);
         main_layout.set_channel_users_button_enabled (main_layout.is_view_enabled (server_name, channel_name));
         update_channel_users_list (server_name, channel_name);
+        update_os_notifications (server_name, channel_name);
     }
 
     private void on_private_message_chat_view_shown (string server_name, string nickname) {
@@ -1302,6 +1353,56 @@ public class Iridium.MainWindow : Hdy.Window {
         main_layout.update_title (nickname, network_name != null ? network_name : server_name);
         main_layout.set_channel_users_button_visible (false);
         main_layout.set_header_tooltip (null);
+        update_os_notifications (server_name, nickname);
+    }
+
+    private void update_os_notifications (string server_name, string channel_name) {
+        var key = @"$server_name|$channel_name";
+        if (!notification_ids.has_key (key)) {
+            return;
+        }
+        foreach (var id in notification_ids.get (key)) {
+            debug ("Withdrawing notification: id=%s, key=%s", id, key);
+            app.withdraw_notification (id);
+        }
+        notification_ids.get (key).clear ();
+        update_app_badge ();
+    }
+
+    private void update_app_badge () {
+        // Notifications are 1:1 with the badge count
+        int64 count = 0;
+        foreach (var entry in notification_ids.entries) {
+            count += entry.value.size;
+        }
+        // Perform actions in different order depending on showing or hiding to prevent seeing a 0 count
+        if (count > 0) {
+            set_app_badge (count);
+            set_app_badge_visible (true);
+        } else {
+            set_app_badge_visible (false);
+            set_app_badge (count);
+        }
+    }
+
+    private void set_app_badge (int64 count) {
+        Granite.Services.Application.set_badge.begin (count, (obj, res) => {
+            try {
+                Granite.Services.Application.set_badge.end (res);
+            } catch (GLib.Error e) {
+                warning (e.message);
+            }
+        });
+    }
+
+    private void set_app_badge_visible (bool visible) {
+        Granite.Services.Application.set_badge_visible.begin (visible, (obj, res) => {
+            try {
+                Granite.Services.Application.set_badge_visible.end (res);
+            } catch (GLib.Error e) {
+                warning (e.message);
+            }
+        });
     }
 
     private void on_nickname_button_clicked (string server_name) {

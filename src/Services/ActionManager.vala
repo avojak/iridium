@@ -37,6 +37,8 @@ public class Iridium.Services.ActionManager : GLib.Object {
     public const string ACTION_RESET_MARKER = "action_reset_marker";
     public const string ACTION_BROWSE_SERVERS = "action_browse_servers";
 
+    public const string ACTION_SHOW_CHAT_VIEW = "action-show-chat-view";
+
     private const GLib.ActionEntry[] ACTION_ENTRIES = {
         { ACTION_NEW_WINDOW, action_new_window },
         { ACTION_NEW_SERVER_CONNECTION, action_new_server_connection },
@@ -52,6 +54,10 @@ public class Iridium.Services.ActionManager : GLib.Object {
         { ACTION_TOGGLE_SIDEBAR, action_toggle_sidebar },
         { ACTION_RESET_MARKER, action_reset_marker },
         { ACTION_BROWSE_SERVERS, action_browse_servers }
+    };
+
+    private const GLib.ActionEntry[] APP_ACTION_ENTRIES = {
+        { ACTION_SHOW_CHAT_VIEW, action_show_chat_view, "(ss)" }
     };
 
     private static Gee.MultiMap<string, string> accelerators;
@@ -99,6 +105,8 @@ public class Iridium.Services.ActionManager : GLib.Object {
             accelerators_array += null;
             application.set_accels_for_action (ACTION_PREFIX + action, accelerators_array);
         }
+
+        application.add_action_entries (APP_ACTION_ENTRIES, this);
     }
 
     public static void action_from_group (string action_name, ActionGroup action_group, Variant? parameter = null) {
@@ -169,6 +177,20 @@ public class Iridium.Services.ActionManager : GLib.Object {
 
     private void action_browse_servers () {
         window.show_browse_servers_dialog ();
+    }
+
+    private void action_show_chat_view (SimpleAction action, Variant? parameter) {
+        debug ("beep boop");
+        if (parameter == null) {
+            return;
+        }
+        if (parameter.n_children () != 2) {
+            warning ("Expected 2 variant children");
+            return;
+        }
+        string server_name = parameter.get_child_value (0).get_string ();
+        string channel_name = parameter.get_child_value (1).get_string ();
+        window.show_chat_view (server_name, channel_name);
     }
 
 }

@@ -106,6 +106,13 @@ public class Iridium.Widgets.PreferencesDialog : Granite.Dialog {
         suppress_join_part_switch.valign = Gtk.Align.CENTER;
         Iridium.Application.settings.bind ("suppress-join-part-messages", suppress_join_part_switch, "active", SettingsBindFlags.DEFAULT);
 
+        var mute_mentions_label = new Gtk.Label (_("Mute mention notifications:"));
+        mute_mentions_label.halign = Gtk.Align.END;
+        var mute_mentions_switch = new Gtk.Switch ();
+        mute_mentions_switch.halign = Gtk.Align.START;
+        mute_mentions_switch.valign = Gtk.Align.CENTER;
+        Iridium.Application.settings.bind ("mute-mention-notifications", mute_mentions_switch, "active", SettingsBindFlags.DEFAULT);
+
         var security_header_label = new Granite.HeaderLabel (_("Security and Privacy"));
 
         var cert_validation_policy_label = new Gtk.Label (_("Unacceptable SSL/TLS Certificates:"));
@@ -232,12 +239,14 @@ public class Iridium.Widgets.PreferencesDialog : Granite.Dialog {
         form_grid.attach (default_realname_entry, 1, 2, 1);
         form_grid.attach (suppress_join_part_label, 0, 3, 1);
         form_grid.attach (suppress_join_part_switch, 1, 3, 1);
-        form_grid.attach (security_header_label, 0, 4, 1);
-        form_grid.attach (cert_validation_policy_label, 0, 5, 1);
-        form_grid.attach (cert_validation_policy_combo, 1, 5, 1);
-        form_grid.attach (security_posture_stack, 0, 6, 2);
-        form_grid.attach (remember_connections_label, 0, 7, 1);
-        form_grid.attach (remember_connections_switch, 1, 7, 1);
+        form_grid.attach (mute_mentions_label, 0, 4, 1);
+        form_grid.attach (mute_mentions_switch, 1, 4, 1);
+        form_grid.attach (security_header_label, 0, 5, 1);
+        form_grid.attach (cert_validation_policy_label, 0, 6, 1);
+        form_grid.attach (cert_validation_policy_combo, 1, 6, 1);
+        form_grid.attach (security_posture_stack, 0, 7, 2);
+        form_grid.attach (remember_connections_label, 0, 8, 1);
+        form_grid.attach (remember_connections_switch, 1, 8, 1);
 
         body.add (header_grid);
         body.add (form_grid);
