@@ -180,7 +180,6 @@ public class Iridium.Services.ActionManager : GLib.Object {
     }
 
     private void action_show_chat_view (SimpleAction action, Variant? parameter) {
-        debug ("beep boop");
         if (parameter == null) {
             return;
         }

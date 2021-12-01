@@ -461,25 +461,6 @@ public class Iridium.Services.SQLClient : GLib.Object {
         statement.reset ();
     }
 
-    public void set_channel_mute_mentions (int channel_id, bool mute_mentions) {
-        var sql = "UPDATE channels SET mute_mentions = $MUTE_MENTIONS WHERE id = $ID;";
-        Sqlite.Statement statement;
-        if (database.prepare_v2 (sql, sql.length, out statement) != Sqlite.OK) {
-            log_database_error (database.errcode (), database.errmsg ());
-            return;
-        }
-        statement.bind_int (1, bool_to_int (mute_mentions));
-        statement.bind_int (2, channel_id);
-
-        string err_msg;
-        int ec = database.exec (statement.expanded_sql (), null, out err_msg);
-        if (ec != Sqlite.OK) {
-            log_database_error (ec, err_msg);
-            debug ("SQL statement: %s", statement.expanded_sql ());
-        }
-        statement.reset ();
-    }
-
     private Iridium.Services.Server parse_server_row (Sqlite.Statement statement) {
         var num_columns = statement.column_count ();
         var server = new Iridium.Services.Server ();
