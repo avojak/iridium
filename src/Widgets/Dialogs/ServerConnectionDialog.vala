@@ -60,7 +60,7 @@ public abstract class Iridium.Widgets.ServerConnectionDialog : Granite.Dialog {
         try {
             SERVER_REGEX = new GLib.Regex ("""^[a-zA-Z0-9\.-]+$""", GLib.RegexCompileFlags.OPTIMIZE);
             // See RFC 2812 Section 2.3.1
-            NICKNAME_REGEX = new GLib.Regex ("""^[a-zA-Z\[\]\\\`\_\^\{\|\}][a-zA-Z0-9\[\]\\\`\_\^\{\|\}]{0,8}$""", GLib.RegexCompileFlags.OPTIMIZE);
+            NICKNAME_REGEX = new GLib.Regex ("""^[a-zA-Z\[\]\\\`\_\^\{\|\}][a-zA-Z0-9\[\]\\\`\_\^\{\|\}]*$""", GLib.RegexCompileFlags.OPTIMIZE);
         } catch (GLib.Error e) {
             critical (e.message);
         }
