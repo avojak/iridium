@@ -21,6 +21,21 @@
     <binary>@appid@</binary>
   </provides>
   <releases>
+    <release version="1.6.0" date="2021-12-01">
+      <description>
+        <p>1.6.0 Release</p>
+        <ul>
+          <li>Integrate with OS notifications to display a notification when mentioned in a channel or private message (#23)</li>
+          <li>Display the number of unread mentions as an application badge in the dock (#24)</li>
+          <li>Set initial default nickname and real name based on system user account (#171)</li>
+          <li>Fix marker line in chat views showing incorrectly when font scaling other than 1x is used (#182)</li>
+          <li>Fix incorrect handling of network availability state (#189)</li>
+          <li>Fix the "restoring connections" overlay not appearing on startup (#190)</li>
+          <li>Fix incorrect parsing of command-line arguments (#193)</li>
+          <li>Revert the overly-restrictive 8-character nickname limit in the server connection dialog (#197)</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.5.0" date="2021-11-18">
       <description>
         <p>1.5.0 Release</p>

@@ -1,5 +1,5 @@
 # Project name and programming language
-project('com.github.avojak.iridium', 'vala', 'c', version: '1.5.0')
+project('com.github.avojak.iridium', 'vala', 'c', version: '1.6.0')
 
 i18n = import('i18n')
 gnome = import('gnome')
