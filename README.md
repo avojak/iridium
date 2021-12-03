@@ -57,6 +57,8 @@ $ flatpak-builder build com.github.avojak.iridium.yml --user --install --force-c
 $ flatpak run --env=G_MESSAGES_DEBUG=all com.github.avojak.iridium
 ```
 
+Another helpful environment variable to set is `GTK_DEBUG=interactive` for investigating UI and styling issues.
+
 ### Development Build
 
 You can also install a development build alongside a stable version by specifying the dev profile:

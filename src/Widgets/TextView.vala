@@ -93,16 +93,19 @@ public class Iridium.Widgets.TextView : Gtk.SourceView {
 
         Gdk.Rectangle rect;
         get_iter_location (iter, out rect);
+        int line_y; // Don't use this - use line_y_window instead
+        int line_height;
+        get_line_yrange (iter, out line_y, out line_height);
 
         // Convert to window coordinates
-        int window_x;
-        int window_y;
-        buffer_to_window_coords (Gtk.TextWindowType.TEXT, rect.x, rect.y, out window_x, out window_y);
+        int line_x_window;
+        int line_y_window;
+        buffer_to_window_coords (Gtk.TextWindowType.TEXT, rect.x, rect.y, out line_x_window, out line_y_window);
 
         // Don't include the border_width, because it gets buggy and sometimes doesn't update the part of the line in the border
-        double line_width = hadjustment.upper + left_margin + right_margin;
-        double line_x = left_margin + border_width;
-        double line_y = window_y + 26; // + 10; // TODO: Compute this based on font size and padding between lines
+        double render_width = hadjustment.upper + left_margin + right_margin;
+        double render_x = left_margin + border_width;
+        double render_y = line_y_window + line_height + border_width;
 
         ctx.save ();
 
@@ -111,8 +114,8 @@ public class Iridium.Widgets.TextView : Gtk.SourceView {
         ctx.set_source_rgba (rgba.red, rgba.green, rgba.blue, 1);
         ctx.set_line_width (1);
 
-        ctx.move_to (line_x, line_y);
-        ctx.line_to (line_width, line_y);
+        ctx.move_to (render_x, render_y);
+        ctx.line_to (render_width, render_y);
 
         ctx.stroke ();
         ctx.restore ();
