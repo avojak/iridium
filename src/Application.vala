@@ -220,6 +220,18 @@ public class Iridium.Application : Gtk.Application {
             // If network is available, next `true` value for network availability will be a reconnection
             is_first_network_availability = false;
         }
+
+        update_default_preferences ();
+    }
+
+    private void update_default_preferences () {
+        // Update values that cannot be defined as constants in the schema
+        if (settings.get_string ("default-nickname") == "") {
+            settings.set_string ("default-nickname", GLib.Environment.get_user_name ());
+        }
+        if (settings.get_string ("default-realname") == "") {
+            settings.set_string ("default-realname", GLib.Environment.get_real_name ());
+        }
     }
 
     public static int main (string[] args) {
