@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: com.github.avojak.iridium\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-03 15:44-0700\n"
-"PO-Revision-Date: 2021-05-17 13:52+0200\n"
+"PO-Revision-Date: 2021-12-04 14:18+0100\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: \n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.4.2\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.0\n"
 
 #: src/Layouts/MainLayout.vala:408
 msgid "Restoring server connections…"
@@ -40,11 +40,11 @@ msgstr "NickServ"
 
 #: src/Models/AuthenticationMethod.vala:39
 msgid "SASL (Plain)"
-msgstr ""
+msgstr "SASL (platte tekst)"
 
 #: src/Models/AuthenticationMethod.vala:41
 msgid "SASL (External)"
-msgstr ""
+msgstr "SASL (extern)"
 
 #: src/Models/CertificateErrorMapping.vala:27
 msgid "An error has occurred processing the server's certificate"
@@ -93,9 +93,8 @@ msgid "Error while connecting"
 msgstr "Fout bij verbinden"
 
 #: src/Services/ServerConnection.vala:160
-#, fuzzy
 msgid "Certificate file not found"
-msgstr "Certificaat geweigerd:"
+msgstr "Geen certificaatbestand aangetroffen"
 
 #: src/Services/ServerConnection.vala:210
 msgid "Certificate rejected:"
@@ -113,9 +112,8 @@ msgid "Certificate was rejected by the user."
 msgstr "Het certificaat is geweigerd door de gebruiker."
 
 #: src/Services/ServerConnection.vala:323
-#, fuzzy
 msgid "No stored secret found for this server."
-msgstr "Je bent niet verbonden met deze server"
+msgstr "Er is geen opgeslagen geheim aangetroffen voor deze server."
 
 #: src/Views/ChannelChatView.vala:38
 msgid "You must join this channel to begin chatting"
@@ -154,13 +152,12 @@ msgid "Connect to a server and save it in the server list"
 msgstr "Maak verbinding met een server en sla deze op op de serverlijst"
 
 #: src/Views/Welcome.vala:42
-#, fuzzy
 msgid "Browse Servers"
-msgstr "Servers"
+msgstr "Bladeren door servers"
 
 #: src/Views/Welcome.vala:42
 msgid "Browse a curated list of popular IRC servers"
-msgstr ""
+msgstr "Blader door een lijst met populaire irc-servers"
 
 #: src/Widgets/Dialogs/BrowseChannelsDialog.vala:53
 #: src/Widgets/Dialogs/BrowseChannelsDialog.vala:73
@@ -326,7 +323,7 @@ msgstr "Deelname- en actieberichten onderdrukken:"
 
 #: src/Widgets/Dialogs/PreferencesDialog.vala:109
 msgid "Mute mention notifications:"
-msgstr ""
+msgstr "Geen melding tonen bij vermeldingen"
 
 #: src/Widgets/Dialogs/PreferencesDialog.vala:116
 msgid "Security and Privacy"
@@ -388,7 +385,7 @@ msgstr ""
 msgid "Connection insecure. Consider enabling SSL/TLS from the Advanced tab."
 msgstr ""
 "Onbeveiligde verbinding. Overweeg ssl/tls in te schakelen op het tabblad "
-"'Geavanceerd'."
+"‘Geavanceerd’."
 
 #: src/Widgets/Dialogs/ServerConnectionDialog.vala:117
 msgid "Basic"
@@ -420,13 +417,15 @@ msgstr "Verificatiemethode:"
 
 #: src/Widgets/Dialogs/ServerConnectionDialog.vala:260
 msgid "SASL External requires SSL/TLS"
-msgstr ""
+msgstr "SASL vereist ssl/tls"
 
 #: src/Widgets/Dialogs/ServerConnectionDialog.vala:260
 msgid ""
 "To use SASL External authentication, you must enable SSL/TLS for this server "
 "connection."
 msgstr ""
+"Om externe sasl-authenticatie te kunnen gebruiken, dien je ssl/tls in te "
+"schakelen op deze serververbinding."
 
 #: src/Widgets/Dialogs/ServerConnectionDialog.vala:278
 msgid "Password:"
@@ -434,11 +433,11 @@ msgstr "Wachtwoord:"
 
 #: src/Widgets/Dialogs/ServerConnectionDialog.vala:300
 msgid "Identity File:"
-msgstr ""
+msgstr "Identiteitsbestand"
 
 #: src/Widgets/Dialogs/ServerConnectionDialog.vala:303
 msgid "Select Your Identity File…"
-msgstr ""
+msgstr "Kies een identiteitsbestand…"
 
 #: src/Widgets/Dialogs/ServerConnectionDialog.vala:356
 msgid "Use SSL/TLS:"
@@ -450,7 +449,7 @@ msgstr "Poort:"
 
 #: src/Widgets/Dialogs/ServerConnectionDialog.vala:408
 msgid "Invalid identity file"
-msgstr ""
+msgstr "Ongeldig identiteitsbestand"
 
 #: src/Widgets/SidePanel/ChannelRow.vala:96
 msgid "Edit topic…"
@@ -596,7 +595,7 @@ msgstr "Je neemt al deel aan dit kanaal"
 
 #: src/MainWindow.vala:677
 msgid "Channel must begin with '#' or '&'"
-msgstr "De kanaalnaam moet beginnen met '#' of '&'"
+msgstr "De kanaalnaam moet beginnen met ‘#’ of ‘&’"
 
 #: src/MainWindow.vala:681
 msgid "Enter a channel name"
