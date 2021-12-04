@@ -21,7 +21,15 @@
     <binary>@appid@</binary>
   </provides>
   <releases>
-    <release version="1.6.0" date="2021-12-01">
+    <release version="1.6.1" date="2021-12-04">
+      <description>
+        <p>1.6.1 Release</p>
+        <ul>
+          <li>Updated Dutch translations by Vistaus</li>
+        </ul>
+      </description>
+    </release>
+    <release version="1.6.0" date="2021-12-03">
       <description>
         <p>1.6.0 Release</p>
         <ul>
