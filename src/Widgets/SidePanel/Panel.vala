@@ -100,8 +100,8 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
             item_selected (item);
         });
 
-        add (source_list);
-        //  add (status_bar);
+        attach (source_list, 0, 0);
+        attach (status_bar, 0, 1);
     }
 
     public void add_server_row (string server_name, string? network_name) {

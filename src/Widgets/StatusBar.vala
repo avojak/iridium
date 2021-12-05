@@ -21,54 +21,51 @@
 
 public class Iridium.Widgets.StatusBar : Gtk.ActionBar {
 
-    private Gtk.MenuItem channel_join_menu_item;
-
     construct {
-        var server_connect_menu_item = new Gtk.MenuItem.with_label (_("Connect to a Server…"));
-        channel_join_menu_item = new Gtk.MenuItem.with_label (_("Join a Channel…"));
+        get_style_context ().add_class (Gtk.STYLE_CLASS_INLINE_TOOLBAR);
 
-        var menu = new Gtk.Menu ();
-        menu.append (server_connect_menu_item);
-        menu.append (channel_join_menu_item);
-        menu.show_all ();
+        var server_connect_accellabel = new Granite.AccelLabel.from_action_name (
+            _("New Server Connection…"),
+            Iridium.Services.ActionManager.ACTION_PREFIX + Iridium.Services.ActionManager.ACTION_NEW_SERVER_CONNECTION
+        );
+
+        var server_connect_menu_item = new Gtk.ModelButton ();
+        server_connect_menu_item.action_name = Iridium.Services.ActionManager.ACTION_PREFIX + Iridium.Services.ActionManager.ACTION_NEW_SERVER_CONNECTION;
+        server_connect_menu_item.get_child ().destroy ();
+        server_connect_menu_item.add (server_connect_accellabel);
+
+        var channel_join_accellabel = new Granite.AccelLabel.from_action_name (
+            _("Join Channel…"),
+            Iridium.Services.ActionManager.ACTION_PREFIX + Iridium.Services.ActionManager.ACTION_JOIN_CHANNEL
+        );
+
+        var channel_join_menu_item = new Gtk.ModelButton ();
+        channel_join_menu_item.action_name = Iridium.Services.ActionManager.ACTION_PREFIX + Iridium.Services.ActionManager.ACTION_JOIN_CHANNEL;
+        channel_join_menu_item.get_child ().destroy ();
+        channel_join_menu_item.add (channel_join_accellabel);
+
+        var join_popover_grid = new Gtk.Grid ();
+        join_popover_grid.margin_top = 3;
+        join_popover_grid.margin_bottom = 3;
+        join_popover_grid.orientation = Gtk.Orientation.VERTICAL;
+        join_popover_grid.width_request = 200;
+        join_popover_grid.attach (server_connect_menu_item, 0, 0, 1, 1);
+        join_popover_grid.attach (channel_join_menu_item, 0, 1, 1, 1);
+        join_popover_grid.show_all ();
+
+        var join_popover = new Gtk.Popover (null);
+        join_popover.add (join_popover_grid);
 
         var add_menu_button = new Gtk.MenuButton ();
+        add_menu_button.label = _("Join…");
         add_menu_button.direction = Gtk.ArrowType.UP;
-        add_menu_button.popup = menu;
+        add_menu_button.popover = join_popover;
         add_menu_button.tooltip_text = _("Join a Server or Channel");
-        add_menu_button.add (new Gtk.Image.from_icon_name ("list-add-symbolic", Gtk.IconSize.MENU));
+        add_menu_button.image = new Gtk.Image.from_icon_name ("list-add-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
+        add_menu_button.always_show_image = true;
         add_menu_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
 
-        var manage_connections_button = new Gtk.Button.from_icon_name ("edit-symbolic", Gtk.IconSize.MENU);
-        manage_connections_button.tooltip_text = _("Manage connections…");
-        manage_connections_button.get_style_context ().add_class (Gtk.STYLE_CLASS_FLAT);
-
         pack_start (add_menu_button);
-        //  pack_end (manage_connections_button);
-
-        server_connect_menu_item.activate.connect (() => {
-            server_connect_button_clicked ();
-        });
-
-        channel_join_menu_item.activate.connect (() => {
-            channel_join_button_clicked ();
-        });
-
-        manage_connections_button.clicked.connect (() => {
-            manage_connections_button_clicked ();
-        });
     }
-
-    public void enable_channel_join_item () {
-        channel_join_menu_item.sensitive = true;
-    }
-
-    public void disable_channel_join_item () {
-        channel_join_menu_item.sensitive = false;
-    }
-
-    public signal void server_connect_button_clicked ();
-    public signal void channel_join_button_clicked ();
-    public signal void manage_connections_button_clicked ();
 
 }
