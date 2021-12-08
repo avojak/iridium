@@ -26,12 +26,12 @@ public class Iridium.Widgets.SidePanel.PrivateMessageRow : Granite.Widgets.Sourc
     public string nickname { get; set; }
     public string server_name { get; construct; }
 
-    public Iridium.Widgets.SidePanel.Row.State state { 
+    public Iridium.Widgets.SidePanel.Row.State state {
         get {
             lock (_state) {
                 return _state;
             }
-        } 
+        }
         set {
             lock (_state) {
                 _state = value;

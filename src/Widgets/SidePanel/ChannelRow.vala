@@ -27,12 +27,12 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
     public string server_name { get; construct; }
     public string? network_name { get; set; }
 
-    public Iridium.Widgets.SidePanel.Row.State state { 
+    public Iridium.Widgets.SidePanel.Row.State state {
         get {
             lock (_state) {
                 return _state;
             }
-        } 
+        }
         set {
             lock (_state) {
                 _state = value;
