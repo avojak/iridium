@@ -72,17 +72,6 @@ install_data(
 )
 
 install_data(
-    join_paths('assets', 'icons', '16x16', meson.project_name() + '.image-loading-symbolic.svg'),
-    install_dir: join_paths(get_option('datadir'), 'icons', 'hicolor', '16x16', 'status'),
-    rename: '@0@.image-loading-symbolic.svg'.format(application_id)
-)
-
-install_data(
-    join_paths('assets', 'icons', '16x16', meson.project_name() + '.network-server-connecting.svg'),
-    install_dir: join_paths(get_option('datadir'), 'icons', 'hicolor', '16x16', 'status'),
-    rename: '@0@.network-server-connecting.svg'.format(application_id)
-)
-install_data(
     join_paths('assets', 'icons', '16x16', meson.project_name() + '.network-server-connected.svg'),
     install_dir: join_paths(get_option('datadir'), 'icons', 'hicolor', '16x16', 'status'),
     rename: '@0@.network-server-connected.svg'.format(application_id)
