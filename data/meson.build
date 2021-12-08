@@ -72,10 +72,30 @@ install_data(
 )
 
 install_data(
-    join_paths('assets', 'icons', '16x16', meson.project_name() + '.image-loading-symbolic.svg'),
+    join_paths('assets', 'icons', '16x16', meson.project_name() + '.network-server-connected.svg'),
     install_dir: join_paths(get_option('datadir'), 'icons', 'hicolor', '16x16', 'status'),
-    rename: '@0@.image-loading-symbolic.svg'.format(application_id)
+    rename: '@0@.network-server-connected.svg'.format(application_id)
 )
+install_data(
+    join_paths('assets', 'icons', '16x16', meson.project_name() + '.network-server-disconnected.svg'),
+    install_dir: join_paths(get_option('datadir'), 'icons', 'hicolor', '16x16', 'status'),
+    rename: '@0@.network-server-disconnected.svg'.format(application_id)
+)
+install_data(
+    join_paths('assets', 'icons', '16x16', meson.project_name() + '.network-server-error.svg'),
+    install_dir: join_paths(get_option('datadir'), 'icons', 'hicolor', '16x16', 'status'),
+    rename: '@0@.network-server-error.svg'.format(application_id)
+)
+
+# Install the spinner
+spinner_image_indices = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
+foreach i : spinner_image_indices
+    install_data(
+        join_paths('assets', 'icons', '24x24', 'spinner', meson.project_name() + '.process-working-' + i + '-symbolic.svg'),
+        install_dir: join_paths(get_option('datadir'), 'icons', 'hicolor', '24x24', 'status'),
+        rename: '@0@.process-working-@1@-symbolic.svg'.format(application_id, i)
+    )
+endforeach
 
 # Install the settings schema
 schema_path = '/com/github/avojak/iridium/'

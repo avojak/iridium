@@ -21,12 +21,25 @@
 
 public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.Item, Iridium.Widgets.SidePanel.Row {
 
+    private Iridium.Widgets.SidePanel.Row.State _state;
+
     public string channel_name { get; construct; }
     public string server_name { get; construct; }
     public string? network_name { get; set; }
-    public Iridium.Widgets.SidePanel.Row.State state { get; set; }
 
-    private bool is_enabled = true;
+    public Iridium.Widgets.SidePanel.Row.State state {
+        get {
+            lock (_state) {
+                return _state;
+            }
+        }
+        set {
+            lock (_state) {
+                _state = value;
+            }
+        }
+    }
+
     private bool is_favorite = false;
 
     public ChannelRow (string channel_name, string server_name) {
@@ -34,7 +47,7 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
             name: channel_name,
             channel_name: channel_name,
             server_name: server_name,
-            icon: new GLib.ThemedIcon ("user-available"),
+            icon: new GLib.ThemedIcon ("emblem-disabled"),
             state: Iridium.Widgets.SidePanel.Row.State.DISABLED
         );
     }
@@ -48,41 +61,32 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
     }
 
     public new void enable () {
-        if (is_enabled) {
-            return;
-        }
-        icon = new GLib.ThemedIcon ("user-available");
-        //  icon = new GLib.ThemedIcon ("internet-chat");
-        //  icon = null;
-        this.is_enabled = true;
+        state = Iridium.Widgets.SidePanel.Row.State.ENABLED;
+        update_icon ("emblem-enabled");
         update_markup ();
     }
 
     public new void disable () {
-        if (!is_enabled) {
-            return;
-        }
-        icon = new GLib.ThemedIcon ("user-offline");
-        //  icon = new GLib.ThemedIcon ("internet-chat");
-        //  icon = null;
-        this.is_enabled = false;
+        state = Iridium.Widgets.SidePanel.Row.State.DISABLED;
+        update_icon ("emblem-disabled");
         update_markup ();
     }
 
-    public new void error (string error_message, string? error_details) {
+    public new void error () {
+        state = Iridium.Widgets.SidePanel.Row.State.ERROR;
     }
 
     public new void updating () {
-        icon = new GLib.ThemedIcon ("mail-unread");
-        // Maybe add the symbolic chat and user icons so we can specifically use them when not loading?
-        // Could also create "disabled" versions of each that are greyed out slightly
-        //  icon = new GLib.ThemedIcon (Constants.APP_ID + ".image-loading-symbolic");
-        this.is_enabled = false;
+        state = Iridium.Widgets.SidePanel.Row.State.UPDATING;
         update_markup ();
     }
 
     public new bool get_enabled () {
-        return is_enabled;
+        return state == Iridium.Widgets.SidePanel.Row.State.ENABLED;
+    }
+
+    public new Iridium.Widgets.SidePanel.Row.State get_state () {
+        return state;
     }
 
     public void set_favorite (bool favorite) {
@@ -120,13 +124,13 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
 
         var close_item = new Gtk.MenuItem.with_label (_("Close"));
         close_item.activate.connect (() => {
-            if (is_enabled) {
+            if (state == Iridium.Widgets.SidePanel.Row.State.ENABLED) {
                 leave_channel ();
             }
             remove_channel ();
         });
 
-        if (is_enabled) {
+        if (state == Iridium.Widgets.SidePanel.Row.State.ENABLED) {
             menu.append (edit_topic_item);
             menu.append (new Gtk.SeparatorMenuItem ());
         }
@@ -136,7 +140,7 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
             menu.append (favorite_item);
         }
         menu.append (new Gtk.SeparatorMenuItem ());
-        if (is_enabled) {
+        if (state == Iridium.Widgets.SidePanel.Row.State.ENABLED) {
             menu.append (leave_item);
         } else {
             menu.append (join_item);
@@ -156,18 +160,25 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
     private void update_markup () {
         if (is_favorite) {
             var server_text = network_name == null ? server_name : network_name;
-            if (is_enabled) {
+            if (state == Iridium.Widgets.SidePanel.Row.State.ENABLED) {
                 markup = channel_name + " <small>" + server_text + "</small>";
             } else {
                 markup = "<i>" + channel_name + " <small>" + server_text + "</small></i>";
             }
         } else {
-            if (is_enabled) {
+            if (state == Iridium.Widgets.SidePanel.Row.State.ENABLED) {
                 markup = null;
             } else {
                 markup = "<i>" + channel_name + "</i>";
             }
         }
+    }
+
+    private void update_icon (string icon_name) {
+        Idle.add (() => {
+            icon = new GLib.ThemedIcon (icon_name);
+            return false;
+        });
     }
 
     public signal void edit_topic ();
