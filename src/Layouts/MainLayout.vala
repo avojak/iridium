@@ -350,6 +350,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         string? child_name = get_child_name (server_name, channel_name);
         if (child_name != null) {
             main_stack.set_visible_child_full (child_name, Gtk.StackTransitionType.SLIDE_RIGHT);
+            update_last_shown_view (server_name, channel_name);
         }
 
         // Notify the chat view that it has gained focus
@@ -374,6 +375,11 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
             chat_view.set_entry_focus ();
             return false;
         });
+    }
+
+    private void update_last_shown_view (string server_name, string? channel_name) {
+        Iridium.Application.settings.set_string ("last-server", server_name);
+        Iridium.Application.settings.set_string ("last-channel", channel_name == null ? "" : channel_name);
     }
 
     public string? get_visible_server () {

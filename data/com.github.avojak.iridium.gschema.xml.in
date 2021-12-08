@@ -66,5 +66,15 @@
 			<summary>The saved height of the window.</summary>
 			<description>The saved height of the window.</description>
 		</key>
+    <key name="last-server" type="s">
+			<default>""</default>
+			<summary>The last shown server.</summary>
+			<description>The last shown server.</description>
+		</key>
+    <key name="last-channel" type="s">
+			<default>""</default>
+			<summary>The last shown channel.</summary>
+			<description>The last shown channel.</description>
+		</key>
   </schema>
 </schemalist>

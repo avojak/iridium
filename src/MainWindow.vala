@@ -222,6 +222,14 @@ public class Iridium.MainWindow : Hdy.Window {
             }
         }
 
+        // Switch to the last shown view from the prior session
+        var last_server = Iridium.Application.settings.get_string ("last-server");
+        var last_channel = Iridium.Application.settings.get_string ("last-channel");
+        Idle.add (() => {
+            main_layout.show_chat_view (last_server, last_channel == "" ? null : last_channel);
+            return false;
+        });
+
         ui_initialized (servers, channels);
     }
 
