@@ -78,6 +78,9 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
         server_connection.open_failed.connect (() => {
             open_connections.unset (server);
         });
+        server_connection.connection_closed.connect (() => {
+            open_connections.unset (server);
+        });
 
         server_connection.open ();
         return server_connection;
@@ -101,7 +104,6 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
             return;
         }
         connection.close ();
-        open_connections.unset (server);
     }
 
     public void fail_server_connection (string server, string error_message, string? error_details) {
@@ -110,7 +112,6 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
             return;
         }
         connection.close ();
-        open_connections.unset (server);
         connection.open_failed (error_message, error_details);
     }
 
@@ -177,10 +178,12 @@ public class Iridium.Services.ServerConnectionManager : GLib.Object {
 
     public void close_all_connections () {
         debug ("Closing all connections…");
-        foreach (var connection in open_connections.entries) {
+        // Create an intermediate map so we're not modifying the same map we're iterating through
+        var intermediate = new Gee.HashMap<string, Iridium.Services.ServerConnection> ();
+        intermediate.set_all (open_connections);
+        foreach (var connection in intermediate.entries) {
             connection.value.close ();
         }
-        open_connections.clear ();
     }
 
     public void send_user_message (string server_name, string message) {
