@@ -25,6 +25,8 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
     //       the row items. Might allow us to display a spinner while connecting to a server or joining
     //       a channel.
 
+    private const int NUM_SPINNER_IMAGES = 12;
+
     private Granite.Widgets.SourceList source_list;
     public Iridium.Widgets.StatusBar status_bar;
 
@@ -39,6 +41,10 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
     // TODO: May need to use this list as the source of truth once items start moving around for favorites
     private Gee.Map<string, Gee.List<Iridium.Widgets.SidePanel.ChannelRow>> channel_items;
     private Gee.Map<string, Gee.List<Iridium.Widgets.SidePanel.PrivateMessageRow>> private_message_items;
+
+    private Thread<void> spinner_thread;
+    private Cancellable spinner_cancellable = new Cancellable ();
+    private Gee.Map<int, GLib.ThemedIcon> spinner_images;
 
     public unowned Iridium.MainWindow window { get; construct; }
 
@@ -102,6 +108,45 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
 
         attach (source_list, 0, 0);
         attach (status_bar, 0, 1);
+
+        spinner_images = new Gee.HashMap<int, GLib.ThemedIcon> ();
+        for (int i = 0; i < NUM_SPINNER_IMAGES; i++) {
+            spinner_images.set (i, new GLib.ThemedIcon ("%s.process-working-%d-symbolic".printf (Constants.APP_ID, i + 1)));
+        }
+        spinner_thread = new Thread<void> (@"Side panel spinner", do_spin);
+
+        this.destroy.connect (() => {
+            spinner_cancellable.cancel ();
+        });
+    }
+
+    private void do_spin () {
+        int image_index = 0;
+        while (!spinner_cancellable.is_cancelled ()) {
+            foreach (var server_entry in server_items.entries) {
+                var server_row = (Iridium.Widgets.SidePanel.Row) server_entry.value;
+                if (server_row.get_state () == Iridium.Widgets.SidePanel.Row.State.UPDATING) {
+                    Idle.add (() => {
+                        ((Granite.Widgets.SourceList.Item) server_entry.value).icon = spinner_images.get(image_index);
+                        return false;
+                    });
+                }
+                foreach (var channel_item in channel_items.get (server_entry.key)) {
+                    var channel_row = (Iridium.Widgets.SidePanel.Row) channel_item;
+                    if (channel_row.get_state () == Iridium.Widgets.SidePanel.Row.State.UPDATING) {
+                        Idle.add (() => {
+                            ((Granite.Widgets.SourceList.Item) channel_item).icon = spinner_images.get(image_index);
+                            return false;
+                        });
+                    }
+                }
+            }
+            image_index++;
+            if (image_index == NUM_SPINNER_IMAGES) {
+                image_index = 0;
+            }
+            GLib.Thread.usleep (50000);
+        }
     }
 
     public void add_server_row (string server_name, string? network_name) {

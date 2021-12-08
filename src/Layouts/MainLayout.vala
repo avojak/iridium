@@ -311,6 +311,9 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         // Display the error on the side panel row
         if (chat_view is Iridium.Views.ServerChatView) {
             side_panel.error_server_row (server_name, error_message, error_details);
+            var message = new Iridium.Services.Message ();
+            message.message = (error_details == null) ? error_message : @"$error_message: $error_details";
+            chat_view.display_server_error_msg (message);
         } else if (chat_view is Iridium.Views.ChannelChatView) {
             // TODO
         } else if (chat_view is Iridium.Views.PrivateMessageChatView) {

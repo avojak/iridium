@@ -78,6 +78,10 @@ public class Iridium.Widgets.SidePanel.PrivateMessageRow : Granite.Widgets.Sourc
         return is_enabled;
     }
 
+    public new Iridium.Widgets.SidePanel.Row.State get_state () {
+        return state;
+    }
+
     public override Gtk.Menu? get_context_menu () {
         var menu = new Gtk.Menu ();
 

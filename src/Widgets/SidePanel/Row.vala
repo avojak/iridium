@@ -24,7 +24,8 @@ public interface Iridium.Widgets.SidePanel.Row : GLib.Object {
     protected enum State {
         ENABLED,
         DISABLED,
-        UPDATING
+        UPDATING,
+        ERROR
     }
 
     public abstract string get_server_name ();
@@ -34,7 +35,7 @@ public interface Iridium.Widgets.SidePanel.Row : GLib.Object {
     public abstract void error (string error_message, string? error_details);
     // TODO: Maybe remove this from interface and add to implementations as 'joining', 'connecting', etc.
     public abstract void updating ();
-    //  public abstract State get_state ();
+    public abstract State get_state ();
     public abstract bool get_enabled ();
 
 }
