@@ -21,11 +21,23 @@
 
 public class Iridium.Widgets.SidePanel.PrivateMessageRow : Granite.Widgets.SourceList.ExpandableItem, Iridium.Widgets.SidePanel.Row {
 
+    private Iridium.Widgets.SidePanel.Row.State _state;
+
     public string nickname { get; set; }
     public string server_name { get; construct; }
-    public Iridium.Widgets.SidePanel.Row.State state { get; set; }
 
-    private bool is_enabled = true;
+    public Iridium.Widgets.SidePanel.Row.State state { 
+        get {
+            lock (_state) {
+                return _state;
+            }
+        } 
+        set {
+            lock (_state) {
+                _state = value;
+            }
+        }
+    }
 
     public PrivateMessageRow (string nickname, string server_name) {
         Object (
@@ -46,36 +58,26 @@ public class Iridium.Widgets.SidePanel.PrivateMessageRow : Granite.Widgets.Sourc
     }
 
     public new void enable () {
-        if (is_enabled) {
-            return;
-        }
-        //  icon = new GLib.ThemedIcon ("user-available");
-        icon = new GLib.ThemedIcon ("system-users");
+        state = Iridium.Widgets.SidePanel.Row.State.ENABLED;
+        update_icon ("system-users");
         markup = null;
-        is_enabled = true;
     }
 
     public new void disable () {
-        if (!is_enabled) {
-            return;
-        }
-        //  icon = new GLib.ThemedIcon ("user-offline");
+        state = Iridium.Widgets.SidePanel.Row.State.DISABLED;
         markup = "<i>" + nickname + "</i>";
-        is_enabled = false;
     }
 
     public new void error (string error_message, string? error_details) {
+        // Private messages don't have an error state
     }
 
     public new void updating () {
-        //  icon = new GLib.ThemedIcon ("mail-unread");
-        icon = new GLib.ThemedIcon (Constants.APP_ID + ".image-loading-symbolic");
-        markup = "<i>" + nickname + "</i>";
-        is_enabled = false;
+        // Private messages don't have an updating state
     }
 
     public new bool get_enabled () {
-        return is_enabled;
+        return state == Iridium.Widgets.SidePanel.Row.State.ENABLED;
     }
 
     public new Iridium.Widgets.SidePanel.Row.State get_state () {
@@ -99,6 +101,13 @@ public class Iridium.Widgets.SidePanel.PrivateMessageRow : Granite.Widgets.Sourc
     public void update_nickname (string nickname) {
         this.name = nickname;
         this.nickname = nickname;
+    }
+
+    private void update_icon (string icon_name) {
+        Idle.add (() => {
+            icon = new GLib.ThemedIcon (icon_name);
+            return false;
+        });
     }
 
     public signal void close_private_message ();

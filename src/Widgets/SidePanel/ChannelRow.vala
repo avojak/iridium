@@ -21,12 +21,25 @@
 
 public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.Item, Iridium.Widgets.SidePanel.Row {
 
+    private Iridium.Widgets.SidePanel.Row.State _state;
+
     public string channel_name { get; construct; }
     public string server_name { get; construct; }
     public string? network_name { get; set; }
-    public Iridium.Widgets.SidePanel.Row.State state { get; set; }
 
-    //  private bool is_enabled = true;
+    public Iridium.Widgets.SidePanel.Row.State state { 
+        get {
+            lock (_state) {
+                return _state;
+            }
+        } 
+        set {
+            lock (_state) {
+                _state = value;
+            }
+        }
+    }
+
     private bool is_favorite = false;
 
     public ChannelRow (string channel_name, string server_name) {
@@ -48,26 +61,14 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
     }
 
     public new void enable () {
-        if (state == Iridium.Widgets.SidePanel.Row.State.ENABLED) {
-            return;
-        }
         state = Iridium.Widgets.SidePanel.Row.State.ENABLED;
-        icon = new GLib.ThemedIcon ("emblem-enabled");
-        //  icon = new GLib.ThemedIcon ("internet-chat");
-        //  icon = null;
-        //  this.is_enabled = true;
+        update_icon ("emblem-enabled");
         update_markup ();
     }
 
     public new void disable () {
-        if (state == Iridium.Widgets.SidePanel.Row.State.DISABLED) {
-            return;
-        }
         state = Iridium.Widgets.SidePanel.Row.State.DISABLED;
-        icon = new GLib.ThemedIcon ("emblem-disabled");
-        //  icon = new GLib.ThemedIcon ("internet-chat");
-        //  icon = null;
-        //  this.is_enabled = false;
+        update_icon ("emblem-disabled");
         update_markup ();
     }
 
@@ -76,12 +77,7 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
     }
 
     public new void updating () {
-        //  icon = new GLib.ThemedIcon ("mail-unread");
-        // Maybe add the symbolic chat and user icons so we can specifically use them when not loading?
-        // Could also create "disabled" versions of each that are greyed out slightly
-        //  icon = new GLib.ThemedIcon (Constants.APP_ID + ".image-loading-symbolic");
         state = Iridium.Widgets.SidePanel.Row.State.UPDATING;
-        //  this.is_enabled = false;
         update_markup ();
     }
 
@@ -176,6 +172,13 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
                 markup = "<i>" + channel_name + "</i>";
             }
         }
+    }
+
+    private void update_icon (string icon_name) {
+        Idle.add (() => {
+            icon = new GLib.ThemedIcon (icon_name);
+            return false;
+        });
     }
 
     public signal void edit_topic ();
