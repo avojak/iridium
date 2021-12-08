@@ -68,7 +68,7 @@ public class Iridium.Widgets.SidePanel.PrivateMessageRow : Granite.Widgets.Sourc
         markup = "<i>" + nickname + "</i>";
     }
 
-    public new void error (string error_message, string? error_details) {
+    public new void error () {
         // Private messages don't have an error state
     }
 

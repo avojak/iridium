@@ -32,7 +32,7 @@ public interface Iridium.Widgets.SidePanel.Row : GLib.Object {
     public abstract string? get_channel_name ();
     public abstract void enable ();
     public abstract void disable ();
-    public abstract void error (string error_message, string? error_details);
+    public abstract void error ();
     // TODO: Maybe remove this from interface and add to implementations as 'joining', 'connecting', etc.
     public abstract void updating ();
     public abstract State get_state ();

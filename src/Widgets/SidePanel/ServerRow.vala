@@ -95,7 +95,7 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
         markup = "<i>" + (network_name == null ? server_name : network_name) + "</i>";
     }
 
-    public new void error (string error_message, string? error_details) {
+    public new void error () {
         state = Iridium.Widgets.SidePanel.Row.State.ERROR;
         update_icon (Constants.APP_ID + ".network-server-error");
     }

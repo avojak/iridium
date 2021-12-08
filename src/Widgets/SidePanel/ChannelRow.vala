@@ -72,7 +72,7 @@ public class Iridium.Widgets.SidePanel.ChannelRow : Granite.Widgets.SourceList.I
         update_markup ();
     }
 
-    public new void error (string error_message, string? error_details) {
+    public new void error () {
         state = Iridium.Widgets.SidePanel.Row.State.ERROR;
     }
 

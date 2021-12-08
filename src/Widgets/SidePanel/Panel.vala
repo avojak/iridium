@@ -397,13 +397,13 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
         server_row_disabled (server_name);
     }
 
-    public void error_server_row (string server_name, string error_message, string? error_details) {
+    public void error_server_row (string server_name) {
         var server_item = server_items.get (server_name);
         if (server_item == null) {
             return;
         }
         unowned Iridium.Widgets.SidePanel.Row server_row = (Iridium.Widgets.SidePanel.Row) server_item;
-        server_row.error (error_message, error_details);
+        server_row.error ();
     }
 
     public void updating_server_row (string server_name) {
