@@ -113,7 +113,7 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
         for (int i = 0; i < NUM_SPINNER_IMAGES; i++) {
             spinner_images.set (i, new GLib.ThemedIcon ("%s.process-working-%d-symbolic".printf (Constants.APP_ID, i + 1)));
         }
-        spinner_thread = new Thread<void> (@"Side panel spinner", do_spin);
+        spinner_thread = new Thread<void> ("Side panel spinner", do_spin);
 
         this.destroy.connect (() => {
             spinner_cancellable.cancel ();
@@ -127,7 +127,7 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
                 var server_row = (Iridium.Widgets.SidePanel.Row) server_entry.value;
                 if (server_row.get_state () == Iridium.Widgets.SidePanel.Row.State.UPDATING) {
                     Idle.add (() => {
-                        ((Granite.Widgets.SourceList.Item) server_entry.value).icon = spinner_images.get(image_index);
+                        ((Granite.Widgets.SourceList.Item) server_entry.value).icon = spinner_images.get (image_index);
                         return false;
                     });
                 }
@@ -135,7 +135,7 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
                     var channel_row = (Iridium.Widgets.SidePanel.Row) channel_item;
                     if (channel_row.get_state () == Iridium.Widgets.SidePanel.Row.State.UPDATING) {
                         Idle.add (() => {
-                            ((Granite.Widgets.SourceList.Item) channel_item).icon = spinner_images.get(image_index);
+                            ((Granite.Widgets.SourceList.Item) channel_item).icon = spinner_images.get (image_index);
                             return false;
                         });
                     }

@@ -137,7 +137,7 @@ public class Iridium.Widgets.SidePanel.ServerRow : Granite.Widgets.SourceList.Ex
         //  activatable = new GLib.ThemedIcon ("dialog-error");
         //  activatable_tooltip = error_message;
         this.error_message = error_message;
-        this.error_details = error_details;        
+        this.error_details = error_details;
     }
 
     public new void updating () {
