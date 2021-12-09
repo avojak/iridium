@@ -608,7 +608,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         return (Iridium.Views.ChatView) main_stack.get_child_by_name (child_name);
     }
 
-    private string? get_child_name (string server_name, string? channel_name) {
+    public string? get_child_name (string server_name, string? channel_name) {
         if (channel_name == null) {
             return server_name;
         } else if (channel_name.has_prefix ("#") || channel_name.has_prefix ("&")) {

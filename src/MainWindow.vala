@@ -134,7 +134,7 @@ public class Iridium.MainWindow : Hdy.Window {
             string? server_name = main_layout.get_visible_server ();
             string? channel_name = main_layout.get_visible_channel ();
             if (server_name != null && channel_name != null) {
-                update_os_notifications (server_name, channel_name);
+                withdraw_notifications (channel_name == null ? server_name : @"$server_name:$channel_name");
             }
         });
 
@@ -1163,7 +1163,7 @@ public class Iridium.MainWindow : Hdy.Window {
             var target = new GLib.Variant.tuple ({new GLib.Variant.string (server_name), new GLib.Variant.string (channel_name)});
             notification.set_default_action_and_target_value ("app.action-show-chat-view", target);
             var id = GLib.Uuid.string_random ();
-            var key = @"$server_name|$channel_name";
+            var key = main_layout.get_child_name (server_name, channel_name);
             if (!notification_ids.has_key (key)) {
                 notification_ids.set (key, new Gee.ArrayList<string> ());
             }
@@ -1356,7 +1356,7 @@ public class Iridium.MainWindow : Hdy.Window {
         main_layout.set_channel_users_button_visible (true);
         main_layout.set_channel_users_button_enabled (main_layout.is_view_enabled (server_name, channel_name));
         update_channel_users_list (server_name, channel_name);
-        update_os_notifications (server_name, channel_name);
+        withdraw_notifications (main_layout.get_child_name (server_name, channel_name));
     }
 
     private void on_private_message_chat_view_shown (string server_name, string nickname) {
@@ -1364,11 +1364,10 @@ public class Iridium.MainWindow : Hdy.Window {
         main_layout.update_title (nickname, network_name != null ? network_name : server_name);
         main_layout.set_channel_users_button_visible (false);
         main_layout.set_header_tooltip (null);
-        update_os_notifications (server_name, nickname);
+        withdraw_notifications (main_layout.get_child_name (server_name, nickname));
     }
 
-    private void update_os_notifications (string server_name, string channel_name) {
-        var key = @"$server_name|$channel_name";
+    private void withdraw_notifications (string key) {
         if (!notification_ids.has_key (key)) {
             return;
         }
