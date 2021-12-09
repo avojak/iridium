@@ -1310,8 +1310,11 @@ public class Iridium.MainWindow : Hdy.Window {
 
     private void on_action_message_received (string server_name, string channel_name, string nickname, string self_nickname, string action) {
         Idle.add (() => {
-            main_layout.add_private_message_chat_view (server_name, nickname, self_nickname);
-            main_layout.enable_chat_view (server_name, nickname);
+            // If the channel name matches the nickname, it's an action message in a private message, so make sure that a chat view exists
+            if (channel_name == nickname) {
+                main_layout.add_private_message_chat_view (server_name, nickname, self_nickname);
+                main_layout.enable_chat_view (server_name, nickname);
+            }
 
             var message = new Iridium.Services.Message ();
             message.message = "%s %s".printf (nickname, action);
