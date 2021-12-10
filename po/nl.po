@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.avojak.iridium\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-03 15:44-0700\n"
+"POT-Creation-Date: 2021-12-10 08:44-0700\n"
 "PO-Revision-Date: 2021-12-04 14:18+0100\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: \n"
@@ -18,11 +18,11 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.0\n"
 
-#: src/Layouts/MainLayout.vala:408
+#: src/Layouts/MainLayout.vala:417
 msgid "Restoring server connections…"
 msgstr "Bezig met herstellen van serververbindingen…"
 
-#: src/Layouts/MainLayout.vala:429
+#: src/Layouts/MainLayout.vala:438
 msgid "Opening URI…"
 msgstr "Bezig met openen van uri…"
 
@@ -189,7 +189,7 @@ msgid "Cancel"
 msgstr "Annuleren"
 
 #: src/Widgets/Dialogs/BrowseChannelsDialog.vala:174
-#: src/Widgets/Dialogs/ChannelJoinDialog.vala:155 src/Widgets/HeaderBar.vala:38
+#: src/Widgets/Dialogs/ChannelJoinDialog.vala:155
 msgid "Join"
 msgstr "Deelnemen"
 
@@ -286,8 +286,8 @@ msgstr "Echte naam"
 
 #: src/Widgets/Dialogs/ManageConnectionsDialog.vala:127
 #: src/Widgets/Dialogs/PreferencesDialog.vala:254
-#: src/Widgets/SidePanel/ChannelRow.vala:121
-#: src/Widgets/SidePanel/PrivateMessageRow.vala:84
+#: src/Widgets/SidePanel/ChannelRow.vala:125
+#: src/Widgets/SidePanel/PrivateMessageRow.vala:90
 msgid "Close"
 msgstr "Sluiten"
 
@@ -451,63 +451,59 @@ msgstr "Poort:"
 msgid "Invalid identity file"
 msgstr "Ongeldig identiteitsbestand"
 
-#: src/Widgets/SidePanel/ChannelRow.vala:96
+#: src/Widgets/SidePanel/ChannelRow.vala:100
 msgid "Edit topic…"
 msgstr "Onderwerp aanpassen…"
 
-#: src/Widgets/SidePanel/ChannelRow.vala:101
+#: src/Widgets/SidePanel/ChannelRow.vala:105
 msgid "Add to favorites"
 msgstr "Toevoegen aan favorieten"
 
-#: src/Widgets/SidePanel/ChannelRow.vala:106
+#: src/Widgets/SidePanel/ChannelRow.vala:110
 msgid "Remove from favorites"
 msgstr "Verwijderen uit favorieten"
 
-#: src/Widgets/SidePanel/ChannelRow.vala:111
+#: src/Widgets/SidePanel/ChannelRow.vala:115
 msgid "Join channel"
 msgstr "Deelnemen aan kanaal"
 
-#: src/Widgets/SidePanel/ChannelRow.vala:116
+#: src/Widgets/SidePanel/ChannelRow.vala:120
 msgid "Leave channel"
 msgstr "Kanaal verlaten"
 
-#: src/Widgets/SidePanel/Panel.vala:58
+#: src/Widgets/SidePanel/Panel.vala:64
 msgid "Favorite Channels"
 msgstr "Favoriete kanalen"
 
-#: src/Widgets/SidePanel/Panel.vala:73
+#: src/Widgets/SidePanel/Panel.vala:79
 msgid "Servers"
 msgstr "Servers"
 
-#: src/Widgets/SidePanel/ServerRow.vala:56
-msgid "Dismiss"
-msgstr "Verwerpen"
-
-#: src/Widgets/SidePanel/ServerRow.vala:153 src/Widgets/StatusBar.vala:28
+#: src/Widgets/SidePanel/ServerRow.vala:119
 msgid "Join a Channel…"
 msgstr "Deelnemen aan kanaal…"
 
-#: src/Widgets/SidePanel/ServerRow.vala:158
+#: src/Widgets/SidePanel/ServerRow.vala:124
 msgid "Edit Connection…"
 msgstr "Verbinding bewerken…"
 
-#: src/Widgets/SidePanel/ServerRow.vala:163
+#: src/Widgets/SidePanel/ServerRow.vala:129
 msgid "Connect"
 msgstr "Verbinden"
 
-#: src/Widgets/SidePanel/ServerRow.vala:168
+#: src/Widgets/SidePanel/ServerRow.vala:134
 msgid "Disconnect"
 msgstr "Verbinding verbreken"
 
-#: src/Widgets/SidePanel/ServerRow.vala:173
+#: src/Widgets/SidePanel/ServerRow.vala:139
 msgid "Remove"
 msgstr "Verwijderen"
 
-#: src/Widgets/SidePanel/ServerRow.vala:207
+#: src/Widgets/SidePanel/ServerRow.vala:173
 msgid "Are you sure you want to proceed?"
 msgstr "Weet je zeker dat je wilt doorgaan?"
 
-#: src/Widgets/SidePanel/ServerRow.vala:208
+#: src/Widgets/SidePanel/ServerRow.vala:174
 msgid ""
 "By removing this connection you will be disconnected, and will not be able "
 "to recover the connection settings. If you wish to join this server again in "
@@ -517,11 +513,11 @@ msgstr ""
 "onomkeerbaar. Als je weer verbinding wilt maken met deze server, dan moet je "
 "de verbindingsinstellingen opnieuw opgeven."
 
-#: src/Widgets/SidePanel/ServerRow.vala:213
+#: src/Widgets/SidePanel/ServerRow.vala:179
 msgid "Yes, remove"
 msgstr "Ja, verwijderen"
 
-#: src/Widgets/SidePanel/ServerRow.vala:217
+#: src/Widgets/SidePanel/ServerRow.vala:183
 msgid "Don't warn me again"
 msgstr "Niet meer tonen"
 
@@ -529,35 +525,27 @@ msgstr "Niet meer tonen"
 msgid "No users"
 msgstr "Geen gebruikers"
 
-#: src/Widgets/HeaderBar.vala:43
-msgid "New Server Connection…"
-msgstr "Nieuwe serververbinding…"
-
-#: src/Widgets/HeaderBar.vala:53
-msgid "Join Channel…"
-msgstr "Deelnemen aan kanaal…"
-
-#: src/Widgets/HeaderBar.vala:78
+#: src/Widgets/HeaderBar.vala:38
 msgid "Channel users"
 msgstr "Kanaalgebruikers"
 
-#: src/Widgets/HeaderBar.vala:88
+#: src/Widgets/HeaderBar.vala:48
 msgid "Menu"
 msgstr "Menu"
 
-#: src/Widgets/HeaderBar.vala:93
+#: src/Widgets/HeaderBar.vala:53
 msgid "Toggle Sidebar"
 msgstr "Zijpaneel tonen/verbergen"
 
-#: src/Widgets/HeaderBar.vala:103
+#: src/Widgets/HeaderBar.vala:63
 msgid "Reset Marker Line"
 msgstr "Markering terugzetten"
 
-#: src/Widgets/HeaderBar.vala:113
+#: src/Widgets/HeaderBar.vala:73
 msgid "Preferences…"
 msgstr "Voorkeuren…"
 
-#: src/Widgets/HeaderBar.vala:123
+#: src/Widgets/HeaderBar.vala:83
 msgid "Quit"
 msgstr "Afsluiten"
 
@@ -573,100 +561,114 @@ msgstr "Maak verbinding met het internet om deel te nemen aan servers."
 msgid "Network Settings…"
 msgstr "Internetinstellingen…"
 
-#: src/Widgets/StatusBar.vala:27
-msgid "Connect to a Server…"
-msgstr "Verbinden met server…"
+#: src/Widgets/StatusBar.vala:28
+msgid "New Server Connection…"
+msgstr "Nieuwe serververbinding…"
 
 #: src/Widgets/StatusBar.vala:38
+msgid "Join Channel…"
+msgstr "Deelnemen aan kanaal…"
+
+#: src/Widgets/StatusBar.vala:60
+#, fuzzy
+msgid "Join…"
+msgstr "Deelnemen"
+
+#: src/Widgets/StatusBar.vala:63
 msgid "Join a Server or Channel"
 msgstr "Deelnemen aan server of kanaal"
 
-#: src/Widgets/StatusBar.vala:43
-msgid "Manage connections…"
-msgstr "Verbindingen beheren…"
-
-#: src/MainWindow.vala:415 src/MainWindow.vala:466
+#: src/MainWindow.vala:423 src/MainWindow.vala:474
 msgid "Already connected to this server!"
 msgstr "Je bent al verbonden met deze server!"
 
-#: src/MainWindow.vala:666 src/MainWindow.vala:668
+#: src/MainWindow.vala:674 src/MainWindow.vala:676
 msgid "You've already joined this channel"
 msgstr "Je neemt al deel aan dit kanaal"
 
-#: src/MainWindow.vala:677
+#: src/MainWindow.vala:685
 msgid "Channel must begin with '#' or '&'"
 msgstr "De kanaalnaam moet beginnen met ‘#’ of ‘&’"
 
-#: src/MainWindow.vala:681
+#: src/MainWindow.vala:689
 msgid "Enter a channel name"
 msgstr "Voer een kanaalnaam in"
 
-#: src/MainWindow.vala:711
+#: src/MainWindow.vala:719
 msgid "Start your message with a /"
 msgstr "Begin je bericht met een /"
 
-#: src/MainWindow.vala:777
+#: src/MainWindow.vala:785
 msgid "No recipient nickname specified (Usage: /msg <nickname> <message>)"
 msgstr ""
 "Je hebt geen ontvanger opgegeven (gebruiksvoorbeeld: /msg <bijnaam> "
 "<bericht>)"
 
-#: src/MainWindow.vala:781
+#: src/MainWindow.vala:789
 msgid "No message specified (Usage: /msg <nickname> <message>)"
 msgstr ""
 "Je hebt geen bericht ingevoerd (gebruiksvoorbeeld: /msg <bijnaam> <bericht>)"
 
-#: src/MainWindow.vala:792
+#: src/MainWindow.vala:800
 msgid "No action specified (Usage: /me <action>)"
 msgstr "Je hebt geen actie opgegeven (gebruiksvoorbeeld: /me <actie>)"
 
-#: src/MainWindow.vala:989 src/MainWindow.vala:1006
+#: src/MainWindow.vala:997 src/MainWindow.vala:1014
 msgid " has quit"
 msgstr " is weggegaan"
 
-#: src/MainWindow.vala:1042
+#: src/MainWindow.vala:1050
 msgid " has cleared the topic"
 msgstr " heeft het onderwerp verwijderd"
 
-#: src/MainWindow.vala:1044
+#: src/MainWindow.vala:1052
 msgid " has changed the topic to: "
 msgstr " heeft het onderwerp gewijzigd in "
 
-#: src/MainWindow.vala:1059
+#: src/MainWindow.vala:1067
 msgid "Topic for "
 msgstr "Onderwerp over "
 
-#: src/MainWindow.vala:1059
+#: src/MainWindow.vala:1067
 msgid " is: "
 msgstr " is: "
 
-#: src/MainWindow.vala:1061
+#: src/MainWindow.vala:1069
 msgid "Topic set by "
 msgstr "Het onderwerp is ingesteld door "
 
-#: src/MainWindow.vala:1073 src/MainWindow.vala:1076
+#: src/MainWindow.vala:1081 src/MainWindow.vala:1084
 msgid "Nickname already in use."
 msgstr "Deze bijnaam is al in gebruik."
 
-#: src/MainWindow.vala:1082
+#: src/MainWindow.vala:1090
 msgid "Nickname already in use"
 msgstr "Deze bijnaam is al in gebruik"
 
-#: src/MainWindow.vala:1082
+#: src/MainWindow.vala:1090
 msgid "Choose a new nickname and retry the connection."
 msgstr "Kies een andere bijnaam en probeer het opnieuw."
 
-#: src/MainWindow.vala:1087
+#: src/MainWindow.vala:1095
 msgid " is not a valid nickname."
 msgstr " is geen geldige bijnaam."
 
-#: src/MainWindow.vala:1174
+#: src/MainWindow.vala:1182
 msgid " has joined"
 msgstr " neemt nu deel aan het kanaal"
 
-#: src/MainWindow.vala:1188
+#: src/MainWindow.vala:1196
 msgid " has left"
 msgstr " heeft het kanaal verlaten"
+
+#~ msgid "Dismiss"
+#~ msgstr "Verwerpen"
+
+#~ msgid "Connect to a Server…"
+#~ msgstr "Verbinden met server…"
+
+#~ msgid "Manage connections…"
+#~ msgstr "Verbindingen beheren…"
 
 #~ msgid "Connect to a Server"
 #~ msgstr "Verbinden met server"

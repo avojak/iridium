@@ -21,6 +21,19 @@
     <binary>@appid@</binary>
   </provides>
   <releases>
+    <release version="1.7.0" date="2021-12-10">
+      <description>
+        <p>1.7.0 Release</p>
+        <ul>
+          <li>Use non-symbolic icons in the headerbar (#123)</li>
+          <li>Re-open application to the last chat view (#187)</li>
+          <li>Use new icons for server items in the side panel (#199)</li>
+          <li>Fix parsing of ACTION messages causing empty private messages to appear (#153)</li>
+          <li>Fix inability to reconnect to a server if it dies without restarting the application (#203)</li>
+          <li>Fix app icon badge not clearing with private message chat view regains focus (#208)</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.6.1" date="2021-12-04">
       <description>
         <p>1.6.1 Release</p>

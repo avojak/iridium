@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.avojak.iridium\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-03 15:44-0700\n"
+"POT-Creation-Date: 2021-12-10 08:44-0700\n"
 "PO-Revision-Date: 2021-04-26 20:09-0600\n"
 "Last-Translator: Jeyson Antonio Flores Deras <jeyson.flores@protonmail.com>\n"
 "Language-Team: \n"
@@ -18,11 +18,11 @@ msgstr ""
 "X-Generator: Poedit 2.4.3\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/Layouts/MainLayout.vala:408
+#: src/Layouts/MainLayout.vala:417
 msgid "Restoring server connections…"
 msgstr "Restaurando conexiones a servidores..."
 
-#: src/Layouts/MainLayout.vala:429
+#: src/Layouts/MainLayout.vala:438
 msgid "Opening URI…"
 msgstr ""
 
@@ -195,7 +195,7 @@ msgid "Cancel"
 msgstr "Cancelar"
 
 #: src/Widgets/Dialogs/BrowseChannelsDialog.vala:174
-#: src/Widgets/Dialogs/ChannelJoinDialog.vala:155 src/Widgets/HeaderBar.vala:38
+#: src/Widgets/Dialogs/ChannelJoinDialog.vala:155
 msgid "Join"
 msgstr "Unirte"
 
@@ -292,8 +292,8 @@ msgstr "Nombre Real"
 
 #: src/Widgets/Dialogs/ManageConnectionsDialog.vala:127
 #: src/Widgets/Dialogs/PreferencesDialog.vala:254
-#: src/Widgets/SidePanel/ChannelRow.vala:121
-#: src/Widgets/SidePanel/PrivateMessageRow.vala:84
+#: src/Widgets/SidePanel/ChannelRow.vala:125
+#: src/Widgets/SidePanel/PrivateMessageRow.vala:90
 msgid "Close"
 msgstr "Cerrar"
 
@@ -453,64 +453,60 @@ msgstr "Puerto:"
 msgid "Invalid identity file"
 msgstr ""
 
-#: src/Widgets/SidePanel/ChannelRow.vala:96
+#: src/Widgets/SidePanel/ChannelRow.vala:100
 msgid "Edit topic…"
 msgstr "Editar asunto..."
 
-#: src/Widgets/SidePanel/ChannelRow.vala:101
+#: src/Widgets/SidePanel/ChannelRow.vala:105
 msgid "Add to favorites"
 msgstr "Añadir a favoritos"
 
-#: src/Widgets/SidePanel/ChannelRow.vala:106
+#: src/Widgets/SidePanel/ChannelRow.vala:110
 msgid "Remove from favorites"
 msgstr "Remover de favoritos"
 
-#: src/Widgets/SidePanel/ChannelRow.vala:111
+#: src/Widgets/SidePanel/ChannelRow.vala:115
 msgid "Join channel"
 msgstr "Unirte al canal"
 
-#: src/Widgets/SidePanel/ChannelRow.vala:116
+#: src/Widgets/SidePanel/ChannelRow.vala:120
 msgid "Leave channel"
 msgstr "Dejar el canal"
 
-#: src/Widgets/SidePanel/Panel.vala:58
+#: src/Widgets/SidePanel/Panel.vala:64
 msgid "Favorite Channels"
 msgstr "Canales Favoritos"
 
-#: src/Widgets/SidePanel/Panel.vala:73
+#: src/Widgets/SidePanel/Panel.vala:79
 msgid "Servers"
 msgstr "Servidores"
 
-#: src/Widgets/SidePanel/ServerRow.vala:56
-msgid "Dismiss"
-msgstr "Ocultar"
-
-#: src/Widgets/SidePanel/ServerRow.vala:153 src/Widgets/StatusBar.vala:28
+#: src/Widgets/SidePanel/ServerRow.vala:119
 msgid "Join a Channel…"
 msgstr "Unirte a un Canal...."
 
-#: src/Widgets/SidePanel/ServerRow.vala:158
+#: src/Widgets/SidePanel/ServerRow.vala:124
 #, fuzzy
 msgid "Edit Connection…"
 msgstr "Nueva Conexión"
 
-#: src/Widgets/SidePanel/ServerRow.vala:163
+#: src/Widgets/SidePanel/ServerRow.vala:129
 msgid "Connect"
 msgstr "Conectar"
 
-#: src/Widgets/SidePanel/ServerRow.vala:168
+#: src/Widgets/SidePanel/ServerRow.vala:134
 msgid "Disconnect"
 msgstr "Desconectar"
 
-#: src/Widgets/SidePanel/ServerRow.vala:173
+#: src/Widgets/SidePanel/ServerRow.vala:139
 msgid "Remove"
 msgstr "Remover"
 
-#: src/Widgets/SidePanel/ServerRow.vala:207
+#: src/Widgets/SidePanel/ServerRow.vala:173
 msgid "Are you sure you want to proceed?"
 msgstr "¿Estás seguro que quieres proceder?"
 
-#: src/Widgets/SidePanel/ServerRow.vala:208
+#: src/Widgets/SidePanel/ServerRow.vala:174
 msgid ""
 "By removing this connection you will be disconnected, and will not be able "
 "to recover the connection settings. If you wish to join this server again in "
@@ -520,11 +516,11 @@ msgstr ""
 "los ajustes de la conexión. Si quieres unirte a este servidor de nuevo en el "
 "futuro, tendrás que volver a ingresar los ajustes de la conexión."
 
-#: src/Widgets/SidePanel/ServerRow.vala:213
+#: src/Widgets/SidePanel/ServerRow.vala:179
 msgid "Yes, remove"
 msgstr "Si, remover"
 
-#: src/Widgets/SidePanel/ServerRow.vala:217
+#: src/Widgets/SidePanel/ServerRow.vala:183
 msgid "Don't warn me again"
 msgstr "No advertirme de nuevo"
 
@@ -532,38 +528,28 @@ msgstr "No advertirme de nuevo"
 msgid "No users"
 msgstr "Sin usuarios"
 
-#: src/Widgets/HeaderBar.vala:43
-#, fuzzy
-msgid "New Server Connection…"
-msgstr "Nueva Conexión de Servidor"
-
-#: src/Widgets/HeaderBar.vala:53
-#, fuzzy
-msgid "Join Channel…"
-msgstr "Unirte a un Canal...."
-
-#: src/Widgets/HeaderBar.vala:78
+#: src/Widgets/HeaderBar.vala:38
 msgid "Channel users"
 msgstr "Usuarios del Canal"
 
-#: src/Widgets/HeaderBar.vala:88
+#: src/Widgets/HeaderBar.vala:48
 msgid "Menu"
 msgstr "Menú"
 
-#: src/Widgets/HeaderBar.vala:93
+#: src/Widgets/HeaderBar.vala:53
 msgid "Toggle Sidebar"
 msgstr "Alternar Barra Lateral"
 
-#: src/Widgets/HeaderBar.vala:103
+#: src/Widgets/HeaderBar.vala:63
 msgid "Reset Marker Line"
 msgstr "Reiniciar Línea del Marcador"
 
-#: src/Widgets/HeaderBar.vala:113
+#: src/Widgets/HeaderBar.vala:73
 #, fuzzy
 msgid "Preferences…"
 msgstr "Preferencias"
 
-#: src/Widgets/HeaderBar.vala:123
+#: src/Widgets/HeaderBar.vala:83
 msgid "Quit"
 msgstr "Salir"
 
@@ -579,100 +565,116 @@ msgstr "Conéctate a la internet para unirte a servidores."
 msgid "Network Settings…"
 msgstr "Ajustes de Red..."
 
-#: src/Widgets/StatusBar.vala:27
-msgid "Connect to a Server…"
-msgstr "Conectar a Servidor..."
+#: src/Widgets/StatusBar.vala:28
+#, fuzzy
+msgid "New Server Connection…"
+msgstr "Nueva Conexión de Servidor"
 
 #: src/Widgets/StatusBar.vala:38
+#, fuzzy
+msgid "Join Channel…"
+msgstr "Unirte a un Canal...."
+
+#: src/Widgets/StatusBar.vala:60
+#, fuzzy
+msgid "Join…"
+msgstr "Unirte"
+
+#: src/Widgets/StatusBar.vala:63
 msgid "Join a Server or Channel"
 msgstr "Únete a un Servidor o Canal"
 
-#: src/Widgets/StatusBar.vala:43
-msgid "Manage connections…"
-msgstr "Gestionar conexiones..."
-
-#: src/MainWindow.vala:415 src/MainWindow.vala:466
+#: src/MainWindow.vala:423 src/MainWindow.vala:474
 msgid "Already connected to this server!"
 msgstr "¡Ya estás conectado a este servidor!"
 
-#: src/MainWindow.vala:666 src/MainWindow.vala:668
+#: src/MainWindow.vala:674 src/MainWindow.vala:676
 msgid "You've already joined this channel"
 msgstr "¡Ya te has unido a este canal!"
 
-#: src/MainWindow.vala:677
+#: src/MainWindow.vala:685
 msgid "Channel must begin with '#' or '&'"
 msgstr "El canal debe de empezar con '#' o '&'"
 
-#: src/MainWindow.vala:681
+#: src/MainWindow.vala:689
 msgid "Enter a channel name"
 msgstr "Ingresa un nombre de canal"
 
-#: src/MainWindow.vala:711
+#: src/MainWindow.vala:719
 msgid "Start your message with a /"
 msgstr "Empieza tu mensaje con un /"
 
-#: src/MainWindow.vala:777
+#: src/MainWindow.vala:785
 msgid "No recipient nickname specified (Usage: /msg <nickname> <message>)"
 msgstr "Apodo del destinatario no especificado (Uso: /msg <apodo> <mensaje>)"
 
-#: src/MainWindow.vala:781
+#: src/MainWindow.vala:789
 msgid "No message specified (Usage: /msg <nickname> <message>)"
 msgstr "Mensaje no especificado (Uso: /msg <apodo> <mensaje>)"
 
-#: src/MainWindow.vala:792
+#: src/MainWindow.vala:800
 #, fuzzy
 msgid "No action specified (Usage: /me <action>)"
 msgstr "Mensaje no especificado (Uso: /msg <apodo> <mensaje>)"
 
-#: src/MainWindow.vala:989 src/MainWindow.vala:1006
+#: src/MainWindow.vala:997 src/MainWindow.vala:1014
 msgid " has quit"
 msgstr " ha salido"
 
-#: src/MainWindow.vala:1042
+#: src/MainWindow.vala:1050
 #, fuzzy
 msgid " has cleared the topic"
 msgstr "Limpiar Asunto"
 
-#: src/MainWindow.vala:1044
+#: src/MainWindow.vala:1052
 msgid " has changed the topic to: "
 msgstr ""
 
-#: src/MainWindow.vala:1059
+#: src/MainWindow.vala:1067
 msgid "Topic for "
 msgstr ""
 
-#: src/MainWindow.vala:1059
+#: src/MainWindow.vala:1067
 msgid " is: "
 msgstr ""
 
-#: src/MainWindow.vala:1061
+#: src/MainWindow.vala:1069
 msgid "Topic set by "
 msgstr ""
 
-#: src/MainWindow.vala:1073 src/MainWindow.vala:1076
+#: src/MainWindow.vala:1081 src/MainWindow.vala:1084
 msgid "Nickname already in use."
 msgstr "Apodo en uso."
 
-#: src/MainWindow.vala:1082
+#: src/MainWindow.vala:1090
 #, fuzzy
 msgid "Nickname already in use"
 msgstr "Apodo en uso."
 
-#: src/MainWindow.vala:1082
+#: src/MainWindow.vala:1090
 msgid "Choose a new nickname and retry the connection."
 msgstr ""
 
-#: src/MainWindow.vala:1087
+#: src/MainWindow.vala:1095
 msgid " is not a valid nickname."
 msgstr " no es un apodo válido."
 
-#: src/MainWindow.vala:1174
+#: src/MainWindow.vala:1182
 msgid " has joined"
 msgstr " se ha unido"
 
-#: src/MainWindow.vala:1188
+#: src/MainWindow.vala:1196
 msgid " has left"
 msgstr " se ha ido"
+
+#~ msgid "Dismiss"
+#~ msgstr "Ocultar"
+
+#~ msgid "Connect to a Server…"
+#~ msgstr "Conectar a Servidor..."
+
+#~ msgid "Manage connections…"
+#~ msgstr "Gestionar conexiones..."
 
 #~ msgid "Connect to a Server"
 #~ msgstr "Conectar a un Servidor"
