@@ -11,7 +11,6 @@ finish-args:
   - '--share=network'
   - '--socket=fallback-x11'
   - '--socket=wayland'
-  - '--system-talk-name=org.freedesktop.Accounts'
   - '--talk-name=org.freedesktop.secrets'
 
 modules:
