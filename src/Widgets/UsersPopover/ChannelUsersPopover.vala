@@ -21,9 +21,6 @@
 
 public class Iridium.Widgets.UsersPopover.ChannelUsersPopover : Gtk.Popover {
 
-    // TODO: Need to handle nicknames for OPs and other special cases where the
-    //       nickname starts with a symbol (e.g. @)
-
     private Gtk.SearchEntry search_entry;
     
     private Gtk.Box box;
@@ -73,39 +70,12 @@ public class Iridium.Widgets.UsersPopover.ChannelUsersPopover : Gtk.Popover {
             var num_users = tree_view.update_search_text (search_text == null ? "" : search_text.strip ().down ());
             update_user_count (num_users);
         });
-        //  list_box.row_selected.connect ((row) => {
-        //      if (row == null) {
-        //          return;
-        //      }
-        //      Iridium.Widgets.UsersPopover.UserListBoxRow user_row = (Iridium.Widgets.UsersPopover.UserListBoxRow) row;
-        //      nickname_selected (user_row.nickname);
-        //      popdown ();
-        //  });
         this.closed.connect (() => {
             search_entry.set_text ("");
-            //  list_box.select_row (null);
         });
     }
 
-    
-
     public void set_users (Gee.List<string> nicknames, Gee.List<string> operators) {
-        //  list_box.foreach ((widget) => {
-        //      widget.destroy ();
-        //  });
-        //  foreach (string nickname in nicknames) {
-        //      if (nickname == null || nickname.chomp ().length == 0) {
-        //          continue;
-        //      }
-        //      bool is_op = operators.contains (nickname);
-        //      var row = new Iridium.Widgets.UsersPopover.UserListBoxRow (nickname, is_op);
-        //      list_box.insert (row, -1);
-        //  }
-        //  list_box.show_all ();
-        //  list_box.invalidate_sort ();
-        //  list_box.invalidate_filter ();
-        //  scrolled_window.check_resize ();
-        // For performance reasons, unset the data model before populating it, then re-add to the tree view once fully populated
         nicknames.sort ((a, b) => {
             return a.down ().ascii_casecmp (b.down ());
         });

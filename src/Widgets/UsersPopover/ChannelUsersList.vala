@@ -115,8 +115,6 @@ public class Iridium.Widgets.UsersPopover.ChannelUsersList : Gtk.TreeView {
             }
         });
 
-        
-
         // TODO: Fix scrolling when repopulating list
     }
 
@@ -157,6 +155,7 @@ public class Iridium.Widgets.UsersPopover.ChannelUsersList : Gtk.TreeView {
     public int update_search_text (string _search_text) {
         search_text = _search_text;
         filter.refilter ();
+        // Return the number of visible children
         return filter.iter_n_children (null);
     }
 
@@ -165,6 +164,8 @@ public class Iridium.Widgets.UsersPopover.ChannelUsersList : Gtk.TreeView {
         list_store.clear ();
         foreach (var nickname in nicknames) {
             bool is_op = operators.contains (nickname);
+            nickname = nickname.has_prefix ("@") ? nickname.substring (1, -1) : nickname;
+            nickname = nickname.has_prefix ("%") ? nickname.substring (1, -1) : nickname;
             Gtk.TreeIter iter;
             list_store.append (out iter);
             list_store.set (iter, /*Column.STATUS_ICON, "user-available",*/
@@ -174,6 +175,7 @@ public class Iridium.Widgets.UsersPopover.ChannelUsersList : Gtk.TreeView {
         }
         // With the model fully populated, we can now update the view
         set_model (filter);
+        // Return the number of visible children
         return filter.iter_n_children (null);
     }
 
