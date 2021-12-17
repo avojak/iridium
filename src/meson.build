@@ -77,8 +77,8 @@ iridium_files = files(
     join_paths('Widgets', 'SidePanel', 'ServerRow.vala'),
     join_paths('Widgets', 'SidePanel', 'ChannelRow.vala'),
     join_paths('Widgets', 'SidePanel', 'PrivateMessageRow.vala'),
-    join_paths('Widgets', 'UsersPopover', 'ChannelUsersPopover.vala'),
-    join_paths('Widgets', 'UsersPopover', 'UserListBoxRow.vala')
+    join_paths('Widgets', 'UsersPopover', 'ChannelUsersList.vala'),
+    join_paths('Widgets', 'UsersPopover', 'ChannelUsersPopover.vala')
 )
 
 # Create a new executable, list the files we want to compile, list the dependencies we need, and install

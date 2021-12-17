@@ -593,10 +593,15 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         side_panel.favorite_channel (server_name, channel_name);
     }
 
-    public void update_channel_users (string server_name, string channel_name, Gee.List<string> nicknames) {
+    public void update_channel_users (string server_name, string channel_name, Gee.List<string> nicknames, Gee.List<string> operators) {
         var channel_chat_view = get_channel_chat_view (server_name, channel_name);
         if (channel_chat_view != null) {
             channel_chat_view.set_nicknames (nicknames);
+        }
+        // Update the channel users popover if this call affects the current chat view
+        // TODO: Update this all the time
+        if ((get_visible_server () == server_name) && (get_visible_channel () == channel_name)) {
+            header_bar.set_channel_users (nicknames, operators);
         }
     }
 
@@ -657,10 +662,6 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
 
     public void set_channel_users_button_enabled (bool enabled) {
         header_bar.set_channel_users_button_enabled (enabled);
-    }
-
-    public void set_channel_users (Gee.List<string> nicknames, Gee.List<string> operators) {
-        header_bar.set_channel_users (nicknames, operators);
     }
 
     /*

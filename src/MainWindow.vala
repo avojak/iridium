@@ -1222,10 +1222,7 @@ public class Iridium.MainWindow : Hdy.Window {
         var nicknames = Iridium.Application.connection_manager.get_users (server_name, channel_name);
         var operators = Iridium.Application.connection_manager.get_operators (server_name, channel_name);
         Idle.add (() => {
-            main_layout.update_channel_users (server_name, channel_name, nicknames);
-            if (main_layout.get_visible_server () == server_name && main_layout.get_visible_channel () == channel_name) {
-                main_layout.set_channel_users (nicknames, operators);
-            }
+            main_layout.update_channel_users (server_name, channel_name, nicknames, operators);
             return false;
         });
     }
