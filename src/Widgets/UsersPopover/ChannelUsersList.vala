@@ -95,46 +95,56 @@ public class Iridium.Widgets.UsersPopover.ChannelUsersList : Gtk.TreeView {
 
         button_press_event.connect ((event) => {
             if ((event.type == Gdk.EventType.BUTTON_PRESS) && (event.button == Gdk.BUTTON_SECONDARY)) {
+                // Get the path within the tree where the click event occurred
                 Gtk.TreePath? path;
                 Gtk.TreeViewColumn? column;
                 int cell_x;
                 int cell_y;
                 get_path_at_pos ((int) event.x, (int) event.y, out path, out column, out cell_x, out cell_y);
-                debug ("%d, %d", (int) event.x, (int) event.y);
                 if (path == null) {
                     return false;
                 }
+                // Get the iter for the path
                 Gtk.TreeIter iter;
                 if (!filter.get_iter (out iter, path)) {
                     return false;
                 }
+                // Determine the nickname that was selected based on the iter
                 string nickname = "";
                 filter.get (iter, Column.NICKNAME, out nickname, -1);
-                debug (nickname);
-                var menu = new Gtk.Menu ();
+
+                var menu = create_popover (nickname);
+                menu.popup_at_pointer (event);
+                return true;
             }
+            return false;
         });
 
         // TODO: Fix scrolling when repopulating list
+    }
+
+    private Gtk.Menu create_popover (string nickname) {
+        var menu = new Gtk.Menu ();
+        menu.attach_widget = this;
+        var private_message_item = new Gtk.MenuItem.with_label (_("Send private message"));
+        private_message_item.activate.connect (() => {
+            initiate_private_message (nickname);
+        });
+        menu.append (private_message_item);
+        menu.show_all ();
+        return menu;
     }
 
     private void badge_cell_data_func (Gtk.CellLayout layout, Gtk.CellRenderer renderer, Gtk.TreeModel model, Gtk.TreeIter iter) {
         var badge_renderer = renderer as Granite.Widgets.CellRendererBadge;
         assert (badge_renderer != null);
 
-        string text = "";
-        bool visible = false;
-
         string op_badge = "";
         model.get (iter, Column.OP_BADGE, out op_badge, -1);
-        visible = op_badge != null && op_badge.strip () != "";
+        bool is_visible = (op_badge != null) && (op_badge.strip () != "");
 
-        if (visible) {
-            text = op_badge;
-        }
-
-        badge_renderer.visible = visible;
-        badge_renderer.text = text;
+        badge_renderer.visible = is_visible;
+        badge_renderer.text = is_visible ? op_badge : "";
     }
 
     private static bool filter_func (Gtk.TreeModel model, Gtk.TreeIter iter) {
@@ -164,8 +174,6 @@ public class Iridium.Widgets.UsersPopover.ChannelUsersList : Gtk.TreeView {
         list_store.clear ();
         foreach (var nickname in nicknames) {
             bool is_op = operators.contains (nickname);
-            nickname = nickname.has_prefix ("@") ? nickname.substring (1, -1) : nickname;
-            nickname = nickname.has_prefix ("%") ? nickname.substring (1, -1) : nickname;
             Gtk.TreeIter iter;
             list_store.append (out iter);
             list_store.set (iter, /*Column.STATUS_ICON, "user-available",*/
@@ -178,5 +186,7 @@ public class Iridium.Widgets.UsersPopover.ChannelUsersList : Gtk.TreeView {
         // Return the number of visible children
         return filter.iter_n_children (null);
     }
+
+    public signal void initiate_private_message (string nickname);
 
 }

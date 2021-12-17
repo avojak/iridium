@@ -49,8 +49,8 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
     construct {
         header_bar = new Iridium.Widgets.HeaderBar ();
         header_bar.set_channel_users_button_visible (false);
-        header_bar.nickname_selected.connect ((nickname) => {
-            nickname_selected (nickname);
+        header_bar.initiate_private_message.connect ((nickname) => {
+            initiate_private_message (nickname);
         });
 
         side_panel = new Iridium.Widgets.SidePanel.Panel (window);
@@ -703,5 +703,5 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
     public signal void edit_channel_topic_button_clicked (string server_name, string channel_name);
     public signal void edit_connection_button_clicked (string server_name);
 
-    public signal void nickname_selected (string nickname); // TODO: Rename this - for selecting nickname from channel list
+    public signal void initiate_private_message (string nickname); // TODO: Rename this - for selecting nickname from channel list
 }

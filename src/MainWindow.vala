@@ -74,7 +74,7 @@ public class Iridium.MainWindow : Hdy.Window {
         main_layout.disconnect_from_server_button_clicked.connect (on_disconnect_from_server_button_clicked);
         main_layout.edit_channel_topic_button_clicked.connect (on_edit_channel_topic_button_clicked);
         main_layout.edit_connection_button_clicked.connect (on_edit_connection_button_clicked);
-        main_layout.nickname_selected.connect (on_nickname_selected);
+        main_layout.initiate_private_message.connect (initiate_private_message);
 
         // Connect to connection handler signals
         Iridium.Application.connection_manager.unacceptable_certificate.connect (on_unacceptable_certificate);
@@ -865,29 +865,18 @@ public class Iridium.MainWindow : Hdy.Window {
     // HeaderBar Callbacks
     //
 
-    private void on_nickname_selected (string nickname) {
+    private void initiate_private_message (string nickname) {
         var server_name = main_layout.get_visible_server ();
         if (server_name == null) {
             return;
         }
         var self_nickname = main_layout.get_server_chat_view (server_name).nickname;
-        var trimmed_nickname = strip_nickname_prefix (nickname);
         Idle.add (() => {
-            main_layout.add_private_message_chat_view (server_name, trimmed_nickname, self_nickname);
-            main_layout.enable_chat_view (server_name, trimmed_nickname);
-            main_layout.show_chat_view (server_name, trimmed_nickname);
+            main_layout.add_private_message_chat_view (server_name, nickname, self_nickname);
+            main_layout.enable_chat_view (server_name, nickname);
+            main_layout.show_chat_view (server_name, nickname);
             return false;
         });
-    }
-
-    private string strip_nickname_prefix (string nickname) {
-        var prefixes = new string[] { "@", "&" };
-        foreach (string prefix in prefixes) {
-            if (nickname.has_prefix (prefix)) {
-                return nickname.substring (1, nickname.length - 1);
-            }
-        }
-        return nickname;
     }
 
     //
@@ -1220,7 +1209,7 @@ public class Iridium.MainWindow : Hdy.Window {
     // Simply updates the UI based on changes that were already made to the underlying data model
     private void update_channel_users_list (string server_name, string channel_name) {
         var nicknames = Iridium.Application.connection_manager.get_users (server_name, channel_name);
-        var operators = Iridium.Application.connection_manager.get_operators (server_name, channel_name);
+        var operators = Iridium.Application.connection_manager.get_operators (server_name, channel_name);        
         Idle.add (() => {
             main_layout.update_channel_users (server_name, channel_name, nicknames, operators);
             return false;

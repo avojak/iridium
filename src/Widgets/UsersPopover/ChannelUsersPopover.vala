@@ -22,8 +22,9 @@
 public class Iridium.Widgets.UsersPopover.ChannelUsersPopover : Gtk.Popover {
 
     private Gtk.SearchEntry search_entry;
-    
+
     private Gtk.Box box;
+    private Gtk.ScrolledWindow scrolled_window;
     private Iridium.Widgets.UsersPopover.ChannelUsersList tree_view;
     private Gtk.Label label;
 
@@ -37,7 +38,7 @@ public class Iridium.Widgets.UsersPopover.ChannelUsersPopover : Gtk.Popover {
         search_entry = new Gtk.SearchEntry ();
         search_entry.margin_bottom = 6;
 
-        Gtk.ScrolledWindow scrolled_window = new Gtk.ScrolledWindow (null, null);
+        scrolled_window = new Gtk.ScrolledWindow (null, null);
         scrolled_window.set_shadow_type (Gtk.ShadowType.ETCHED_IN);
         scrolled_window.min_content_height = 50;
         scrolled_window.max_content_height = 250;
@@ -45,6 +46,9 @@ public class Iridium.Widgets.UsersPopover.ChannelUsersPopover : Gtk.Popover {
         scrolled_window.margin_bottom = 6;
 
         tree_view = new Iridium.Widgets.UsersPopover.ChannelUsersList ();
+        tree_view.initiate_private_message.connect ((nickname) => {
+            initiate_private_message (nickname);
+        });
         scrolled_window.add (tree_view);
 
         label = new Gtk.Label ("");
@@ -86,12 +90,12 @@ public class Iridium.Widgets.UsersPopover.ChannelUsersPopover : Gtk.Popover {
 
     private void update_user_count (int num_users) {
         if (num_users == 1) {
-            label.set_text ("%d user".printf (num_users));
+            label.set_text (_("%d user").printf (num_users));
         } else {
-            label.set_text ("%d users".printf (num_users));
+            label.set_text (_("%d users").printf (num_users));
         }
     }
 
-    public signal void nickname_selected (string nickname);
+    public signal void initiate_private_message (string nickname);
 
 }
