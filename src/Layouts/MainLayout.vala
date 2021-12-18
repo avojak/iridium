@@ -49,8 +49,8 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
     construct {
         header_bar = new Iridium.Widgets.HeaderBar ();
         header_bar.set_channel_users_button_visible (false);
-        header_bar.nickname_selected.connect ((nickname) => {
-            nickname_selected (nickname);
+        header_bar.initiate_private_message.connect ((nickname) => {
+            initiate_private_message (nickname);
         });
 
         side_panel = new Iridium.Widgets.SidePanel.Panel (window);
@@ -593,10 +593,15 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         side_panel.favorite_channel (server_name, channel_name);
     }
 
-    public void update_channel_users (string server_name, string channel_name, Gee.List<string> nicknames) {
+    public void update_channel_users (string server_name, string channel_name, Gee.List<string> nicknames, Gee.List<string> operators) {
         var channel_chat_view = get_channel_chat_view (server_name, channel_name);
         if (channel_chat_view != null) {
             channel_chat_view.set_nicknames (nicknames);
+        }
+        // Update the channel users popover if this call affects the current chat view
+        // TODO: Update this all the time
+        if ((get_visible_server () == server_name) && (get_visible_channel () == channel_name)) {
+            header_bar.set_channel_users (nicknames, operators);
         }
     }
 
@@ -659,10 +664,6 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         header_bar.set_channel_users_button_enabled (enabled);
     }
 
-    public void set_channel_users (Gee.List<string> nicknames, Gee.List<string> operators) {
-        header_bar.set_channel_users (nicknames, operators);
-    }
-
     /*
      * Handlers for the side panel signals
      */
@@ -702,5 +703,5 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
     public signal void edit_channel_topic_button_clicked (string server_name, string channel_name);
     public signal void edit_connection_button_clicked (string server_name);
 
-    public signal void nickname_selected (string nickname); // TODO: Rename this - for selecting nickname from channel list
+    public signal void initiate_private_message (string nickname); // TODO: Rename this - for selecting nickname from channel list
 }

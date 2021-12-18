@@ -40,7 +40,9 @@ public class Iridium.Widgets.HeaderBar : Hdy.HeaderBar {
         channel_users_button.valign = Gtk.Align.CENTER;
 
         channel_users_popover = new Iridium.Widgets.UsersPopover.ChannelUsersPopover (channel_users_button);
-        channel_users_popover.nickname_selected.connect (on_nickname_selected);
+        channel_users_popover.initiate_private_message.connect ((nickname) => {
+            initiate_private_message (nickname);
+        });
         channel_users_button.popover = channel_users_popover;
 
         var settings_button = new Gtk.MenuButton ();
@@ -134,10 +136,6 @@ public class Iridium.Widgets.HeaderBar : Hdy.HeaderBar {
         channel_users_popover.set_users (nicknames, operators);
     }
 
-    private void on_nickname_selected (string nickname) {
-        nickname_selected (nickname);
-    }
-
-    public signal void nickname_selected (string nickname);
+    public signal void initiate_private_message (string nickname);
 
 }

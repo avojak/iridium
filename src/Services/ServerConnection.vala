@@ -855,11 +855,22 @@ public class Iridium.Services.ServerConnection : GLib.Object {
         }
         // Add each new nickname to the buffer
         foreach (string nickname in nicknames) {
-            nickname_buffer.get (channel_name).add (nickname);
+            var trimmed_nickname = strip_nickname_prefix (nickname);
+            nickname_buffer.get (channel_name).add (trimmed_nickname);
             if (nickname.has_prefix ("@")) {
-                operators_buffer.get (channel_name).add (nickname);
+                operators_buffer.get (channel_name).add (trimmed_nickname);
             }
         }
+    }
+
+    private string strip_nickname_prefix (string nickname) {
+        var prefixes = new string[] { "@", "&", "~", "%", "+" };
+        foreach (string prefix in prefixes) {
+            if (nickname.has_prefix (prefix)) {
+                return nickname.substring (1, -1);
+            }
+        }
+        return nickname;
     }
 
     private void end_of_nicknames (string channel_name) {
