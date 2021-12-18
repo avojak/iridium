@@ -119,8 +119,6 @@ public class Iridium.Widgets.UsersPopover.ChannelUsersList : Gtk.TreeView {
             }
             return false;
         });
-
-        // TODO: Fix scrolling when repopulating list
     }
 
     private Gtk.Menu create_popover (string nickname) {
@@ -151,12 +149,14 @@ public class Iridium.Widgets.UsersPopover.ChannelUsersList : Gtk.TreeView {
         if (search_text == "") {
             return true;
         }
-        string nickname = "";
+        string? nickname = null;
+        string? op_badge = null;
         model.get (iter, Column.NICKNAME, out nickname, -1);
+        model.get (iter, Column.OP_BADGE, out op_badge, -1);
         if (nickname == null) {
             return true;
         }
-        if (nickname.down ().contains (search_text)) {
+        if (nickname.down ().contains (search_text) || ((op_badge != null) && op_badge.down ().contains (search_text))) {
             return true;
         }
         return false;

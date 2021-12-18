@@ -1209,7 +1209,7 @@ public class Iridium.MainWindow : Hdy.Window {
     // Simply updates the UI based on changes that were already made to the underlying data model
     private void update_channel_users_list (string server_name, string channel_name) {
         var nicknames = Iridium.Application.connection_manager.get_users (server_name, channel_name);
-        var operators = Iridium.Application.connection_manager.get_operators (server_name, channel_name);        
+        var operators = Iridium.Application.connection_manager.get_operators (server_name, channel_name);
         Idle.add (() => {
             main_layout.update_channel_users (server_name, channel_name, nicknames, operators);
             return false;

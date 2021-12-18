@@ -84,7 +84,12 @@ public class Iridium.Widgets.UsersPopover.ChannelUsersPopover : Gtk.Popover {
             return a.down ().ascii_casecmp (b.down ());
         });
         search_entry.sensitive = false;
+        double scroll_offset = scrolled_window.vadjustment.get_value ();
         update_user_count (tree_view.set_users (nicknames, operators));
+        Idle.add (() => {
+            scrolled_window.vadjustment.set_value (scroll_offset);
+            return false;
+        });
         search_entry.sensitive = true;
     }
 
