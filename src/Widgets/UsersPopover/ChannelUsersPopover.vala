@@ -67,7 +67,7 @@ public class Iridium.Widgets.UsersPopover.ChannelUsersPopover : Gtk.Popover {
 
         add (box);
 
-        show_all ();
+        box.show_all ();
 
         search_entry.search_changed.connect (() => {
             var search_text = search_entry.get_text ();
