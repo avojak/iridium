@@ -45,6 +45,7 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
     private bool is_enabled = true;
     private bool has_unread_messages = false;
 
+    private double prev_upper_adj = 0;
     private DateTime? last_message_time = null;
 
     protected ChatView (Iridium.MainWindow window, string nickname) {
@@ -164,7 +165,9 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
             } else {
                 clear_selectable_underlining ();
             }
-
+        });
+        text_view.size_allocate.connect (() => {
+            attempt_autoscroll ();
         });
 
         // Clear the underlining when the mouse leaves the event box around the text view
@@ -379,25 +382,14 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         }
         last_message_time = new DateTime.now_utc ();
         do_display_server_msg (message);
-        // Always auto-scroll server messages (The large number of messages received upon connecting
-        // break the auto-scrolling's ability to keep up), unless this is a JOIN, PART or QUIT message
-        if (message.command != Iridium.Services.MessageCommands.JOIN &&
-                message.command != Iridium.Services.MessageCommands.PART &&
-                message.command != Iridium.Services.MessageCommands.QUIT) {
-            do_autoscroll ();
-        }
     }
 
     public void display_server_error_msg (Iridium.Services.Message message) {
-        bool should_autoscroll = should_autoscroll ();
         if (should_display_datetime ()) {
             do_display_datetime ();
         }
         last_message_time = new DateTime.now_utc ();
         do_display_server_error_msg (message);
-        if (should_autoscroll) {
-            do_autoscroll ();
-        }
     }
 
     public void display_private_msg (Iridium.Services.Message message) {
@@ -405,16 +397,11 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
             update_last_read_message_mark ();
             has_unread_messages = true;
         }
-
-        bool should_autoscroll = should_autoscroll ();
         if (should_display_datetime ()) {
             do_display_datetime ();
         }
         last_message_time = new DateTime.now_utc ();
         do_display_private_msg (message);
-        if (should_autoscroll) {
-            do_autoscroll ();
-        }
     }
 
     public void focus_gained () {
@@ -445,6 +432,19 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         return is_view_in_focus && is_window_in_focus;
     }
 
+    private void attempt_autoscroll () {
+        var adj = scrolled_window.get_vadjustment ();
+        var units_from_end = prev_upper_adj - adj.page_size - adj.value;
+        var view_size_difference = adj.upper - prev_upper_adj;
+        if (view_size_difference < 0) {
+            view_size_difference = 0;
+        }
+        if (prev_upper_adj <= adj.page_size || units_from_end <= 50) {
+            do_autoscroll ();
+        }
+        prev_upper_adj = adj.upper;
+    }
+
     private void do_autoscroll () {
         var buffer_end_mark = text_view.get_buffer ().get_mark ("buffer-end");
         if (buffer_end_mark != null) {
@@ -452,17 +452,8 @@ public abstract class Iridium.Views.ChatView : Gtk.Grid {
         }
     }
 
-    private bool should_autoscroll () {
-        // If we've never opened this view the adjustment won't return the values you'd expect,
-        // so instead simply check whether there is a last read message and if the view has focus
-        if (!is_view_in_focus && text_view.get_buffer ().get_mark ("last-read-message") == null) {
-            return true;
-        }
-
-        return at_bottom_of_screen ();
-    }
-
     private bool at_bottom_of_screen () {
+        // Not ideal, but it works...
         var adjustment = scrolled_window.get_vadjustment ();
         double page_size = adjustment.get_page_size ();
         double max_view_size = adjustment.get_upper ();
