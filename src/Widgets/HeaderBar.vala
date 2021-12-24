@@ -27,14 +27,19 @@ public class Iridium.Widgets.HeaderBar : Hdy.HeaderBar {
 
     public HeaderBar () {
         Object (
-            title: Constants.APP_NAME,
+            //  title: Constants.APP_NAME,
+            has_subtitle: true,
             show_close_button: true
         );
     }
 
     construct {
+        unowned Gtk.StyleContext style_context = get_style_context ();
+        //  style_context.add_class ("default-decoration");
+        style_context.add_class (Gtk.STYLE_CLASS_FLAT);
+
         channel_users_button = new Gtk.MenuButton ();
-        channel_users_button.set_image (new Gtk.Image.from_icon_name ("system-users", Gtk.IconSize.LARGE_TOOLBAR));
+        channel_users_button.set_image (new Gtk.Image.from_icon_name ("system-users-symbolic", Gtk.IconSize.SMALL_TOOLBAR));
         channel_users_button.tooltip_text = _("Channel users"); // TODO: Enable accelerator
         channel_users_button.relief = Gtk.ReliefStyle.NONE;
         channel_users_button.valign = Gtk.Align.CENTER;
@@ -46,7 +51,7 @@ public class Iridium.Widgets.HeaderBar : Hdy.HeaderBar {
         channel_users_button.popover = channel_users_popover;
 
         var settings_button = new Gtk.MenuButton ();
-        settings_button.image = new Gtk.Image.from_icon_name ("open-menu", Gtk.IconSize.LARGE_TOOLBAR);
+        settings_button.image = new Gtk.Image.from_icon_name ("preferences-system-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
         settings_button.tooltip_text = _("Menu");
         settings_button.relief = Gtk.ReliefStyle.NONE;
         settings_button.valign = Gtk.Align.CENTER;
@@ -118,7 +123,7 @@ public class Iridium.Widgets.HeaderBar : Hdy.HeaderBar {
         return menu_separator;
     }
 
-    public void update_title (string title, string? subtitle) {
+    public void update_title (string? title, string? subtitle) {
         this.title = title;
         this.subtitle = subtitle;
     }

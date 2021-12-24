@@ -1323,7 +1323,7 @@ public class Iridium.MainWindow : Hdy.Window {
     //
 
     private void on_welcome_view_shown () {
-        main_layout.update_title (Constants.APP_NAME, null);
+        main_layout.update_title (null, null);
         main_layout.set_channel_users_button_visible (false);
         main_layout.set_header_tooltip (null);
     }

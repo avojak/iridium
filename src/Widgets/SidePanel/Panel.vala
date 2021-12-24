@@ -47,15 +47,20 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
     private Gee.Map<int, GLib.ThemedIcon> spinner_images;
 
     public unowned Iridium.MainWindow window { get; construct; }
+    public unowned Hdy.HeaderBar header_bar { get; construct; }
 
-    public Panel (Iridium.MainWindow window) {
+    public Panel (Iridium.MainWindow window, Hdy.HeaderBar header_bar) {
         Object (
             orientation: Gtk.Orientation.VERTICAL,
-            window: window
+            window: window,
+            header_bar: header_bar
         );
     }
 
     construct {
+        unowned Gtk.StyleContext style_context = get_style_context ();
+        style_context.add_class (Gtk.STYLE_CLASS_SIDEBAR);
+        
         source_list = new Granite.Widgets.SourceList ();
         status_bar = new Iridium.Widgets.StatusBar ();
 
@@ -106,8 +111,9 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
             item_selected (item);
         });
 
-        attach (source_list, 0, 0);
-        attach (status_bar, 0, 1);
+        attach (header_bar, 0, 0);
+        attach (source_list, 0, 1);
+        attach (status_bar, 0, 2);
 
         // This is a bit of a hack since Gtk.Spinner isn't supported by Granite.SourceList, but far
         // easier than re-implementing SourceList

@@ -32,6 +32,9 @@ public class Iridium.Views.Welcome : Granite.Widgets.Welcome {
     }
 
     construct {
+        unowned Gtk.StyleContext style_context = get_style_context ();
+        style_context.add_class (Gtk.STYLE_CLASS_FLAT);
+
         valign = Gtk.Align.FILL;
         halign = Gtk.Align.FILL;
         vexpand = true;
