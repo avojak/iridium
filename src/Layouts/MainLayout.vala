@@ -57,20 +57,28 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         welcome_view = new Iridium.Views.Welcome (window);
         main_stack = new Gtk.Stack ();
         main_stack.add_named (welcome_view, "welcome");
+        overlay = new Gtk.Overlay ();
+        overlay.add (main_stack);
+
+        // Create a header group that automatically assigns the right decoration controls to the
+        // right headerbar automatically
+        var header_group = new Hdy.HeaderGroup ();
+        header_group.add_header_bar (side_panel.header_bar);
+        header_group.add_header_bar (header_bar);
+
+        network_info_bar = new Iridium.Widgets.NetworkInfoBar ();
+
+        var main_grid = new Gtk.Grid ();
+        main_grid.attach (header_bar, 0, 0);
+        main_grid.attach (network_info_bar, 0, 1);
+        main_grid.attach (overlay, 0, 2);
 
         paned = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
         paned.position = 240;
         paned.pack1 (side_panel, false, false);
-        paned.pack2 (main_stack, true, false);
+        paned.pack2 (main_grid, true, false);
 
-        network_info_bar = new Iridium.Widgets.NetworkInfoBar ();
-
-        overlay = new Gtk.Overlay ();
-        overlay.add (paned);
-
-        attach (header_bar, 0, 0);
-        attach (network_info_bar, 0, 1);
-        attach (overlay, 0, 2);
+        attach (paned, 0, 0);
 
         nickname_mapping = new Gee.HashMap<string, Gee.Map<string, string>> ();
         server_child_views = new Gee.HashMap<string, Gee.List<Iridium.Views.ChatView>> ();
@@ -648,7 +656,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         }
     }
 
-    public void update_title (string title, string? subtitle) {
+    public void update_title (string? title, string? subtitle) {
         header_bar.update_title (title, subtitle);
     }
 
