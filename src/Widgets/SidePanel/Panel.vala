@@ -65,12 +65,12 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
         // is in a consistent position with the maximize button on the other header bar (which *does* have
         // a subtitle)
         header_bar = new Hdy.HeaderBar () {
-            has_subtitle = true, 
+            has_subtitle = true,
             show_close_button = true
         };
         unowned Gtk.StyleContext header_bar_context = header_bar.get_style_context ();
         header_bar_context.add_class (Gtk.STYLE_CLASS_FLAT);
-        
+
         source_list = new Granite.Widgets.SourceList ();
         status_bar = new Iridium.Widgets.StatusBar ();
 

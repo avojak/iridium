@@ -27,7 +27,6 @@ public class Iridium.Widgets.HeaderBar : Hdy.HeaderBar {
 
     public HeaderBar () {
         Object (
-            //  title: Constants.APP_NAME,
             has_subtitle: true,
             show_close_button: true
         );
@@ -35,7 +34,6 @@ public class Iridium.Widgets.HeaderBar : Hdy.HeaderBar {
 
     construct {
         unowned Gtk.StyleContext style_context = get_style_context ();
-        //  style_context.add_class ("default-decoration");
         style_context.add_class (Gtk.STYLE_CLASS_FLAT);
 
         channel_users_button = new Gtk.MenuButton ();
