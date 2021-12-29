@@ -21,6 +21,8 @@
 
 public class Iridium.Views.Welcome : Granite.Widgets.Welcome {
 
+    private static Gtk.CssProvider provider;
+
     public unowned Iridium.MainWindow window { get; construct; }
 
     public Welcome (Iridium.MainWindow window) {
@@ -31,9 +33,14 @@ public class Iridium.Views.Welcome : Granite.Widgets.Welcome {
         );
     }
 
+    static construct {
+        provider = new Gtk.CssProvider ();
+        provider.load_from_resource ("com/github/avojak/iridium/WelcomeView.css");
+    }
+
     construct {
-        //  unowned Gtk.StyleContext style_context = get_style_context ();
-        //  style_context.add_class (Gtk.STYLE_CLASS_FLAT);
+        unowned Gtk.StyleContext style_context = get_style_context ();
+        style_context.add_provider (provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
 
         valign = Gtk.Align.FILL;
         halign = Gtk.Align.FILL;

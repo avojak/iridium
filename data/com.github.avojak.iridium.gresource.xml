@@ -3,5 +3,6 @@
     <gresource prefix="/com/github/avojak/iridium">
         <file alias="CertificateWarningDialog.css" compressed="true">styles/CertificateWarningDialog.css</file>
         <file alias="PreferencesDialog.css" compressed="true">styles/PreferencesDialog.css</file>
+        <file alias="WelcomeView.css" compressed="true">styles/WelcomeView.css</file>
     </gresource>
 </gresources>
