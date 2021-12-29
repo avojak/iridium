@@ -52,13 +52,15 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         main_header_bar.initiate_private_message.connect ((nickname) => {
             initiate_private_message (nickname);
         });
-        
+
+        // Technically this header bar doesn't have a subtitle, but set to true so that the close button
+        // is in a consistent position with the maximize button on the other header bar (which *does* have
+        // a subtitle)
         var side_panel_header_bar = new Hdy.HeaderBar () {
-            has_subtitle = true,
+            has_subtitle = true, 
             show_close_button = true
         };
         unowned Gtk.StyleContext side_panel_header_bar_context = side_panel_header_bar.get_style_context ();
-        //  side_panel_header_bar_context.add_class ("default-decoration");
         side_panel_header_bar_context.add_class (Gtk.STYLE_CLASS_FLAT);
 
         // Create a header group that automatically assigns the right decoration controls to the

@@ -112,6 +112,7 @@ public class Iridium.Widgets.HeaderBar : Hdy.HeaderBar {
 
         settings_button.popover = settings_popover;
 
+        pack_start (new Gtk.Separator (Gtk.Orientation.VERTICAL));
         pack_end (settings_button);
         pack_end (channel_users_button);
         pack_end (new Gtk.Separator (Gtk.Orientation.VERTICAL));
