@@ -78,12 +78,6 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         paned.pack1 (side_panel, false, false);
         paned.pack2 (main_grid, true, false);
 
-        //  overlay = new Gtk.Overlay ();
-        //  overlay.add (paned);
-
-        //  attach (network_info_bar, 0, 0);
-        //  attach (overlay, 0, 1);
-
         attach (paned, 0, 0);
 
         nickname_mapping = new Gee.HashMap<string, Gee.Map<string, string>> ();
