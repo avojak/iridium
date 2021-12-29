@@ -33,7 +33,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
 
     private Gtk.Paned paned;
 
-    private Iridium.Widgets.HeaderBar main_header_bar;
+    private Iridium.Widgets.HeaderBar header_bar;
     private Iridium.Widgets.NetworkInfoBar network_info_bar;
     private Gtk.Overlay overlay;
     private Granite.Widgets.OverlayBar? restore_connections_overlay_bar;
@@ -47,35 +47,25 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
     }
 
     construct {
-        main_header_bar = new Iridium.Widgets.HeaderBar ();
-        main_header_bar.set_channel_users_button_visible (false);
-        main_header_bar.initiate_private_message.connect ((nickname) => {
+        header_bar = new Iridium.Widgets.HeaderBar ();
+        header_bar.set_channel_users_button_visible (false);
+        header_bar.initiate_private_message.connect ((nickname) => {
             initiate_private_message (nickname);
         });
 
-        // Technically this header bar doesn't have a subtitle, but set to true so that the close button
-        // is in a consistent position with the maximize button on the other header bar (which *does* have
-        // a subtitle)
-        var side_panel_header_bar = new Hdy.HeaderBar () {
-            has_subtitle = true, 
-            show_close_button = true
-        };
-        unowned Gtk.StyleContext side_panel_header_bar_context = side_panel_header_bar.get_style_context ();
-        side_panel_header_bar_context.add_class (Gtk.STYLE_CLASS_FLAT);
-
-        // Create a header group that automatically assigns the right decoration controls to the
-        // right headerbar automatically
-        var header_group = new Hdy.HeaderGroup ();
-        header_group.add_header_bar (side_panel_header_bar);
-        header_group.add_header_bar (main_header_bar);
-
-        side_panel = new Iridium.Widgets.SidePanel.Panel (window, side_panel_header_bar);
+        side_panel = new Iridium.Widgets.SidePanel.Panel (window);
         welcome_view = new Iridium.Views.Welcome (window);
         main_stack = new Gtk.Stack ();
         main_stack.add_named (welcome_view, "welcome");
 
+        // Create a header group that automatically assigns the right decoration controls to the
+        // right headerbar automatically
+        var header_group = new Hdy.HeaderGroup ();
+        header_group.add_header_bar (side_panel.header_bar);
+        header_group.add_header_bar (header_bar);
+
         var main_grid = new Gtk.Grid ();
-        main_grid.attach (main_header_bar, 0, 0);
+        main_grid.attach (header_bar, 0, 0);
         main_grid.attach (main_stack, 0 , 1);
 
         paned = new Gtk.Paned (Gtk.Orientation.HORIZONTAL);
@@ -88,7 +78,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         overlay = new Gtk.Overlay ();
         overlay.add (paned);
 
-        attach (main_header_bar, 0, 0);
+        attach (header_bar, 0, 0);
         attach (network_info_bar, 0, 1);
         attach (overlay, 0, 2);
 
@@ -621,7 +611,7 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
         // Update the channel users popover if this call affects the current chat view
         // TODO: Update this all the time
         if ((get_visible_server () == server_name) && (get_visible_channel () == channel_name)) {
-            main_header_bar.set_channel_users (nicknames, operators);
+            header_bar.set_channel_users (nicknames, operators);
         }
     }
 
@@ -669,19 +659,19 @@ public class Iridium.Layouts.MainLayout : Gtk.Grid {
     }
 
     public void update_title (string? title, string? subtitle) {
-        main_header_bar.update_title (title, subtitle);
+        header_bar.update_title (title, subtitle);
     }
 
     public void set_header_tooltip (string? tooltip) {
-        main_header_bar.set_tooltip_text (tooltip);
+        header_bar.set_tooltip_text (tooltip);
     }
 
     public void set_channel_users_button_visible (bool visible) {
-        main_header_bar.set_channel_users_button_visible (visible);
+        header_bar.set_channel_users_button_visible (visible);
     }
 
     public void set_channel_users_button_enabled (bool enabled) {
-        main_header_bar.set_channel_users_button_enabled (enabled);
+        header_bar.set_channel_users_button_enabled (enabled);
     }
 
     /*

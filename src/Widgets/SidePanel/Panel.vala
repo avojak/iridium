@@ -27,8 +27,10 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
 
     private const int NUM_SPINNER_IMAGES = 12;
 
+    public Hdy.HeaderBar header_bar { get; construct; }
+
     private Granite.Widgets.SourceList source_list;
-    public Iridium.Widgets.StatusBar status_bar;
+    private Iridium.Widgets.StatusBar status_bar;
 
     private Granite.Widgets.SourceList.ExpandableItem favorites_category;
     private Granite.Widgets.SourceList.ExpandableItem servers_category;
@@ -47,19 +49,27 @@ public class Iridium.Widgets.SidePanel.Panel : Gtk.Grid {
     private Gee.Map<int, GLib.ThemedIcon> spinner_images;
 
     public unowned Iridium.MainWindow window { get; construct; }
-    public unowned Hdy.HeaderBar header_bar { get; construct; }
 
-    public Panel (Iridium.MainWindow window, Hdy.HeaderBar header_bar) {
+    public Panel (Iridium.MainWindow window) {
         Object (
             orientation: Gtk.Orientation.VERTICAL,
-            window: window,
-            header_bar: header_bar
+            window: window
         );
     }
 
     construct {
         unowned Gtk.StyleContext style_context = get_style_context ();
         style_context.add_class (Gtk.STYLE_CLASS_SIDEBAR);
+
+        // Technically this header bar doesn't have a subtitle, but set to true so that the close button
+        // is in a consistent position with the maximize button on the other header bar (which *does* have
+        // a subtitle)
+        header_bar = new Hdy.HeaderBar () {
+            has_subtitle = true, 
+            show_close_button = true
+        };
+        unowned Gtk.StyleContext header_bar_context = header_bar.get_style_context ();
+        header_bar_context.add_class (Gtk.STYLE_CLASS_FLAT);
         
         source_list = new Granite.Widgets.SourceList ();
         status_bar = new Iridium.Widgets.StatusBar ();
