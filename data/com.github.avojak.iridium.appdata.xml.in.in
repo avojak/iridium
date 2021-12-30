@@ -21,6 +21,18 @@
     <binary>@appid@</binary>
   </provides>
   <releases>
+    <release version="1.8.0" date="2021-12-30">
+      <description>
+        <p>1.8.0 Release</p>
+        <ul>
+          <li>Redesign of the headerbar!</li>
+          <li>Update elementary OS runtime to 6.1 (#207)</li>
+          <li>Remove unnecessary sandbox hole for accountsservice (#215)</li>
+          <li>Fix slow switching of channel views when there is a large number of users (#210)</li>
+          <li>Fix auto-scrolling to be more reliable and simpler (#211)</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.7.0" date="2021-12-10">
       <description>
         <p>1.7.0 Release</p>

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.avojak.iridium\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-10 08:44-0700\n"
+"POT-Creation-Date: 2021-12-30 12:00-0700\n"
 "PO-Revision-Date: 2021-12-04 14:18+0100\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: \n"
@@ -18,11 +18,11 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.0\n"
 
-#: src/Layouts/MainLayout.vala:417
+#: src/Layouts/MainLayout.vala:425
 msgid "Restoring server connections…"
 msgstr "Bezig met herstellen van serververbindingen…"
 
-#: src/Layouts/MainLayout.vala:438
+#: src/Layouts/MainLayout.vala:446
 msgid "Opening URI…"
 msgstr "Bezig met openen van uri…"
 
@@ -119,15 +119,15 @@ msgstr "Er is geen opgeslagen geheim aangetroffen voor deze server."
 msgid "You must join this channel to begin chatting"
 msgstr "Neem deel aan het kanaal om te chatten"
 
-#: src/Views/ChatView.vala:74
+#: src/Views/ChatView.vala:75
 msgid "You have unread messages!"
 msgstr "Je hebt ongelezen berichten!"
 
-#: src/Views/ChatView.vala:75
+#: src/Views/ChatView.vala:76
 msgid "Take me there"
 msgstr "Ga ernaartoe"
 
-#: src/Views/ChatView.vala:95 src/Widgets/Dialogs/BrowseChannelsDialog.vala:96
+#: src/Views/ChatView.vala:96 src/Widgets/Dialogs/BrowseChannelsDialog.vala:96
 msgid "Clear"
 msgstr "Wissen"
 
@@ -135,27 +135,27 @@ msgstr "Wissen"
 msgid "You are not connected to this server"
 msgstr "Je bent niet verbonden met deze server"
 
-#: src/Views/Welcome.vala:29
+#: src/Views/Welcome.vala:31
 msgid "Welcome to Iridium"
 msgstr "Welkom bij Iridium"
 
-#: src/Views/Welcome.vala:30
+#: src/Views/Welcome.vala:32
 msgid "Connect to Any IRC Server"
 msgstr "Maak verbinding met irc-servers"
 
-#: src/Views/Welcome.vala:41
+#: src/Views/Welcome.vala:51
 msgid "Add a New Server"
 msgstr "Server toevoegen"
 
-#: src/Views/Welcome.vala:41
+#: src/Views/Welcome.vala:51
 msgid "Connect to a server and save it in the server list"
 msgstr "Maak verbinding met een server en sla deze op op de serverlijst"
 
-#: src/Views/Welcome.vala:42
+#: src/Views/Welcome.vala:52
 msgid "Browse Servers"
 msgstr "Bladeren door servers"
 
-#: src/Views/Welcome.vala:42
+#: src/Views/Welcome.vala:52
 msgid "Browse a curated list of popular IRC servers"
 msgstr "Blader door een lijst met populaire irc-servers"
 
@@ -471,11 +471,11 @@ msgstr "Deelnemen aan kanaal"
 msgid "Leave channel"
 msgstr "Kanaal verlaten"
 
-#: src/Widgets/SidePanel/Panel.vala:64
+#: src/Widgets/SidePanel/Panel.vala:79
 msgid "Favorite Channels"
 msgstr "Favoriete kanalen"
 
-#: src/Widgets/SidePanel/Panel.vala:79
+#: src/Widgets/SidePanel/Panel.vala:94
 msgid "Servers"
 msgstr "Servers"
 
@@ -521,31 +521,37 @@ msgstr "Ja, verwijderen"
 msgid "Don't warn me again"
 msgstr "Niet meer tonen"
 
-#: src/Widgets/UsersPopover/ChannelUsersPopover.vala:38
-msgid "No users"
+#: src/Widgets/UsersPopover/ChannelUsersPopover.vala:98
+#, fuzzy, c-format
+msgid "%d user"
 msgstr "Geen gebruikers"
 
-#: src/Widgets/HeaderBar.vala:38
+#: src/Widgets/UsersPopover/ChannelUsersPopover.vala:100
+#, fuzzy, c-format
+msgid "%d users"
+msgstr "Geen gebruikers"
+
+#: src/Widgets/HeaderBar.vala:41
 msgid "Channel users"
 msgstr "Kanaalgebruikers"
 
-#: src/Widgets/HeaderBar.vala:48
+#: src/Widgets/HeaderBar.vala:53
 msgid "Menu"
 msgstr "Menu"
 
-#: src/Widgets/HeaderBar.vala:53
+#: src/Widgets/HeaderBar.vala:58
 msgid "Toggle Sidebar"
 msgstr "Zijpaneel tonen/verbergen"
 
-#: src/Widgets/HeaderBar.vala:63
+#: src/Widgets/HeaderBar.vala:68
 msgid "Reset Marker Line"
 msgstr "Markering terugzetten"
 
-#: src/Widgets/HeaderBar.vala:73
+#: src/Widgets/HeaderBar.vala:78
 msgid "Preferences…"
 msgstr "Voorkeuren…"
 
-#: src/Widgets/HeaderBar.vala:83
+#: src/Widgets/HeaderBar.vala:88
 msgid "Quit"
 msgstr "Afsluiten"
 
@@ -613,51 +619,51 @@ msgstr ""
 msgid "No action specified (Usage: /me <action>)"
 msgstr "Je hebt geen actie opgegeven (gebruiksvoorbeeld: /me <actie>)"
 
-#: src/MainWindow.vala:997 src/MainWindow.vala:1014
+#: src/MainWindow.vala:986 src/MainWindow.vala:1003
 msgid " has quit"
 msgstr " is weggegaan"
 
-#: src/MainWindow.vala:1050
+#: src/MainWindow.vala:1039
 msgid " has cleared the topic"
 msgstr " heeft het onderwerp verwijderd"
 
-#: src/MainWindow.vala:1052
+#: src/MainWindow.vala:1041
 msgid " has changed the topic to: "
 msgstr " heeft het onderwerp gewijzigd in "
 
-#: src/MainWindow.vala:1067
+#: src/MainWindow.vala:1056
 msgid "Topic for "
 msgstr "Onderwerp over "
 
-#: src/MainWindow.vala:1067
+#: src/MainWindow.vala:1056
 msgid " is: "
 msgstr " is: "
 
-#: src/MainWindow.vala:1069
+#: src/MainWindow.vala:1058
 msgid "Topic set by "
 msgstr "Het onderwerp is ingesteld door "
 
-#: src/MainWindow.vala:1081 src/MainWindow.vala:1084
+#: src/MainWindow.vala:1070 src/MainWindow.vala:1073
 msgid "Nickname already in use."
 msgstr "Deze bijnaam is al in gebruik."
 
-#: src/MainWindow.vala:1090
+#: src/MainWindow.vala:1079
 msgid "Nickname already in use"
 msgstr "Deze bijnaam is al in gebruik"
 
-#: src/MainWindow.vala:1090
+#: src/MainWindow.vala:1079
 msgid "Choose a new nickname and retry the connection."
 msgstr "Kies een andere bijnaam en probeer het opnieuw."
 
-#: src/MainWindow.vala:1095
+#: src/MainWindow.vala:1084
 msgid " is not a valid nickname."
 msgstr " is geen geldige bijnaam."
 
-#: src/MainWindow.vala:1182
+#: src/MainWindow.vala:1171
 msgid " has joined"
 msgstr " neemt nu deel aan het kanaal"
 
-#: src/MainWindow.vala:1196
+#: src/MainWindow.vala:1185
 msgid " has left"
 msgstr " heeft het kanaal verlaten"
 

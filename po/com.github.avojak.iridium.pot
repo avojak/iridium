@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: com.github.avojak.iridium\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-10 08:44-0700\n"
+"POT-Creation-Date: 2021-12-30 12:00-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,11 +17,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/Layouts/MainLayout.vala:417
+#: src/Layouts/MainLayout.vala:425
 msgid "Restoring server connections…"
 msgstr ""
 
-#: src/Layouts/MainLayout.vala:438
+#: src/Layouts/MainLayout.vala:446
 msgid "Opening URI…"
 msgstr ""
 
@@ -115,15 +115,15 @@ msgstr ""
 msgid "You must join this channel to begin chatting"
 msgstr ""
 
-#: src/Views/ChatView.vala:74
+#: src/Views/ChatView.vala:75
 msgid "You have unread messages!"
 msgstr ""
 
-#: src/Views/ChatView.vala:75
+#: src/Views/ChatView.vala:76
 msgid "Take me there"
 msgstr ""
 
-#: src/Views/ChatView.vala:95 src/Widgets/Dialogs/BrowseChannelsDialog.vala:96
+#: src/Views/ChatView.vala:96 src/Widgets/Dialogs/BrowseChannelsDialog.vala:96
 msgid "Clear"
 msgstr ""
 
@@ -131,27 +131,27 @@ msgstr ""
 msgid "You are not connected to this server"
 msgstr ""
 
-#: src/Views/Welcome.vala:29
+#: src/Views/Welcome.vala:31
 msgid "Welcome to Iridium"
 msgstr ""
 
-#: src/Views/Welcome.vala:30
+#: src/Views/Welcome.vala:32
 msgid "Connect to Any IRC Server"
 msgstr ""
 
-#: src/Views/Welcome.vala:41
+#: src/Views/Welcome.vala:51
 msgid "Add a New Server"
 msgstr ""
 
-#: src/Views/Welcome.vala:41
+#: src/Views/Welcome.vala:51
 msgid "Connect to a server and save it in the server list"
 msgstr ""
 
-#: src/Views/Welcome.vala:42
+#: src/Views/Welcome.vala:52
 msgid "Browse Servers"
 msgstr ""
 
-#: src/Views/Welcome.vala:42
+#: src/Views/Welcome.vala:52
 msgid "Browse a curated list of popular IRC servers"
 msgstr ""
 
@@ -450,11 +450,11 @@ msgstr ""
 msgid "Leave channel"
 msgstr ""
 
-#: src/Widgets/SidePanel/Panel.vala:64
+#: src/Widgets/SidePanel/Panel.vala:79
 msgid "Favorite Channels"
 msgstr ""
 
-#: src/Widgets/SidePanel/Panel.vala:79
+#: src/Widgets/SidePanel/Panel.vala:94
 msgid "Servers"
 msgstr ""
 
@@ -497,31 +497,37 @@ msgstr ""
 msgid "Don't warn me again"
 msgstr ""
 
-#: src/Widgets/UsersPopover/ChannelUsersPopover.vala:38
-msgid "No users"
+#: src/Widgets/UsersPopover/ChannelUsersPopover.vala:98
+#, c-format
+msgid "%d user"
 msgstr ""
 
-#: src/Widgets/HeaderBar.vala:38
+#: src/Widgets/UsersPopover/ChannelUsersPopover.vala:100
+#, c-format
+msgid "%d users"
+msgstr ""
+
+#: src/Widgets/HeaderBar.vala:41
 msgid "Channel users"
 msgstr ""
 
-#: src/Widgets/HeaderBar.vala:48
+#: src/Widgets/HeaderBar.vala:53
 msgid "Menu"
 msgstr ""
 
-#: src/Widgets/HeaderBar.vala:53
+#: src/Widgets/HeaderBar.vala:58
 msgid "Toggle Sidebar"
 msgstr ""
 
-#: src/Widgets/HeaderBar.vala:63
+#: src/Widgets/HeaderBar.vala:68
 msgid "Reset Marker Line"
 msgstr ""
 
-#: src/Widgets/HeaderBar.vala:73
+#: src/Widgets/HeaderBar.vala:78
 msgid "Preferences…"
 msgstr ""
 
-#: src/Widgets/HeaderBar.vala:83
+#: src/Widgets/HeaderBar.vala:88
 msgid "Quit"
 msgstr ""
 
@@ -585,50 +591,50 @@ msgstr ""
 msgid "No action specified (Usage: /me <action>)"
 msgstr ""
 
-#: src/MainWindow.vala:997 src/MainWindow.vala:1014
+#: src/MainWindow.vala:986 src/MainWindow.vala:1003
 msgid " has quit"
 msgstr ""
 
-#: src/MainWindow.vala:1050
+#: src/MainWindow.vala:1039
 msgid " has cleared the topic"
 msgstr ""
 
-#: src/MainWindow.vala:1052
+#: src/MainWindow.vala:1041
 msgid " has changed the topic to: "
 msgstr ""
 
-#: src/MainWindow.vala:1067
+#: src/MainWindow.vala:1056
 msgid "Topic for "
 msgstr ""
 
-#: src/MainWindow.vala:1067
+#: src/MainWindow.vala:1056
 msgid " is: "
 msgstr ""
 
-#: src/MainWindow.vala:1069
+#: src/MainWindow.vala:1058
 msgid "Topic set by "
 msgstr ""
 
-#: src/MainWindow.vala:1081 src/MainWindow.vala:1084
+#: src/MainWindow.vala:1070 src/MainWindow.vala:1073
 msgid "Nickname already in use."
 msgstr ""
 
-#: src/MainWindow.vala:1090
+#: src/MainWindow.vala:1079
 msgid "Nickname already in use"
 msgstr ""
 
-#: src/MainWindow.vala:1090
+#: src/MainWindow.vala:1079
 msgid "Choose a new nickname and retry the connection."
 msgstr ""
 
-#: src/MainWindow.vala:1095
+#: src/MainWindow.vala:1084
 msgid " is not a valid nickname."
 msgstr ""
 
-#: src/MainWindow.vala:1182
+#: src/MainWindow.vala:1171
 msgid " has joined"
 msgstr ""
 
-#: src/MainWindow.vala:1196
+#: src/MainWindow.vala:1185
 msgid " has left"
 msgstr ""
