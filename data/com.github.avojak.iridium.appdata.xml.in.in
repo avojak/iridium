@@ -21,6 +21,14 @@
     <binary>@appid@</binary>
   </provides>
   <releases>
+    <release version="1.8.1" date="2022-03-27">
+      <description>
+        <p>1.8.1 Release</p>
+        <ul>
+          <li>Fix missing application window title (#222)</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.8.0" date="2021-12-30">
       <description>
         <p>1.8.0 Release</p>
