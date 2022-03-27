@@ -42,6 +42,7 @@ public class Iridium.MainWindow : Hdy.Window {
 
     public MainWindow (Iridium.Application application) {
         Object (
+            title: Constants.APP_NAME,
             application: application,
             app: application,
             border_width: 0,
