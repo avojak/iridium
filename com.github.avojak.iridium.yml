@@ -1,7 +1,7 @@
 app-id: com.github.avojak.iridium
 
 runtime: io.elementary.Platform
-runtime-version: '6.1'
+runtime-version: '7'
 sdk: io.elementary.Sdk
 
 command: com.github.avojak.iridium
@@ -25,5 +25,3 @@ modules:
     sources:
       - type: dir
         path: .
-    # config-opts:
-    #   - '-Dprofile=dev'
